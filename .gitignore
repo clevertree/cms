@@ -1,0 +1,29 @@
+config.js
+
+#JetBrains
+.idea
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+
+# Dependency directories
+node_modules/
+jspm_packages/
+.DS_Store
+node_modules/
+.well-known/
+package-lock.json
+_cacache
+_locks
+anonymous-cli-metrics.json
