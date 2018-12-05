@@ -150,6 +150,7 @@ body.theme-minimal {
 }
 .theme-minimal ul.flex-list > li > img {
     max-width: 90%;
+    max-height: 200px;
 }
 .theme-minimal ul.flex-list > li > p {
     padding: 0 1em;
