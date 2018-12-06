@@ -6,27 +6,26 @@ body.theme-minimal {
 /** Theme: Minimal **/
 .theme-minimal {
     color: #2b2b2b;
-    margin: 0 0;
+    margin: 0 auto;
     font-family: 'Advent Pro', monospace;
     font-size: 16px;
     /* line-height: 20px; */
 }
 
-.theme-minimal > header > .logo {
+.theme-minimal > header .logo {
     background: url(logo/logo-header.png) no-repeat;
-    width: 182px;
-    height: 112px;
-    margin: 0.3em 1em;
-    border-bottom: 2px solid grey;
+    margin: 0px auto;
+    background-size: 100% auto;
+    width: 36vw;
+    height: 24vw;
+    /* margin: 0.3em 1em; */
     /*float: left;*/
-    float: right;
-}
-.theme-minimal > header > .logo.right {
+    /* float: right; */
 }
 
 .theme-minimal > header,
 .theme-minimal > header > .logo-container {
-    max-width: 570px;
+    max-width: 532px;
     margin: 0 auto;
 }
 
@@ -34,11 +33,23 @@ body.theme-minimal {
     display: block;
     font-size: 3em;
     font-weight: bold;
+    text-align: center;
     margin: 0.3em 1em;
     text-decoration: none;
     color: rgb(255, 246, 212);
 }
 
+@media only screen and (min-width: 600px) {
+    .theme-minimal > header .logo {
+        width: 182px;
+        height: 112px;
+        float: right;
+        /* height: 22vw; */
+    }
+    .theme-minimal .logo-text {
+        text-align: left;
+    }
+}
 
 /** Navigation **/
 
@@ -50,7 +61,9 @@ body.theme-minimal {
     margin: 0 auto;
     padding: 0;
     overflow: hidden;
-    display: table;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     width: 85%;
 }
 .theme-minimal > nav > ul > li {
@@ -87,7 +100,11 @@ body.theme-minimal {
     padding: 1em;
 }
 
-.theme-minimal > article > section.odd {
+.theme-minimal > article > section:nth-child(even) {
+    /*background: #ddd;*/
+}
+
+.theme-minimal > article > section:nth-child(odd) {
     background: #FFF6D4;
 }
 
@@ -137,7 +154,7 @@ body.theme-minimal {
 @media only screen and (min-width: 600px) {
     .theme-minimal ul.flex-list {
         display: flex;
-        flex-wrap: wrap;-
+        flex-wrap: wrap;
         justify-content: center;
     }
 }
