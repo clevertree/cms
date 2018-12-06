@@ -12,6 +12,12 @@ body.theme-minimal {
     /* line-height: 20px; */
 }
 
+.theme-minimal > header {
+    padding: 1em;
+    max-width: 490px;
+    margin: 0 auto;
+}
+
 .theme-minimal > header .logo {
     background: url(logo/logo-header.png) no-repeat;
     margin: 0px auto;
@@ -23,18 +29,13 @@ body.theme-minimal {
     /* float: right; */
 }
 
-.theme-minimal > header,
-.theme-minimal > header > .logo-container {
-    max-width: 532px;
-    margin: 0 auto;
-}
 
 .theme-minimal .logo-text {
     display: block;
     font-size: 3em;
     font-weight: bold;
     text-align: center;
-    margin: 0.3em 1em;
+    /* margin: 0.3em 1em; */
     text-decoration: none;
     color: rgb(255, 246, 212);
 }
