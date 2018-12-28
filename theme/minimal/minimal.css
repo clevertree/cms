@@ -209,19 +209,19 @@ body.theme-minimal {
 
 
 /** Custom Image Cropping **/
-.theme-minimal .custom-image-crop-1 {
+.theme-minimal img[src='images/page/afoh1.jpg'] {
     object-position: 50% 0%;
     object-fit: cover;
     width: 252px;
     height: 127px;
 }
-.theme-minimal .custom-image-crop-2 {
-    object-position: 50% 23%;
+.theme-minimal img[src='images/page/afoh2.jpg'] {
+    object-position: 50% 17%;
     object-fit: cover;
-    width: 184px;
-    height: 149px;
+    width: 191px;
+    height: 158px;
 }
-.theme-minimal .custom-image-crop-3 {
+.theme-minimal img[src='images/page/afoh3.jpg'] {
     object-position: 50% 0%;
     object-fit: cover;
     width: 162px;
