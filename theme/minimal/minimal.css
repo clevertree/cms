@@ -100,7 +100,7 @@ body.theme-minimal {
 /** Page Articles **/
 .theme-minimal > article {
     padding: 0 0;
-    background: #F5E7A8;
+    background: #EEC455;
 }
 
 .theme-minimal > article > section {
@@ -110,7 +110,7 @@ body.theme-minimal {
 }
 
 .theme-minimal > article > section:nth-child(even) {
-    /*background: #ddd;*/
+    background: #f5e7a8;
 }
 
 .theme-minimal > article > section.highlight {
@@ -193,7 +193,9 @@ body.theme-minimal {
 /** Images **/
 
 .theme-minimal .box-shadow {
-    box-shadow:  3px 2px 8px #444;
+    box-shadow: 0px 0px 8px #000;
+    z-index: 1;
+    position: relative;
 }
 
 
