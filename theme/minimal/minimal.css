@@ -13,9 +13,14 @@ body.theme-minimal {
 }
 
 .theme-minimal > header {
+    background: url(texture/header.background.png);
+    background-size: contain;
     padding: 1em;
-    max-width: 490px;
-    margin: 0 auto;
+}
+
+.theme-minimal > header .logo-container {
+     max-width: 490px;
+     margin: 0 auto;
 }
 
 .theme-minimal > header .logo {
@@ -45,19 +50,21 @@ body.theme-minimal {
         width: 182px;
         height: 112px;
         float: right;
+        box-shadow: #0008 1px 4px 19px;
         /* height: 22vw; */
     }
     .theme-minimal .logo-text {
         text-align: left;
+        text-shadow: #0008 4px 3px 9px;
     }
 }
 
 /** Navigation **/
 
-.theme-minimal > nav {
+.theme-minimal nav {
     /*background-color: #333333;*/
 }
-.theme-minimal > nav > ul {
+.theme-minimal nav > ul {
     list-style-type: none;
     margin: 0 auto;
     padding: 0;
@@ -67,12 +74,12 @@ body.theme-minimal {
     justify-content: center;
     width: 85%;
 }
-.theme-minimal > nav > ul > li {
+.theme-minimal nav > ul > li {
     display: table-cell;
     text-align: center;
 }
 
-.theme-minimal > nav > ul > li a {
+.theme-minimal nav > ul > li a {
     font-weight: bold;
     font-size: 18px;
     display: block;
@@ -82,7 +89,7 @@ body.theme-minimal {
     text-decoration: none;
 }
 
-.theme-minimal > nav > ul > li a:hover {
+.theme-minimal nav > ul > li a:hover {
     background-color: #111111;
 }
 
