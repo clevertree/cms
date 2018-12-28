@@ -50,11 +50,12 @@ body.theme-minimal {
         width: 182px;
         height: 112px;
         float: right;
+        margin-left: 17px;
         box-shadow: #0008 1px 4px 19px;
         /* height: 22vw; */
     }
     .theme-minimal .logo-text {
-        text-align: left;
+        text-align: center;
         text-shadow: #0008 4px 3px 9px;
     }
 }
@@ -112,8 +113,9 @@ body.theme-minimal {
     /*background: #ddd;*/
 }
 
-.theme-minimal > article > section:nth-child(odd) {
-    background: #FFF6D4;
+.theme-minimal > article > section.highlight {
+    background: #AB521A;
+    color: #f5e7a8;
 }
 
 
@@ -121,7 +123,7 @@ body.theme-minimal {
 .theme-minimal section > h1 {
     font-size: 2.5em;
     margin: 6px 0px;
-    color: rgb(0, 101, 169);
+    /* color: rgb(0, 101, 169); */
     font-weight: bold;
 }
 
@@ -149,6 +151,13 @@ body.theme-minimal {
     float: right;
     max-width: 400px;
     margin-left: 2em;
+}
+
+.theme-minimal .page-quote {
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1em;
 }
 
 /** Flex List **/
@@ -183,7 +192,7 @@ body.theme-minimal {
 
 /** Images **/
 
-.theme-minimal img.box-shadow {
+.theme-minimal .box-shadow {
     box-shadow:  3px 2px 8px #444;
 }
 
@@ -212,18 +221,18 @@ body.theme-minimal {
 .theme-minimal img[src='images/page/afoh1.jpg'] {
     object-position: 50% 0%;
     object-fit: cover;
-    width: 252px;
-    height: 127px;
+    width: 230px;
+    height: 150px;
 }
 .theme-minimal img[src='images/page/afoh2.jpg'] {
     object-position: 50% 17%;
     object-fit: cover;
-    width: 191px;
-    height: 158px;
+    width: 230px;
+    height: 150px;
 }
 .theme-minimal img[src='images/page/afoh3.jpg'] {
     object-position: 50% 0%;
     object-fit: cover;
-    width: 162px;
-    height: 201px;
+    width: 230px;
+    height: 150px;
 }
