@@ -173,12 +173,11 @@ body.theme-minimal {
     flex-grow: 1;
     flex-basis: 0;
 }
-.theme-minimal ul.flex-list > li > img {
+
+.theme-minimal ul.flex-list > li > img,
+.theme-minimal ul.flex-list > li > a > img {
     max-width: 90%;
     max-height: 200px;
-}
-.theme-minimal ul.flex-list > li > p {
-    padding: 0 1em;
 }
 
 
@@ -187,6 +186,9 @@ body.theme-minimal {
 .theme-minimal img.box-shadow {
     box-shadow:  3px 2px 8px #444;
 }
+
+
+
 /** Footer **/
 
 .theme-minimal > footer {
@@ -205,3 +207,23 @@ body.theme-minimal {
     border-radius: 4px;
 }
 
+
+/** Custom Image Cropping **/
+.theme-minimal .custom-image-crop-1 {
+    object-position: 50% 0%;
+    object-fit: cover;
+    width: 252px;
+    height: 127px;
+}
+.theme-minimal .custom-image-crop-2 {
+    object-position: 50% 23%;
+    object-fit: cover;
+    width: 184px;
+    height: 149px;
+}
+.theme-minimal .custom-image-crop-3 {
+    object-position: 50% 0%;
+    object-fit: cover;
+    width: 162px;
+    height: 201px;
+}
