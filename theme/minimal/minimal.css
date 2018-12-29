@@ -137,6 +137,18 @@ body.theme-minimal {
     margin-left: .5em;
 }
 
+/** Floating **/
+@media only screen and (min-width: 600px) {
+    .theme-minimal .float-left {
+        float: left;
+        margin-right: 1em;
+    }
+    .theme-minimal .float-right {
+        float: right;
+        margin-left: 1em;
+    }
+}
+
 /** Paragraphs **/
 .theme-minimal section > p {
     text-align: justify;
@@ -148,9 +160,9 @@ body.theme-minimal {
 
 
 .theme-minimal section > p > img {
-    float: right;
+    /* float: right; */
     max-width: 400px;
-    margin-left: 2em;
+    /* margin-left: 2em; */
 }
 
 .theme-minimal .page-quote {
@@ -237,4 +249,25 @@ body.theme-minimal {
     object-fit: cover;
     width: 230px;
     height: 150px;
+}
+
+.theme-minimal img[src='images/page/afoh4.jpg'] {
+    /*object-position: 50% 0%;*/
+    /*object-fit: cover;*/
+    /*width: 230px;*/
+    /*height: 150px;*/
+}
+
+.theme-minimal img[src='images/page/afoh5.jpg'] {
+    /*object-position: 50% 0%;*/
+    /*object-fit: cover;*/
+    /*width: 230px;*/
+    /*height: 150px;*/
+}
+
+.theme-minimal img[src='images/page/afoh6.jpg'] {
+    /*object-position: 50% 0%;*/
+    /*object-fit: cover;*/
+    /* width: 230px; */
+    /*height: 150px;*/
 }
