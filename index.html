@@ -7,6 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link href="theme/minimal/minimal.css" rel="stylesheet" />
+        <script src="theme/minimal/minimal.js"></script>
         <link href='https://fonts.googleapis.com/css?family=Advent Pro' rel='stylesheet'>
     </head>
 
@@ -20,18 +21,55 @@
             </div>
             <nav>
                 <ul>
-                    <li><a class="selected" href=".">Home</a></li>
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="https://www.facebook.com/groups/arizonafriendsofhomeless/files/#mission.html">Homeless Resources</a></li>
-                    <li><a href="https://www.facebook.com/groups/arizonafriendsofhomeless/files/#help.html">AFOH Outreach</a></li>
-                    <li><a href="https://www.facebook.com/groups/arizonafriendsofhomeless/files/#donate.html">Contribute / Volunteer</a></li>
-                    <li><a href="https://www.facebook.com/groups/arizonafriendsofhomeless/#contact.html">Contact Us</a></li>
+                    <li>
+                        <a href="#home">Home</a>
+                    </li>
+                    <li>
+                        <a href="#about">About Us</a>
+                        <ul class="submenu">
+                            <li><a href="#about">What We Do</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#resources">Homeless Resources</a>
+                        <ul class="submenu">
+                            <li><a href="#faq">AFOH FAQ</a></li>
+                            <li><a href="#faq">Homelessness and Crisis Directories</a></li>
+                            <li><a href="#faq">Groups, Outreach, and Organizations</a></li>
+                            <li><a href="#faq">Foodbanks, Kitchens, Medical, and Other</a></li>
+                            <li><a href="#faq">Shelter and Housing Directories</a></li>
+                            <li><a href="#faq">Women's, Youth, and Domestic Violence</a></li>
+                            <li><a href="#faq">Seniors, Veterans, and Disabled</a></li>
+                            <li><a href="#faq">Pregnant, Post-partum, and Family</a></li>
+                            <li><a href="#faq">Single Men's Shelter, and Housing</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#projects">AFOH Outreach / Projects</a>
+                        <ul class="submenu">
+                            <li><a href="#faq">AFOH Central Phoenix</a></li>
+                            <li><a href="#faq">AFOH Chavez Park</a></li>
+                            <li><a href="#faq">AFOH Motor Home Project</a></li>
+                            <li><a href="#faq">AFOH Wash Morning @ Social Spin</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#contribute">Contribute / Volunteer</a>
+                        <ul class="submenu">
+                            <li><a href="#faq">Donate!</a></li>
+                            <li><a href="#faq">Volunteer!</a></li>
+                            <li><a href="#faq">Amazon Wishlist</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#contact">Contact Us</a>
+                        <ul class="submenu">
+                            <li><a href="https://www.facebook.com/groups/arizonafriendsofhomeless/">Facebook</a></li>
+                            <li><a href="#faq">E-mail</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </nav>
         </header>
 
 
-        <article>
+        <article id="home" class="page-article selected">
             <section class="highlight box-shadow">
                 <ul class="flex-list">
                     <li>
@@ -52,7 +90,6 @@
                     </li>
                 </ul>
             </section>
-
             <section>
                 <div class="page-quote">
                     "The best way to find yourself is to lose yourself in the service of others."
@@ -90,6 +127,32 @@
                     </li>
                 </ul>
             </section>
+        </article>
+
+        <article id="about" class="page-article">
+            <section class="section-photo">
+                <br/>
+                <br/>
+                <br/>
+                <div class="box-highlight-text box-shadow">
+                    <h2>About Us</h2>
+                    <p>
+                        It's all about the homeless. From local to nationwide and elsewhere, our focus is on homelessness issues and coming up with solutions with the local community.
+                        Arizona Friends of Homeless is a non-profit 501c3 organization which serves the homeless through daily outreach, connections
+                        to local services, shelters, and programs, and provides awareness to the general public, members, advocates, donors,
+                        and volunteers on homelessness issues for Arizonans. Arizona Friends of Homeless hands out
+                        food, clothing, blankets, towels, hygiene packs, ponchos, socks, back packs, bikes, shoes, pet food and more
+                        relief items to the homeless at various locations within Phoenix where need is great.
+                    </p>
+                </div>
+                <br/>
+                <br/>
+                <br/>
+            </section>
+        </article>
+
+        <article id="iframe" class="page-article">
+            <iframe data-src="https://www.facebook.com/groups/arizonafriendsofhomeless/"></iframe>
         </article>
 
         <footer>

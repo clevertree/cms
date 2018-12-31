@@ -78,23 +78,51 @@ body.theme-minimal {
 }
 .theme-minimal nav > ul > li {
     display: table-cell;
-    text-align: center;
 }
 
-.theme-minimal nav > ul > li a {
+.theme-minimal nav > ul > li:hover {
+    background-color: #6190a0;
+    z-index: 2;
+    border-radius: 4px 4px 0px 0;
+}
+.theme-minimal nav > ul > li:hover > ul > li:hover {
+    background-color: #444;
     font-weight: bold;
+}
+
+.theme-minimal nav ul > li > a {
+    /* font-weight: bold; */
     font-size: 18px;
     display: block;
     color: white;
-    text-align: center;
     padding: 12px;
     text-decoration: none;
 }
 
-.theme-minimal nav > ul > li a:hover {
-    background-color: #111111;
+/** Sub Menu **/
+.theme-minimal ul.submenu {
+    position: absolute;
+    z-index: 2;
+    background-color: #6190a0;
+    list-style: none;
+    padding: 0 0;
+    text-align: right;
+    border-radius: 0px 0px 4px 4px;
 }
 
+.theme-minimal ul.submenu > li > a {
+    /* font-weight: bold; */
+    font-size: 14px;
+    display: block;
+    color: white;
+    text-align: left;
+    padding: 0.5em 0.5em 0.5em;
+    text-decoration: none;
+}
+
+.theme-minimal li:not(:hover) > ul.submenu {
+    display: none;
+}
 
 
 
@@ -199,12 +227,27 @@ body.theme-minimal {
 }
 
 
-/** Images **/
+/** Section effects **/
+
+.theme-minimal .section-photo {
+    background: url(../../images/page/afoh1.jpg);
+}
+
+/** Box effects **/
 
 .theme-minimal .box-shadow {
     box-shadow: 0px 0px 8px #000;
     z-index: 1;
     position: relative;
+}
+
+.theme-minimal .box-highlight-text {
+    background-color: #ab6428ed;
+    padding: 1em 2em;
+    max-width: 600px;
+    margin: 0em auto;
+    color: white;
+    text-align: justify;
 }
 
 
@@ -226,6 +269,12 @@ body.theme-minimal {
     background-color: rgba(81, 81, 81, 0.5);
     padding: 8px 16px;
     border-radius: 4px;
+}
+
+/** Page Article **/
+
+.theme-minimal .page-article:not(.selected) {
+    display: none;
 }
 
 
