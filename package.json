@@ -1,0 +1,29 @@
+{
+  "name": "afoh",
+  "version": "0.0.2",
+  "description": "Arizona Friends of the Homeless Website",
+  "author": "Ari Asulin",
+  "license": "GPL-3.0",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "customURL": "git+ssh://git@github.com/clevertree/afoh-site.git"
+  },
+  "keywords": [
+    "arizona",
+    "friends",
+    "homeless"
+  ],
+  "bugs": {
+    "customURL": "https://github.com/clevertree/afoh-site/issues"
+  },
+  "homepage": "https://github.com/clevertree/afoh-site#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "ejs": "^2.6.1"
+  }
+}

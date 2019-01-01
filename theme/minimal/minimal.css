@@ -12,6 +12,14 @@ body.theme-minimal {
     /* line-height: 20px; */
 }
 
+
+.theme-minimal .highlight {
+    color: #f5efd5;
+    text-shadow: #000 1px 1px 1px;
+    /* font-weight: bold; */
+}
+
+/** Header **/
 .theme-minimal > header {
     background: url(texture/header.background.png);
     background-size: contain;
@@ -77,7 +85,7 @@ body.theme-minimal {
 .theme-minimal nav {
     /*background-color: #333333;*/
 }
-.theme-minimal nav > ul {
+.theme-minimal ul.nav-menu {
     list-style-type: none;
     margin: 0 auto;
     padding: 0;
@@ -87,21 +95,22 @@ body.theme-minimal {
     justify-content: center;
     width: 85%;
 }
-.theme-minimal nav > ul > li {
+.theme-minimal ul.nav-menu > li {
     display: table-cell;
 }
 
-.theme-minimal nav > ul > li:hover {
+.theme-minimal ul.nav-menu > li:hover {
     background-color: #6190a0;
     z-index: 2;
     border-radius: 4px 4px 0px 0;
 }
-.theme-minimal nav > ul > li:hover > ul > li:hover {
+.theme-minimal ul.nav-menu > li:hover > ul.nav-submenu > li:hover {
     background-color: #444;
     font-weight: bold;
 }
 
-.theme-minimal nav ul > li > a {
+.theme-minimal ul.nav-menu > li > a,
+.theme-minimal ul.nav-submenu > li > a {
     /* font-weight: bold; */
     font-size: 18px;
     display: block;
@@ -109,7 +118,7 @@ body.theme-minimal {
 }
 
 /** Sub Menu **/
-.theme-minimal ul.submenu {
+.theme-minimal ul.nav-submenu {
     position: absolute;
     z-index: 2;
     background-color: #6190a0;
@@ -119,7 +128,7 @@ body.theme-minimal {
     border-radius: 0px 0px 4px 4px;
 }
 
-.theme-minimal ul.submenu > li > a {
+.theme-minimal ul.nav-submenu > li > a {
     /* font-weight: bold; */
     font-size: 14px;
     display: block;
@@ -129,7 +138,7 @@ body.theme-minimal {
     text-decoration: none;
 }
 
-.theme-minimal li:not(:hover) > ul.submenu {
+.theme-minimal li:not(:hover) > ul.nav-submenu {
     display: none;
 }
 
@@ -154,11 +163,6 @@ body.theme-minimal {
 }
 
 
-.theme-minimal .highlight {
-    color: #f5efd5;
-    text-shadow: #000 1px 1px 1px;
-    /* font-weight: bold; */
-}
 
 /** Page Headings **/
 .theme-minimal h1.themed,
@@ -284,46 +288,45 @@ body.theme-minimal {
     /* display: none; */
     opacity: 0;
     position: absolute;
-    /* transition: 0s opacity; */
 }
 
 
 /** Backgrounds **/
 
 .theme-minimal .background-photo-1 {
-    background: url(../../images/page/afoh1.jpg) -68px 0px;
+    background: url(../../article/image/afoh1.jpg) -68px 0px;
     background-size: cover;
 }
 .theme-minimal .background-photo-2 {
-    background: url(../../images/page/afoh2.jpg);
+    background: url(../../article/image/afoh2.jpg);
     background-size: cover;
 }
 .theme-minimal .background-photo-3 {
-    background: url(../../images/page/afoh3.jpg);
+    background: url(../../article/image/afoh3.jpg);
     background-size: cover;
 }
 .theme-minimal .background-photo-4 {
-    background: url(../../images/page/afoh4.jpg);
+    background: url(../../article/image/afoh4.jpg);
     background-size: cover;
 }
 .theme-minimal .background-photo-5 {
-    background: url(../../images/page/afoh5.jpg);
+    background: url(../../article/image/afoh5.jpg);
     background-size: cover;
 }
 .theme-minimal .background-photo-6 {
-    background: url(../../images/page/afoh6.jpg) -68px 0px;
+    background: url(../../article/image/afoh6.jpg) -68px 0px;
     background-size: cover;
 }
 .theme-minimal .background-photo-7 {
-    background: url(../../images/page/afoh7.jpg) -68px 0px;
+    background: url(../../article/image/afoh7.jpg) -68px 0px;
     background-size: cover;
 }
 .theme-minimal .background-photo-8 {
-    background: url(../../images/page/afoh8.jpg) -68px 0px;
+    background: url(../../article/image/afoh8.jpg) -68px 0px;
     background-size: cover;
 }
 .theme-minimal .background-photo-9 {
-    background: url(../../images/page/afoh9.jpg) -68px 0px;
+    background: url(../../article/image/afoh9.jpg) -68px 0px;
     background-size: cover;
 }
 
@@ -332,40 +335,40 @@ body.theme-minimal {
 .theme-minimal .text-bottom-right {position: absolute;right: 11px;bottom: 5px;/* font-weight: bold; */transform: scaleY(1.5);color: white;}
 
 /** Custom Image Cropping **/
-.theme-minimal img[src='images/page/afoh1.jpg'] {
+.theme-minimal img[src='article/image/afoh1.jpg'] {
     object-position: 50% 0%;
     object-fit: cover;
     width: 230px;
     height: 150px;
 }
-.theme-minimal img[src='images/page/afoh2.jpg'] {
+.theme-minimal img[src='article/image/afoh2.jpg'] {
     object-position: 50% 17%;
     object-fit: cover;
     width: 230px;
     height: 150px;
 }
-.theme-minimal img[src='images/page/afoh3.jpg'] {
+.theme-minimal img[src='article/image/afoh3.jpg'] {
     object-position: 50% 0%;
     object-fit: cover;
     width: 230px;
     height: 150px;
 }
 
-.theme-minimal img[src='images/page/afoh4.jpg'] {
+.theme-minimal img[src='article/image/afoh4.jpg'] {
     /*object-position: 50% 0%;*/
     /*object-fit: cover;*/
     /*width: 230px;*/
     /*height: 150px;*/
 }
 
-.theme-minimal img[src='images/page/afoh5.jpg'] {
+.theme-minimal img[src='article/image/afoh5.jpg'] {
     /*object-position: 50% 0%;*/
     /*object-fit: cover;*/
     /*width: 230px;*/
     /*height: 150px;*/
 }
 
-.theme-minimal img[src='images/page/afoh6.jpg'] {
+.theme-minimal img[src='article/image/afoh6.jpg'] {
     object-position: 50% 0%;
     object-fit: cover;
     width: 363px;
