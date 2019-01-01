@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
-    <% const theme = config && config.theme ? config.theme : 'minimal' %>
-    <%- include(`theme/${theme}/partial/head`) %>
+<% const theme = config && config.theme ? config.theme : 'minimal' %>
+<%- include(`theme/${theme}/partial/head`) %>
     <body class='<%= config.theme ? `theme-` + config.theme : `no-theme` %>'>
-        <%- include(`theme/${theme}/partial/header`) %>
+<%- include(`theme/${theme}/partial/header`) %>
 
-        <% for(var i=0; i < articleList.length; i++) { %>
-        <%- include(articleList[i]) %>
-        <% } %>
+<% for(var i=0; i < articleList.length; i++) { %>
+<%- include(articleList[i]) %>
+<% } %>
         <article data-path="iframe" class="page-article">
             <iframe data-src="https://www.facebook.com/groups/arizonafriendsofhomeless/"></iframe>
         </article>
 
-        <%- include(`theme/${theme}/partial/footer`) %>
+<%- include(`theme/${theme}/partial/footer`) %>
     </body>
 </html>
