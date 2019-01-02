@@ -221,24 +221,19 @@ body.theme-minimal {
 @media only screen and (min-width: 600px) {
     .theme-minimal ul.flex-list {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
+        /* flex-wrap: wrap; */
+        /* justify-content: center; */
+        /* align-items: center; */
     }
 }
 
 .theme-minimal ul.flex-list > li {
-    /*min-width: 100px;*/
-    /*max-width: 50%;*/
-    /* margin: 1em 1em; */
-    /* display: flex; */
+    display: block;
     flex-grow: 1;
     flex-basis: 0;
+}
+.theme-minimal ul.flex-list > li > * {
     vertical-align: middle;
-    flex-direction: column;
-    justify-content: center;
-    display: flex;
-    align-items: center;
-    /* text-align: center; */
 }
 
 .theme-minimal ul.flex-list > li > img,
@@ -355,7 +350,7 @@ body.theme-minimal {
 .theme-minimal img.themed {
     /* object-position: 50% 0%; */
     box-shadow: 0px 0px 8px #000;
-    max-width: 200px;
+    max-width: 80%;
     max-height: 200px;
     object-position: center;
 }
