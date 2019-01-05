@@ -6,11 +6,11 @@ const viewList = app.getViewList();
     <%- include(`theme/${themeName}/partial/head`) %>
     <body class='<%= themeName ? `theme-` + themeName : `no-theme` %>'>
         <%- include(`theme/${themeName}/partial/header`) %>
-
+        <%= sessionUser && sessionUser.email ? sessionUser.email : 'N/A'%>
         <% for(var i=0; i < viewList.length; i++) { %>
         <%- include(viewList[i]) %>
         <% } %>
-        <article data-path="iframe" class="page-article">
+        <article data-path="iframe" class="page-view">
             <iframe data-src="https://www.facebook.com/groups/arizonafriendsofhomeless/"></iframe>
         </article>
 

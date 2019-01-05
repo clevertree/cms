@@ -33,21 +33,25 @@ app.config.theme = app.config.theme || 'minimal';
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
-app.get('/', function(req, res) {
-    res.render(BASE_DIR + '/index.ejs', {
-        app,
-    });
-});
-app.get('/[\\w/]+\.ejs', function(req, res) {
-    res.render(BASE_DIR + req.url, {
-        app,
+// app.get('/', function(req, res) {
+//     app.users.getSessionUser(req, (error, sessionUser) => {
+//         res.render(BASE_DIR + '/view/index.ejs', {
+//             app, req, sessionUser
+//         });
+//     });
+// });
+app.get(['/[\\w/]+\.ejs', '/'], function(req, res) {
+    app.users.getSessionUser(req, (error, sessionUser) => {
+        res.render(BASE_DIR + '/view' + req.url, {
+            app, req, sessionUser
+        });
     });
 });
 app.use(express.static(BASE_DIR));
 
 app.getViewList = function() {
-    return fs.readdirSync(BASE_DIR + '/view')
-        .map(path => 'view/' + path)
+    return fs.readdirSync(BASE_DIR + '/view/article')
+        .map(path => 'article/' + path)
         .filter(file => file.endsWith('.ejs'));
 };
 

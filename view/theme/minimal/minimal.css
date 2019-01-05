@@ -276,13 +276,13 @@ body.theme-minimal {
 
 /** Page Article **/
 
-.theme-minimal .page-article {
+.theme-minimal .page-view {
     transition: opacity 0.8s, height 0.5s;
     opacity: 1;
     width: 100%;
 }
 
-.theme-minimal .page-article:not(.selected) {
+.theme-minimal .page-view:not(.selected) {
     /* display: none; */
     opacity: 0;
     position: absolute;
@@ -292,50 +292,11 @@ body.theme-minimal {
 
 /** Backgrounds **/
 
-.theme-minimal .background-photo-1 {
-    background: url(../../view/image/afoh1.jpg) -68px 0px;
+.theme-minimal .background-photo-bears {
+    background: url(../../image/bears1.jpg) -68px 0px;
     background-size: cover;
 }
 
-.theme-minimal .background-photo-2 {
-    background: url(../../view/image/afoh2.jpg);
-    background-size: cover;
-}
-
-.theme-minimal .background-photo-3 {
-    background: url(../../view/image/afoh3.jpg);
-    background-size: cover;
-}
-
-.theme-minimal .background-photo-4 {
-    background: url(../../view/image/afoh4.jpg);
-    background-size: cover;
-}
-
-.theme-minimal .background-photo-5 {
-    background: url(../../view/image/afoh5.jpg);
-    background-size: cover;
-}
-
-.theme-minimal .background-photo-6 {
-    background: url(../../view/image/afoh6.jpg) -68px 0px;
-    background-size: cover;
-}
-
-.theme-minimal .background-photo-7 {
-    background: url(../../view/image/afoh7.jpg) -68px 0px;
-    background-size: cover;
-}
-
-.theme-minimal .background-photo-8 {
-    background: url(../../view/image/afoh8.jpg) -68px 0px;
-    background-size: cover;
-}
-
-.theme-minimal .background-photo-9 {
-    background: url(../../view/image/afoh9.jpg) -68px 0px;
-    background-size: cover;
-}
 
 /** Custom Text **/
 .theme-minimal .text-bottom-right {
