@@ -1,17 +1,19 @@
-<!DOCTYPE html>
+<!DOCTYPE html><%
+const themeName = app.config.themeName ? app.config.themeName : 'minimal';
+const viewList = app.getViewList();
+%>
 <html>
-<% const theme = config && config.theme ? config.theme : 'minimal' %>
-<%- include(`theme/${theme}/partial/head`) %>
-    <body class='<%= config.theme ? `theme-` + config.theme : `no-theme` %>'>
-<%- include(`theme/${theme}/partial/header`) %>
+    <%- include(`theme/${themeName}/partial/head`) %>
+    <body class='<%= themeName ? `theme-` + themeName : `no-theme` %>'>
+        <%- include(`theme/${themeName}/partial/header`) %>
 
-<% for(var i=0; i < articleList.length; i++) { %>
-<%- include(articleList[i]) %>
-<% } %>
+        <% for(var i=0; i < viewList.length; i++) { %>
+        <%- include(viewList[i]) %>
+        <% } %>
         <article data-path="iframe" class="page-article">
             <iframe data-src="https://www.facebook.com/groups/arizonafriendsofhomeless/"></iframe>
         </article>
 
-<%- include(`theme/${theme}/partial/footer`) %>
+        <%- include(`theme/${themeName}/partial/footer`) %>
     </body>
 </html>
