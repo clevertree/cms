@@ -1,5 +1,5 @@
 module.exports = {
-    themeName: 'minimal',
+    theme: 'minimal',
     port: 8090,
     debugPort: 80,
     debug: false,

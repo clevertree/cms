@@ -89,7 +89,7 @@ class UserManager {
           FROM user u
           WHERE ${fieldName} = ?`;
         this.app.db.query(SQL, [fieldValue], (error, results, fields) => {
-            callback(error, error ? null : new User(results[0]));
+            callback(error, results.length > 0 ? new User(results[0]) : null);
         });
     }
 
@@ -98,7 +98,11 @@ class UserManager {
 
     getSessionUser(req, callback) {
         if(req.session && req.session.user) {
-            return this.findUserByID(req.session.user.id, callback);
+            return this.findUserByID(req.session.user.id, function(error, user) {
+                if(error)
+                    return console.error(error);
+                callback(user);
+            });
         }
         callback("No Session User Found", null);
     }

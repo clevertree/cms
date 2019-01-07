@@ -17,13 +17,15 @@ CREATE TABLE `user` (
 CREATE TABLE `article` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `path` varchar(256),
+  `parent_path` varchar(256) DEFAULT NULL,
+  `theme` varchar(256) DEFAULT NULL,
   `content` TEXT,
   PRIMARY KEY (`id`),
   UNIQUE KEY `article_path_unique` (`path`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `article` SET path = '/', content = '<%- include("template/home.ejs") %>';
-INSERT INTO `article` SET path = '/about', content = '<%- include("index.ejs") %>';
+INSERT INTO `article` SET path = '/about', content = '<%- include("template/about.ejs") %>';
 
 # SET foreign_key_checks = 1;
 
