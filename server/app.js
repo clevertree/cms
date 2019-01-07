@@ -1,93 +1,45 @@
-// app.js
-// load the things we need
-const path = require('path');
-const fs = require('fs');
-
 const express = require('express');
-const mysql = require('mysql');
-const bodyParser = require('body-parser');
-const session = require('client-sessions');
-const BASE_DIR = path.dirname(__dirname);
-const app = express();
-exports.app = app;
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+const { UserAPI, UserSessionManager, UserManager } = require('./user.js');
+const { ViewManager } = require('./view.js');
+const { DatabaseManager } = require('./database.js');
 
-// Sessions
-app.use(session({
-    cookieName: 'session',
-    secret: 'random_string_goes_here',
-    duration: 30 * 60 * 1000,
-    activeDuration: 5 * 60 * 1000,
-}));
+class App {
+    constructor() {
+        this.loadConfig();
 
-app.config = (() => {
-    try {
-        return require('../config.js');
-    } catch (e) {
-        return require('./config.sample.js');
+
+        this.express = express();
+
+        this.api = {};
+        this.view = new ViewManager(this);
+
+        this.user = new UserManager(this);
+        this.session = new UserSessionManager(this);
+        this.api.user = new UserAPI(this);
+
+        this.db = new DatabaseManager(this);
     }
-})();
-app.config.theme = app.config.theme || 'minimal';
 
-// set the view engine to ejs
-app.set('view engine', 'ejs');
-// app.get('/', function(req, res) {
-//     app.users.getSessionUser(req, (error, sessionUser) => {
-//         res.render(BASE_DIR + '/view/index.ejs', {
-//             app, req, sessionUser
-//         });
-//     });
-// });
-app.get(['/[\\w/]+\.ejs', '/'], function(req, res) {
-    app.users.getSessionUser(req, (error, sessionUser) => {
-        res.render(BASE_DIR + '/view' + req.url, {
-            app, req, sessionUser
-        });
-    });
-});
-app.use(express.static(BASE_DIR));
 
-app.getViewList = function() {
-    return fs.readdirSync(BASE_DIR + '/view/article')
-        .map(path => 'article/' + path)
-        .filter(file => file.endsWith('.ejs'));
-};
+    start() {
 
-app.createMysqlConnection = function() {
-    // Mysql
-    const db = mysql.createConnection(app.config.mysql);
-    app.db = db;
+        // HTTP
+        this.express.listen(this.config.port);
+        console.log(`Listening on ${this.config.port}`);
 
-    db.on('error', function (err){
-        console.error("DB Error", err);
-    });
-    db.connect({}, (err) => {
-        if (err) {
-            console.error(`DB Connection to '${app.config.mysql.database}' Failed`, err.message);
-            setTimeout(() => app.createMysqlConnection(), 3000);
-            db.end();
-        } else {
-            console.info(`DB Connecting to '${app.config.mysql.database}' Successful`);
+        this.db.connect();
+    }
+
+    loadConfig() {
+        try {
+            // noinspection JSFileReferences
+            this.config = require('../config.js');
+        } catch (e) {
+            this.config = require('./config.sample.js');
         }
-    });
-};
+        this.config.theme = this.config.theme || 'minimal';
+    }
+}
 
-app.start = function() {
-
-    // HTTP
-    app.listen(app.config.port);
-    console.log(`Listening on ${app.config.port}`);
-
-    app.createMysqlConnection();
-};
-
-
-// Include APIs
-
-
-const APIList = fs.readdirSync(BASE_DIR + '/server/api')
-    .map(path => BASE_DIR + '/server/api/' + path)
-    .filter(file => file.endsWith('.js'))
-    .forEach((apiFile) => require(apiFile)(app));
+exports.App = App;
