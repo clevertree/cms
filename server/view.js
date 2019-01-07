@@ -22,27 +22,45 @@ class ViewManager {
         app.express.use(express.static(BASE_DIR));
     }
 
-    render(req, res) {
+    getArticleByPath(renderPath, callback) {
         let SQL = `
           SELECT a.*
           FROM article a
           WHERE a.path = ?`;
+        this.app.db.query(SQL, [renderPath], (error, results, fields) => {
+            callback(error, results && results[0] ? results[0] : null);
+        });
+    }
+
+    getArticleByFlag(flags) { // Async with ejs?
+        if(Array.isArray(flags))
+            flags = flags.join(' ,')
+        let SQL = `
+          SELECT a.*
+          FROM article a
+          WHERE FIND_IN_SET(?, a.flag)`;
+        this.app.db.query(SQL, [flags], (error, results, fields) => {
+            callback(error, results);
+        });
+    }
+
+    render(req, res) {
         const app = this.app;
         const renderPath = req.url;
         app.user.getSessionUser(req, (sessionUser) => {
-            this.app.db.query(SQL, [renderPath], (error, results, fields) => {
+            this.getArticleByPath(renderPath, (error, article) => {
                 try {
                     if(error)
                         throw error;
-                    if(!results || results.length === 0)
+                    if(!article)
                         throw "Path not found: " + renderPath;
                     const renderData = {
                         app, req, sessionUser
                     };
-                    const renderedHTML = ejs.render(results[0].content, renderData, this.options);
+                    const renderedHTML = ejs.render(article.content, renderData, this.options);
                     renderData.content = renderedHTML;
 
-                    const templatePath = path.resolve(BASE_DIR + '/theme/' + app.config.theme + '/template.ejs');
+                    const templatePath = path.resolve(BASE_DIR + '/theme/' + app.config.theme + '/template/default.ejs');
                     const templateHTML = fs.readFileSync(templatePath,{ encoding: 'utf8' });
                     const renderedTemplateHTML = ejs.render(templateHTML, renderData, this.options);
                     res.send(renderedTemplateHTML);

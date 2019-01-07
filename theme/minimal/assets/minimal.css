@@ -282,7 +282,7 @@ body.theme-minimal {
     width: 100%;
 }
 
-.theme-minimal .page-view:not(.selected) {
+.theme-minimal .page-view1:not(.selected) {
     /* display: none; */
     opacity: 0;
     position: absolute;
