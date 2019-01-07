@@ -4,13 +4,18 @@ const mysql = require('mysql');
 class DatabaseManager {
     constructor(app) {
         this.app = app;
+        this.instance = null;
+    }
+
+    query() {
+        this.instance.query(arguments[0], arguments[1], arguments[2]);
     }
 
     connect() {
         // Mysql
         const dbConfig = this.app.config.mysql;
         const db = mysql.createConnection(dbConfig);
-        this.db = db;
+        this.instance = db;
 
         db.on('error', function (err){
             console.error("DB Error", err);
