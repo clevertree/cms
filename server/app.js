@@ -8,10 +8,11 @@ class App {
     constructor() {
         this.loadConfig();
 
+        this.themes = {};
+        this.api = {};
 
         this.express = express();
 
-        this.api = {};
         this.view = new ViewManager(this);
 
         this.user = new UserManager(this);
@@ -21,6 +22,13 @@ class App {
         this.db = new DatabaseManager(this);
     }
 
+    getTheme(themeName) {
+        if(typeof this.themes[themeName] !== 'undefined')
+            return this.themes[themeName];
+        const themeClass = require('../theme/' + themeName + '/template/theme.js');
+        this.themes[themeName] = new themeClass(this);
+        return this.themes[themeName];
+    }
 
     start() {
 

@@ -20,7 +20,7 @@ CREATE TABLE `article` (
   `path` varchar(256),
   `title` varchar(256) DEFAULT NULL,
   `theme` varchar(256) DEFAULT NULL,
-  `flag` SET('main-menu', 'sub-menu'),
+  `flag` SET('main-menu', 'sub-menu', 'logged-in', 'logged-out'),
   `content` TEXT,
   PRIMARY KEY (`id`),
   UNIQUE KEY `article_path_unique` (`path`)
@@ -54,7 +54,10 @@ INSERT INTO `article` (id, parent_id, title, path, content, flag)
 
           (401, null,  'Contact Us',   '/contact',     '<%- include("template/about.ejs") %>', 'main-menu'),
           (402, 401,    'Facebook',     '/contact-facebook',   '<%- include("template/about.ejs") %>', 'sub-menu'),
-          (403, 401,    'E-mail',       '/contact-email',   '<%- include("template/about.ejs") %>', 'sub-menu');
+          (403, 401,    'E-mail',       '/contact-email',   '<%- include("template/about.ejs") %>', 'sub-menu'),
+
+          (1001, null,  'Log out',   '/logout',     '<%- include("template/logout.ejs") %>', 'main-menu,logged-out'),
+          (1002, null,  'Log in',   '/login',     '<%- include("template/login.ejs") %>', 'main-menu,logged-in');
 
 
 CREATE USER IF NOT EXISTS 'afoh'@'localhost';
