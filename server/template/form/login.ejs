@@ -1,0 +1,25 @@
+            <% if (sessionUser && !sessionUser.hasFlag('guest')) { %>
+                <form action="/user/logout" method="POST" class="themed">
+                    <fieldset>
+                        <label class="label-submit">Submit<br/>
+                            <button type="submit">Log out</button>
+                        </label>
+                    </fieldset>
+                </form>
+            <% } else { %>
+                <form action="/user/login" method="POST" class="themed">
+                    <fieldset>
+                        <label class="label-email">Login Email<br/>
+                            <input type="text" name="email" placeholder="" required/>
+                        </label>
+                        <br/><br/>
+                        <label class="label-password">Password<br/>
+                            <input type="password" name="password" placeholder="" required/>
+                        </label>
+                        <br/><br/>
+                        <label class="label-submit">Submit<br/>
+                            <button type="submit">Log In</button>
+                        </label>
+                    </fieldset>
+                </form>
+            <% } %>

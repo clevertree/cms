@@ -290,13 +290,6 @@ body.theme-minimal {
     overflow: hidden;
 }
 
-/** Backgrounds **/
-
-.theme-minimal .background-photo-bears {
-    background: url(../../image/bears1.jpg) -68px 0px;
-    background-size: cover;
-}
-
 
 /** Custom Text **/
 .theme-minimal .text-bottom-right {
@@ -314,4 +307,24 @@ body.theme-minimal {
     max-width: 80%;
     max-height: 200px;
     object-position: center;
+}
+
+/** Forms **/
+
+.theme-minimal form.themed {
+    padding: 1em;
+}
+
+
+.theme-minimal input.themed,
+.theme-minimal select.themed,
+.theme-minimal button.themed,
+.theme-minimal form.themed input,
+.theme-minimal form.themed select,
+.theme-minimal form.themed button {
+    padding: 4px 9px;
+    margin: 0px 5px 1px 0px;
+    border-radius: 4px;
+    border: 1px inset;
+    font-size: large;
 }

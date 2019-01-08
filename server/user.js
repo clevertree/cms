@@ -6,14 +6,17 @@ const session = require('client-sessions');
 class User {
     constructor(row) {
         Object.assign(this, row);
+        this.flag = this.flag ? this.flag.split(',') : [];
     }
+
+    hasFlag(flag) { return this.flag.indexOf(flag) !== -1; }
 }
 
 class UserAPI {
     constructor(app) {
         // API Routes
-        app.express.post('/login', (req, res) => this.login(req, res));
-        app.express.post('/register', (req, res) => this.register(req, res));
+        app.express.post('(/user)?/login', (req, res) => this.login(req, res));
+        app.express.post('(/user)?/register', (req, res) => this.register(req, res));
     }
 
     login(req, res) {
@@ -83,28 +86,34 @@ class UserManager {
         this.app = app;
     }
 
-    findUser(fieldName, fieldValue, callback) {
+    findUser(fieldName, fieldValues, callback) {
         let SQL = `
           SELECT u.*
           FROM user u
-          WHERE ${fieldName} = ?`;
-        this.app.db.query(SQL, [fieldValue], (error, results, fields) => {
-            callback(error, results.length > 0 ? new User(results[0]) : null);
+          WHERE ${fieldName}`;
+        this.app.db.query(SQL, fieldValues, (error, results, fields) => {
+            callback(error, results && results.length > 0 ? new User(results[0]) : null);
         });
     }
 
-    findUserByID(id, callback) { return this.findUser('u.id', id, callback); }
-    findUserByEmail(email, callback) { return this.findUser('u.email', email, callback); }
+    findUserByID(id, callback) { return this.findUser('u.id = ?', id, callback); }
+    findUserByEmail(email, callback) { return this.findUser('u.email = ?', email, callback); }
+    findGuestUser(callback) { return this.findUser('FIND_IN_SET(\'guest\', u.flag)', null, callback); }
 
     getSessionUser(req, callback) {
         if(req.session && req.session.user) {
-            return this.findUserByID(req.session.user.id, function(error, user) {
+            this.findUserByID(req.session.user.id, (error, user) => {
                 if(error)
-                    return console.error(error);
-                callback(user);
+                    return callback(error);
+                callback(user?null:"No Session User Found", user);
             });
+        } else {
+            this.findGuestUser((error, user) => {
+                if(error)
+                    return callback(error);
+                callback(user?null:"No Guest User Found", user);
+            })
         }
-        callback("No Session User Found", null);
     }
 
     createUser(email, password, callback) {

@@ -3,7 +3,6 @@
                     const menuItem = menu[i][0];
                     if(!menuItem)
                         continue;
-                    console.log(menuItem);
                     const subMenuItems = menu[i][1];
                     _%>
                     <li>
@@ -18,5 +17,10 @@
                         </ul>
                         <%_ } _%>
                     </li>
-                <%_ } _%>
+                <%_ }
+
+                if(sessionUser) { _%>
+
+                <%_}
+                _%>
                 </ul>

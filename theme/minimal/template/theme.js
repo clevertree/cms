@@ -2,6 +2,7 @@
 const path = require('path');
 const ejs = require('ejs');
 
+const TEMPLATE_DIR = path.resolve(path.dirname(__dirname));
 const BASE_DIR = path.resolve(path.dirname(path.dirname(path.dirname(__dirname))));
 
 class MinimalTheme {
@@ -9,7 +10,10 @@ class MinimalTheme {
         this.app = app;
         this.menuData = null;
         this.renderOptions = {
-            views: [BASE_DIR]
+            views: [
+                path.resolve(TEMPLATE_DIR + '/template/'),
+                path.resolve(BASE_DIR + '/server/template/')
+            ]
             // async: true
         };
     }
@@ -21,12 +25,15 @@ class MinimalTheme {
                 return sendErr(res, error);
 
             try {
-                renderData.content = ejs.render(renderData.article.content, renderData, this.renderOptions);
+                renderData.content = !renderData.article.content
+                    ? "No Content"
+                    : ejs.render(renderData.article.content, renderData, this.renderOptions);
             } catch (e) {
+                console.error(e);
                 renderData.content = e.message || e;
             }
 
-            const templatePath = path.resolve(BASE_DIR + '/theme/minimal/template/default.ejs');
+            const templatePath = path.resolve(TEMPLATE_DIR + '/template/default.ejs');
             ejs.renderFile(templatePath, renderData, this.renderOptions, (error, renderedTemplateHTML) => {
                 if(error)
                     return sendErr(res, error);
@@ -35,17 +42,16 @@ class MinimalTheme {
         });
     }
 
-    renderTemplate(renderData, callback) {
-        const templatePath = path.resolve(BASE_DIR + '/theme/minimal/template/default.ejs');
-        ejs.renderFile(templatePath, renderData, this.renderOptions, callback);
-    }
-
     queryArticleData(req, res, callback) {
         const app = this.app;
         const renderPath = req.url;
         app.view.getArticleByPath(renderPath, (error, article) => {
+            if(error)
+                return callback(error);
             this.queryMenuData(false, (error, menu) => {
-                app.user.getSessionUser(req, (sessionUser) => {
+                if(error)
+                    return callback(error);
+                app.user.getSessionUser(req, (error, sessionUser) => {
                     if(error)
                         return callback(error);
                     if(!article)
@@ -61,7 +67,7 @@ class MinimalTheme {
     }
 
     queryMenuData(force, callback) {
-        if(!force && this.menuData)
+        if(!force && this.menuData && false)
             return callback(null, this.menuData);
         const app = this.app;
         app.view.queryMenuData((error, menuData) => {
@@ -76,5 +82,5 @@ module.exports = MinimalTheme;
 
 function sendErr(res, e) {
     console.error(e);
-    res.send(e);
+    res.send(e.message ? e.message + "<br/>\n" + JSON.stringify(e) : e);
 }
