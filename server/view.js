@@ -22,6 +22,36 @@ class ViewManager {
         app.express.use(express.static(BASE_DIR));
     }
 
+
+    getArticleByPath(renderPath, callback) {
+        let SQL = `
+          SELECT a.*
+          FROM article a
+          WHERE a.path = ?`;
+        this.app.db.query(SQL, [renderPath], (error, results, fields) => {
+            callback(error, results && results[0] ? results[0] : null);
+        });
+    }
+
+
+    queryMenuData(callback) {
+        let SQL = `
+          SELECT a.id, a.parent_id, a.path, a.title
+          FROM article a
+          WHERE (
+                  FIND_IN_SET('main-menu', a.flag) 
+              OR  FIND_IN_SET('sub-menu', a.flag)
+          )
+`;
+        this.app.db.query(SQL, [], (error, results, fields) => {
+            if(!results || results.length === 0)
+                return callback("No menu items found");
+            for(var i=0; i<results.length; i++) {
+                
+            }
+        });
+    }
+
 }
 
 module.exports = {ViewManager};

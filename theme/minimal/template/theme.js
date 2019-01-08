@@ -13,7 +13,7 @@ class MinimalTheme {
     render(req, res) {
         const app = this.app;
         const renderPath = req.url;
-        app.db.getArticleByPath(renderPath, (error, article) => {
+        app.view.getArticleByPath(renderPath, (error, article) => {
             app.user.getSessionUser(req, (sessionUser) => {
                 if(error)
                     return sendErr(res, error);
@@ -25,7 +25,8 @@ class MinimalTheme {
                 const renderData = {
                     app, req, sessionUser
                 };
-                renderData.content = ejs.render(article.content, renderData, renderOptions);
+
+                renderData.renderContent = () => ejs.render(article.content, renderData, renderOptions);
 
                 const templatePath = path.resolve(BASE_DIR + '/theme/minimal/template/default.ejs');
                 ejs.renderFile(templatePath, renderData, renderOptions, (error, renderedTemplateHTML) => {
@@ -35,6 +36,13 @@ class MinimalTheme {
                 });
             });
         });
+    }
+
+    getMenuArticles(callback) {
+        const app = this.app;
+        app.db.selectArticlesByFlag('main-menu,sub-menu', (error, articleList) => {
+
+        })
     }
 
 }

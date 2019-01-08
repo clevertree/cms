@@ -20,11 +20,11 @@
                 </a>
             </div>
             <nav>
-                <%- include('theme/minimal/template/nav/auto.ejs') %>
+                <%- include('./nav/auto.ejs') %>
             </nav>
         </header>
 
-        <%-content%>
+        <%-renderContent()%>
 
         <footer>
             <ul class="flex-list">
