@@ -36,23 +36,45 @@ class ViewManager {
 
     queryMenuData(callback) {
         let SQL = `
-          SELECT a.id, a.parent_id, a.path, a.title
+          SELECT a.id, a.parent_id, a.path, a.title, a.flag
           FROM article a
           WHERE (
                   FIND_IN_SET('main-menu', a.flag) 
               OR  FIND_IN_SET('sub-menu', a.flag)
           )
 `;
-        this.app.db.query(SQL, [], (error, results, fields) => {
-            if(!results || results.length === 0)
+        this.app.db.query(SQL, [], (error, menuEntries, fields) => {
+            if(!menuEntries || menuEntries.length === 0)
                 return callback("No menu items found");
-            for(var i=0; i<results.length; i++) {
-                
+            const menuData = {};
+            for(let i=0; i<menuEntries.length; i++) {
+                const menuEntry = new Article(menuEntries[i]);
+                if(menuEntry.hasFlag('main-menu')) {
+                    if(!menuData[menuEntry.id]) menuData[menuEntry.id] = [null, []];
+                    menuData[menuEntry.id][0] = menuEntry;
+                }
+                if(menuEntry.hasFlag('sub-menu')) {
+                    if(!menuData[menuEntry.parent_id]) menuData[menuEntry.parent_id] = [null, []];
+                    menuData[menuEntry.parent_id][1].push(menuEntry);
+                }
             }
+
+            callback(null, Object.values(menuData));
         });
     }
 
 }
+
+// const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
+class Article {
+    constructor(row) {
+        Object.assign(this, row);
+        this.flag = this.flag ? this.flag.split(',') : [];
+    }
+
+    hasFlag(flag) { return this.flag.indexOf(flag) !== -1; }
+}
+
 
 module.exports = {ViewManager};
 
