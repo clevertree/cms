@@ -14,13 +14,37 @@ class ViewManager {
         app.express.use(bodyParser.json());
 
         app.express.get(['/[\\w/]+(\.ejs)?', '/'], (req, res) => {
-            const app = this.app;
             const theme = app.getTheme(app.config.theme || 'minimal');
             theme.render(req, res);
             // this.render(req, res);
         });
         app.express.use(express.static(BASE_DIR));
+
+        app.express.post('*', (req, res, next) => {
+            const isJSONRequest = req.headers.accept.split(',').indexOf('application/json') !== -1;
+
+            console.info("POST", req.url);
+            res.sendAPIError = (message, redirect) => {
+                console.error("API: ", message);
+                if(isJSONRequest) {
+                    res.status(status).json({success: false, message: message, redirect: redirect});
+                    return;
+                }
+                const theme = app.getTheme(app.config.theme || 'minimal');
+                theme.render(req, res);
+            };
+            res.sendAPISuccess = (message, redirect) => {
+                if(isJSONRequest) {
+                    res.json({success: true, message: message, redirect: redirect});
+                    return;
+                }
+            };
+            next();
+        });
+        // TODO: use view manager for post
+
     }
+
 
 
     getArticleByPath(renderPath, callback) {

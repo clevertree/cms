@@ -18,7 +18,7 @@ class MinimalTheme {
         };
     }
 
-
+    // TODO: allow rendering error pagesc
     render(req, res) {
         this.queryArticleData(req, res, (error, renderData) => {
             if(error)

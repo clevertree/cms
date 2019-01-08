@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const formLogin = document.querySelector('form[action="/user/login"]');
 
     document.addEventListener('submit', submitForm);
 

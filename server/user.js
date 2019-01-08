@@ -20,6 +20,7 @@ class UserAPI {
         // API Routes
         app.express.post('/user/login', (req, res) => this.login(req, res));
         app.express.post('/user/register', (req, res) => this.register(req, res));
+        // TODO: use view manager for post
     }
 
 
@@ -27,32 +28,29 @@ class UserAPI {
         console.log("Login Request", req.body);
 
         if(!req.body.email)
-            return sendAPIError(res, "Email is required");
+            return res.sendAPIError(res, "Email is required");
         if(!UserManager.validateEmail(req.body.email))
-            return sendAPIError(res, "Email format is invalid");
+            return res.sendAPIError(res, "Email format is invalid");
 
         if(!req.body.password)
-            return sendAPIError(res, "Password is required");
+            return res.sendAPIError(res, "Password is required");
 
         this.app.user.findUserByEmail(req.body.email, (error, user) => {
             if(error)
-                return sendAPIError(res, error.message || error);
+                return res.sendAPIError(res, error.message || error);
             if(!user)
-                return sendAPIError(res, "User not found: " + req.body.email);
+                return res.sendAPIError(res, "User not found: " + req.body.email);
 
             bcrypt.compare(req.body.password, user.password, (error, matches) => {
                 if(error)
-                    return sendAPIError(res, error.message || error);
+                    return res.sendAPIError(res, error.message || error);
                 if(matches !== true)
-                    return sendAPIError(res, "Invalid Password");
+                    return res.sendAPIError(res, "Invalid Password");
                 // sets a cookie with the user's info
                 req.session.reset();
                 req.session.user = {id: user.id};
 
-                res.json({
-                    success: true,
-                    message: `User logged in successfully: ${user.email}`
-                });
+                return res.sendAPISuccess(`User logged in successfully: ${user.email}`);
             });
 
         });
@@ -62,19 +60,19 @@ class UserAPI {
         console.log("Registration Request", req.body);
 
         if(!req.body.email)
-            return sendAPIError(res, "Email is required");
+            return res.sendAPIError(res, "Email is required");
         if(!UserManager.validateEmail(req.body.email))
-            return sendAPIError(res, "Email format is invalid");
+            return res.sendAPIError(res, "Email format is invalid");
 
         if(!req.body.password)
-            return sendAPIError(res, "Password is required");
+            return res.sendAPIError(res, "Password is required");
 
         if(req.body.password !== req.body.confirm_password)
-            return sendAPIError(res, "Confirm & Password do not match");
+            return res.sendAPIError(res, "Confirm & Password do not match");
 
         this.app.user.createUser(req.body.email, req.body.password, (error, user) => {
             if(error)
-                return sendAPIError(res, error.message || error);
+                return res.sendAPIError(res, error.message || error);
 
             req.session.reset();
             req.session.user = {id: user.id};
@@ -168,8 +166,3 @@ class UserSessionManager {
 
 module.exports = {User, UserSessionManager, UserManager, UserAPI};
 
-
-function sendAPIError(res, message, status=404) {
-    console.error("API: ", message);
-    res.status(status).json({success: false, message: message})
-}
