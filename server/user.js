@@ -5,8 +5,10 @@ const session = require('client-sessions');
 // const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
 class User {
     constructor(row) {
-        Object.assign(this, row);
-        this.flag = this.flag ? this.flag.split(',') : [];
+        this.id = row.id;
+        this.email = row.email;
+        this.password = row.password;
+        this.flag = row.flag ? row.flag.split(',') : [];
     }
 
     hasFlag(flag) { return this.flag.indexOf(flag) !== -1; }
@@ -14,31 +16,35 @@ class User {
 
 class UserAPI {
     constructor(app) {
+        this.app = app;
         // API Routes
-        app.express.post('(/user)?/login', (req, res) => this.login(req, res));
-        app.express.post('(/user)?/register', (req, res) => this.register(req, res));
+        app.express.post('/user/login', (req, res) => this.login(req, res));
+        app.express.post('/user/register', (req, res) => this.register(req, res));
     }
+
 
     login(req, res) {
         console.log("Login Request", req.body);
 
         if(!req.body.email)
-            return res.status(404).json({success: false, message: "Email is required"});
+            return sendAPIError(res, "Email is required");
         if(!UserManager.validateEmail(req.body.email))
-            return res.status(404).json({success: false, message: "Email format is invalid"});
+            return sendAPIError(res, "Email format is invalid");
 
         if(!req.body.password)
-            return res.status(404).json({success: false, message: "Password is required"});
+            return sendAPIError(res, "Password is required");
 
-        this.findUserByEmail(req.body.email, (error, user) => {
+        this.app.user.findUserByEmail(req.body.email, (error, user) => {
             if(error)
-                return res.status(404).json({success: false, message: error.message || error});
+                return sendAPIError(res, error.message || error);
+            if(!user)
+                return sendAPIError(res, "User not found: " + req.body.email);
 
-            bcrypt.compare(req.body.password, user.password, (err, matches) => {
-                if(err)
-                    return res.status(404).json({success: false, message: err.message || err});
+            bcrypt.compare(req.body.password, user.password, (error, matches) => {
+                if(error)
+                    return sendAPIError(res, error.message || error);
                 if(matches !== true)
-                    return res.status(404).json({success: false, message: "Invalid Password"});
+                    return sendAPIError(res, "Invalid Password");
                 // sets a cookie with the user's info
                 req.session.reset();
                 req.session.user = {id: user.id};
@@ -54,23 +60,24 @@ class UserAPI {
 
     register(req, res) {
         console.log("Registration Request", req.body);
-        const response = {success: false};
 
         if(!req.body.email)
-            return res.status(404).json({success: false, message: "Email is required"});
+            return sendAPIError(res, "Email is required");
         if(!UserManager.validateEmail(req.body.email))
-            return res.status(404).json({success: false, message: "Email format is invalid"});
+            return sendAPIError(res, "Email format is invalid");
 
         if(!req.body.password)
-            return res.status(404).json({success: false, message: "Password is required"});
+            return sendAPIError(res, "Password is required");
 
-        bcrypt.hash('myPassword', 10, function(err, hash) {
-            // Store hash in database
-        });
+        if(req.body.password !== req.body.confirm_password)
+            return sendAPIError(res, "Confirm & Password do not match");
 
-        this.createUser(req.body.email, req.body.password, (error, user) => {
+        this.app.user.createUser(req.body.email, req.body.password, (error, user) => {
             if(error)
-                return res.status(404).json({success: false, message: error.message || error});
+                return sendAPIError(res, error.message || error);
+
+            req.session.reset();
+            req.session.user = {id: user.id};
 
             res.json({
                 success: true,
@@ -160,3 +167,9 @@ class UserSessionManager {
 
 
 module.exports = {User, UserSessionManager, UserManager, UserAPI};
+
+
+function sendAPIError(res, message, status=404) {
+    console.error("API: ", message);
+    res.status(status).json({success: false, message: message})
+}

@@ -325,6 +325,6 @@ body.theme-minimal {
     padding: 4px 9px;
     margin: 0px 5px 1px 0px;
     border-radius: 4px;
-    border: 1px inset;
+    border-width: 1px;
     font-size: large;
 }
