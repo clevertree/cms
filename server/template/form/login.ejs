@@ -1,4 +1,4 @@
-            <% if (sessionUser && !sessionUser.hasFlag('guest')) { %>
+            <% if (req.sessionUser && !req.sessionUser.hasFlag('guest')) { %>
                 <form action="/user/logout" method="POST" class="themed">
                     <fieldset>
                         <label class="label-submit">Submit<br/>

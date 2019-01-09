@@ -4,48 +4,67 @@ const path = require('path');
 const ejs = require('ejs');
 const express = require('express');
 
-const BASE_DIR = path.resolve(path.dirname(__dirname));
+const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
 
 // Init
 class ViewManager {
     constructor(app) {
         this.app = app;
-        app.express.use(bodyParser.urlencoded({ extended: true }));
-        app.express.use(bodyParser.json());
+    }
 
-        app.express.get(['/[\\w/]+(\.ejs)?', '/'], (req, res) => {
-            const theme = app.getTheme(app.config.theme || 'minimal');
-            theme.render(req, res);
-            // this.render(req, res);
+    loadRoutes(router) {
+        const app = this.app;
+        // API Routes
+        router.use(bodyParser.urlencoded({ extended: true }));
+        router.use(bodyParser.json());
+
+        router.get(['/[\\w/]+(\.ejs)?', '/'], (req, res) => {
+            this.handleArticleRequest(req, res);
         });
-        app.express.use(express.static(BASE_DIR));
+        router.use(express.static(BASE_DIR));
 
-        app.express.post('*', (req, res, next) => {
+        router.post('*', (req, res, next) => {
             const isJSONRequest = req.headers.accept.split(',').indexOf('application/json') !== -1;
 
             console.info("POST", req.url);
             res.sendAPIError = (message, redirect) => {
-                console.error("API: ", message);
+                res.sendAPIResponse(message, 404, redirect);
+            };
+            res.sendAPIResponse = (message, status=200, redirect) => {
+                console[status === 200 ? 'info' : 'error']("API: ", message);
+                if(status)
+                    res.status(status);
                 if(isJSONRequest) {
-                    res.status(status).json({success: false, message: message, redirect: redirect});
+                    res.json({success: status === 200, message: message, redirect: redirect});
                     return;
                 }
                 const theme = app.getTheme(app.config.theme || 'minimal');
-                theme.render(req, res);
-            };
-            res.sendAPISuccess = (message, redirect) => {
-                if(isJSONRequest) {
-                    res.json({success: true, message: message, redirect: redirect});
-                    return;
-                }
+                theme.renderArticle({
+                    title: message,
+                    content: message,
+                    redirect: redirect
+                }, req, res);
             };
             next();
         });
-        // TODO: use view manager for post
-
     }
 
+    handleArticleRequest(req, res) {
+        const app = this.app;
+        const renderPath = req.url;
+        app.view.getArticleByPath(renderPath, (error, article) => {
+            if(error)
+                return callback(error);
+            article.theme = article.theme || app.config.theme || 'minimal';
 
+            const theme = app.getTheme(article.theme || app.config.theme || 'minimal');
+            theme.renderArticle(article, req, res);
+        });
+    }
+
+    renderArticleWithTheme(articleContent, theme) {
+
+    }
 
     getArticleByPath(renderPath, callback) {
         let SQL = `
@@ -92,11 +111,17 @@ class ViewManager {
 // const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
 class Article {
     constructor(row) {
-        Object.assign(this, row);
-        this.flag = this.flag ? this.flag.split(',') : [];
+        this.id = row.id;
+        this.parent_id = row.parent_id;
+        this.path = row.path;
+        this.title = row.title;
+        this.theme = row.theme;
+        this.flag = row.flag ? row.flag.split(',') : [];
+        this.content = row.content;
     }
 
     hasFlag(flag) { return this.flag.indexOf(flag) !== -1; }
+
 }
 
 

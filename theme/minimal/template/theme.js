@@ -18,20 +18,24 @@ class MinimalTheme {
         };
     }
 
-    // TODO: allow rendering error pagesc
-    render(req, res) {
-        this.queryArticleData(req, res, (error, renderData) => {
+    renderArticle(article, req, res) {
+        const app = this.app;
+
+        this.queryMenuData(false, (error, menu) => {
             if(error)
                 return sendErr(res, error);
+            const renderData = {
+                app, req, article, menu
+            };
 
             try {
-                renderData.content = !renderData.article.content
-                    ? "No Content"
-                    : ejs.render(renderData.article.content, renderData, this.renderOptions);
+                renderData.renderedArticle = ejs.render(article.content || '', renderData, this.renderOptions);
             } catch (e) {
                 console.error(e);
-                renderData.content = e.message || e;
+                renderData.renderedArticle = e.message || e;
             }
+
+            // TODO: handle subdirectory path
 
             const templatePath = path.resolve(TEMPLATE_DIR + '/template/default.ejs');
             ejs.renderFile(templatePath, renderData, this.renderOptions, (error, renderedTemplateHTML) => {
@@ -42,29 +46,49 @@ class MinimalTheme {
         });
     }
 
-    queryArticleData(req, res, callback) {
-        const app = this.app;
-        const renderPath = req.url;
-        app.view.getArticleByPath(renderPath, (error, article) => {
-            if(error)
-                return callback(error);
-            this.queryMenuData(false, (error, menu) => {
-                if(error)
-                    return callback(error);
-                app.user.getSessionUser(req, (error, sessionUser) => {
-                    if(error)
-                        return callback(error);
-                    if(!article)
-                        return callback("Path not found: " + renderPath);
-                    const renderData = {
-                        app, req, article, menu, sessionUser
-                    };
-                    callback(null, renderData);
-                });
-            });
-        });
+    // TODO: allow rendering error pagesc
+    // render(req, res) {
+    //     this.queryArticleData(req, res, (error, renderData) => {
+    //         if(error)
+    //             return sendErr(res, error);
+    //
+    //         try {
+    //             renderData.content = !renderData.article.content
+    //                 ? "No Content"
+    //                 : ejs.render(renderData.article.content, renderData, this.renderOptions);
+    //         } catch (e) {
+    //             console.error(e);
+    //             renderData.content = e.message || e;
+    //         }
+    //
+    //         const templatePath = path.resolve(TEMPLATE_DIR + '/template/default.ejs');
+    //         ejs.renderFile(templatePath, renderData, this.renderOptions, (error, renderedTemplateHTML) => {
+    //             if(error)
+    //                 return sendErr(res, error);
+    //             res.send(renderedTemplateHTML);
+    //         });
+    //     });
+    // }
 
-    }
+    // queryArticleData(req, res, callback) {
+    //     const app = this.app;
+    //     const renderPath = req.url;
+    //     app.view.getArticleByPath(renderPath, (error, article) => {
+    //         if(error)
+    //             return callback(error);
+    //         this.queryMenuData(false, (error, menu) => {
+    //             if(error)
+    //                 return callback(error);
+    //             if(!article)
+    //                 return callback("Path not found: " + renderPath);
+    //             const renderData = {
+    //                 app, req, article, menu
+    //             };
+    //             callback(null, renderData);
+    //         });
+    //     });
+    //
+    // }
 
     queryMenuData(force, callback) {
         if(!force && this.menuData && false)
