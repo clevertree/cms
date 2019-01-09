@@ -1,6 +1,5 @@
-                <script src="/server/template/form/client/edit-article.js"></script>
 
-                <form action="/article" method="POST" class="themed">
+                <form action="/article" method="POST" class="form-article-edit themed">
                     <input type="hidden" name="id" />
                     <fieldset>
                         <table>
@@ -22,12 +21,19 @@
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td>Content</td>
+                                    <td>
+                                        <textarea name="content"></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td>Submit</td>
                                     <td>
-                                        <button type="submit">Log out</button>
+                                        <button type="submit" disabled>Update</button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </fieldset>
                 </form>
+                <script src="/server/template/editor/article-editor.js"></script>

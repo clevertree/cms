@@ -79,7 +79,7 @@ class MinimalTheme {
     // queryArticleData(req, res, callback) {
     //     const app = this.app;
     //     const renderPath = req.url;
-    //     app.view.getArticleByPath(renderPath, (error, article) => {
+    //     app.article.fetchArticleByPath(renderPath, (error, article) => {
     //         if(error)
     //             return callback(error);
     //         this.queryMenuData(false, (error, menu) => {
@@ -100,7 +100,7 @@ class MinimalTheme {
         if(!force && this.menuData && false)
             return callback(null, this.menuData);
         const app = this.app;
-        app.view.queryMenuData((error, menuData) => {
+        app.article.queryMenuData((error, menuData) => {
             this.menuData = menuData;
             callback(null, this.menuData);
         })
