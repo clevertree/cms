@@ -23,13 +23,13 @@
   },
   "homepage": "https://github.com/clevertree/afoh-site#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "client-sessions": "^0.8.0",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
     "multer": "^1.4.1",
     "mysql": "^2.16.0",
-    "bcryptjs": "^2.4.3",
     "trumbowyg": "^2.13.0"
   }
 }

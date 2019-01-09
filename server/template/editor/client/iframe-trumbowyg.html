@@ -8,7 +8,7 @@
     <link href="theme/minimal/assets/minimal.css" rel="stylesheet" />
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.2.1.min.js"><\/script>')</script>
+    <script src="https://rawgit.com/RickStrahl/jquery-resizable/master/dist/jquery-resizable.min.js"></script>
 
     <script src="node_modules/trumbowyg/dist/trumbowyg.min.js"></script>
 
@@ -16,25 +16,44 @@
     <script src="node_modules/trumbowyg/dist/plugins/pasteimage/trumbowyg.pasteimage.min.js"></script>
 
     <link rel="stylesheet" href="node_modules/trumbowyg/dist/ui/trumbowyg.min.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let targetTextArea = null;
+            targetTextArea = window.frameElement.parentElement.querySelector('.editor-iframe-target');
+            targetTextArea.addEventListener('change', (e) => $('#editor').trumbowyg('html', targetTextArea.value));
+            targetTextArea.addEventListener('keyup', (e) => $('#editor').trumbowyg('html', targetTextArea.value));
+
+            // Doing this in a loaded JS file is better, I put this here for simplicity
+
+            $('#editor').trumbowyg()
+                .on('tbwchange', function(e) {
+                    const content = $('#editor').trumbowyg('html');
+                    targetTextArea.value = content;
+                    // console.info("Editor content changed", content);
+                })
+                .on('tbwopenfullscreen', e => window.frameElement.classList.add('fullscreen'))
+                .on('tbwclosefullscreen', e => window.frameElement.classList.remove('fullscreen'));
+
+            $('#editor').trumbowyg('html', targetTextArea.value);
+
+            setTimeout(() =>
+                window.frameElement.style.height = (document.body.offsetHeight + 20) + 'px', 500);
+        });
+    </script>
+    <style>
+        body {
+            margin: 0 auto;
+            padding: 0 0;
+            width: 99%;
+        }
+        .trumbowyg-box, .trumbowyg-editor {
+            min-height: 500px;
+        }
+    </style>
 </head>
 <body>
     <div class="theme-minimal">
-        <textarea id="editor">sdaf 32</textarea>
+        <textarea id="editor"></textarea>
     </div>
-    <script>
-        let targetTextArea = null;
-        document.addEventListener('DOMContentLoaded', (e) => {
-            targetTextArea = window.frameElement.parentElement.querySelector('.editor-iframe-target');
-            $('#editor').trumbowyg('html', targetTextArea.value);
-        });
-
-        // Doing this in a loaded JS file is better, I put this here for simplicity
-        $('#editor').trumbowyg()
-            .on('tbwchange', function(e) {
-                const content = $('#editor').trumbowyg('html');
-                targetTextArea.value = content;
-                console.info("Editor content changed", content);
-            });
-    </script>
 </body>
 </html>

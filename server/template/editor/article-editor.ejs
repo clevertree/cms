@@ -32,8 +32,9 @@
                                 <tr>
                                     <td class="label">Content</td>
                                     <td>
-                                        <textarea class="editor-plain editor-iframe-target" name="content" style="width: 100%; height: 400px"></textarea>
-                                        <iframe class="editor-iframe editor-iframe-trumbowyg" src="/server/template/editor/client/iframe-trumbowyg.html" style="width: 100%; height: 400px"></iframe>
+                                        <textarea class="editor-plain editor-iframe-target" name="content" style="width: 100%; height: 400px; display: none;"></textarea>
+                                        <iframe class="editor-iframe editor-iframe-trumbowyg" src="/server/template/editor/client/iframe-trumbowyg.html"
+                                                style="width: 100%; height: 400px; overflow-x: hidden; border: 0px"></iframe>
                                     </td>
                                 </tr>
                                 <tr>
@@ -66,3 +67,4 @@
                     </fieldset>
                 </form>
                 <script src="/server/template/editor/client/article-editor.js"></script>
+                <link rel="stylesheet" href="/server/template/editor/client/article-editor.css">

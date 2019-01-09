@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         input.value = json[input.name];
 
                 }
-                formEditArticle.onChange(e);
             };
             xhr.responseType = 'json';
             xhr.open ("GET", `:article/${id}`, true);

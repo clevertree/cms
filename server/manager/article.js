@@ -84,10 +84,10 @@ class ArticleAPI {
         });
 
         // Handle Article JSON / API
-        router.get(['/\:article/:id(\\d+)', '/\:article/:id(\\d+)/json'], (req, res) => {
+        router.get(['/\:?article/:id(\\d+)', '/\:article/:id(\\d+)/json'], (req, res) => {
             this.getArticleJSON(req, res);
         });
-        router.get(['/\:article/:id(\\d+)/edit', '/\:article/new'], (req, res) => {
+        router.get(['/\:?article/:id(\\d+)/edit', '/\:article/new'], (req, res) => {
             this.renderArticleEditor(req, res);
         });
     }

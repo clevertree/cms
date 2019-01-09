@@ -113,9 +113,9 @@ class UserAPI {
 
     loadRoutes(router) {
         // API Routes
-        router.post('/:user/login', (req, res) => this.login(req, res));
-        router.post('/:user/logout', (req, res) => this.logout(req, res));
-        router.post('/:user/register', (req, res) => this.register(req, res));
+        router.post('/:?user/login', (req, res) => this.login(req, res));
+        router.post('/:?user/logout', (req, res) => this.logout(req, res));
+        router.post('/:?user/register', (req, res) => this.register(req, res));
 
         // TODO: get json :user
     }
