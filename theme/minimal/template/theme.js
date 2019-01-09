@@ -27,6 +27,7 @@ class MinimalTheme {
             const renderData = {
                 app, req, article, menu
             };
+            req.baseHref = this.getBaseHRef(req);
 
             try {
                 renderData.renderedArticle = ejs.render(article.content || '', renderData, this.renderOptions);
@@ -35,8 +36,6 @@ class MinimalTheme {
                 renderData.renderedArticle = e.message || e;
             }
 
-            // TODO: handle subdirectory path
-
             const templatePath = path.resolve(TEMPLATE_DIR + '/template/default.ejs');
             ejs.renderFile(templatePath, renderData, this.renderOptions, (error, renderedTemplateHTML) => {
                 if(error)
@@ -44,6 +43,13 @@ class MinimalTheme {
                 res.send(renderedTemplateHTML);
             });
         });
+    }
+
+    getBaseHRef(req) {
+        const slashCount = req.path.split('/').length-1;
+        if(slashCount <= 1)
+            return null;
+        return "../".repeat(slashCount-1);
     }
 
     // TODO: allow rendering error pagesc

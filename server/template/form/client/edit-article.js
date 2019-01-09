@@ -2,14 +2,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.addEventListener('submit', submitForm);
 
+    // TODO: Populate form field
 
     function submitForm(e) {
+        if(e.defaultPrevented)
+            return;
         const form = e.target;
         switch(new URL(form.action).pathname) {
-            case "/user/login":
-            case "/user/logout":
-            case "/user/register":
-            case "/user/account":
+            case "/article/edit":
+            case "/article/delete":
+            case "/article/new":
                 break;
             default:
                 return;

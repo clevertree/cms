@@ -1,6 +1,10 @@
             <% if (req.sessionUser && !req.sessionUser.hasFlag('guest')) { %>
                 <form action="/user/logout" method="POST" class="themed">
                     <fieldset>
+                        <label class="label-email">Logged in as<br/>
+                            <input type="text" name="email" value="<%=req.sessionUser.email%>" disabled/>
+                        </label>
+                        <br/><br/>
                         <label class="label-submit">Submit<br/>
                             <button type="submit">Log out</button>
                         </label>

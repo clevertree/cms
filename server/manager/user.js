@@ -108,6 +108,7 @@ class UserAPI {
     loadRoutes(router) {
         // API Routes
         router.post('/user/login', (req, res) => this.login(req, res));
+        router.post('/user/logout', (req, res) => this.logout(req, res));
         router.post('/user/register', (req, res) => this.register(req, res));
     }
 
@@ -138,10 +139,19 @@ class UserAPI {
                 req.session.reset();
                 req.session.user = {id: user.id};
 
-                return res.sendAPIResponse(`User logged in successfully: ${user.email}`);
+                return res.sendAPIResponse(`User logged in successfully: ${user.email}. Redirecting...`, '/account');
             });
 
         });
+    }
+
+
+    logout(req, res) {
+        console.log("Log out Request", req.body);
+
+        // sets a cookie with the user's info
+        req.session.reset();
+        return res.sendAPIResponse(`User logged out successfully. Redirecting...`, '/login');
     }
 
     register(req, res) {
@@ -165,10 +175,7 @@ class UserAPI {
             req.session.reset();
             req.session.user = {id: user.id};
 
-            res.json({
-                success: true,
-                message: `User created successfully: ${user.email}`
-            });
+            return res.sendAPIResponse(`User created successfully: ${user.email}. Redirecting...`, '/account');
         });
     }
 

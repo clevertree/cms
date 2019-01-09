@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <% if(req.baseHref) {%>
+        <base href="<%=req.baseHref;%>">
+        <% } %>
         <title>Arizona Friends of the Homeless</title>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <meta name="keywords" CONTENT="arizona, friends of the homeless, resources, links">

@@ -27,10 +27,10 @@ class ViewManager {
             const isJSONRequest = req.headers.accept.split(',').indexOf('application/json') !== -1;
 
             console.info("POST", req.url);
-            res.sendAPIError = (message, redirect) => {
-                res.sendAPIResponse(message, 404, redirect);
+            res.sendAPIError = (message, redirect=null) => {
+                res.sendAPIResponse(message, redirect, 404);
             };
-            res.sendAPIResponse = (message, status=200, redirect) => {
+            res.sendAPIResponse = (message, redirect=null, status=200) => {
                 console[status === 200 ? 'info' : 'error']("API: ", message);
                 if(status)
                     res.status(status);
@@ -38,11 +38,20 @@ class ViewManager {
                     res.json({success: status === 200, message: message, redirect: redirect});
                     return;
                 }
+                let redirectHTML = '';
+                if(redirect)
+                    redirectHTML = `<script>setTimeout(()=>document.location.href = '${redirect}', 3000);</script>`;
+
                 const theme = app.getTheme(app.config.theme || 'minimal');
                 theme.renderArticle({
                     title: message,
-                    content: message,
-                    redirect: redirect
+                    content: `
+                        <section>
+                            <h4>${message}</h4>
+                            ${redirectHTML}
+                        </section>
+                        `,
+                    // redirect: redirect
                 }, req, res);
             };
             next();
@@ -55,6 +64,10 @@ class ViewManager {
         app.view.getArticleByPath(renderPath, (error, article) => {
             if(error)
                 return callback(error);
+            if(!article)
+                article = new Article({
+                    content: 'Article not found: ' + renderPath,
+                });
             article.theme = article.theme || app.config.theme || 'minimal';
 
             const theme = app.getTheme(article.theme || app.config.theme || 'minimal');
