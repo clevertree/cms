@@ -111,7 +111,7 @@ class ArticleAPI {
 
     renderArticleEditor(req, res) {
         const app = this.app;
-        const articleID = req.params.id;
+        const articleID = parseInt(req.params.id);
         const editorArticle = new Article({
             content: `<%-include('editor/article-editor.ejs', {id: ${articleID}})%>`,
         });
