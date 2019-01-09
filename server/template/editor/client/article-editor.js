@@ -5,13 +5,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // Populate Form Data
         formEditArticle.loadArticle = function(id) {
             const xhr = new XMLHttpRequest();
-            xhr.onload = () => {
+            xhr.onload = (e) => {
                 const json = xhr.response;
                 for(let i=0; i<formEditArticle.elements.length; i++) {
                     const input = formEditArticle.elements[i];
                     if(input.name && typeof json[input.name] !== 'undefined')
                         input.value = json[input.name];
+
                 }
+                formEditArticle.onChange(e);
             };
             xhr.responseType = 'json';
             xhr.open ("GET", `:article/${id}`, true);
@@ -20,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         // Submit Form
-        formEditArticle.addEventListener('submit', function(e) {
+        formEditArticle.onSubmit = function(e) {
             e.preventDefault();
             const form = e.target;
             const request = {};
@@ -34,7 +36,23 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.send (JSON.stringify(request));
             console.log(request);
-        });
+        };
+
+        // Submit Form
+        // formEditArticle.onChange = function(e) {
+        //     e.preventDefault();
+        //     const form = e.target;
+        //     const data = new FormData(form);
+        //     const iframes = document.querySelectorAll('iframe.editor-iframe');
+        //     iframes.forEach(iframe => {
+        //         iframe.contentWindow.document.dispatchEvent(new CustomEvent('editor:set', {
+        //             detail: data.get('content')
+        //         }))
+        //     })
+        // };
+
+        formEditArticle.addEventListener('submit', formEditArticle.onSubmit);
+        // formEditArticle.addEventListener('change', formEditArticle.onChange);
 
         const loadArticleID = new FormData(formEditArticle).get('id');
         if(loadArticleID) {

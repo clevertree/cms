@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <title>Title</title>
 
+    <link href="theme/minimal/assets/minimal.css" rel="stylesheet" />
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.2.1.min.js"><\/script>')</script>
 
@@ -16,12 +18,22 @@
     <link rel="stylesheet" href="node_modules/trumbowyg/dist/ui/trumbowyg.min.css">
 </head>
 <body>
-    <textarea class="my-editor">sdaf 32</textarea>
+    <div class="theme-minimal">
+        <textarea id="editor">sdaf 32</textarea>
+    </div>
     <script>
+        let targetTextArea = null;
+        document.addEventListener('DOMContentLoaded', (e) => {
+            targetTextArea = window.frameElement.parentElement.querySelector('.editor-iframe-target');
+            $('#editor').trumbowyg('html', targetTextArea.value);
+        });
+
         // Doing this in a loaded JS file is better, I put this here for simplicity
-        $('.my-editor').trumbowyg()
+        $('#editor').trumbowyg()
             .on('tbwchange', function(e) {
-                console.log($('.my-editor').trumbowyg('html'));
+                const content = $('#editor').trumbowyg('html');
+                targetTextArea.value = content;
+                console.info("Editor content changed", content);
             });
     </script>
 </body>
