@@ -8,10 +8,10 @@ class User {
         this.id = row.id;
         this.email = row.email;
         this.password = row.password;
-        this.flag = row.flag ? row.flag.split(',') : [];
+        this.flags = row.flags ? row.flags.split(',') : [];
     }
 
-    hasFlag(flag) { return this.flag.indexOf(flag) !== -1; }
+    hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
 }
 
 class UserManager {
@@ -37,7 +37,7 @@ class UserManager {
 
     findUserByID(id, callback) { return this.findUser('u.id = ?', id, callback); }
     findUserByEmail(email, callback) { return this.findUser('u.email = ?', email, callback); }
-    findGuestUser(callback) { return this.findUser('FIND_IN_SET(\'guest\', u.flag)', null, callback); }
+    findGuestUser(callback) { return this.findUser('FIND_IN_SET(\'guest\', u.flags)', null, callback); }
 
     createUser(email, password, callback) {
         bcrypt.genSalt(10, (err, salt) => {

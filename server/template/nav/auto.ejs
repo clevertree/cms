@@ -1,5 +1,5 @@
 <ul class="nav-menu">
-                <%_ for(let i=0; i<menu.length; i++) {
+                <%_ if(typeof menu !== "undefined") for(let i=0; i<menu.length; i++) {
                     const menuItem = menu[i][0];
                     if(!menuItem)
                         continue;

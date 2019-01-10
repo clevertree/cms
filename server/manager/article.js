@@ -4,6 +4,22 @@
 // const express = require('express');
 
 
+// const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
+class Article {
+    constructor(row) {
+        this.id = row.id;
+        this.parent_id = row.parent_id;
+        this.path = row.path;
+        this.title = row.title;
+        this.theme = row.theme;
+        this.flags = row.flags ? row.flags.split(',') : [];
+        this.content = row.content;
+    }
+
+    hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
+
+}
+
 // Init
 class ArticleManager {
     constructor(app) {
@@ -16,10 +32,11 @@ class ArticleManager {
         this.api.loadRoutes(router);
     }
 
+    // TODO: load draft content
     queryArticles(whereSQL, values, callback) {
         let SQL = `
           SELECT a.*, 
-          (SELECT article_content ac WHERE a.id = ac.article_id AND ac.status = 'published' ORDER BY ac.created DESC LIMIT 1) as content
+          (SELECT ac.content FROM article_content ac WHERE a.id = ac.article_id AND ac.status = 'published' ORDER BY ac.created DESC LIMIT 1) as content
           FROM article a
           WHERE ${whereSQL}`;
         this.app.db.query(SQL, values, (error, results, fields) => {
@@ -40,49 +57,70 @@ class ArticleManager {
         });
     }
 
-    updateArticle(data, user, callback) {
+    insertArticleContent(article_id, user_id, status, content, callback) {
         let SQL = `
           INSERT INTO article_content
           SET ?
         `;
-        this.app.db.query(SQL, [{
-                article_id: data.id,
-                user_id: user.id,
-                status: data.status,
-                content: data.content,
-            }, data.id],
-            (error, results1, fields) => {
+        this.app.db.query(SQL, {
+            article_id,
+            user_id,
+            status,
+            content,
+        }, (error, results, fields) => {
+            callback(error, results ? results.insertId : null)
+        })
+    }
+
+    insertArticle(title, path, parent_id, theme, flags, callback) {
+        let SQL = `
+          INSERT INTO article
+          SET ?
+        `;
+        this.app.db.query(SQL, {
+            parent_id,
+            path,
+            title,
+            theme,
+            flags,
+        }, (error, results, fields) => {
             if(error)
                 return callback(error);
+            callback(null, results);
+        })
+    }
 
-            let SQL = `
-              UPDATE article
-              SET ?, updated = UTC_TIMESTAMP()
-              WHERE id=?
-            `;
-            this.app.db.query(SQL, [{
-                parent_id: data.parent_id || null,
-                path: data.path,
-                title: data.title,
-                theme: data.theme,
-                flag: data.flag,
-            }, data.id],
-            (error, results2, fields) => {
-                callback(error, error ? null : results1.affectedRows + results2.affectedRows);
-            });
-        });
+    updateArticle(id, title, path, parent_id, theme, flags, callback) {
+        let SQL = `
+          UPDATE article a
+          SET ?
+          WHERE a.id = ?
+        `;
+        this.app.db.query(SQL, [{
+            parent_id,
+            path,
+            title,
+            theme,
+            flags,
+        }, id], (error, results, fields) => {
+            if(error)
+                return callback(error);
+            callback(null, results);
+        })
     }
 
     queryMenuData(callback) {
         let SQL = `
-          SELECT a.id, a.parent_id, a.path, a.title, a.flag
+          SELECT a.id, a.parent_id, a.path, a.title, a.flags
           FROM article a
           WHERE (
-                  FIND_IN_SET('main-menu', a.flag) 
-              OR  FIND_IN_SET('sub-menu', a.flag)
+                  FIND_IN_SET('main-menu', a.flags) 
+              OR  FIND_IN_SET('sub-menu', a.flags)
           )
 `;
         this.app.db.query(SQL, [], (error, menuEntries, fields) => {
+            if(error)
+                return callback(error);
             if(!menuEntries || menuEntries.length === 0)
                 return callback("No menu items found");
             const menuData = {};
@@ -103,7 +141,6 @@ class ArticleManager {
     }
 
 }
-
 class ArticleAPI {
     constructor(app) {
         this.app = app;
@@ -119,66 +156,93 @@ class ArticleAPI {
                 if (!article)
                     return next();
 
-                this.handleArticleRequest(article, req, res);
+                this.renderArticleResponse(article, article, req, res);
             });
         });
         router.get(['/:?article/:id/?', '/:?article/:id/:mode'], (req, res, next) => {
-            this.handleArticleRequestByID(req, res, next);
+            this.app.article.fetchArticleByID(req.params.id, (error, article) => {
+                if (error)
+                    return res.status(400).send(error);
+                if (!article)
+                    return next();
+
+                this.renderArticleResponse(article, article, req, res);
+            });
         });
-        router.post(['/:?article/:id/?', '/:?article/:id/:mode'], (req, res, next) => {
-            this.handleArticleRequestByID(req, res, next);
+        router.post('/:?article/:id/:mode', (req, res, next) => {
+            this.app.article.fetchArticleByID(req.params.id, (error, article) => {
+                if (error)
+                    return res.status(400).send(error);
+                if (!article)
+                    return next();
+
+                this.handleArticleRequest(article, req, res);
+            });
         });
 
     }
 
-    handleArticleRequestByID(req, res, next) {
-        this.app.article.fetchArticleByID(req.params.id, (error, article) => {
-            if (error)
-                return res.status(400).send(error);
-            if (!article)
-                return next();
-
-            this.handleArticleRequest(article, req, res);
-        });
-    }
 
     handleArticleRequest(article, req, res) {
         const mode = req.params.mode || 'view';
-        const isJSONRequest = req.headers.accept.split(',').indexOf('application/json') !== -1;
-        if(req.method === 'POST') {
-            // API shouldn't render html
-            switch(mode) {
-                default:
-                    throw new Error("Unknown mode: " + mode);
+        // API shouldn't render html
+        switch(mode) {
+            default:
+                throw new Error("Unknown mode: " + mode);
 
-                case 'view':
-                    res.set('Content-Type', 'application/json');
-                    res.json(article);
-                    break;
+            case 'view':
+                return this.renderArticleResponse(article, article, req, res);
+                // res.set('Content-Type', 'application/json');
+                // res.json(article);
+                // break;
 
-                case 'edit':
-                    this.app.article.updateArticle(req.body, req.sessionUser, (error, updated) => {
-                        res.set('Content-Type', 'application/json');
-                        res.json({
-                            success: true,
-                            message: "Article updated successfully"
-                        });
+            case 'edit':
+                this.app.article.updateArticle(
+                    req.body.id,
+                    req.body.title,
+                    req.body.path,
+                    req.body.parent_id,
+                    req.body.theme,
+                    req.body.flags,
+                    (error, articleUpdateResult) => {
+                        if(error)
+                            return this.renderArticleResponse(article, error, req, res);
+                        if(req.body.content && req.body.content !== article.content) {
+                            this.app.article.insertArticleContent(
+                                req.body.id,
+                                req.sessionUser ? req.sessionUser.id : null,
+                                req.body.status,
+                                req.body.content,
+                                (error, insertArticleContentResult) => {
+                                    if(error)
+                                        return this.renderArticleResponse(article, error, req, res);
+                                    return this.renderArticleResponse(article, {
+                                        success: true,
+                                        message: "Article and Content updated successfully",
+                                        articleUpdateResult, insertArticleContentResult
+                                    }, req, res);
+                                });
+
+                        } else {
+                            return this.renderArticleResponse(article, {
+                                success: true,
+                                message: "Article updated successfully",
+                                articleUpdateResult
+                            }, req, res);
+                        }
                     });
-                    break;
-            }
-
-        } else {
-            if(isJSONRequest) {
-                res.set('Content-Type', 'application/json');
-                res.json(article);
-
-            } else {
-                this.renderArticleResponse(article, req, res);
-            }
+                break;
         }
     }
 
-    renderArticleResponse(article, req, res) {
+    renderArticleResponse(article, response, req, res) {
+
+        const isJSONRequest = req.headers.accept.split(',').indexOf('application/json') !== -1;
+        if(isJSONRequest) {
+            res.set('Content-Type', 'application/json');
+            res.json(response);
+            return;
+        }
         const mode = req.params.mode || 'view';
 
         switch(mode) {
@@ -203,21 +267,6 @@ class ArticleAPI {
             .renderArticle(article, req, res);
     }
 
-
-}
-// const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
-class Article {
-    constructor(row) {
-        this.id = row.id;
-        this.parent_id = row.parent_id;
-        this.path = row.path;
-        this.title = row.title;
-        this.theme = row.theme;
-        this.flag = row.flag ? row.flag.split(',') : [];
-        this.content = row.content;
-    }
-
-    hasFlag(flag) { return this.flag.indexOf(flag) !== -1; }
 
 }
 

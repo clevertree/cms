@@ -102,7 +102,7 @@ class MinimalTheme {
         const app = this.app;
         app.article.queryMenuData((error, menuData) => {
             this.menuData = menuData;
-            callback(null, this.menuData);
+            callback(error, this.menuData);
         })
     }
 

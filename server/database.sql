@@ -9,12 +9,12 @@ CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(256) DEFAULT NULL,
   `password` varchar(256) DEFAULT NULL,
-  `flag` SET('guest', 'admin'),
+  `flags` SET('guest', 'admin'),
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_email_unique` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `user` (`id`, `email`, `flag`)
+INSERT INTO `user` (`id`, `email`, `flags`)
   VALUES (1, 'guest@localhost', 'guest');
 
 
@@ -26,14 +26,14 @@ CREATE TABLE `article` (
   `path` varchar(256),
   `title` varchar(256) DEFAULT NULL,
   `theme` varchar(256) DEFAULT NULL,
-  `flag` SET('main-menu', 'sub-menu', 'account-only', 'admin-only'),
+  `flags` SET('main-menu', 'sub-menu', 'account-only', 'admin-only'),
   `created` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `updated` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `article_path_unique` (`path`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `article` (id, parent_id, title, path, flag, content)
+INSERT INTO `article` (id, parent_id, title, path, flags, content)
   VALUES  (1, null,   'Home',                 '/',          'main-menu', '<%- include("about.ejs") %>'),
           (2, null,   'About Us',             '/about',     'sub-menu', '<%- include("about.ejs") %>'),
           (3, 1,      'What We Do',           '/service',   'sub-menu', '<%- include("about.ejs") %>');
@@ -44,7 +44,7 @@ INSERT INTO `article` (id, parent_id, title, path, flag, content)
 CREATE TABLE `article_content` (
    `article_id` int(11) NOT NULL,
    `user_id` int(11) NOT NULL,
-   `status` ENUM('draft', 'published'),
+   `status` ENUM('suggested', 'drafted', 'published'),
    `content` TEXT,
    `created` DATETIME DEFAULT CURRENT_TIMESTAMP,
    `updated` DATETIME DEFAULT CURRENT_TIMESTAMP,
