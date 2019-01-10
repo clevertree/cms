@@ -18,7 +18,8 @@ class ArticleManager {
 
     queryArticles(whereSQL, values, callback) {
         let SQL = `
-          SELECT a.*
+          SELECT a.*, 
+          (SELECT article_content ac WHERE a.id = ac.article_id AND ac.status = 'published' ORDER BY ac.created DESC LIMIT 1) as content
           FROM article a
           WHERE ${whereSQL}`;
         this.app.db.query(SQL, values, (error, results, fields) => {
@@ -39,22 +40,36 @@ class ArticleManager {
         });
     }
 
-    updateArticle(data, callback) {
+    updateArticle(data, user, callback) {
         let SQL = `
-          UPDATE article
+          INSERT INTO article_content
           SET ?
-          WHERE id=?
         `;
         this.app.db.query(SQL, [{
+                article_id: data.id,
+                user_id: user.id,
+                status: data.status,
+                content: data.content,
+            }, data.id],
+            (error, results1, fields) => {
+            if(error)
+                return callback(error);
+
+            let SQL = `
+              UPDATE article
+              SET ?, updated = UTC_TIMESTAMP()
+              WHERE id=?
+            `;
+            this.app.db.query(SQL, [{
                 parent_id: data.parent_id || null,
                 path: data.path,
                 title: data.title,
                 theme: data.theme,
                 flag: data.flag,
-                content: data.content,
             }, data.id],
-            (error, results, fields) => {
-            callback(error, results.affectedRows);
+            (error, results2, fields) => {
+                callback(error, error ? null : results1.affectedRows + results2.affectedRows);
+            });
         });
     }
 
@@ -142,7 +157,7 @@ class ArticleAPI {
                     break;
 
                 case 'edit':
-                    this.app.article.updateArticle(req.body, (error, updated) => {
+                    this.app.article.updateArticle(req.body, req.sessionUser, (error, updated) => {
                         res.set('Content-Type', 'application/json');
                         res.json({
                             success: true,
