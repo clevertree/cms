@@ -39,6 +39,24 @@ class ArticleManager {
         });
     }
 
+    updateArticle(data, callback) {
+        let SQL = `
+          UPDATE article
+          SET ?
+          WHERE id=?
+        `;
+        this.app.db.query(SQL, [{
+                parent_id: data.parent_id || null,
+                path: data.path,
+                title: data.title,
+                theme: data.theme,
+                flag: data.flag,
+                content: data.content,
+            }, data.id],
+            (error, results, fields) => {
+            callback(error, results.affectedRows);
+        });
+    }
 
     queryMenuData(callback) {
         let SQL = `
@@ -79,55 +97,97 @@ class ArticleAPI {
 
     loadRoutes(router) {
         // Handle Article requests
-        router.get(['/[\\w/]+(\.ejs)?', '/'], (req, res) => {
-            this.renderArticle(req, res);
+        router.get(['/[\\w/]+(?:\.ejs)?', '/'], (req, res, next) => {
+            this.app.article.fetchArticleByPath(req.url, (error, article) => {
+                if (error)
+                    return res.status(400).send(error);
+                if (!article)
+                    return next();
+
+                this.handleArticleRequest(article, req, res);
+            });
+        });
+        router.get(['/:?article/:id/?', '/:?article/:id/:mode'], (req, res, next) => {
+            this.handleArticleRequestByID(req, res, next);
+        });
+        router.post(['/:?article/:id/?', '/:?article/:id/:mode'], (req, res, next) => {
+            this.handleArticleRequestByID(req, res, next);
         });
 
-        // Handle Article JSON / API
-        router.get(['/\:?article/:id(\\d+)', '/\:article/:id(\\d+)/json'], (req, res) => {
-            this.getArticleJSON(req, res);
-        });
-        router.get(['/\:?article/:id(\\d+)/edit', '/\:article/new'], (req, res) => {
-            this.renderArticleEditor(req, res);
-        });
     }
 
-    renderArticle(req, res) {
-        const app = this.app;
-        const renderPath = req.url;
-        app.article.fetchArticleByPath(renderPath, (error, article) => {
+    handleArticleRequestByID(req, res, next) {
+        this.app.article.fetchArticleByID(req.params.id, (error, article) => {
             if (error)
-                return callback(error);
+                return res.status(400).send(error);
             if (!article)
-                article = new Article({
-                    content: 'Article not found: ' + renderPath,
+                return next();
+
+            this.handleArticleRequest(article, req, res);
+        });
+    }
+
+    handleArticleRequest(article, req, res) {
+        const mode = req.params.mode || 'view';
+        const isJSONRequest = req.headers.accept.split(',').indexOf('application/json') !== -1;
+        if(req.method === 'POST') {
+            // API shouldn't render html
+            switch(mode) {
+                default:
+                    throw new Error("Unknown mode: " + mode);
+
+                case 'view':
+                    res.set('Content-Type', 'application/json');
+                    res.json(article);
+                    break;
+
+                case 'edit':
+                    this.app.article.updateArticle(req.body, (error, updated) => {
+                        res.set('Content-Type', 'application/json');
+                        res.json({
+                            success: true,
+                            message: "Article updated successfully"
+                        });
+                    });
+                    break;
+            }
+
+        } else {
+            if(isJSONRequest) {
+                res.set('Content-Type', 'application/json');
+                res.json(article);
+
+            } else {
+                this.renderArticleResponse(article, req, res);
+            }
+        }
+    }
+
+    renderArticleResponse(article, req, res) {
+        const mode = req.params.mode || 'view';
+
+        switch(mode) {
+            default:
+                throw new Error("Unknown mode: " + mode);
+
+            case 'view':
+                break;
+
+            case 'edit':
+                const includeParams = JSON.stringify({
+                    id: article.id,
+                    // response: response
                 });
-            article.theme = article.theme || app.config.theme;
+                article = new Article({
+                    content: `<%-include('editor/article-editor.ejs', ${includeParams})%>`,
+                });
+                break;
+        }
 
-            const theme = app.getTheme(article.theme);
-            theme.renderArticle(article, req, res);
-        });
+        this.app.getTheme(article.theme)
+            .renderArticle(article, req, res);
     }
 
-    renderArticleEditor(req, res) {
-        const app = this.app;
-        const articleID = parseInt(req.params.id);
-        const editorArticle = new Article({
-            content: `<%-include('editor/article-editor.ejs', {id: ${articleID}})%>`,
-        });
-
-        const theme = app.getTheme();
-        theme.renderArticle(editorArticle, req, res);
-    }
-
-    getArticleJSON(req, res) {
-        const app = this.app;
-        const articleID = req.params.id;
-        app.article.fetchArticleByID(articleID, (error, article) => {
-            // res.set('Content-Type', 'application/json');
-            res.json(article);
-        });
-    }
 
 }
 // const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));

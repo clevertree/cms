@@ -62,7 +62,7 @@ class App {
                 redirectHTML = `<script>setTimeout(()=>document.location.href = '${redirect}', 3000);</script>`;
 
             const theme = this.getTheme(this.config.theme || 'minimal');
-            theme.renderArticle({
+            theme.handleArticleRequest({
                 title: message,
                 content: `
                             <section>

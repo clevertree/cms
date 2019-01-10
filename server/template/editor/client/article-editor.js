@@ -9,9 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const json = xhr.response;
                 for(let i=0; i<formEditArticle.elements.length; i++) {
                     const input = formEditArticle.elements[i];
-                    if(input.name && typeof json[input.name] !== 'undefined')
+                    if(input.name && typeof json[input.name] !== 'undefined' && json[input.name] !== null)
                         input.value = json[input.name];
-
                 }
             };
             xhr.responseType = 'json';
@@ -30,11 +29,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             const xhr = new XMLHttpRequest();
-            xhr.onload = function(){ alert (xhr.responseText); };
+            xhr.onload = function(){ console.log (xhr.response); };
             xhr.open (form.method, form.action, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.setRequestHeader("Accept", "application/json");
+            xhr.responseType = 'json';
             xhr.send (JSON.stringify(request));
-            console.log(request);
         };
 
         // Submit Form

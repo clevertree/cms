@@ -324,11 +324,18 @@ body.theme-minimal {
 .theme-minimal form.themed select,
 .theme-minimal form.themed textarea,
 .theme-minimal form.themed button {
-    padding: 4px 6px;
-    margin: 0px -4px;
+    padding: 2px 6px;
+    margin: 0px 0px;
     border-radius: 4px;
     border-width: 1px;
     font-size: large;
+}
+.theme-minimal input[type=checkbox].themed,
+.theme-minimal form.themed input[type=checkbox] {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin: 0 0px 4px 0px;
 }
 
 /** Table **/
@@ -336,7 +343,6 @@ body.theme-minimal {
 .theme-minimal table.themed td.label {
     padding-right: 6px;
     text-align: right;
-    min-height:;
     /* font-weight: bold; */
 }
 .theme-minimal table.themed {
