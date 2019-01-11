@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
         //     })
         // };
 
-        formEditArticle.addEventListener('submit', formEditArticle.onSubmit);
+        // formEditArticle.addEventListener('submit', formEditArticle.onSubmit);
         // formEditArticle.addEventListener('change', formEditArticle.onChange);
 
         const loadArticleID = new FormData(formEditArticle).get('id');

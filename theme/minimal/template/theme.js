@@ -18,31 +18,25 @@ class MinimalTheme {
         };
     }
 
-    renderArticle(article, req, res) {
+    async renderArticle(article, req, res) {
         const app = this.app;
 
-        this.queryMenuData(false, (error, menu) => {
-            if(error)
-                return sendErr(res, error);
-            const renderData = {
-                app, req, article, menu
-            };
-            req.baseHref = this.getBaseHRef(req);
+        const menu = await app.article.queryMenuData(false);
+        const renderData = {
+            app, req, article, menu
+        };
+        req.baseHref = this.getBaseHRef(req);
 
-            try {
-                renderData.renderedArticle = ejs.render(article.content || '', renderData, this.renderOptions);
-            } catch (e) {
-                console.error(e);
-                renderData.renderedArticle = e.message || e;
-            }
+        try {
+            renderData.renderedArticle = ejs.render(article.content || '', renderData, this.renderOptions);
+        } catch (e) {
+            console.error(e);
+            renderData.renderedArticle = e.message || e;
+        }
 
-            const templatePath = path.resolve(TEMPLATE_DIR + '/template/default.ejs');
-            ejs.renderFile(templatePath, renderData, this.renderOptions, (error, renderedTemplateHTML) => {
-                if(error)
-                    return sendErr(res, error);
-                res.send(renderedTemplateHTML);
-            });
-        });
+        const templatePath = path.resolve(TEMPLATE_DIR + '/template/default.ejs');
+        const renderedTemplateHTML = await ejs.renderFile(templatePath, renderData, this.renderOptions);
+        res.send(renderedTemplateHTML);
     }
 
     getBaseHRef(req) {

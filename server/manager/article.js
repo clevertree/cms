@@ -58,74 +58,59 @@ class ArticleManager {
     }
 
     async fetchArticleByPath(renderPath) {
-        return await this.selectArticles('*', 'a.path = ? LIMIT 1', renderPath)[0];
+        const articles = await this.selectArticles('*', 'a.path = ? LIMIT 1', renderPath);
+        return articles[0];
     }
     async fetchArticleByID(renderPath) {
-        return await this.selectArticles('*', 'a.id = ? LIMIT 1', renderPath)[0];
+        const articles = await this.selectArticles('*', 'a.id = ? LIMIT 1', renderPath);
+        return articles[0];
     }
 
-    insertArticle(title, content, path, user_id, parent_id, theme, flags, callback) {
+    async insertArticle(title, content, path, user_id, parent_id, theme, flags, callback) {
         let SQL = `
           INSERT INTO article
           SET ?
         `;
-        this.app.db.query(SQL,
-            {title, content, path, user_id, parent_id, theme, flags},
-            (error, results, fields) => {
-                if(error)
-                    return callback(error);
-                callback(null, results.insertId, results);
-            })
+        return await this.app.db.queryAsync(SQL, {title, content, path, user_id, parent_id, theme, flags})
+            .insertId;
     }
 
-    updateArticle(id, title, content, path, user_id, parent_id, theme, flags, callback) {
+    async updateArticle(id, title, content, path, user_id, parent_id, theme, flags, callback) {
         let SQL = `
           UPDATE article a
           SET ?
           WHERE a.id = ?
         `;
-        this.app.db.query(SQL, [{title, content, path, user_id, parent_id, theme, flags}, id],
-            (error, results, fields) => {
-                if(error)
-                    return callback(error);
-                callback(null, results.affectedRows, results);
-            })
+        const results = await this.app.db.queryAsync(SQL, [{title, content, path, user_id, parent_id, theme, flags}, id])
+        return results.affectedRows;
     }
 
     /** Article History **/
 
-    selectArticleHistory(selectSQL, whereSQL, values, callback) {
+    async selectArticleHistory(selectSQL, whereSQL, values, callback) {
         let SQL = `
           SELECT ${selectSQL}
           FROM article_history ah
           WHERE ${whereSQL}
           ORDER BY created DESC`;
 
-        this.app.db.query(SQL, values, (error, results) => {
-            callback(error, results && results.length > 0
-                ? results.map(result => new ArticleHistoryEntry(result))
-                : null);
-        });
+        return await this.app.db.queryAsync(SQL, values)
+            .map(result => new ArticleHistoryEntry(result))
     }
 
     // Inserting history without updating article === draft
-    insertArticleHistory(article_id, title, content, user_id, callback) {
+    async insertArticleHistory(article_id, title, content, user_id, callback) {
         let SQL = `
           INSERT INTO article_history
           SET ?
         `;
-        this.app.db.query(SQL,
-            {article_id, user_id, title, content},
-            (error, results, fields) => {
-                if(error)
-                    return callback(error);
-                callback(null, results.insertId, results);
-            })
+        const results = await this.app.db.queryAsync(SQL, {article_id, user_id, title, content})
+        return results.insertId;
     }
 
     /** Article Menu **/
 
-    queryMenuData(callback) {
+    async queryMenuData() {
         let SQL = `
           SELECT a.id, a.parent_id, a.path, a.title, a.flags
           FROM article a
@@ -134,26 +119,23 @@ class ArticleManager {
               OR  FIND_IN_SET('sub-menu', a.flags)
           )
 `;
-        this.app.db.query(SQL, [], (error, menuEntries, fields) => {
-            if(error)
-                return callback(error);
-            if(!menuEntries || menuEntries.length === 0)
-                return callback("No menu items found");
-            const menuData = {};
-            for(let i=0; i<menuEntries.length; i++) {
-                const menuEntry = new ArticleEntry(menuEntries[i]);
-                if(menuEntry.hasFlag('main-menu')) {
-                    if(!menuData[menuEntry.id]) menuData[menuEntry.id] = [null, []];
-                    menuData[menuEntry.id][0] = menuEntry;
-                }
-                if(menuEntry.hasFlag('sub-menu')) {
-                    if(!menuData[menuEntry.parent_id]) menuData[menuEntry.parent_id] = [null, []];
-                    menuData[menuEntry.parent_id][1].push(menuEntry);
-                }
+        const menuEntries = await this.app.db.queryAsync(SQL);
+        if(!menuEntries || menuEntries.length === 0)
+            throw new Error("No menu items found");
+        const menuData = {};
+        for(let i=0; i<menuEntries.length; i++) {
+            const menuEntry = new ArticleEntry(menuEntries[i]);
+            if(menuEntry.hasFlag('main-menu')) {
+                if(!menuData[menuEntry.id]) menuData[menuEntry.id] = [null, []];
+                menuData[menuEntry.id][0] = menuEntry;
             }
+            if(menuEntry.hasFlag('sub-menu')) {
+                if(!menuData[menuEntry.parent_id]) menuData[menuEntry.parent_id] = [null, []];
+                menuData[menuEntry.parent_id][1].push(menuEntry);
+            }
+        }
 
-            callback(null, Object.values(menuData));
-        });
+        return Object.values(menuData);
     }
 
 }
@@ -165,105 +147,122 @@ class ArticleAPI {
 
     loadRoutes(router) {
         // Handle Article requests
-        router.get(['/[\\w/]+(?:\.ejs)?', '/'], (req, res, next) => {
-
-            this.app.article.fetchArticleByPath(req.params.id)
-                .then((article) => {
-                    this.renderArticleResponse(article, article, req, res);
-                }).catch((error) => {
-                    res.status(400).send(error)
-                });
+        router.get(['/[\\w/]+(?:\.ejs)?', '/'], async (req, res, next) => {
+            try {
+                const article = await this.app.article.fetchArticleByPath(req.url);
+                if(!article)
+                    return next();
+                await this.renderArticle(article, article, req, res);
+            } catch (error) {
+                res.status(400).send(error)
+            }
         });
 
 
-        router.all('/:?article/:id/view', (req, res, next) => this.handleView(req, res, next));
-        router.all('/:?article/:id/edit', (req, res, next) => this.handleEdit(req, res, next));
+        router.all(['/:?article/:id/view', '/:?article/:id'], async (req, res, next) => await this.handleView(req, res, next));
+        router.all('/:?article/:id/edit', async (req, res, next) => await this.handleEdit(req, res, next));
     }
 
     async handleView(req, res, next) {
-        const article = await this.app.article.fetchArticleByID(req.params.id);
-
-        if(req.method === 'GET') {
-            return this.renderArticleResponse(article, article, req, res);
+        try {
+            const article = await this.app.article.fetchArticleByID(req.params.id);
+            if(!article)
+                return next();
+            await this.renderArticle(article, article, req, res);
+        } catch (error) {
+            res.status(400).send(error)
         }
-        return this.renderArticleResponse(article, article, req, res);
     }
 
     async handleEdit(req, res, next) {
-        let insertID;
-        const article = await this.app.article.fetchArticleByID(req.params.id);
+        try {
+            let insertID;
+            const article = await this.app.article.fetchArticleByID(req.params.id);
+            if(!article)
+                return next();
 
-        if(req.method === 'GET') {
-            return this.renderArticleResponse(article, article, req, res);
-        }
-        switch(req.body.action) {
-            default:
-            case 'publish':
-                const affectedRows = await this.app.article.updateArticle(
-                    article.id,
-                    req.body.title,
-                    req.body.content,
-                    req.body.path,
-                    req.sessionUser ? req.sessionUser.id : null,
-                    req.body.parent_id ? parseInt(req.body.parent_id) : null,
-                    req.body.theme,
-                    req.body.flags);
+            if(req.method === 'GET') {
+                return await this.renderArticleEditor(article, article, req, res);
+            }
+            switch(req.body.action) {
+                default:
+                case 'publish':
+                    const affectedRows = await this.app.article.updateArticle(
+                        article.id,
+                        req.body.title,
+                        req.body.content,
+                        req.body.path,
+                        req.sessionUser ? req.sessionUser.id : null,
+                        req.body.parent_id ? parseInt(req.body.parent_id) : null,
+                        req.body.theme,
+                        req.body.flags);
 
-                insertID = await this.app.article.insertArticleHistory(
-                    article.id,
-                    req.body.title,
-                    req.body.content,
-                    req.sessionUser ? req.sessionUser.id : null);
-                return this.renderArticleResponse(article, {
-                    success: !error,
-                    message: error || "Article published successfully",
-                    insertID
-                }, req, res);
+                    insertID = await this.app.article.insertArticleHistory(
+                        article.id,
+                        req.body.title,
+                        req.body.content,
+                        req.sessionUser ? req.sessionUser.id : null);
+                    return this.renderArticle(article, {
+                        success: true,
+                        message: "Article published successfully",
+                        insertID
+                    }, req, res);
 
-            case 'draft':
-                insertID = await this.app.article.insertArticleHistory(
-                    article.id,
-                    req.body.title,
-                    req.body.content,
-                    req.sessionUser ? req.sessionUser.id : null);
-                return this.renderArticleResponse(article, {
-                    success: !error,
-                    message: error || "Draft saved successfully",
-                    insertID
-                }, req, res);
-                break;
+                case 'draft':
+                    insertID = await this.app.article.insertArticleHistory(
+                        article.id,
+                        req.body.title,
+                        req.body.content,
+                        req.sessionUser ? req.sessionUser.id : null);
+                    return this.renderArticle(article, {
+                        success: true,
+                        message: "Draft saved successfully",
+                        insertID
+                    }, req, res);
+                    break;
+            }
+        } catch (error) {
+            res.status(400).send(error.message || error)
         }
     }
 
 
-    renderArticleResponse(article, response, req, res) {
-        const mode = req.params.mode || 'view';
+    async renderArticle(article, response, req, res) {
         const isJSONRequest = req.headers.accept.split(',').indexOf('application/json') !== -1;
-
-        switch(mode) {
-            default:
-                throw new Error("Unknown mode: " + mode);
-
-            case 'view':
-                break;
-
-            case 'edit':
-                const includeParams = JSON.stringify({
-                    id: article.id,
-                    // response: response
-                });
-                article = new ArticleEntry({
-                    content: `<%-include('editor/article-editor.ejs', ${includeParams})%>`,
-                });
-                break;
-        }
 
         if(isJSONRequest) {
             res.set('Content-Type', 'application/json');
             res.json(response);
 
         } else {
-            this.app.getTheme(article.theme)
+            if(req.method !== 'GET')
+                return res.redirect('/:article/' + article.id + '/view')
+
+            await this.app.getTheme(article.theme)
+                .renderArticle(article, req, res);
+        }
+    }
+
+
+    async renderArticleEditor(article, response, req, res) {
+        const isJSONRequest = req.headers.accept.split(',').indexOf('application/json') !== -1;
+        const includeParams = JSON.stringify({
+            id: article.id,
+            // response: response
+        });
+        article = new ArticleEntry({
+            content: `<%-include('editor/article-editor.ejs', ${includeParams})%>`,
+        });
+
+        if(isJSONRequest) {
+            res.set('Content-Type', 'application/json');
+            res.json(response);
+
+        } else {
+            if(req.method !== 'GET')
+                return res.redirect('/:article/' + article.id + '/edit')
+
+            await this.app.getTheme(article.theme)
                 .renderArticle(article, req, res);
         }
     }
