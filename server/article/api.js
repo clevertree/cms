@@ -1,11 +1,12 @@
 const {UserSession} = require('./user.js');
+const {ArticleDatabase} = require('./database.js');
 
 class ArticleAPI {
     constructor(app) {
         this.app = app;
     }
 
-    get articleDB () { return new ArticleDB(this.app.db); }
+    get articleDB () { return new ArticleDatabase(this.app.db); }
 
     loadRoutes(router) {
         // Handle Article requests

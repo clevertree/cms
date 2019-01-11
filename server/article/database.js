@@ -9,7 +9,7 @@ class ArticleDatabase {
     constructor(db) {
         this.db = db;
     }
-
+    
     /** Articles **/
 
     async selectArticles(selectSQL, whereSQL, values) {
@@ -18,7 +18,7 @@ class ArticleDatabase {
           FROM article a
           WHERE ${whereSQL}`;
 
-        const results = await this.db.queryAsync(SQL, values);
+        const results = await this.queryAsync(SQL, values);
         if(!results)
             return null;
         return results.map(result => new ArticleEntry(result));
@@ -38,7 +38,7 @@ class ArticleDatabase {
           INSERT INTO article
           SET ?
         `;
-        return await this.db.queryAsync(SQL, {title, content, path, user_id, parent_id, theme, flags})
+        return await this.queryAsync(SQL, {title, content, path, user_id, parent_id, theme, flags})
             .insertId;
     }
 
@@ -48,7 +48,7 @@ class ArticleDatabase {
           SET ?
           WHERE a.id = ?
         `;
-        const results = await this.db.queryAsync(SQL, [{title, content, path, user_id, parent_id, theme, flags}, id])
+        const results = await this.queryAsync(SQL, [{title, content, path, user_id, parent_id, theme, flags}, id])
         return results.affectedRows;
     }
 
@@ -61,7 +61,7 @@ class ArticleDatabase {
           WHERE ${whereSQL}
           ORDER BY created DESC`;
 
-        return await this.db.queryAsync(SQL, values)
+        return await this.queryAsync(SQL, values)
             .map(result => new ArticleHistoryEntry(result))
     }
 
@@ -71,7 +71,7 @@ class ArticleDatabase {
           INSERT INTO article_history
           SET ?
         `;
-        const results = await this.db.queryAsync(SQL, {article_id, user_id, title, content})
+        const results = await this.queryAsync(SQL, {article_id, user_id, title, content})
         return results.insertId;
     }
 
@@ -86,7 +86,7 @@ class ArticleDatabase {
               OR  FIND_IN_SET('sub-menu', a.flags)
           )
 `;
-        const menuEntries = await this.db.queryAsync(SQL);
+        const menuEntries = await this.queryAsync(SQL);
         if(!menuEntries || menuEntries.length === 0)
             throw new Error("No menu items found");
         const menuData = {};
@@ -105,6 +105,14 @@ class ArticleDatabase {
         return Object.values(menuData);
     }
 
+
+    queryAsync(sql, values) {
+        return new Promise( ( resolve, reject ) => {
+            this.db.query(sql, values, ( err, rows ) => {
+                err ? reject (err) : resolve (rows);
+            });
+        });
+    }
 }
 
 class ArticleEntry {

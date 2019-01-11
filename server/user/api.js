@@ -1,4 +1,4 @@
-const { UserDatabase } = require('./database.js');
+const { UserDatabase, UserEntry } = require('./database.js');
 
 class UserAPI {
     constructor(app) {
@@ -8,20 +8,20 @@ class UserAPI {
 
     loadRoutes(router) {
         // API Routes
-        router.post('/:?user/login', (req, res) => this.login(req, res));
-        router.post('/:?user/logout', (req, res) => this.logout(req, res));
-        router.post('/:?user/register', (req, res) => this.register(req, res));
+        router.post('/:?user/login', (req, res) => await this.login(req, res));
+        router.post('/:?user/logout', (req, res) => await this.logout(req, res));
+        router.post('/:?user/register', (req, res) => await this.register(req, res));
 
         // TODO: get json :user
     }
 
 
-    login(req, res) {
+    async login(req, res) {
         console.log("Login Request", req.body);
 
         if(!req.body.email)
             return res.sendAPIError(res, "Email is required");
-        if(!UserManager.validateEmail(req.body.email))
+        if(!UserAPI.validateEmail(req.body.email))
             return res.sendAPIError(res, "Email format is invalid");
 
         if(!req.body.password)
@@ -49,7 +49,7 @@ class UserAPI {
     }
 
 
-    logout(req, res) {
+    async logout(req, res) {
         console.log("Log out Request", req.body);
 
         // sets a cookie with the user's info
@@ -57,7 +57,7 @@ class UserAPI {
         return res.sendAPIResponse(`User logged out successfully. Redirecting...`, '/login');
     }
 
-    register(req, res) {
+    async register(req, res) {
         console.log("Registration Request", req.body);
 
         if(!req.body.email)
@@ -82,6 +82,10 @@ class UserAPI {
         });
     }
 
+    static validateEmail(email) {
+        var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(email).toLowerCase());
+    }
 }
 
 

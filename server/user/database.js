@@ -1,45 +1,43 @@
-const { DatabaseManager } = require('../database/manager.js');
 
-class UserDatabase extends DatabaseManager {
+class UserDatabase  {
     constructor(db) {
-        super(db)
+        this.db = db;
     }
 
-    async findUser(fieldName, fieldValues, callback) {
+    async findUser(fieldName, fieldValues) {
         let SQL = `
           SELECT u.*
           FROM user u
           WHERE ${fieldName}`;
-        return await this.queryAsync(SQL, fieldValues, (error, results, fields) => {
-            callback(error, results && results.length > 0 ? new UserEntry(results[0]) : null);
-        });
+        const results = await this.queryAsync(SQL, fieldValues);
+        return results && results.length > 0 ? new UserEntry(results[0]) : null
     }
 
-    findUserByID(id, callback) { return this.findUser('u.id = ?', id, callback); }
-    findUserByEmail(email, callback) { return this.findUser('u.email = ?', email, callback); }
-    findGuestUser(callback) { return this.findUser('FIND_IN_SET(\'guest\', u.flags)', null, callback); }
+    async findUserByID(id) { return await this.findUser('u.id = ?', id); }
+    async findUserByEmail(email) { return await this.findUser('u.email = ?', email); }
+    async findGuestUser() { return await this.findUser('FIND_IN_SET(\'guest\', u.flags)', null); }
 
-    createUser(email, password, callback) {
-        bcrypt.genSalt(10, (err, salt) => {
-            bcrypt.hash(password, salt, (err, hash) => {
-                let SQL = `
-                  INSERT INTO user SET 
-                      email = ?,
-                      password = ?`;
+    async createUser(email, password) {
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(password, salt);
+        let SQL = `
+          INSERT INTO user SET 
+              email = ?,
+              password = ?`;
 
-                this.db.query(SQL, [email, hash], (error) => {
-                    if(error) {
-                        callback && callback(error, null);
-                        return;
-                    }
-                    this.findUserByEmail(email, (error, user) => {
-                        callback && callback(error, user);
-                        console.info("User Created", user);
-                    });
-                });
+        await this.queryAsync(SQL, [email, hash]);
+
+        const user = await this.findUserByEmail(email);
+        console.info("User Created", user);
+        return user;
+    }
+
+    queryAsync(sql, values) {
+        return new Promise( ( resolve, reject ) => {
+            this.db.query(sql, values, ( err, rows ) => {
+                err ? reject (err) : resolve (rows);
             });
         });
-
     }
 }
 
@@ -53,10 +51,6 @@ class UserEntry {
 
     hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
 
-    static validateEmail(email) {
-        var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(String(email).toLowerCase());
-    }
 }
 module.exports = {UserEntry, UserDatabase};
 
