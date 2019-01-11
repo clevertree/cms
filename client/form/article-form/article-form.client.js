@@ -46,7 +46,10 @@ class HTMLFormArticleEditorElement extends HTMLElement {
     loadArticle(articleID) {
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
-            this.article = xhr.response;
+            console.info(xhr.response);
+            if(!xhr.response.article)
+                throw new Error("Invalid Response");
+            this.article = xhr.response.article;
             this.render();
         };
         xhr.responseType = 'json';

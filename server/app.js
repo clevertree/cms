@@ -1,27 +1,24 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const mysql = require('mysql');
 
-const { UserAPI, UserSessionManager, UserManager } = require('./manager/user.js');
-const { ArticleManager } = require('./manager/article.js');
-const { DatabaseManager } = require('./manager/database.js');
+const { UserSessionManager } = require('./user/session.js');
+const { UserAPI } = require('./user/api.js');
+const { ArticleAPI } = require('./article/api.js');
+const { DatabaseManager } = require('./database/manager.js');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
 class App {
     constructor() {
+        this.themes = {};
+        this.db = null;
+
         this.loadConfig();
 
-        this.themes = {};
-        this.api = {};
 
-
-        this.user = new UserManager(this);
-        this.session = new UserSessionManager(this);
-
-        this.article = new ArticleManager(this);
-
-        this.db = new DatabaseManager(this);
+        // this.db = new DatabaseManager(this);
 
         this.express = express();
         this.express.use(bodyParser.urlencoded({ extended: true }));
@@ -33,48 +30,13 @@ class App {
 
 
         // Routes
-        this.session.loadRoutes(this.express);
-        this.article.loadRoutes(this.express);
-        this.user.loadRoutes(this.express);
+        new UserSessionManager(this).loadRoutes(this.express);
+        new UserAPI(this).loadRoutes(this.express);
+        new ArticleAPI(this).loadRoutes(this.express);
 
         // Asset files
         this.express.use(express.static(BASE_DIR));
     }
-
-    // TODO: refactor
-    // postMiddleware(req, res, next) {
-    //     const isJSONRequest = req.headers.accept.split(',').indexOf('application/json') !== -1;
-    //
-    //     console.info("POST", req.url);
-    //     res.sendAPIError = (message, redirect=null) => {
-    //         res.sendAPIResponse(message, redirect, 404);
-    //     };
-    //     res.sendAPIResponse = (message, redirect=null, status=200) => {
-    //         console[status === 200 ? 'info' : 'error']("API: ", message);
-    //         if(status)
-    //             res.status(status);
-    //         if(isJSONRequest) {
-    //             res.json({success: status === 200, message: message, redirect: redirect});
-    //             return;
-    //         }
-    //         let redirectHTML = '';
-    //         if(redirect)
-    //             redirectHTML = `<script>setTimeout(()=>document.location.href = '${redirect}', 3000);</script>`;
-    //
-    //         const theme = this.getTheme(this.config.theme || 'minimal');
-    //         theme.handleArticleRequest({
-    //             title: message,
-    //             content: `
-    //                         <section>
-    //                             <h4>${message}</h4>
-    //                             ${redirectHTML}
-    //                         </section>
-    //                         `,
-    //             // redirect: redirect
-    //         }, req, res);
-    //     };
-    //     next();
-    // }
 
     getTheme(themeName) {
         if(!themeName)
@@ -92,7 +54,30 @@ class App {
         this.express.listen(this.config.port);
         console.log(`Listening on ${this.config.port}`);
 
-        this.db.connect();
+        this.createDBConnection();
+    }
+
+    createDBConnection() {
+        // Mysql
+        const dbConfig = this.config.mysql;
+        const db = mysql.createConnection(dbConfig);
+        if(this.db)
+            this.db.end();
+        this.db = db;
+
+        db.on('error', function (err){
+            console.error("DB Error", err);
+        });
+        db.connect({}, (err) => {
+            if (err) {
+                console.error(`DB Connection to '${dbConfig.database}' Failed`, err.message);
+                setTimeout(() => this.createDBConnection(), 3000);
+                db.end();
+            } else {
+                console.info(`DB Connecting to '${dbConfig.database}' Successful`);
+            }
+        });
+        return db;
     }
 
     loadConfig() {

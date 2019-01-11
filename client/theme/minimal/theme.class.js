@@ -1,6 +1,7 @@
 // const fs = require('fs');
 const path = require('path');
 const ejs = require('ejs');
+const { ArticleDatabase } = require('../../../server/article/database.js');
 
 const TEMPLATE_DIR = path.resolve(__dirname);
 const BASE_DIR = path.resolve(path.dirname(path.dirname(path.dirname(__dirname))));
@@ -17,13 +18,16 @@ class MinimalTheme {
             // async: true
         };
     }
+    get articleDB() { return new ArticleDatabase(this.app.db); }
 
     async render(req, content, renderData) {
         const app = this.app;
+        if(!renderData)
+            renderData = {};
         renderData.app = app;
-        renderData.menu = await app.article.queryMenuData(false);
+        renderData.menu = await this.articleDB.queryMenuData(false);
         renderData.req = req;
-        renderData.content = await ejs.render(content, renderData, this.renderOptions);
+        renderData.content = content ? await ejs.render(content, renderData, this.renderOptions) : "No Content";
 
         req.baseHref = this.getBaseHRef(req);
 
@@ -39,59 +43,6 @@ class MinimalTheme {
         return "../".repeat(slashCount-1);
     }
 
-    // TODO: allow rendering error pagesc
-    // render(req, res) {
-    //     this.queryArticleData(req, res, (error, renderData) => {
-    //         if(error)
-    //             return sendErr(res, error);
-    //
-    //         try {
-    //             renderData.content = !renderData.article.content
-    //                 ? "No Content"
-    //                 : ejs.render(renderData.article.content, renderData, this.renderOptions);
-    //         } catch (e) {
-    //             console.error(e);
-    //             renderData.content = e.message || e;
-    //         }
-    //
-    //         const templatePath = path.resolve(TEMPLATE_DIR + '/template/default.ejs');
-    //         ejs.renderFile(templatePath, renderData, this.renderOptions, (error, renderedTemplateHTML) => {
-    //             if(error)
-    //                 return sendErr(res, error);
-    //             res.send(renderedTemplateHTML);
-    //         });
-    //     });
-    // }
-
-    // queryArticleData(req, res, callback) {
-    //     const app = this.app;
-    //     const renderPath = req.url;
-    //     app.article.fetchArticleByPath(renderPath, (error, article) => {
-    //         if(error)
-    //             return callback(error);
-    //         this.queryMenuData(false, (error, menu) => {
-    //             if(error)
-    //                 return callback(error);
-    //             if(!article)
-    //                 return callback("Path not found: " + renderPath);
-    //             const renderData = {
-    //                 app, req, article, menu
-    //             };
-    //             callback(null, renderData);
-    //         });
-    //     });
-    //
-    // }
-
-    queryMenuData(force, callback) {
-        if(!force && this.menuData && false)
-            return callback(null, this.menuData);
-        const app = this.app;
-        app.article.queryMenuData((error, menuData) => {
-            this.menuData = menuData;
-            callback(error, this.menuData);
-        })
-    }
 
 }
 
