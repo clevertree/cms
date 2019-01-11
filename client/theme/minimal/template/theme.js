@@ -3,7 +3,7 @@ const path = require('path');
 const ejs = require('ejs');
 
 const TEMPLATE_DIR = path.resolve(path.dirname(__dirname));
-const BASE_DIR = path.resolve(path.dirname(path.dirname(path.dirname(__dirname))));
+const BASE_DIR = path.resolve(path.resolve(path.dirname(path.dirname(path.dirname(__dirname)))));
 
 class MinimalTheme {
     constructor(app) {
@@ -12,32 +12,25 @@ class MinimalTheme {
         this.renderOptions = {
             views: [
                 path.resolve(TEMPLATE_DIR + '/template/'),
-                path.resolve(BASE_DIR + '/server/template/')
+                path.resolve(BASE_DIR + '/template/')
             ]
             // async: true
         };
     }
 
-    async renderArticle(article, req, res) {
+    async render(req, content, renderData) {
         const app = this.app;
+        renderData.app = app;
+        renderData.menu = await app.article.queryMenuData(false);
+        renderData.req = req;
+        renderData.content = await ejs.render(content, renderData, this.renderOptions);
 
-        const menu = await app.article.queryMenuData(false);
-        const renderData = {
-            app, req, article, menu
-        };
         req.baseHref = this.getBaseHRef(req);
 
-        try {
-            renderData.renderedArticle = ejs.render(article.content || '', renderData, this.renderOptions);
-        } catch (e) {
-            console.error(e);
-            renderData.renderedArticle = e.message || e;
-        }
-
         const templatePath = path.resolve(TEMPLATE_DIR + '/template/default.ejs');
-        const renderedTemplateHTML = await ejs.renderFile(templatePath, renderData, this.renderOptions);
-        res.send(renderedTemplateHTML);
+        return await ejs.renderFile(templatePath, renderData, this.renderOptions);
     }
+
 
     getBaseHRef(req) {
         const slashCount = req.path.split('/').length-1;

@@ -147,23 +147,25 @@ class ArticleAPI {
 
     loadRoutes(router) {
         // Handle Article requests
-        router.get(['/[\\w/]+(?:\.ejs)?', '/'], async (req, res, next) => {
-            try {
-                const article = await this.app.article.fetchArticleByPath(req.url);
-                if(!article)
-                    return next();
-                await this.renderArticle(article, article, req, res);
-            } catch (error) {
-                res.status(400).send(error)
-            }
-        });
+        router.get(['/[\\w/]+(?:\.ejs)?', '/'], async (req, res, next) => await this.handleViewByPath(req, res,next));
 
 
-        router.all(['/:?article/:id/view', '/:?article/:id'], async (req, res, next) => await this.handleView(req, res, next));
-        router.all('/:?article/:id/edit', async (req, res, next) => await this.handleEdit(req, res, next));
+        router.all(['/:?article/:id/view', '/:?article/:id'], async (req, res, next) => await this.handleViewByID(req, res, next));
+        router.all('/:?article/:id/edit', async (req, res, next) => await this.handleEditByID(req, res, next));
     }
 
-    async handleView(req, res, next) {
+    async handleViewByPath(req, res, next) {
+        try {
+            const article = await this.app.article.fetchArticleByPath(req.url);
+            if(!article)
+                return next();
+            await this.renderArticle(article, article, req, res);
+        } catch (error) {
+            res.status(400).send(error)
+        }
+    }
+
+    async handleViewByID(req, res, next) {
         try {
             const article = await this.app.article.fetchArticleByID(req.params.id);
             if(!article)
@@ -174,7 +176,7 @@ class ArticleAPI {
         }
     }
 
-    async handleEdit(req, res, next) {
+    async handleEditByID(req, res, next) {
         try {
             let insertID;
             const article = await this.app.article.fetchArticleByID(req.params.id);
@@ -238,21 +240,16 @@ class ArticleAPI {
             if(req.method !== 'GET')
                 return res.redirect('/:article/' + article.id + '/view')
 
-            await this.app.getTheme(article.theme)
-                .renderArticle(article, req, res);
+            res.send(
+                await this.app.getTheme(article.theme)
+                    .render(req, article.content, {article})
+            );
         }
     }
 
 
     async renderArticleEditor(article, response, req, res) {
         const isJSONRequest = req.headers.accept.split(',').indexOf('application/json') !== -1;
-        const includeParams = JSON.stringify({
-            id: article.id,
-            // response: response
-        });
-        article = new ArticleEntry({
-            content: `<%-include('editor/article-editor.ejs', ${includeParams})%>`,
-        });
 
         if(isJSONRequest) {
             res.set('Content-Type', 'application/json');
@@ -262,8 +259,14 @@ class ArticleAPI {
             if(req.method !== 'GET')
                 return res.redirect('/:article/' + article.id + '/edit')
 
-            await this.app.getTheme(article.theme)
-                .renderArticle(article, req, res);
+            res.send(
+                await this.app.getTheme(article.theme)
+                    .render(req, `
+                        <div class="article-editor-container"></div>
+                        <script src="/client/form/article-editor/article-editor.js"></script>
+                        <script>new ArticleEditor('.article-editor-container').loadArticle(${article.id});</script>
+                    `, {article})
+            );
         }
     }
 

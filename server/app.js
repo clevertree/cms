@@ -29,7 +29,7 @@ class App {
 
 
         // Post wrapper
-        this.express.post('*', this.postMiddleware);
+        // this.express.post('*', this.postMiddleware);
 
 
         // Routes
@@ -42,46 +42,46 @@ class App {
     }
 
     // TODO: refactor
-    postMiddleware(req, res, next) {
-        const isJSONRequest = req.headers.accept.split(',').indexOf('application/json') !== -1;
-
-        console.info("POST", req.url);
-        res.sendAPIError = (message, redirect=null) => {
-            res.sendAPIResponse(message, redirect, 404);
-        };
-        res.sendAPIResponse = (message, redirect=null, status=200) => {
-            console[status === 200 ? 'info' : 'error']("API: ", message);
-            if(status)
-                res.status(status);
-            if(isJSONRequest) {
-                res.json({success: status === 200, message: message, redirect: redirect});
-                return;
-            }
-            let redirectHTML = '';
-            if(redirect)
-                redirectHTML = `<script>setTimeout(()=>document.location.href = '${redirect}', 3000);</script>`;
-
-            const theme = this.getTheme(this.config.theme || 'minimal');
-            theme.handleArticleRequest({
-                title: message,
-                content: `
-                            <section>
-                                <h4>${message}</h4>
-                                ${redirectHTML}
-                            </section>
-                            `,
-                // redirect: redirect
-            }, req, res);
-        };
-        next();
-    }
+    // postMiddleware(req, res, next) {
+    //     const isJSONRequest = req.headers.accept.split(',').indexOf('application/json') !== -1;
+    //
+    //     console.info("POST", req.url);
+    //     res.sendAPIError = (message, redirect=null) => {
+    //         res.sendAPIResponse(message, redirect, 404);
+    //     };
+    //     res.sendAPIResponse = (message, redirect=null, status=200) => {
+    //         console[status === 200 ? 'info' : 'error']("API: ", message);
+    //         if(status)
+    //             res.status(status);
+    //         if(isJSONRequest) {
+    //             res.json({success: status === 200, message: message, redirect: redirect});
+    //             return;
+    //         }
+    //         let redirectHTML = '';
+    //         if(redirect)
+    //             redirectHTML = `<script>setTimeout(()=>document.location.href = '${redirect}', 3000);</script>`;
+    //
+    //         const theme = this.getTheme(this.config.theme || 'minimal');
+    //         theme.handleArticleRequest({
+    //             title: message,
+    //             content: `
+    //                         <section>
+    //                             <h4>${message}</h4>
+    //                             ${redirectHTML}
+    //                         </section>
+    //                         `,
+    //             // redirect: redirect
+    //         }, req, res);
+    //     };
+    //     next();
+    // }
 
     getTheme(themeName) {
         if(!themeName)
             themeName = this.config.theme;
         if(typeof this.themes[themeName] !== 'undefined')
             return this.themes[themeName];
-        const themeClass = require('../theme/' + themeName + '/template/theme.js');
+        const themeClass = require('../client/theme/' + themeName + '/template/theme.js');
         this.themes[themeName] = new themeClass(this);
         return this.themes[themeName];
     }
