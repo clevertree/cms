@@ -2,8 +2,8 @@
 const path = require('path');
 const ejs = require('ejs');
 
-const TEMPLATE_DIR = path.resolve(path.dirname(__dirname));
-const BASE_DIR = path.resolve(path.resolve(path.dirname(path.dirname(path.dirname(__dirname)))));
+const TEMPLATE_DIR = path.resolve(__dirname);
+const BASE_DIR = path.resolve(path.dirname(path.dirname(path.dirname(__dirname))));
 
 class MinimalTheme {
     constructor(app) {
@@ -12,7 +12,7 @@ class MinimalTheme {
         this.renderOptions = {
             views: [
                 path.resolve(TEMPLATE_DIR + '/template/'),
-                path.resolve(BASE_DIR + '/template/')
+                path.resolve(BASE_DIR + '/client/template/')
             ]
             // async: true
         };

@@ -184,6 +184,7 @@ class ArticleAPI {
                 return next();
 
             if(req.method === 'GET') {
+                // TODO: fetch revision history
                 return await this.renderArticleEditor(article, article, req, res);
             }
             switch(req.body.action) {
@@ -262,9 +263,8 @@ class ArticleAPI {
             res.send(
                 await this.app.getTheme(article.theme)
                     .render(req, `
-                        <div class="article-editor-container"></div>
-                        <script src="/client/form/article-editor/article-editor.js"></script>
-                        <script>new ArticleEditor('.article-editor-container').loadArticle(${article.id});</script>
+                        <script src="/client/form/article-form/article-form.client.js"></script>
+                        <article-form article-id="${article.id}"></article-form>
                     `, {article})
             );
         }
