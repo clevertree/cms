@@ -33,7 +33,7 @@ class ArticleAPI {
                 );
             }
         } catch (error) {
-            res.status(400).send(error.message || error)
+            sendResponse({message:error.message, status: 400}, req, res);
         }
     }
 
@@ -53,7 +53,7 @@ class ArticleAPI {
                 );
             }
         } catch (error) {
-            res.status(400).send(error.message || error)
+            sendResponse({message:error.message, status: 400}, req, res);
         }
     }
 
@@ -83,7 +83,7 @@ class ArticleAPI {
                     );
                 }
 
-                // TODO: fetch
+                // TODO: fetch additional form data
             } else {                            // Handle POST
                 switch (req.body.action) {
                     default:
@@ -125,13 +125,7 @@ class ArticleAPI {
         }
 
         // Return Status
-        res.status(response.status);
-        if(isJSON(req)) {
-            res.json(response);
-        } else {
-            new UserSession(req.session).addMessage(response.message);
-            res.redirect(response.redirect);
-        }
+        sendResponse(response, req, res);
     }
 
 }
@@ -142,4 +136,13 @@ module.exports = {ArticleAPI};
 
 function isJSON(req) {
     return req.headers.accept.split(',').indexOf('application/json') !== -1;
+}
+function sendResponse(response, req, res) {
+    res.status(response.status);
+    if(isJSON(req)) {
+        res.json(response);
+    } else {
+        new UserSession(req.session).addMessage(response.message);
+        res.redirect(response.redirect);
+    }
 }

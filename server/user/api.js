@@ -8,72 +8,132 @@ class UserAPI {
 
     loadRoutes(router) {
         // API Routes
-        router.post('/:?user/login', (req, res) => await this.login(req, res));
-        router.post('/:?user/logout', (req, res) => await this.logout(req, res));
-        router.post('/:?user/register', (req, res) => await this.register(req, res));
+        router.post('/:?user/login', async (req, res) => await this.login(req, res));
+        router.post('/:?user/logout', async (req, res) => await this.logout(req, res));
+        router.post('/:?user/register', async (req, res) => await this.register(req, res));
 
         // TODO: get json :user
     }
 
 
     async login(req, res) {
-        console.log("Login Request", req.body);
+        let response = {
+            redirect: '/:login',
+            message: "Login Form",
+            status: 200,
+        };
 
-        if(!req.body.email)
-            return res.sendAPIError(res, "Email is required");
-        if(!UserAPI.validateEmail(req.body.email))
-            return res.sendAPIError(res, "Email format is invalid");
+        try {
+            if(req.method === 'GET') {
+                // Handle GET Request
+                if(!isJSON(req)) {
+                    // Render Editor
+                    res.send(
+                        await this.app.getTheme()
+                            .render(req, `
+                                <script src="/client/form/user-form/user-login-form.client.js"></script>
+                                <user-login-form></user-login-form>
+                            `)
+                    );
+                }
 
-        if(!req.body.password)
-            return res.sendAPIError(res, "Password is required");
+                // TODO: fetch additional form data
+            } else {
+                // Handle POST Request
 
-        this.userDB.findUserByEmail(req.body.email, (error, user) => {
-            if(error)
-                return res.sendAPIError(res, error.message || error);
-            if(!user)
-                return res.sendAPIError(res, "User not found: " + req.body.email);
 
-            bcrypt.compare(req.body.password, user.password, (error, matches) => {
+                console.log("Login Request", req.body);
+
+                if(!req.body.email)
+                    throw new Error("Email is required");
+                if(!UserAPI.validateEmail(req.body.email))
+                    throw new Error("Email format is invalid");
+
+                if(!req.body.password)
+                    throw new Error("Password is required");
+
+                const user = await this.userDB.findUserByEmail(req.body.email);
+                if(!user)
+                    throw new Error("User not found: " + req.body.email);
+
+                const matches = await bcrypt.compare(req.body.password, user.password);
                 if(error)
-                    return res.sendAPIError(res, error.message || error);
+                    throw new Error(error.message || error);
                 if(matches !== true)
-                    return res.sendAPIError(res, "Invalid Password");
+                    throw new Error("Invalid Password");
                 // sets a cookie with the user's info
                 req.session.reset();
                 req.session.user = {id: user.id};
 
-                return res.sendAPIResponse(`User logged in successfully: ${user.email}. Redirecting...`, '/account');
-            });
+                response.message = `User logged in successfully: ${user.email}. Redirecting...`;
+                response.redirect = '/:user/' + user.id;
 
-        });
+            }
+        } catch (error) {
+            response.message = error.stack;
+            response.status = 400;
+        }
+
+        sendResponse(response, req, res);
     }
 
 
     async logout(req, res) {
-        console.log("Log out Request", req.body);
+        let response = {
+            redirect: '/:logout',
+            message: "Logout Form",
+            status: 200,
+        };
 
-        // sets a cookie with the user's info
-        req.session.reset();
-        return res.sendAPIResponse(`User logged out successfully. Redirecting...`, '/login');
+        try {
+            if(req.method === 'GET') {
+                // Handle GET Request
+                if(!isJSON(req)) {
+                    // Render Editor
+                    res.send(
+                        await this.app.getTheme()
+                            .render(req, `
+                                <script src="/client/form/user-form/user-login-form.client.js"></script>
+                                <user-login-form></user-login-form>
+                            `)
+                    );
+                }
+
+                // TODO: fetch additional form data
+            } else {
+                // Handle POST Request
+
+                req.session.reset();
+
+                response.message = `User logged out successfully: ${user.email}. Redirecting...`;
+                response.redirect = '/:user/' + user.id;
+
+            }
+        } catch (error) {
+            response.message = error.stack;
+            response.status = 400;
+        }
+
+        sendResponse(response, req, res);
     }
 
     async register(req, res) {
         console.log("Registration Request", req.body);
 
         if(!req.body.email)
-            return res.sendAPIError(res, "Email is required");
+            throw new Error("Email is required");
         if(!UserManager.validateEmail(req.body.email))
-            return res.sendAPIError(res, "Email format is invalid");
+            throw new Error("Email format is invalid");
 
         if(!req.body.password)
-            return res.sendAPIError(res, "Password is required");
+            throw new Error("Password is required");
 
         if(req.body.password !== req.body.confirm_password)
-            return res.sendAPIError(res, "Confirm & Password do not match");
+            throw new Error("Confirm & Password do not match");
 
         this.userDB.createUser(req.body.email, req.body.password, (error, user) => {
             if(error)
-                return res.sendAPIError(res, error.message || error);
+                throw new Error(error.message || error);
 
             req.session.reset();
             req.session.user = {id: user.id};
@@ -91,3 +151,16 @@ class UserAPI {
 
 module.exports = {UserAPI};
 
+
+function isJSON(req) {
+    return req.headers.accept.split(',').indexOf('application/json') !== -1;
+}
+function sendResponse(response, req, res) {
+    res.status(response.status);
+    if(isJSON(req)) {
+        res.json(response);
+    } else {
+        new UserSession(req.session).addMessage(response.message);
+        res.redirect(response.redirect);
+    }
+}
