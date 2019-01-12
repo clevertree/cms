@@ -1,0 +1,14 @@
+form.form-article-edit {
+
+}
+
+form.form-article-edit .editor-iframe {
+    width: 100%;
+    /* min-height: 860px; */
+}
+form.form-article-edit .editor-iframe.fullscreen {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100% !important;
+}

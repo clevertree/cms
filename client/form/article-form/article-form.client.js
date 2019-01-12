@@ -14,7 +14,7 @@ class HTMLFormArticleEditorElement extends HTMLElement {
 
     connectedCallback() {
         // this.editor = this.closest('music-editor'); // Don't rely on this !!!
-        this.addEventListener('change', this.onSubmit);
+        // this.addEventListener('change', this.onSubmit);
         // this.addEventListener('input', this.onSubmit);
         this.addEventListener('submit', this.onSubmit);
 
