@@ -1,4 +1,6 @@
-form.userform {max-width: 520px;}
+form.userform {
+    max-width: 520px;
+}
 
 form.userform > fieldset {
     margin: 0px auto;
@@ -10,7 +12,7 @@ form.userform > fieldset > table {
 }
 form.userform > fieldset > table > caption {
     /* font-weight: bold; */
-    font-style: italic;
+    /*font-style: italic;*/
     text-align: left;
     /* padding-bottom: 1em; */
 }
@@ -25,4 +27,21 @@ form.form-article-edit .editor-iframe.fullscreen {
     left: 0;
     top: 0;
     height: 100% !important;
+}
+
+/** Form Messages **/
+
+form.userform div.success,
+form.userform div.error {
+    padding: 0.5em;
+    margin: 0.5em;
+    border-radius: 4px;
+}
+form.userform div.success {
+    color: #f5fbf2;
+    background: #118c09;
+}
+form.userform div.error {
+    color: #fee;
+    background: #d25757;
 }

@@ -8,14 +8,13 @@ document.addEventListener('DOMContentLoaded', function() {
 {
 
     class AbstractHTMLUserFormElement extends HTMLElement {
-        constructor() {
-            super();
-            this.state = {
-                email: "",
-                password: "",
-            };
-            // this.state = {id:-1, flags:[]};
-        }
+        // constructor() {
+        //     super();
+        //     this.state = {
+        //         response: null
+        //     };
+        //     // this.state = {id:-1, flags:[]};
+        // }
 
         setState(newState) {
             Object.assign(this.state, newState);
@@ -33,6 +32,9 @@ document.addEventListener('DOMContentLoaded', function() {
             //     this.requestFormData(userID);
         }
 
+        onSuccess(e, response) {}
+        onError(e, response) {}
+
         onEvent(e) {
             switch (event.type) {
                 case 'submit':
@@ -47,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
         submit(e) {
             e.preventDefault();
             const form = e.target; // querySelector('form.user-login-form');
+            this.setState({processing: true});
             const request = {};
             new FormData(form).forEach(function (value, key) {
                 request[key] = value;
@@ -56,12 +59,13 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.onload = (e) => {
                 console.log(e, xhr.response);
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                if (xhr.status !== 200) {
-                    this.setState({error: response.message});
+                response.status = xhr.status;
+                if(xhr.status === 200) {
+                    this.onSuccess(e, response);
                 } else {
-                    this.setState(response);
+                    this.onError(e, response);
                 }
-
+                this.setState({response, processing: false});
             };
             xhr.open(form.method, form.action, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -103,7 +107,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <fieldset>
                         <legend>Register a new account</legend>
                         <table class="themed">
-                            <caption>To register a new account, <br/>please enter your email and password</caption>
+                            <caption>
+                                To register a new account, <br/>please enter your email and password
+                                ${this.state.error ? `<div class="error">${this.state.error}</div>` : null}
+                            </caption>
                             <tbody>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
@@ -143,21 +150,30 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
+                processing: false,
+                response: null,
                 email: "",
                 password: "",
             };
             // this.state = {id:-1, flags:[]};
         }
 
+        onSuccess(e, response) {
+            setTimeout(() => document.location.href = response.redirect, 3000);
+        }
+
         render() {
+            console.log("Render", this.state);
             this.innerHTML =
                 `
         <form action="/:user/login" method="POST" class="userform userform-login themed">
-            <fieldset>
+            <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
                 <legend>Log In</legend>
                 <table class="themed">
                     <caption>
-                        In order to start a new session, <br/>please enter your email and password and hit 'Log in' below
+                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
+                            ${this.state.response.message}
+                        </div>` : "In order to start a new session, <br/>please enter your email and password and hit 'Log in' below"}
                     </caption>
                     <tbody>
                         <tr><td colspan="2"><hr/></td></tr>
@@ -206,7 +222,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <fieldset>
                 <legend>Log Out</legend>
                 <table class="themed">
-                    <caption>In order to end your session, <br/>please hit 'Log out' below</caption>
+                    <caption>
+                        In order to end your session, <br/>please hit 'Log out' below
+                        ${this.state.error ? `<div class="error">${this.state.error}</div>` : null}
+                    </caption>
                     <tbody>
                         <tr><td colspan="2"><hr/></td></tr>
                         <tr>
@@ -244,10 +263,14 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/forgotpassword" method="POST" class="userform userform-forgotpassword themed" style1="display: none;">
+                    ${this.state.error ? `<div class="error">${this.state.error}</div>` : null}
                     <fieldset>
                         <legend>Forgot Password</legend>
                         <table class="themed">
-                            <caption>In order to recover your password, <br/>please enter your email</caption>
+                            <caption>
+                                In order to recover your password, <br/>please enter your email
+                                ${this.state.error ? `<div class="error">${this.state.error}</div>` : null}
+                                </caption>
                             <tbody>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>

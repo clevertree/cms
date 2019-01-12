@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+
 const { UserDatabase } = require('./userdatabase.class');
 const { UserSession } = require('./usersession.class');
 class UserAPI {
@@ -76,17 +78,17 @@ class UserAPI {
 
             } else {
                 // Handle Form (POST) Request
-                console.log("Log in Request", req.body);
+                // console.log("Log in Request", req.body);
                 const user = await this.login(req.session, req.body.email, req.body.password);
 
                 return res.json({
                     redirect: '/:user/' + user.id,
-                    message: `User logged in successfully: ${user.email}. Redirecting...`,
+                    message: `User logged in successfully: ${user.email}. <br/>Redirecting...`,
                     user
                 });
             }
         } catch (error) {
-            res.status(400).json({message: error.message, error: error.stack});
+            res.status(400).json({message: "Error: " + error.message, error: error.stack});
         }
     }
 
@@ -109,12 +111,12 @@ class UserAPI {
 
                 return res.json({
                     redirect: '/:user/' + user.id,
-                    message: `User logged out successfully: ${user.email}. Redirecting...`,
+                    message: `User logged out successfully: ${user.email}. <br/>Redirecting...`,
                     user
                 });
             }
         } catch (error) {
-            res.status(400).json({message: error.message, error: error.stack});
+            res.status(400).json({message: "Error: " + error.message, error: error.stack});
         }
     }
 
@@ -137,12 +139,12 @@ class UserAPI {
 
                 return res.json({
                     redirect: '/:user/' + user.id,
-                    message: `User registered successfully: ${user.email}. Redirecting...`,
+                    message: `User registered successfully: ${user.email}. <br/>Redirecting...`,
                     user
                 });
             }
         } catch (error) {
-            res.status(400).json({message: error.message, error: error.stack});
+            res.status(400).json({message: "Error: " + error.message, error: error.stack});
         }
     }
 
