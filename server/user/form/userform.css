@@ -9,7 +9,7 @@ form.userform > fieldset > table {
     width: 100%;
 }
 form.userform > fieldset > table > caption {
-    /*font-weight: bold;*/
+    /* font-weight: bold; */
     font-style: italic;
     text-align: left;
     /* padding-bottom: 1em; */

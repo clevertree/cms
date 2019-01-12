@@ -321,6 +321,16 @@ body.theme-minimal {
     padding: 1em 1em;
     border-radius: 8px;
     border: 1px outset #DDD;
+    background: #CCC;
+}
+.theme-minimal form.themed > fieldset > legend {
+    /* margin: 0 auto; */
+    padding: 2px 8px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    border-bottom: 1px outset #FFF;
+    background: #CCC;
 }
 
 

@@ -70,22 +70,23 @@ class UserAPI {
                     await this.app.getTheme()
                         .render(req, `
                             <script src="/server/user/form/userform.client.js"></script>
-                            <user-login-form></user-login-form>
+                            <userform-login></userform-login>
                         `)
                 );
 
             } else {
                 // Handle Form (POST) Request
                 console.log("Log in Request", req.body);
-                const user = this.login(req.session, req.body.email, req.body.password);
+                const user = await this.login(req.session, req.body.email, req.body.password);
 
-                sendResponse(req, res, {
+                return res.json({
+                    redirect: '/:user/' + user.id,
                     message: `User logged in successfully: ${user.email}. Redirecting...`,
                     user
-                }, '/:user/' + user.id);
+                });
             }
         } catch (error) {
-            res.status(400).send(error.stack);
+            res.status(400).json({message: error.message, error: error.stack});
         }
     }
 
@@ -97,22 +98,23 @@ class UserAPI {
                     await this.app.getTheme()
                         .render(req, `
                             <script src="/server/user/form/userform.client.js"></script>
-                            <user-login-form></user-login-form>
+                            <userform-login></userform-login>
                         `)
                 );
 
             } else {
                 // Handle Form (POST) Request
                 console.log("Log out Request", req.body);
-                const user = this.logout(req.session);
+                const user = await this.logout(req.session);
 
-                sendResponse(req, res, {
+                return res.json({
+                    redirect: '/:user/' + user.id,
                     message: `User logged out successfully: ${user.email}. Redirecting...`,
                     user
-                }, '/:user/' + user.id);
+                });
             }
         } catch (error) {
-            res.status(400).send(error.stack);
+            res.status(400).json({message: error.message, error: error.stack});
         }
     }
 
@@ -123,23 +125,24 @@ class UserAPI {
                 res.send(
                     await this.app.getTheme()
                         .render(req, `
-                            <script src="/server/user/form/user-registration-form.client.js"></script>
-                            <user-registration-form></user-registration-form>
+                            <script src="/server/user/form/userform.client.js"></script>
+                            <userform-register></userform-register>
                         `)
                 );
 
             } else {
                 // Handle Form (POST) Request
                 console.log("Registration Request", req.body);
-                const user = this.register(req.session, req.body.email, req.body.password, req.body.confirm_password);
+                const user = await this.register(req.session, req.body.email, req.body.password, req.body.confirm_password);
 
-                sendResponse(req, res, {
+                return res.json({
+                    redirect: '/:user/' + user.id,
                     message: `User registered successfully: ${user.email}. Redirecting...`,
                     user
-                }, '/:user/' + user.id);
+                });
             }
         } catch (error) {
-            res.status(400).send(error.stack);
+            res.status(400).json({message: error.message, error: error.stack});
         }
     }
 
@@ -153,19 +156,19 @@ class UserAPI {
 module.exports = {UserAPI};
 
 
-function isJSON(req) {
-    return req.headers.accept.split(',').indexOf('application/json') !== -1;
-}
+// function isJSON(req) {
+//     return req.headers.accept.split(',').indexOf('application/json') !== -1;
+// }
 
-function sendResponse(req, res, response, redirect) {
-    if(!redirect)
-        redirect = req.url;
-    if(typeof response === "string")
-        response = {message: response, redirect};
-    if(isJSON(req)) {
-        res.json(response);
-    } else {
-        new UserSession(req.session).addMessage(response.message);
-        res.redirect(redirect);
-    }
-}
+// function sendResponse(req, res, response, redirect) {
+//     if(!redirect)
+//         redirect = req.url;
+//     if(typeof response === "string")
+//         response = {message: response, redirect};
+//     if(isJSON(req)) {
+//         res.json(response);
+//     } else {
+//         new UserSession(req.session).addMessage(response.message);
+//         res.redirect(redirect);
+//     }
+// }
