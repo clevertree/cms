@@ -6,7 +6,6 @@ const mysql = require('mysql');
 const { UserSessionManager } = require('./user/session.js');
 const { UserAPI } = require('./user/api.js');
 const { ArticleAPI } = require('./article/api.js');
-const { DatabaseManager } = require('./database/manager.js');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 

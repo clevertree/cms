@@ -1,4 +1,6 @@
+
 const session = require('client-sessions');
+const {UserDatabase} = require("./database");
 
 class UserSession {
     constructor(session) {
@@ -16,6 +18,21 @@ class UserSession {
             return null;
         return this.session.messages.pop()
     }
+
+    async getSessionUser(db) {
+        const userDB = new UserDatabase(db);
+        let user;
+        if(session && session.user) {
+            user = await userDB.findUserByID(session.user.id);
+            if(!user)
+                throw new Error("No Session User Found");
+        } else {
+            user = await userDB.findGuestUser();
+            if(!user)
+                throw new Error("No Guest User Found");
+        }
+        return user;
+    }
 }
 
 class UserSessionManager {
@@ -24,6 +41,8 @@ class UserSessionManager {
         this.config = app.config.session || {};
     }
 
+    // get userDB () { return new UserDatabase(this.app.db); }
+
     loadRoutes(router) {
         router.use(session({
             cookieName: 'session',
@@ -31,29 +50,25 @@ class UserSessionManager {
             duration: 30 * 60 * 1000,
             activeDuration: 5 * 60 * 1000,
         }));
-        router.use((req, res, next) => {
-            this.getSessionUser(req, (error, sessionUser) => {
-                req.sessionUser = sessionUser;
-                next();
-            });
-        });
+        // router.use(async (req, res, next) => {
+        //     const sessionUser = await this.getSessionUser(req);
+        //     req.sessionUser = sessionUser;
+        // });
     }
 
-    getSessionUser(req, callback) {
-        if(req.session && req.session.user) {
-            this.app.user.findUserByID(req.session.user.id, (error, user) => {
-                if(error)
-                    return callback(error);
-                callback(user?null:"No Session User Found", user);
-            });
-        } else {
-            this.app.user.findGuestUser((error, user) => {
-                if(error)
-                    return callback(error);
-                callback(user?null:"No Guest User Found", user);
-            })
-        }
-    }
+    // async getSessionUser(session) {
+    //     let user;
+    //     if(session && session.user) {
+    //         user = await this.userDB.findUserByID(session.user.id);
+    //         if(!user)
+    //             throw new Error("No Session User Found");
+    //     } else {
+    //         user = await this.userDB.findGuestUser();
+    //         if(!user)
+    //             throw new Error("No Guest User Found");
+    //     }
+    //     return new UserSession(user, session);
+    // }
 
 }
 

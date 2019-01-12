@@ -45,7 +45,7 @@ class HTMLFormArticleEditorElement extends HTMLElement {
 
     loadArticle(articleID) {
         const xhr = new XMLHttpRequest();
-        xhr.onload = (e) => {
+        xhr.onload = () => {
             console.info(xhr.response);
             if(!xhr.response.article)
                 throw new Error("Invalid Response");
@@ -53,8 +53,8 @@ class HTMLFormArticleEditorElement extends HTMLElement {
             this.render();
         };
         xhr.responseType = 'json';
-        xhr.open ("GET", `:article/${articleID}/edit`, true);
-        xhr.setRequestHeader("Accept", "application/json");
+        xhr.open ("GET", `:article/${articleID}/json`, true);
+        // xhr.setRequestHeader("Accept", "application/json");
         xhr.send ();
     }
 

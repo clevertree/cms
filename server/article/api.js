@@ -1,4 +1,5 @@
-const {UserSession} = require('./user.js');
+const {UserSession} = require('../user/session');
+const {UserDatabase} = require("../user/database");
 const {ArticleDatabase} = require('./database.js');
 
 class ArticleAPI {
@@ -11,9 +12,11 @@ class ArticleAPI {
     loadRoutes(router) {
         // Handle Article requests
         router.get(['/[\\w/]+(?:\.ejs)?', '/'], async (req, res, next) => await this.renderArticleByPath(req, res,next));
+        // router.get(['/[\\w/]+(?:\.ejs)?/json', '/json'], async (req, res, next) => await this.renderArticleByPath(req, res,next));
 
 
-        router.get(['/:?article/:id/view', '/:?article/:id'], async (req, res, next) => await this.renderArticleByID(req, res, next));
+        router.get('/:?article/:id/json', async (req, res, next) => await this.renderArticleByID(true, req, res, next));
+        router.get(['/:?article/:id/view', '/:?article/:id'], async (req, res, next) => await this.renderArticleByID(false, req, res, next));
         router.all('/:?article/:id/edit', async (req, res, next) => await this.renderArticleEditorByID(req, res, next));
     }
 
@@ -23,28 +26,28 @@ class ArticleAPI {
             if(!article)
                 return next();
 
-            if(isJSON(req)) {
-                res.json(article);
-
-            } else {
-                res.send(
-                    await this.app.getTheme(article.theme)
-                        .render(req, article.content, {article})
-                );
-            }
+            res.send(
+                await this.app.getTheme(article.theme)
+                    .render(req, article.content, {article})
+            );
         } catch (error) {
-            sendResponse({message:error.message, status: 400}, req, res);
+            res.status(400);
+            res.json({message: error.stack});
         }
     }
 
-    async renderArticleByID(req, res, next) {
+    async renderArticleByID(asJSON, req, res, next) {
         try {
             const article = await this.articleDB.fetchArticleByID(req.params.id);
             if(!article)
                 return next();
 
-            if(isJSON(req)) {
-                res.json(article);
+            if(asJSON) {
+                res.json({
+                    redirect: '/:article/' + article.id + '/view',
+                    message: "Article Queried Successfully",
+                    article
+                });
 
             } else {
                 res.send(
@@ -53,38 +56,34 @@ class ArticleAPI {
                 );
             }
         } catch (error) {
-            sendResponse({message:error.message, status: 400}, req, res);
+            // TODO: as JSON
+            res.status(400);
+            res.json({message: error.stack});
         }
     }
 
     async renderArticleEditorByID(req, res, next) {
-        let response;
         try {
-            let insertID;
+            const session = new UserSession(req.session);
+            const sessionUser = await session.getSessionUser(this.app.db);
+
             const article = await this.articleDB.fetchArticleByID(req.params.id);
             if(!article)
                 return next();
-            response = {
-                redirect: '/:article/' + article.id + '/view',
-                message: "Article queried successfully",
-                status: 200,
-                article
-            };
 
             if(req.method === 'GET') {          // Handle GET
-                if(!isJSON(req)) {
-                    // Render Editor
-                    res.send(
-                        await this.app.getTheme(article.theme)
-                            .render(req, `
-                                <script src="/client/form/article-form/article-form.client.js"></script>
-                                <article-form article-id="${article.id}"></article-form>
-                            `)
-                    );
-                }
+                // Render Editor
+                res.send(
+                    await this.app.getTheme(article.theme)
+                        .render(req, `
+                            <script src="/client/form/article-form/article-form.client.js"></script>
+                            <article-form article-id="${article.id}"></article-form>
+                        `)
+                );
 
-                // TODO: fetch additional form data
-            } else {                            // Handle POST
+            } else {
+                // Handle POST
+                let insertArticleHistoryID;
                 switch (req.body.action) {
                     default:
                     case 'publish':
@@ -93,39 +92,46 @@ class ArticleAPI {
                             req.body.title,
                             req.body.content,
                             req.body.path,
-                            req.sessionUser ? req.sessionUser.id : null,
+                            sessionUser.id,
                             req.body.parent_id ? parseInt(req.body.parent_id) : null,
                             req.body.theme,
-                            req.body.flags);
+                            req.body.flags
+                        );
 
-                        insertID = await this.articleDB.insertArticleHistory(
+                        insertArticleHistoryID = await this.articleDB.insertArticleHistory(
                             article.id,
                             req.body.title,
                             req.body.content,
-                            req.sessionUser ? req.sessionUser.id : null);
-                        response.message = "Article published successfully";
-                        response.insertArticleHistoryID = insertID;
-                        response.affectedArticleRows = affectedRows;
-                        break;
+                            sessionUser.id
+                        );
+
+                        return res.json({
+                            redirect: '/:article/' + article.id + '/view',
+                            message: "Article published successfully",
+                            insertArticleHistoryID: insertArticleHistoryID,
+                            affectedArticleRows: affectedRows,
+                            article
+                        });
 
                     case 'draft':
-                        insertID = await this.articleDB.insertArticleHistory(
+                        insertArticleHistoryID = await this.articleDB.insertArticleHistory(
                             article.id,
                             req.body.title,
                             req.body.content,
-                            req.sessionUser ? req.sessionUser.id : null);
-                        response.message = "Draft saved successfully";
-                        response.insertArticleHistoryID = insertID;
-                        break;
+                            sessionUser.id
+                        );
+                        return res.json({
+                            redirect: '/:article/' + article.id + '/view',
+                            message: "Draft saved successfully",
+                            insertArticleHistoryID: insertArticleHistoryID,
+                            article
+                        });
                 }
             }
         } catch (error) {
-            response.message = error.stack;
-            response.status = 400;
+            res.status(400);
+            res.json({message: error.stack});
         }
-
-        // Return Status
-        sendResponse(response, req, res);
     }
 
 }
@@ -133,16 +139,3 @@ class ArticleAPI {
 
 module.exports = {ArticleAPI};
 
-
-function isJSON(req) {
-    return req.headers.accept.split(',').indexOf('application/json') !== -1;
-}
-function sendResponse(response, req, res) {
-    res.status(response.status);
-    if(isJSON(req)) {
-        res.json(response);
-    } else {
-        new UserSession(req.session).addMessage(response.message);
-        res.redirect(response.redirect);
-    }
-}
