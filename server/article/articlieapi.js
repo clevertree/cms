@@ -1,6 +1,6 @@
-const {UserSession} = require('../user/session');
-const {UserDatabase} = require("../user/database");
-const {ArticleDatabase} = require('./database.js');
+const {ArticleDatabase} = require("./articledatabase");
+const {UserSession} = require('../user/usersession.class');
+// const {UserDatabase} = require("../user/userdatabase.class");
 
 class ArticleAPI {
     constructor(app) {
@@ -76,7 +76,7 @@ class ArticleAPI {
                 res.send(
                     await this.app.getTheme(article.theme)
                         .render(req, `
-                            <script src="/client/form/article-form/article-form.client.js"></script>
+                            <script src="/server/article/form/article-form.client.js"></script>
                             <article-form article-id="${article.id}"></article-form>
                         `)
                 );

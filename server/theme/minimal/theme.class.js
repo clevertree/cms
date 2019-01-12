@@ -1,7 +1,7 @@
 // const fs = require('fs');
 const path = require('path');
 const ejs = require('ejs');
-const { ArticleDatabase } = require('../../../server/article/database.js');
+const { ArticleDatabase } = require('../../../server/article/articledatabase');
 
 const TEMPLATE_DIR = path.resolve(__dirname);
 const BASE_DIR = path.resolve(path.dirname(path.dirname(path.dirname(__dirname))));
@@ -13,7 +13,7 @@ class MinimalTheme {
         this.renderOptions = {
             views: [
                 path.resolve(TEMPLATE_DIR + '/template/'),
-                path.resolve(BASE_DIR + '/client/template/')
+                path.resolve(BASE_DIR + '/server/template/')
             ]
             // async: true
         };

@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("client/form/article-form/article-form.css");
+    })("server/article/form/articleform.css");
 });
 
 
@@ -113,7 +113,7 @@ class HTMLFormArticleEditorElement extends HTMLElement {
                             <td class="label">Content</td>
                             <td>
                                 <textarea class="editor-plain editor-iframe-target" name="content" style="width: 100%; height: 400px; display: none;">${this.article.content}</textarea>
-                                <iframe class="editor-iframe editor-iframe-trumbowyg" src="/client/form/article-form/iframe-trumbowyg.html"
+                                <iframe class="editor-iframe editor-iframe-trumbowyg" src="/server/article/form/iframe-trumbowyg.html"
                                         style="width: 100%; height: 400px; overflow-x: hidden; border: 0px"></iframe>
                             </td>
                         </tr>

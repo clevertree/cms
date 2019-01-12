@@ -312,7 +312,15 @@ body.theme-minimal {
 /** Forms **/
 
 .theme-minimal form.themed {
-    padding: 1em;
+    padding: 0.5em;
+    margin: 0 auto;
+}
+
+
+.theme-minimal form.themed > fieldset {
+    padding: 1em 1em;
+    border-radius: 8px;
+    border: 1px outset #DDD;
 }
 
 
@@ -344,6 +352,7 @@ body.theme-minimal {
     padding-right: 6px;
     text-align: right;
     /* font-weight: bold; */
+    /* max-width: 36px; */
 }
 .theme-minimal table.themed {
     

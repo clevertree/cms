@@ -3,9 +3,9 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const mysql = require('mysql');
 
-const { UserSessionManager } = require('./user/session.js');
-const { UserAPI } = require('./user/api.js');
-const { ArticleAPI } = require('./article/api.js');
+const { UserSessionManager } = require('./user/usersession.class');
+const { UserAPI } = require('./user/userapi.class');
+const { ArticleAPI } = require('./article/articlieapi');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
@@ -42,7 +42,7 @@ class App {
             themeName = this.config.theme;
         if(typeof this.themes[themeName] !== 'undefined')
             return this.themes[themeName];
-        const themeClass = require('../client/theme/' + themeName + '/theme.class.js');
+        const themeClass = require('../server/theme/' + themeName + '/theme.class.js');
         this.themes[themeName] = new themeClass(this);
         return this.themes[themeName];
     }

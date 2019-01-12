@@ -1,6 +1,6 @@
 
 const session = require('client-sessions');
-const {UserDatabase} = require("./database");
+const {UserDatabase} = require("./userdatabase.class");
 
 class UserSession {
     constructor(session) {

@@ -1,5 +1,5 @@
-const { UserDatabase } = require('./database.js');
-const { UserSession } = require('./session.js');
+const { UserDatabase } = require('./userdatabase.class');
+const { UserSession } = require('./usersession.class');
 class UserAPI {
     constructor(app) {
         this.app = app;
@@ -69,7 +69,7 @@ class UserAPI {
                 res.send(
                     await this.app.getTheme()
                         .render(req, `
-                            <script src="/client/form/user-form/user-login-form.client.js"></script>
+                            <script src="/server/user/form/userform.client.js"></script>
                             <user-login-form></user-login-form>
                         `)
                 );
@@ -85,8 +85,7 @@ class UserAPI {
                 }, '/:user/' + user.id);
             }
         } catch (error) {
-            res.status(400);
-            sendResponse(req, res, error.stack, '/:user/' + user.id);
+            res.status(400).send(error.stack);
         }
     }
 
@@ -97,7 +96,7 @@ class UserAPI {
                 res.send(
                     await this.app.getTheme()
                         .render(req, `
-                            <script src="/client/form/user-form/user-login-form.client.js"></script>
+                            <script src="/server/user/form/userform.client.js"></script>
                             <user-login-form></user-login-form>
                         `)
                 );
@@ -113,8 +112,7 @@ class UserAPI {
                 }, '/:user/' + user.id);
             }
         } catch (error) {
-            res.status(400);
-            sendResponse(req, res, error.stack, '/:user/' + user.id);
+            res.status(400).send(error.stack);
         }
     }
 
@@ -125,7 +123,7 @@ class UserAPI {
                 res.send(
                     await this.app.getTheme()
                         .render(req, `
-                            <script src="/client/form/user-form/user-registration-form.client.js"></script>
+                            <script src="/server/user/form/user-registration-form.client.js"></script>
                             <user-registration-form></user-registration-form>
                         `)
                 );
@@ -141,8 +139,7 @@ class UserAPI {
                 }, '/:user/' + user.id);
             }
         } catch (error) {
-            res.status(400);
-            sendResponse(req, res, error.stack, '/:user/' + user.id);
+            res.status(400).send(error.stack);
         }
     }
 

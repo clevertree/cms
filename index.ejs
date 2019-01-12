@@ -5,15 +5,15 @@ const theme = app.config.theme ? app.config.theme : 'minimal';
 <html>
     <head>
         <%- include(`template/partial/head`) %>
-        <%- include(`client/theme/${theme}/partial/head`) %>
+        <%- include(`server/theme/${theme}/partial/head`) %>
     </head>
     <body class='<%= theme ? `theme-` + theme : `no-theme` %>'>
-        <%- include(`client/theme/${theme}/partial/header`) %>
+        <%- include(`server/theme/${theme}/partial/header`) %>
 
         <article data-path="iframe" class="page-view">
             <iframe data-src="https://www.facebook.com/groups/arizonafriendsofhomeless/"></iframe>
         </article>
 
-        <%- include(`client/theme/${theme}/partial/footer`) %>
+        <%- include(`server/theme/${theme}/partial/footer`) %>
     </body>
 </html>

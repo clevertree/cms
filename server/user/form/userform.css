@@ -1,0 +1,28 @@
+form.userform {max-width: 520px;}
+
+form.userform > fieldset {
+    margin: 0px auto;
+    /* display: inline-block; */
+}
+
+form.userform > fieldset > table {
+    width: 100%;
+}
+form.userform > fieldset > table > caption {
+    /*font-weight: bold;*/
+    font-style: italic;
+    text-align: left;
+    /* padding-bottom: 1em; */
+}
+form.userform > fieldset > table > tbody > tr > td:first-child {
+    width: 25%;
+}
+/*form.userform > fieldset > table > tbody > tr > td:nth-child(2){*/
+    /*width: 25%;*/
+/*}*/
+form.form-article-edit .editor-iframe.fullscreen {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100% !important;
+}
