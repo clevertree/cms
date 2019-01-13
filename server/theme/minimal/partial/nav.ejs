@@ -25,7 +25,12 @@
                     </li>
                 <%_ } else { _%>
                     <li>
-                        <a href=":user/${req.session.user.id}/profile">Profile</a>
+                        <a href=":user/<%=req.session.user.id%>/profile">My Profile</a>
+                        <ul class="nav-submenu">
+                            <li>
+                                <a href=":user/logout">Log out</a>
+                            </li>
+                        </ul>
                     </li>
                 <%_ } _%>
                 </ul>

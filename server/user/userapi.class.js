@@ -10,12 +10,12 @@ class UserAPI {
 
     loadRoutes(router) {
         // API Routes
-        router.get('/:?user/:id/json', async (req, res, next) => await this.handleViewRequest(true, req.params.id, req, res, next));
-        router.all('/:?user/:id', async (req, res) => await this.handleViewRequest(false, req.params.id, req, res));
+        router.get('/:?user/:id(\\d+)/json', async (req, res, next) => await this.handleViewRequest(true, req.params.id, req, res, next));
+        router.all('/:?user/:id(\\d+)', async (req, res) => await this.handleViewRequest(false, req.params.id, req, res));
+        router.all('/:?user/:id(\\d+)/profile', async (req, res) => await this.handleProfileRequest(req.params.id, req, res));
         router.all('/:?user/login', async (req, res) => await this.handleLoginRequest(req, res));
         router.all('/:?user/logout', async (req, res) => await this.handleLogoutRequest(req, res));
         router.all('/:?user/register', async (req, res) => await this.handleRegisterRequest(req, res));
-        router.all('/:?user/:id/profile', async (req, res) => await this.handleProfileRequest(req.params.id, req, res));
         // TODO: get json :user
     }
 
@@ -81,7 +81,7 @@ class UserAPI {
                 const user = await this.login(req.session, req.body.email, req.body.password);
 
                 return res.json({
-                    redirect: '/:user/' + user.id,
+                    redirect: `/:user/${user.id}`,
                     message: `User logged in successfully: ${user.email}. <br/>Redirecting...`,
                     user
                 });
@@ -106,7 +106,7 @@ class UserAPI {
                 const user = await this.logout(req.session);
 
                 return res.json({
-                    redirect: '/:user/' + user.id,
+                    redirect: `/:user/${user.id}`,
                     message: `User logged out successfully: ${user.email}. <br/>Redirecting...`,
                     user
                 });
@@ -131,7 +131,7 @@ class UserAPI {
                 const user = await this.register(req.session, req.body.email, req.body.password, req.body.confirm_password);
 
                 return res.json({
-                    redirect: '/:user/' + user.id,
+                    redirect: `/:user/${user.id}/profile`,
                     message: `User registered successfully: ${user.email}. <br/>Redirecting...`,
                     user
                 });
@@ -159,7 +159,7 @@ class UserAPI {
                 const user = await this.updateProfile(req.body);
 
                 return res.json({
-                    redirect: '/:user/' + user.id,
+                    redirect: `/:user/${user.id}`,
                     message: `User profile updated successfully: ${user.email}. <br/>Redirecting...`,
                     user
                 });
