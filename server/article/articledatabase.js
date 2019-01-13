@@ -31,6 +31,13 @@ class ArticleDatabase {
         return articles[0];
     }
 
+    async fetchArticlesByFlag(flags, selectSQL = 'id, parent_id, path, title, flags') {
+        if(!Array.isArray(flags))
+            flags = flags.split(',');
+        const whereSQL = flags.map(flag => 'FIND_IN_SET(?, a.flags)').join(' OR ');
+        return await this.selectArticles(selectSQL, whereSQL, flags);
+    }
+
     async insertArticle(title, content, path, user_id, parent_id, theme, flags) {
         let SQL = `
           INSERT INTO article
@@ -69,10 +76,9 @@ class ArticleDatabase {
         return revisions[0];
     }
 
-    async fetchArticleRevisionsByArticle(articleID, limit=20) {
-        const revisions = await this.selectArticleRevision('*, NULL as content', `ah.article_id = ? ORDER BY ah.created DESC LIMIT ${limit}`,
+    async fetchArticleRevisionsByArticleID(articleID, limit=20, selectSQL = '*, NULL as content') {
+        return await this.selectArticleRevision(selectSQL, `ah.article_id = ? ORDER BY ah.created DESC LIMIT ${limit}`,
             [articleID]);
-        return revisions;
     }
 
     // Inserting revision without updating article === draft

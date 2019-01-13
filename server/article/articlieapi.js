@@ -49,11 +49,12 @@ class ArticleAPI {
                     article
                 };
                 if(req.query.getAll || req.query.getRevision) {
-                    response.history = await this.articleDB.fetchArticleRevisionsByArticle(article.id);
+                    response.history = await this.articleDB.fetchArticleRevisionsByArticleID(article.id);
                     response.revision = await this.articleDB.fetchArticleRevisionByDate(article.id, req.query.getRevision);
                     if(!response.revision && response.history.length > 0)
-                        response.revision = await this.articleDB.fetchArticleRevisionByDate(article.id, response.history[0].created); // response.history[0]; // (await this.articleDB.fetchArticleRevisionsByArticle(article.id))[0];
-                    // TODO: get article parent list
+                        response.revision = await this.articleDB.fetchArticleRevisionByDate(article.id, response.history[0].created); // response.history[0]; // (await this.articleDB.fetchArticleRevisionsByArticleID(article.id))[0];
+                    response.parentList = await this.articleDB.fetchArticlesByFlag(['main-menu', 'sub-menu']);
+                    // TODO: get menu via parent id not flags
                 }
 
                 res.json(response);

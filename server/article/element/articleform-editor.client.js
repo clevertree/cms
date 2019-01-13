@@ -11,7 +11,8 @@ class HTMLArticleFormEditorElement extends HTMLElement {
         super();
         this.state = {
             article: {id: -1, flags:[]},
-            history: []
+            history: [],
+            parentList: [],
         };
         // this.state = {id:-1, flags:[]};
     }
@@ -120,9 +121,13 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         <tr>
                             <td class="label">Parent</td>
                             <td>
-                                <input type="text" name="parent_id" placeholder="ID" size="3" value="${this.state.article.parent_id||''}" />
-                                <select class="articleform-select-parent">
+                                <select name="parent_id" onchange="this.form.parent_id.value = this.value;" class="articleform-select-parent">
                                     <option value="">Select Parent</option>
+                                ${this.state.parentList.map(article => `
+                                    <option value="${article.id}" ${this.state.article.parent_id === article.id ? 'selected="selected"' : null}>
+                                        ${article.title} ${article.path ? `(${article.path})` : null}
+                                    </option>
+                                `)}
                                 </select>
                             </td>
                         </tr>
