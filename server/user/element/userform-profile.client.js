@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 this.setState({response, user:response.user, processing: false});
             };
-            xhr.open(form.method, form.action, true);
+            xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             // xhr.setRequestHeader("Accept", "application/json");
             xhr.responseType = 'json';

@@ -19,9 +19,7 @@ class ArticleDatabase {
           WHERE ${whereSQL}`;
 
         const results = await this.queryAsync(SQL, values);
-        if(!results)
-            return null;
-        return results.map(result => new ArticleEntry(result));
+        return results ? results.map(result => new ArticleEntry(result)) : null;
     }
 
     async fetchArticleByPath(renderPath) {
@@ -33,7 +31,7 @@ class ArticleDatabase {
         return articles[0];
     }
 
-    async insertArticle(title, content, path, user_id, parent_id, theme, flags, callback) {
+    async insertArticle(title, content, path, user_id, parent_id, theme, flags) {
         let SQL = `
           INSERT INTO article
           SET ?
@@ -42,7 +40,7 @@ class ArticleDatabase {
             .insertId;
     }
 
-    async updateArticle(id, title, content, path, user_id, parent_id, theme, flags, callback) {
+    async updateArticle(id, title, content, path, user_id, parent_id, theme, flags) {
         let SQL = `
           UPDATE article a
           SET ?
@@ -52,23 +50,35 @@ class ArticleDatabase {
         return results.affectedRows;
     }
 
-    /** Article History **/
+    /** Article Revision **/
 
-    async selectArticleHistory(selectSQL, whereSQL, values, callback) {
+    async selectArticleRevision(selectSQL, whereSQL, values) {
         let SQL = `
           SELECT ${selectSQL}
-          FROM article_history ah
+          FROM article_revision ah
           WHERE ${whereSQL}
-          ORDER BY created DESC`;
+          `;
 
-        return await this.queryAsync(SQL, values)
-            .map(result => new ArticleHistoryEntry(result))
+        const results = await this.queryAsync(SQL, values);
+        return results.map(result => new ArticleRevisionEntry(result))
     }
 
-    // Inserting history without updating article === draft
-    async insertArticleHistory(article_id, title, content, user_id, callback) {
+    async fetchArticleRevisionByDate(articleID, revisionDate) {
+        const revisions = await this.selectArticleRevision('*', 'ah.article_id = ? AND ah.created = ? LIMIT 1',
+            [articleID, revisionDate]);
+        return revisions[0];
+    }
+
+    async fetchArticleRevisionsByArticle(articleID, limit=20) {
+        const revisions = await this.selectArticleRevision('*, NULL as content', `ah.article_id = ? ORDER BY ah.created DESC LIMIT ${limit}`,
+            [articleID]);
+        return revisions;
+    }
+
+    // Inserting revision without updating article === draft
+    async insertArticleRevision(article_id, title, content, user_id, callback) {
         let SQL = `
-          INSERT INTO article_history
+          INSERT INTO article_revision
           SET ?
         `;
         const results = await this.queryAsync(SQL, {article_id, user_id, title, content})
@@ -132,15 +142,17 @@ class ArticleEntry {
     hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
 }
 
-class ArticleHistoryEntry {
+class ArticleRevisionEntry {
     constructor(row) {
+        this.id = row.id;
         this.article_id = row.article_id;
         this.user_id = row.user_id;
         this.title = row.title;
-        this.content = row.content;
+        if(row.content !== null)
+            this.content = row.content;
         this.created = row.created;
     }
 }
 
-module.exports = {ArticleDatabase, ArticleEntry, ArticleHistoryEntry};
+module.exports = {ArticleDatabase, ArticleEntry, ArticleRevisionEntry};
 

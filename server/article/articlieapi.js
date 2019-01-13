@@ -43,11 +43,20 @@ class ArticleAPI {
                 return next();
 
             if(asJSON) {
-                res.json({
+                const response = {
                     redirect: '/:article/' + article.id + '/view',
                     message: "Article Queried Successfully",
                     article
-                });
+                };
+                if(req.query.getAll || req.query.getRevision) {
+                    response.history = await this.articleDB.fetchArticleRevisionsByArticle(article.id);
+                    response.revision = await this.articleDB.fetchArticleRevisionByDate(article.id, req.query.getRevision);
+                    if(!response.revision && response.history.length > 0)
+                        response.revision = await this.articleDB.fetchArticleRevisionByDate(article.id, response.history[0].created); // response.history[0]; // (await this.articleDB.fetchArticleRevisionsByArticle(article.id))[0];
+                    // TODO: get article parent list
+                }
+
+                res.json(response);
 
             } else {
                 res.send(
@@ -88,7 +97,7 @@ class ArticleAPI {
 
             } else {
                 // Handle POST
-                let insertArticleHistoryID;
+                let insertArticleRevisionID;
                 switch (req.body.action) {
                     default:
                     case 'publish':
@@ -103,7 +112,7 @@ class ArticleAPI {
                             req.body.flags
                         );
 
-                        insertArticleHistoryID = await this.articleDB.insertArticleHistory(
+                        insertArticleRevisionID = await this.articleDB.insertArticleRevision(
                             article.id,
                             req.body.title,
                             req.body.content,
@@ -113,13 +122,13 @@ class ArticleAPI {
                         return res.json({
                             redirect: '/:article/' + article.id + '/view',
                             message: "Article published successfully",
-                            insertArticleHistoryID: insertArticleHistoryID,
+                            insertArticleRevisionID: insertArticleRevisionID,
                             affectedArticleRows: affectedRows,
                             article
                         });
 
                     case 'draft':
-                        insertArticleHistoryID = await this.articleDB.insertArticleHistory(
+                        insertArticleRevisionID = await this.articleDB.insertArticleRevision(
                             article.id,
                             req.body.title,
                             req.body.content,
@@ -128,7 +137,7 @@ class ArticleAPI {
                         return res.json({
                             redirect: '/:article/' + article.id + '/view',
                             message: "Draft saved successfully",
-                            insertArticleHistoryID: insertArticleHistoryID,
+                            insertArticleRevisionID: insertArticleRevisionID,
                             article
                         });
                 }

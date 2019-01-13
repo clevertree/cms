@@ -10,7 +10,8 @@ class HTMLArticleFormEditorElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
-            article: {id: -1, flags:[]}
+            article: {id: -1, flags:[]},
+            history: []
         };
         // this.state = {id:-1, flags:[]};
     }
@@ -74,7 +75,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
             console.log(e, xhr.response);
-            const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+            const response = typeof xhr.response && xhr.response === 'object' ? xhr.response : {message: xhr.response};
             response.status = xhr.status;
             if(xhr.status === 200) {
                 this.onSuccess(e, response);
@@ -83,7 +84,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
             }
             this.setState({response, user:response.user, processing: false});
         };
-        xhr.open(form.method, form.action, true);
+        xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         // xhr.setRequestHeader("Accept", "application/json");
         xhr.responseType = 'json';
@@ -151,6 +152,17 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                                     >${this.state.article.content||''}</textarea>
                                 <iframe class="editor-iframe editor-iframe-trumbowyg" src="/server/article/element/iframe-trumbowyg.html"
                                         style="width: 100%; height: 400px; overflow-x: hidden; border: 0px"></iframe>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Revision</td>
+                            <td>
+                                <select name="revision">
+                                    <option value="">Load a revision</option>
+                                ${this.state.history.map(revision => `
+                                    <option value="${revision.created}">${new Date(revision.created).toLocaleString()}</option>
+                                `)}
+                                </select>
                             </td>
                         </tr>
                         <tr>

@@ -45,7 +45,7 @@ INSERT INTO `article` (id, parent_id, title, path, flags, content)
 
 
 
-CREATE TABLE `article_history` (
+CREATE TABLE `article_revision` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `article_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
@@ -53,11 +53,11 @@ CREATE TABLE `article_history` (
   `content` TEXT,
   `created` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx:article_history.article_id` (`article_id` ASC),
-  KEY `idx:article_history.user_id` (`user_id` ASC),
+  KEY `idx:article_revision.article_id` (`article_id` ASC),
+  KEY `idx:article_revision.user_id` (`user_id` ASC),
 
-  CONSTRAINT `fk:article_history.article_id` FOREIGN KEY (`article_id`) REFERENCES `article` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk:article_history.user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk:article_revision.article_id` FOREIGN KEY (`article_id`) REFERENCES `article` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk:article_revision.user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
