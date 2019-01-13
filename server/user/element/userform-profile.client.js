@@ -90,7 +90,31 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.send(JSON.stringify(request));
         }
 
+        renderProfileField(field) {
+            switch(field.type) {
+                case 'textarea':
+                    break;
+                case 'select':
+                    break;
+                default:
+                    break;
+            }
+        }
+
         render() {
+            let profileFields = [];
+            if(this.state.user && this.state.profileConfig) {
+                profileFields = this.state.profileConfig.slice(0);
+                Object.keys(this.state.user.profile).forEach(key => {
+                    for(var i=0; i<profileFields.length; i++) {
+                        if(profileFields[i].name === key)
+                            return;
+                    }
+                    profileFields.push({
+                        name: key
+                    })
+                });
+            }
             console.log("RENDER", this.state);
             this.innerHTML =
                 `
@@ -111,12 +135,14 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr><td colspan="2"><hr/></td></tr>
                             </thead>
                             <tbody class="themed">
+                            ${profileFields.map(profileField => `
                                 <tr>
-                                    <td class="label">Email</td>
+                                    <td class="label">${profileField.name}</td>
                                     <td>
-                                        <input type="email" name="email" value="${this.state.email}" required />
+                                        ${this.renderProfileField(profileField)}
                                     </td>
                                 </tr>
+                            `).join('')}
                             </tbody>
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
