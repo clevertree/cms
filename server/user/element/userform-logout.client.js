@@ -31,7 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.requestFormData(userID);
         }
 
-        onSuccess(e, response) {}
+        onSuccess(e, response) {
+            setTimeout(() => window.location.href = response.redirect, 3000);
+        }
         onError(e, response) {}
 
         onEvent(e) {
@@ -81,17 +83,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 <legend>Log Out</legend>
                 <table class="themed">
                     <caption>
-                        In order to end your session, <br/>please hit 'Log out' below
-                        ${this.state.error ? `<div class="error">${this.state.error}</div>` : null}
+                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
+                            ${this.state.response.message}
+                        </div>` : "In order to end your session, <br/>please hit 'Log out' below"}
                     </caption>
                     <tbody>
-                        <tr><td colspan="2"><hr/></td></tr>
-                        <tr>
-                            <td class="label">Email</td>
-                            <td>
-                                <input type="email" name="email" value="${this.state.email}" disabled />
-                            </td>
-                        </tr>
                         <tr><td colspan="2"><hr/></td></tr>
                         <tr>
                             <td class="label"></td>

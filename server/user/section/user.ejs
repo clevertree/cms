@@ -1,3 +1,27 @@
 <section>
-    <%=JSON.stringify(user)%>
+    <table class="themed">
+        <tbody>
+            <tr>
+                <th colspan="2">User Profile<hr/></th>
+            </tr>
+            <tr>
+                <td class="label">ID</td>
+                <td><%=user.id%></td>
+            </tr>
+            <tr>
+                <td class="label">Email</td>
+                <td><%=user.email%></td>
+            </tr>
+            <tr>
+                <td class="label">Flags</td>
+                <td><%=user.flags.join(', ')%></td>
+            </tr>
+            <%_ Object.keys(user.profile).map(key => { _%>
+            <tr>
+                <td class="label"><%=key%></td>
+                <td><%=user.profile[key]%></td>
+            </tr>
+            <%_ }) _%>
+        </tbody>
+    </table>
 </section>

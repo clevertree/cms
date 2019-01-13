@@ -358,12 +358,27 @@ body.theme-minimal {
 
 /** Table **/
 
-.theme-minimal table.themed td.label {
+.theme-minimal table.themed {
+    margin: 0 auto;
+    padding: 0.5em;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    background: #CCC;
+}
+
+.theme-minimal table.themed > tbody {
+}
+.theme-minimal table.themed > caption {
+    padding: 2px 8px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    background: #CCC;
+}
+
+.theme-minimal .themed td.label {
     padding-right: 6px;
     text-align: right;
-    /* font-weight: bold; */
+    font-weight: bold;
     /* max-width: 36px; */
-}
-.theme-minimal table.themed {
-    
 }

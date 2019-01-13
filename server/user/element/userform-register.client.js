@@ -31,7 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.requestFormData(userID);
         }
 
-        onSuccess(e, response) {}
+        onSuccess(e, response) {
+            setTimeout(() => window.location.href = response.redirect, 3000);
+        }
         onError(e, response) {}
 
         onEvent(e) {

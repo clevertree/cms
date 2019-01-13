@@ -87,6 +87,7 @@ class UserAPI {
                 });
             }
         } catch (error) {
+            console.error(error);
             res.status(400).json({message: "Error: " + error.message, error: error.stack});
         }
     }
@@ -103,15 +104,15 @@ class UserAPI {
             } else {
                 // Handle Form (POST) Request
                 console.log("Log out Request", req.body);
-                const user = await this.logout(req.session);
+                await this.logout(req.session);
 
                 return res.json({
-                    redirect: `/:user/${user.id}`,
-                    message: `User logged out successfully: ${user.email}. <br/>Redirecting...`,
-                    user
+                    redirect: `/:user/login`,
+                    message: `User logged out successfully. <br/>Redirecting...`
                 });
             }
         } catch (error) {
+            console.error(error);
             res.status(400).json({message: "Error: " + error.message, error: error.stack});
         }
     }
@@ -137,6 +138,7 @@ class UserAPI {
                 });
             }
         } catch (error) {
+            console.error(error);
             res.status(400).json({message: "Error: " + error.message, error: error.stack});
         }
     }
@@ -165,6 +167,7 @@ class UserAPI {
                 });
             }
         } catch (error) {
+            console.error(error);
             res.status(400).json({message: "Error: " + error.message, error: error.stack});
         }
     }
@@ -191,10 +194,11 @@ class UserAPI {
             }
 
         } catch (error) {
+            console.error(error);
             res.status(400);
             res.send(
                 await this.app.getTheme()
-                    .render(req, `<section class='error'>${error.stack}</section>`)
+                    .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
             );
         }
     }
