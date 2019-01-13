@@ -32,9 +32,20 @@ class UserDatabase  {
         return user;
     }
 
+    async updateUser(userID, email, password, profile, flags) {
+        let set = {};
+        if(email !== null) set.email = email;
+        if(password !== null) set.password = password;
+        if(profile !== null) set.profile = profile;
+        if(flags !== null) set.flags = flags.join(',');
+        let SQL = `UPDATE user SET profile=? WHERE id = ?`;
+
+        await this.queryAsync(SQL, [JSON.stringify(profile), userID]);
+    }
+
     queryAsync(sql, values) {
         return new Promise( ( resolve, reject ) => {
-            this.db.query(sql, values, ( err, rows ) => {
+            this.db.query(sql, values, ( err, rows, fields ) => {
                 err ? reject (err) : resolve (rows);
             });
         });
@@ -46,7 +57,12 @@ class UserEntry {
         this.id = row.id;
         this.email = row.email;
         this.password = row.password;
-        this.profile = row.profile ? JSON.parse(row.profile) : {};
+        this.profile = {};
+        try {
+            this.profile = row.profile ? JSON.parse(row.profile) : {};
+        } catch (e) {
+            console.error(e);
+        }
         this.flags = row.flags ? row.flags.split(',') : [];
     }
 

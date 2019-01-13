@@ -19,6 +19,26 @@ class UserAPI {
         // TODO: get json :user
     }
 
+    async updateProfile(userID, profile) {
+        if(!userID)
+            throw new Error("Invalid User ID");
+        if(!profile)
+            throw new Error("Invalid Profile");
+
+        const user = await this.userDB.findUserByID(userID);
+        if(!user)
+            throw new Error("User not found: " + userID);
+
+        for(var i=0; i<this.app.config.user.profile.length; i++) {
+            const profileField = this.app.config.user.profile[i];
+            user.profile[profileField.name] = profile[profileField.name];
+        }
+
+        await this.userDB.updateUser(userID, null, null, user.profile, null);
+        // console.info("SET PROFILE", user, profile);
+        return user;
+    }
+
     async register(session, email, password, confirm_password) {
         if(!email)
             throw new Error("Email is required");
@@ -64,6 +84,41 @@ class UserAPI {
 
     async logout(session) {
         session.reset();
+    }
+
+    async handleViewRequest(asJSON, userID, req, res) {
+        try {
+            if(!userID)
+                throw new Error("Invalid user id");
+            const user = await this.userDB.findUserByID(userID);
+            // Render View
+            if(asJSON) {
+                const response = {user};
+                if(req.query.getAll || req.query.getProfileConfig)
+                    response.profileConfig = this.app.config.user.profile;
+                res.json(response);
+
+            } else {
+                res.send(
+                    await this.app.getTheme()
+                        .render(req, `<%- include("user/section/user.ejs")%>`, {
+                            user
+                        })
+                );
+            }
+
+        } catch (error) {
+            console.error(error);
+            if(asJSON) {
+                res.status(400).json({message: "Error: " + error.message, error: error.stack});
+            } else {
+                res.status(400);
+                res.send(
+                    await this.app.getTheme()
+                        .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+                );
+            }
+        }
     }
 
     async handleLoginRequest(req, res) {
@@ -158,7 +213,7 @@ class UserAPI {
             } else {
                 // Handle Form (POST) Request
                 console.log("Profile Update Request", req.body);
-                const user = await this.updateProfile(req.body);
+                const user = await this.updateProfile(userID, req.body.profile);
 
                 return res.json({
                     redirect: `/:user/${user.id}`,
@@ -169,37 +224,6 @@ class UserAPI {
         } catch (error) {
             console.error(error);
             res.status(400).json({message: "Error: " + error.message, error: error.stack});
-        }
-    }
-
-    async handleViewRequest(asJSON, userID, req, res) {
-        try {
-            if(!userID)
-                throw new Error("Invalid user id");
-            const user = await this.userDB.findUserByID(userID);
-            // Render View
-            if(asJSON) {
-                const response = {user};
-                if(req.query.getAll || req.query.getProfileConfig)
-                    response.profileConfig = this.app.config.user.profile;
-                res.json(response);
-
-            } else {
-                res.send(
-                    await this.app.getTheme()
-                        .render(req, `<%- include("user/section/user.ejs")%>`, {
-                            user
-                        })
-                );
-            }
-
-        } catch (error) {
-            console.error(error);
-            res.status(400);
-            res.send(
-                await this.app.getTheme()
-                    .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
-            );
         }
     }
 

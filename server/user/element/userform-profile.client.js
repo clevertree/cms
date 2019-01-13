@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
-                user: {id: -1}
+                user: {id: -1, flags:[]}
             };
             // this.state = {id:-1, flags:[]};
         }
@@ -21,8 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         connectedCallback() {
-            this.addEventListener('change', this.onEvent);
-            // this.addEventListener('submit', this.onEvent);
+            // this.addEventListener('change', this.onEvent);
+            this.addEventListener('submit', this.onEvent);
 
             this.render();
             const userID = this.getAttribute('id');
@@ -91,29 +91,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         renderProfileField(field) {
+            const value = this.state.user.profile[field.name];
             switch(field.type) {
                 case 'textarea':
-                    break;
+                    return `<textarea name="profile[${field.name}]" class="${field.class}" ${field.attributes}>${value}</textarea>`;
                 case 'select':
-                    break;
+                    return `<select name="profile[${field.name}]" class="${field.class}" ${field.attributes}></select>`;
                 default:
-                    break;
+                    return `<input name="profile[${field.name}]" type="${field.type||'text'}" class="${field.class}" value="${value}" ${field.attributes}/>`;
             }
         }
 
         render() {
             let profileFields = [];
-            if(this.state.user && this.state.profileConfig) {
+            if(this.state.profileConfig) {
                 profileFields = this.state.profileConfig.slice(0);
-                Object.keys(this.state.user.profile).forEach(key => {
-                    for(var i=0; i<profileFields.length; i++) {
-                        if(profileFields[i].name === key)
-                            return;
-                    }
-                    profileFields.push({
-                        name: key
-                    })
-                });
+                if(this.state.user.profile) {
+                    Object.keys(this.state.user.profile).forEach(key => {
+                        for (var i = 0; i < profileFields.length; i++) {
+                            if (profileFields[i].name === key)
+                                return;
+                        }
+                        profileFields.push({
+                            name: key
+                        })
+                    });
+                }
             }
             console.log("RENDER", this.state);
             this.innerHTML =
@@ -135,14 +138,31 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr><td colspan="2"><hr/></td></tr>
                             </thead>
                             <tbody class="themed">
+                                <tr>
+                                    <td class="label">Email</td>
+                                    <td>
+                                        <input type="email" name="email" value="${this.state.user.email}" disabled/>
+                                    </td>
+                                </tr>
                             ${profileFields.map(profileField => `
                                 <tr>
-                                    <td class="label">${profileField.name}</td>
+                                    <td class="label">${profileField.name}:</td>
                                     <td>
-                                        ${this.renderProfileField(profileField)}
+                                        ${this.renderProfileField(profileField, this.state.user.profile[profileField.name])}
                                     </td>
                                 </tr>
                             `).join('')}
+                                <tr>
+                                    <td class="label">Flags</td>
+                                    <td>
+                                        ${['Guest', 'Admin'].map(flagName => `
+                                        <label>
+                                            <input type="checkbox" class="themed" name="flags[${flagName.toLowerCase()}]"  ${this.state.user.flags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
+                                            ${flagName.replace('-', ' ')}
+                                        </label>
+                                        `).join('')}
+                                    </td>
+                                </tr>
                             </tbody>
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>

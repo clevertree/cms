@@ -334,22 +334,27 @@ body.theme-minimal {
 }
 
 
-.theme-minimal input.themed,
-.theme-minimal select.themed,
-.theme-minimal textarea.themed,
-.theme-minimal button.themed,
-.theme-minimal form.themed input,
-.theme-minimal form.themed select,
-.theme-minimal form.themed textarea,
-.theme-minimal form.themed button {
+.theme-minimal .themed input,
+.theme-minimal .themed select,
+.theme-minimal .themed textarea,
+.theme-minimal .themed button {
     padding: 2px 6px;
     margin: 0px 0px;
     border-radius: 4px;
     border-width: 1px;
     font-size: large;
 }
-.theme-minimal input[type=checkbox].themed,
-.theme-minimal form.themed input[type=checkbox] {
+.theme-minimal .themed input[type=text],
+.theme-minimal .themed input[type=email],
+.theme-minimal .themed input[type=password],
+.theme-minimal .themed select,
+.theme-minimal .themed textarea {
+    min-width: 90%;
+}
+.theme-minimal .themed textarea {
+    min-height: 100px;
+}
+.theme-minimal .themed input[type=checkbox] {
     width: 16px;
     height: 16px;
     vertical-align: middle;
@@ -381,4 +386,5 @@ body.theme-minimal {
     text-align: right;
     font-weight: bold;
     /* max-width: 36px; */
+    text-transform: capitalize;
 }
