@@ -57,6 +57,38 @@ class ArticleDatabase {
         return results.affectedRows;
     }
 
+    /** Article Menu **/
+
+    async queryMenuData(cascade=true) {
+        let SQL = `
+          SELECT a.id, a.parent_id, a.path, a.title
+          FROM article a
+          WHERE a.path IS NOT NULL
+`;
+        const menuEntries = await this.queryAsync(SQL);
+        if(!menuEntries || menuEntries.length === 0)
+            throw new Error("No menu items found");
+        if(!cascade)
+            return menuEntries;
+
+        const mainMenu = [];
+        for(let i=0; i<menuEntries.length; i++) {
+            const menuEntry = new ArticleEntry(menuEntries[i]);
+            if(menuEntry.parent_id === null) {
+                const subMenu = [];
+                mainMenu.push([menuEntry, subMenu]);
+                for(let j=0; j<menuEntries.length; j++) {
+                    const menuEntry2 = new ArticleEntry(menuEntries[j]);
+                    if(menuEntry.id === menuEntry2.parent_id) {
+                        subMenu.push([menuEntry2, []]);
+                    }
+                }
+            }
+        }
+
+        return mainMenu;
+    }
+
     /** Article Revision **/
 
     async selectArticleRevision(selectSQL, whereSQL, values) {
@@ -91,35 +123,6 @@ class ArticleDatabase {
         return results.insertId;
     }
 
-    /** Article Menu **/
-
-    async queryMenuData() {
-        let SQL = `
-          SELECT a.id, a.parent_id, a.path, a.title, a.flags
-          FROM article a
-          WHERE (
-                  FIND_IN_SET('main-menu', a.flags) 
-              OR  FIND_IN_SET('sub-menu', a.flags)
-          )
-`;
-        const menuEntries = await this.queryAsync(SQL);
-        if(!menuEntries || menuEntries.length === 0)
-            throw new Error("No menu items found");
-        const menuData = {};
-        for(let i=0; i<menuEntries.length; i++) {
-            const menuEntry = new ArticleEntry(menuEntries[i]);
-            if(menuEntry.hasFlag('main-menu')) {
-                if(!menuData[menuEntry.id]) menuData[menuEntry.id] = [null, []];
-                menuData[menuEntry.id][0] = menuEntry;
-            }
-            if(menuEntry.hasFlag('sub-menu')) {
-                if(!menuData[menuEntry.parent_id]) menuData[menuEntry.parent_id] = [null, []];
-                menuData[menuEntry.parent_id][1].push(menuEntry);
-            }
-        }
-
-        return Object.values(menuData);
-    }
 
 
     queryAsync(sql, values) {

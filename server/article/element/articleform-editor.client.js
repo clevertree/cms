@@ -10,7 +10,8 @@ class HTMLArticleFormEditorElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
-            article: {id: -1, flags:[]},
+            revisionDate: null,
+            article: {id: -1},
             history: [],
             parentList: [],
         };
@@ -23,17 +24,20 @@ class HTMLArticleFormEditorElement extends HTMLElement {
     }
 
     connectedCallback() {
-        // this.addEventListener('change', this.onEvent);
+        this.addEventListener('change', this.onEvent);
         this.addEventListener('submit', this.onEvent);
 
-        this.render();
         const articleID = this.getAttribute('id');
-        if(articleID)
-            this.requestFormData(articleID);
+        if(articleID) {
+            this.setState({article: {id: articleID}})
+            this.requestFormData();
+        }
+        this.render();
     }
 
     onSuccess(e, response) {
-        // setTimeout(() => window.location.href = response.redirect, 3000);
+        if(response.redirect)
+            setTimeout(() => window.location.href = response.redirect, 3000);
     }
     onError(e, response) {}
 
@@ -44,13 +48,23 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                 break;
 
             case 'change':
+                switch(e.target.name) {
+                    case 'revision':
+                        const revisionDate = e.target.value;
+                        console.log("Load Revision: " + revisionDate);
+                        // this.setState({revisionDate});
+                        this.setState({revisionDate});
+                        this.requestFormData();
+                        break;
+                }
                 break;
         }
     }
 
-    requestFormData(articleID) {
+    requestFormData() {
         const xhr = new XMLHttpRequest();
         xhr.onload = () => {
+            this.setState({processing: false});
             // console.info(xhr.response);
             if(!xhr.response || !xhr.response.article)
                 throw new Error("Invalid Response");
@@ -59,9 +73,10 @@ class HTMLArticleFormEditorElement extends HTMLElement {
             // this.render();
         };
         xhr.responseType = 'json';
-        xhr.open ("GET", `:article/${articleID}/json?getAll=true`, true);
+        xhr.open ("GET", `:article/${this.state.article.id}/json?getAll=true&getRevision=${this.state.revisionDate}`, true);
         // xhr.setRequestHeader("Accept", "application/json");
         xhr.send ();
+        this.setState({processing: true});
     }
 
     submit(e) {
@@ -76,7 +91,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
             console.log(e, xhr.response);
-            const response = typeof xhr.response && xhr.response === 'object' ? xhr.response : {message: xhr.response};
+            const response = xhr.response && typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
             response.status = xhr.status;
             if(xhr.status === 200) {
                 this.onSuccess(e, response);
@@ -95,12 +110,23 @@ class HTMLArticleFormEditorElement extends HTMLElement {
 
 
     render() {
+        const articleFlags = this.state.article.flags || [];
         // console.log("RENDER", this.state);
         this.innerHTML =
-            `<form action="/:article/${this.state.article.id}/edit" method="POST" class="form-article-edit themed">
+            `<form action="/:article/${this.state.article.id}/edit" method="POST" class="articleform themed">
             <input type="hidden" name="id" value="${this.state.article.id}" />
             <fieldset>
                 <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <td colspan="2">
+                                ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
+                                    ${this.state.response.message}
+                                </div>` : `Editing article ID ${this.state.article.id}`}
+                            </td>
+                        </tr>
+                        <tr><td colspan="2"><hr/></td></tr>
+                    </thead>
                     <tbody>
                         <tr>
                             <th style="width: 65px;"></th>
@@ -144,7 +170,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                             <td>
                                 ${['Main-Menu', 'Sub-Menu', 'Account-Only', 'Admin-Only'].map(flagName => `
                                 <label>
-                                    <input type="checkbox" class="themed" name="flags[${flagName.toLowerCase()}]"  ${this.state.article.flags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
+                                    <input type="checkbox" class="themed" name="flags[${flagName.toLowerCase()}]"  ${articleFlags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
                                     ${flagName.replace('-', ' ')}
                                 </label>
                                 `).join('')}

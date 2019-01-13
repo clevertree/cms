@@ -27,6 +27,11 @@
         </header>
 
         <article>
+            <%_ if(typeof article !== "undefined" && typeof sessionUser !== "undefined" && sessionUser.isAdmin()) { _%>
+            <section class="message" style="text-align: center; font-size: smaller;">
+                <a href=":article/<%=article.id%>/edit">Edit this page</a>
+            </section>
+            <%_ } _%>
             <%-content%>
         </article>
 
@@ -53,7 +58,7 @@
                 <li>
                     <h2>Contact Us</h2>
                     <p style="text-align: left;">
-                        Telephone: <a href="tel:480-409-9395">480-409-9395</a>
+                        Telephone: <a href="tel:602-492-7768">602-492-7768</a>
                         <br/>
                         2233 N. Laurel Ave.
                         <br/>

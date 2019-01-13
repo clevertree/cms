@@ -1,14 +1,58 @@
-form.form-article-edit {
-
+form.articleform {
+    /* max-width: 1200px; */
 }
 
-form.form-article-edit .editor-iframe {
+form.articleform > fieldset {
+    margin: 0px auto;
+}
+
+form.articleform > fieldset > table {
     width: 100%;
-    /* min-height: 860px; */
+}
+form.articleform > fieldset > table > caption {
+    /* font-weight: bold; */
+    /*font-style: italic;*/
+    text-align: left;
+    /* padding-bottom: 1em; */
+}
+form.articleform > fieldset > table > tbody > tr > td:first-child {
+    width: 8%;
+}
+form.articleform > fieldset > table > tbody > tr > td.label {
+    /* text-align: right; */
+    /* font-weight: bold; */
+    /* padding-right: 4px; */
 }
 form.form-article-edit .editor-iframe.fullscreen {
     position: fixed;
     left: 0;
     top: 0;
     height: 100% !important;
+}
+
+
+
+form.articleform input[type=text],
+form.articleform input[type=email],
+form.articleform input[type=password],
+form.articleform select,
+form.articleform textarea {
+    min-width: 90%;
+}
+
+/** Form Messages **/
+
+form.articleform div.success,
+form.articleform div.error {
+    padding: 0.5em;
+    margin: 0.5em;
+    border-radius: 4px;
+}
+form.articleform div.success {
+    color: #f5fbf2;
+    background: #118c09;
+}
+form.articleform div.error {
+    color: #fee;
+    background: #d25757;
 }

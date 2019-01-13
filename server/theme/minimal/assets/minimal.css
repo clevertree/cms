@@ -162,6 +162,11 @@ body.theme-minimal {
     background-color: #ab6428ed;
 }
 
+.theme-minimal div.message,
+.theme-minimal section.message {
+    background-color: rgba(111, 171, 102, 0.93);
+}
+
 /** Page Headings **/
 .theme-minimal h1.themed,
 .theme-minimal section > h1 {

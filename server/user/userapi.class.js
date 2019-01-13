@@ -31,7 +31,9 @@ class UserAPI {
 
         for(var i=0; i<this.app.config.user.profile.length; i++) {
             const profileField = this.app.config.user.profile[i];
-            user.profile[profileField.name] = profile[profileField.name];
+            let value = profile[profileField.name];
+            value = encodeHTML(value);
+            user.profile[profileField.name] = value;
         }
 
         await this.userDB.updateUser(userID, null, null, user.profile, null);
@@ -241,7 +243,9 @@ class UserAPI {
 
 module.exports = {UserAPI};
 
-
+function encodeHTML(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+}
 // function isJSON(req) {
 //     return req.headers.accept.split(',').indexOf('application/json') !== -1;
 // }

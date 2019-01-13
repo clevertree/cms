@@ -1,7 +1,8 @@
 // const fs = require('fs');
 const path = require('path');
 const ejs = require('ejs');
-const { ArticleDatabase } = require('../../../server/article/articledatabase');
+const { ArticleDatabase } = require('../../article/articledatabase');
+const { UserSession } = require('../../user/usersession.class');
 
 const TEMPLATE_DIR = path.resolve(__dirname);
 const BASE_DIR = path.resolve(path.dirname(path.dirname(path.dirname(__dirname))));
@@ -21,18 +22,24 @@ class MinimalTheme {
     get articleDB() { return new ArticleDatabase(this.app.db); }
 
     async render(req, content, renderData) {
-        const app = this.app;
-        if(!renderData)
-            renderData = {};
-        renderData.app = app;
-        renderData.menu = await this.articleDB.queryMenuData(false);
-        renderData.req = req;
-        renderData.content = content ? await ejs.render(content, renderData, this.renderOptions) : "No Content";
+        try {
+            const app = this.app;
+            if (!renderData)
+                renderData = {};
+            renderData.app = app;
+            renderData.menu = await this.articleDB.queryMenuData(true);
+            renderData.sessionUser = await new UserSession(req.session).getSessionUser(this.app.db);
+            renderData.req = req;
+            renderData.content = content ? await ejs.render(content, renderData, this.renderOptions) : null;
 
-        req.baseHref = this.getBaseHRef(req);
+            req.baseHref = this.getBaseHRef(req);
 
-        const templatePath = path.resolve(TEMPLATE_DIR + '/theme.ejs');
-        return await ejs.renderFile(templatePath, renderData, this.renderOptions);
+            const templatePath = path.resolve(TEMPLATE_DIR + '/theme.ejs');
+            return await ejs.renderFile(templatePath, renderData, this.renderOptions);
+        } catch (e) {
+            console.error(e);
+            return "Error Rendering Theme: " + e.stack;
+        }
     }
 
 

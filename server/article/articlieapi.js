@@ -32,7 +32,10 @@ class ArticleAPI {
             );
         } catch (error) {
             res.status(400);
-            res.json({message: error.stack});
+            res.send(
+                await this.app.getTheme()
+                    .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+            );
         }
     }
 
@@ -50,11 +53,12 @@ class ArticleAPI {
                 };
                 if(req.query.getAll || req.query.getRevision) {
                     response.history = await this.articleDB.fetchArticleRevisionsByArticleID(article.id);
-                    response.revision = await this.articleDB.fetchArticleRevisionByDate(article.id, req.query.getRevision);
+                    response.revision = await this.articleDB.fetchArticleRevisionByDate(article.id, req.query.getRevision || null);
                     if(!response.revision && response.history.length > 0)
                         response.revision = await this.articleDB.fetchArticleRevisionByDate(article.id, response.history[0].created); // response.history[0]; // (await this.articleDB.fetchArticleRevisionsByArticleID(article.id))[0];
-                    response.parentList = await this.articleDB.fetchArticlesByFlag(['main-menu', 'sub-menu']);
-                    // TODO: get menu via parent id not flags
+                }
+                if(req.query.getAll) {
+                    response.parentList = await this.articleDB.queryMenuData(false);
                 }
 
                 res.json(response);
@@ -66,9 +70,15 @@ class ArticleAPI {
                 );
             }
         } catch (error) {
-            // TODO: as JSON
             res.status(400);
-            res.json({message: error.stack});
+            if(asJSON) {
+                res.json({message: error.stack});
+            } else {
+                res.send(
+                    await this.app.getTheme()
+                        .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+                );
+            }
         }
     }
 
@@ -122,7 +132,7 @@ class ArticleAPI {
 
                         return res.json({
                             redirect: '/:article/' + article.id + '/view',
-                            message: "Article published successfully",
+                            message: "Article published successfully.<br/>Redirecting...",
                             insertArticleRevisionID: insertArticleRevisionID,
                             affectedArticleRows: affectedRows,
                             article
@@ -145,7 +155,14 @@ class ArticleAPI {
             }
         } catch (error) {
             res.status(400);
-            res.json({message: error.stack});
+            if(req.method === 'GET') {          // Handle GET
+                res.send(
+                    await this.app.getTheme()
+                        .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+                );
+            } else {
+                res.json({message: error.stack});
+            }
         }
     }
 
