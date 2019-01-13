@@ -66,18 +66,23 @@ class ArticleAPI {
         try {
             const session = new UserSession(req.session);
             const sessionUser = await session.getSessionUser(this.app.db);
+            if(!sessionUser)
+                throw new Error("Must be logged in");
 
             const article = await this.articleDB.fetchArticleByID(req.params.id);
             if(!article)
                 return next();
+
+            if(!sessionUser.isAdmin() && sessionUser.id !== article.user_id)
+                throw new Error("Not authorized");
 
             if(req.method === 'GET') {          // Handle GET
                 // Render Editor
                 res.send(
                     await this.app.getTheme(article.theme)
                         .render(req, `
-                            <script src="/server/article/form/article-form.client.js"></script>
-                            <article-form article-id="${article.id}"></article-form>
+                            <script src="/server/article/element/articleform-editor.client.js"></script>
+                            <articleform-editor id="${article.id}"></articleform-editor>
                         `)
                 );
 

@@ -78,25 +78,29 @@ document.addEventListener('DOMContentLoaded', function() {
         render() {
             this.innerHTML =
                 `
-        <form action="/:user/logout" method="POST" class="userform userform-logout themed" styl1e="display: none;">
+        <form action="/:user/logout" method="POST" class="userform userform-logout themed">
             <fieldset>
                 <legend>Log Out</legend>
-                <table class="themed">
-                    <caption>
-                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
-                            ${this.state.response.message}
-                        </div>` : "In order to end your session, <br/>please hit 'Log out' below"}
-                    </caption>
-                    <tbody>
-                        <tr><td colspan="2"><hr/></td></tr>
-                        <tr>
-                            <td class="label"></td>
-                            <td>
-                                <button type="submit">Log out</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td colspan="2">
+                                    ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
+                                        ${this.state.response.message}
+                                    </div>` : "In order to end your session, <br/>please hit 'Log out' below"}
+                                </td>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr><td colspan="2"><hr/></td></tr>
+                            <tr>
+                                <td class="label"></td>
+                                <td>
+                                    <button type="submit">Log out</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
             </fieldset>
         </form>
 `;

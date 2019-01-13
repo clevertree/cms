@@ -67,6 +67,8 @@ class UserEntry {
     }
 
     hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
+    isAdmin() { return this.hasFlag('admin'); }
+    isGuest() { return this.hasFlag('guest'); }
 
 }
 module.exports = {UserEntry, UserDatabase};

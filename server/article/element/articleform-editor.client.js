@@ -6,64 +6,99 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-class HTMLFormArticleEditorElement extends HTMLElement {
+class HTMLArticleFormEditorElement extends HTMLElement {
     constructor() {
         super();
-        this.article = {id:-1, flags:[]};
+        this.state = {
+            article: {id: -1, flags:[]}
+        };
+        // this.state = {id:-1, flags:[]};
+    }
+
+    setState(newState) {
+        Object.assign(this.state, newState);
+        this.render();
     }
 
     connectedCallback() {
-        // this.editor = this.closest('music-editor'); // Don't rely on this !!!
-        // this.addEventListener('change', this.onSubmit);
-        // this.addEventListener('input', this.onSubmit);
-        this.addEventListener('submit', this.onSubmit);
+        // this.addEventListener('change', this.onEvent);
+        this.addEventListener('submit', this.onEvent);
 
         this.render();
-
-        const articleID = this.getAttribute('article-id');
+        const articleID = this.getAttribute('id');
         if(articleID)
-            this.loadArticle(articleID);
+            this.requestFormData(articleID);
     }
 
+    onSuccess(e, response) {
+        // setTimeout(() => window.location.href = response.redirect, 3000);
+    }
+    onError(e, response) {}
 
-    submit(e) {
-        e.preventDefault();
-        const form = e.target;
-        const request = {};
-        new FormData(form).forEach(function(value, key){
-            request[key] = value;
-        });
+    onEvent(e) {
+        switch (event.type) {
+            case 'submit':
+                this.submit(e);
+                break;
 
-        const xhr = new XMLHttpRequest();
-        xhr.onload = function(){ console.log (xhr.response); };
-        xhr.open (form.method, form.action, true);
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhr.setRequestHeader("Accept", "application/json");
-        xhr.responseType = 'json';
-        xhr.send (JSON.stringify(request));
+            case 'change':
+                break;
+        }
     }
 
-    loadArticle(articleID) {
+    requestFormData(articleID) {
         const xhr = new XMLHttpRequest();
         xhr.onload = () => {
-            console.info(xhr.response);
-            if(!xhr.response.article)
+            // console.info(xhr.response);
+            if(!xhr.response || !xhr.response.article)
                 throw new Error("Invalid Response");
-            this.article = xhr.response.article;
-            this.render();
+            this.setState(xhr.response);
+            // this.state = xhr.response.user;
+            // this.render();
         };
         xhr.responseType = 'json';
-        xhr.open ("GET", `:article/${articleID}/json`, true);
+        xhr.open ("GET", `:article/${articleID}/json?getAll=true`, true);
         // xhr.setRequestHeader("Accept", "application/json");
         xhr.send ();
     }
 
+    submit(e) {
+        e.preventDefault();
+        const form = e.target; // querySelector('element.user-login-element');
+        this.setState({processing: true});
+        const request = {};
+        new FormData(form).forEach(function (value, key) {
+            request[key] = value;
+        });
+
+        const xhr = new XMLHttpRequest();
+        xhr.onload = (e) => {
+            console.log(e, xhr.response);
+            const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+            response.status = xhr.status;
+            if(xhr.status === 200) {
+                this.onSuccess(e, response);
+            } else {
+                this.onError(e, response);
+            }
+            this.setState({response, user:response.user, processing: false});
+        };
+        xhr.open(form.method, form.action, true);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        // xhr.setRequestHeader("Accept", "application/json");
+        xhr.responseType = 'json';
+        xhr.send(JSON.stringify(request));
+    }
+
+
+
     render() {
+        // console.log("RENDER", this.state);
         this.innerHTML =
-            `<form action="/:article/${this.article.id}/edit" method="POST" class="form-article-edit themed">
-            <input type="hidden" name="id" value="${this.article.id}" />
+            `<form action="/:article/${this.state.article.id}/edit" method="POST" class="form-article-edit themed">
+            <input type="hidden" name="id" value="${this.state.article.id}" />
             <fieldset>
-                <table class="themed" style="width: 100%;">
+                <table style="width: 100%;">
                     <tbody>
                         <tr>
                             <th style="width: 65px;"></th>
@@ -72,20 +107,20 @@ class HTMLFormArticleEditorElement extends HTMLElement {
                         <tr>
                             <td class="label">Title</td>
                             <td>
-                                <input type="text" name="title" value="${this.article.title}"/>
+                                <input type="text" name="title" value="${this.state.article.title||''}"/>
                             </td>
                         </tr>
                         <tr>
                             <td class="label">Path</td>
                             <td>
-                                <input type="text" name="path" value="${this.article.path}" />
+                                <input type="text" name="path" value="${this.state.article.path||''}" />
                             </td>
                         </tr>
                         <tr>
                             <td class="label">Parent</td>
                             <td>
-                                <input type="text" name="parent_id" placeholder="ID" size="3" value="${this.article.parent_id}" />
-                                <select class="article-form-select-parent">
+                                <input type="text" name="parent_id" placeholder="ID" size="3" value="${this.state.article.parent_id||''}" />
+                                <select class="articleform-select-parent">
                                     <option value="">Select Parent</option>
                                 </select>
                             </td>
@@ -103,7 +138,7 @@ class HTMLFormArticleEditorElement extends HTMLElement {
                             <td>
                                 ${['Main-Menu', 'Sub-Menu', 'Account-Only', 'Admin-Only'].map(flagName => `
                                 <label>
-                                    <input type="checkbox" class="themed" name="flags[${flagName.toLowerCase()}]"  ${this.article.flags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
+                                    <input type="checkbox" class="themed" name="flags[${flagName.toLowerCase()}]"  ${this.state.article.flags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
                                     ${flagName.replace('-', ' ')}
                                 </label>
                                 `).join('')}
@@ -112,8 +147,9 @@ class HTMLFormArticleEditorElement extends HTMLElement {
                         <tr>
                             <td class="label">Content</td>
                             <td>
-                                <textarea class="editor-plain editor-iframe-target" name="content" style="width: 100%; height: 400px; display: none;">${this.article.content}</textarea>
-                                <iframe class="editor-iframe editor-iframe-trumbowyg" src="/server/article/form/iframe-trumbowyg.html"
+                                <textarea class="editor-plain editor-iframe-target" name="content" style="width: 100%; height: 400px; display: none;"
+                                    >${this.state.article.content||''}</textarea>
+                                <iframe class="editor-iframe editor-iframe-trumbowyg" src="/server/article/element/iframe-trumbowyg.html"
                                         style="width: 100%; height: 400px; overflow-x: hidden; border: 0px"></iframe>
                             </td>
                         </tr>
@@ -140,4 +176,4 @@ class HTMLFormArticleEditorElement extends HTMLElement {
         </form>`;
     }
 }
-customElements.define('article-form', HTMLFormArticleEditorElement);
+customElements.define('articleform-editor', HTMLArticleFormEditorElement);

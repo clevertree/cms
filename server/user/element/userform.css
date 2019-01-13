@@ -30,6 +30,16 @@ form.form-article-edit .editor-iframe.fullscreen {
     height: 100% !important;
 }
 
+
+
+form.userform input[type=text],
+form.userform input[type=email],
+form.userform input[type=password],
+form.userform select,
+form.userform textarea {
+     min-width: 90%;
+}
+
 /** Form Messages **/
 
 form.userform div.success,

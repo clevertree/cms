@@ -87,14 +87,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form action="/:user/login" method="POST" class="userform userform-login themed">
                     <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
                         <legend>Log In</legend>
-                        <table class="themed">
-                            <caption>
-                                ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
-                                    ${this.state.response.message}
-                                </div>` : "In order to start a new session, <br/>please enter your email and password and hit 'Log in' below"}
-                            </caption>
-                            <tbody>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <td colspan="2">
+                                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
+                                            ${this.state.response.message}
+                                        </div>` : "In order to start a new session, <br/>please enter your email and password and hit 'Log in' below"}
+                                    </td>
+                                </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
+                            </thead>
+                            <tbody>
                                 <tr>
                                     <td class="label">Email</td>
                                     <td>
@@ -107,6 +111,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <input type="password" name="password" value="${this.state.password}" required />
                                     </td>
                                 </tr>
+                            </tbody>
+                            <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td class="label"></td>

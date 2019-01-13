@@ -39,7 +39,7 @@ class UserAPI {
         return user;
     }
 
-    async register(session, email, password, confirm_password) {
+    async register(session, email, password, password_confirm) {
         if(!email)
             throw new Error("Email is required");
         if(!UserAPI.validateEmail(email))
@@ -48,7 +48,7 @@ class UserAPI {
         if(!password)
             throw new Error("Password is required");
 
-        if(password !== confirm_password && confirm_password !== null)
+        if(password !== password_confirm && password_confirm !== null)
             throw new Error("Confirm & Password do not match");
 
         const user = await this.userDB.createUser(email, password);
@@ -184,7 +184,7 @@ class UserAPI {
             } else {
                 // Handle Form (POST) Request
                 console.log("Registration Request", req.body);
-                const user = await this.register(req.session, req.body.email, req.body.password, req.body.confirm_password);
+                const user = await this.register(req.session, req.body.email, req.body.password, req.body.password_confirm);
 
                 return res.json({
                     redirect: `/:user/${user.id}/profile`,
@@ -200,6 +200,11 @@ class UserAPI {
 
     async handleProfileRequest(userID, req, res) {
         try {
+            const sessionUser = await new UserSession(req.session).getSessionUser(this.app.db);
+            if(!sessionUser)
+                throw new Error("Must be logged in");
+            if(!sessionUser.isAdmin() && sessionUser.id !== userID)
+                throw new Error("Not authorized");
             if(!userID)
                 throw new Error("Invalid user id");
             // const user = await this.userDB.findUserByID(userID);
@@ -213,11 +218,11 @@ class UserAPI {
             } else {
                 // Handle Form (POST) Request
                 console.log("Profile Update Request", req.body);
-                const user = await this.updateProfile(userID, req.body.profile);
+                const user = await this.updateProfile(userID, req.body);
 
                 return res.json({
-                    redirect: `/:user/${user.id}`,
-                    message: `User profile updated successfully: ${user.email}. <br/>Redirecting...`,
+                    // redirect: `/:user/${user.id}`,
+                    message: `User profile updated successfully: ${user.email}`,
                     user
                 });
             }

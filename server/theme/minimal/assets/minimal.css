@@ -344,13 +344,6 @@ body.theme-minimal {
     border-width: 1px;
     font-size: large;
 }
-.theme-minimal .themed input[type=text],
-.theme-minimal .themed input[type=email],
-.theme-minimal .themed input[type=password],
-.theme-minimal .themed select,
-.theme-minimal .themed textarea {
-    min-width: 90%;
-}
 .theme-minimal .themed textarea {
     min-height: 100px;
 }

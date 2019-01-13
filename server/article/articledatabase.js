@@ -48,7 +48,7 @@ class ArticleDatabase {
           SET ?
           WHERE a.id = ?
         `;
-        const results = await this.queryAsync(SQL, [{title, content, path, user_id, parent_id, theme, flags}, id])
+        const results = await this.queryAsync(SQL, [{title, content, path, user_id, parent_id, theme, flags}, id]);
         return results.affectedRows;
     }
 
@@ -119,6 +119,7 @@ class ArticleEntry {
     constructor(row) {
         this.id = row.id;
         this.parent_id = row.parent_id;
+        this.user_id = row.user_id;
         this.path = row.path;
         this.title = row.title;
         this.theme = row.theme;

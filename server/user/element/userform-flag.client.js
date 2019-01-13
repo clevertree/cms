@@ -6,12 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserRegisterFormElement extends HTMLElement {
+    class HTMLUserFlagFormElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
-                email: "",
-                password: "",
+                user: {id: -1, flags:[]}
             };
             // this.state = {id:-1, flags:[]};
         }
@@ -22,17 +21,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         connectedCallback() {
-            this.addEventListener('change', this.onEvent);
+            // this.addEventListener('change', this.onEvent);
             this.addEventListener('submit', this.onEvent);
 
             this.render();
-            const userID = this.getAttribute('user-id');
+            const userID = this.getAttribute('id');
             if(userID)
                 this.requestFormData(userID);
         }
 
         onSuccess(e, response) {
-            setTimeout(() => window.location.href = response.redirect, 3000);
+            // setTimeout(() => window.location.href = response.redirect, 3000);
         }
         onError(e, response) {}
 
@@ -45,6 +44,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 case 'change':
                     break;
             }
+        }
+
+        requestFormData(userID) {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = (e) => {
+                // console.info(xhr.response);
+                if(xhr.status === 200) {
+                    if(!xhr.response || !xhr.response.user)
+                        throw new Error("Invalid Response");
+                    this.setState(xhr.response);
+                } else {
+                    const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+                    this.onError(e, response);
+                }
+            };
+            xhr.responseType = 'json';
+            xhr.open ("GET", `:user/${userID}/json`, true);
+            // xhr.setRequestHeader("Accept", "application/json");
+            xhr.send ();
         }
 
         submit(e) {
@@ -66,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     this.onError(e, response);
                 }
-                this.setState({response, processing: false});
+                this.setState({response, user:response.user, processing: false});
             };
             xhr.open(form.method, form.action, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -76,50 +94,57 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
+            console.log("RENDER", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/register" method="POST" class="userform userform-register themed">
+                <form action="/:user/${this.state.user.id}/flag" method="POST" class="userform userform-flag themed">
                     <fieldset>
-                        <legend>Register a new account</legend>
-                        <table class="themed">
-                            <caption>
-                                To register a new account, <br/>please enter your email and password
-                                ${this.state.error ? `<div class="error">${this.state.error}</div>` : null}
-                            </caption>
-                            <tbody>
+                        <legend>Update User Flags</legend>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <td colspan="2">
+                                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
+                                            ${this.state.response.message}
+                                        </div>` : "In order to update this flag, <br/>please modify this element and hit 'Update' below"}
+                                    </td>
+                                </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
+                            </thead>
+                            <tbody class="themed">
                                 <tr>
                                     <td class="label">Email</td>
                                     <td>
-                                        <input type="email" name="email" value="${this.state.email}" required />
+                                        <input type="email" name="email" value="${this.state.user.email}" disabled/>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="label">Password</td>
+                                    <td class="label">Flags</td>
                                     <td>
-                                        <input type="password" name="password" value="${this.state.password}" required />
+                                        ${['Guest', 'Admin'].map(flagName => `
+                                        <label>
+                                            <input type="checkbox" class="themed" name="flags[${flagName.toLowerCase()}]"  ${this.state.user.flags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
+                                            ${flagName.replace('-', ' ')}
+                                        </label>
+                                        `).join('')}
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td class="label">Confirm Password</td>
-                                    <td>
-                                        <input type="password" name="password_confirm" value="${this.state.password_confirm}" required />
-                                    </td>
-                                </tr>
+                            </tbody>
+                            <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td class="label"></td>
                                     <td>
-                                        <button type="submit">Register</button>
+                                        <button type="submit">Update</button>
                                     </td>
                                 </tr>
-                            </tbody>
+                            </tfoot>
                         </table>
                     </fieldset>
                 </form>
 `;
         }
     }
-    customElements.define('userform-register', HTMLUserRegisterFormElement);
+    customElements.define('userform-flag', HTMLUserFlagFormElement);
 
 }

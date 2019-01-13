@@ -22,8 +22,8 @@ class UserSession {
     async getSessionUser(db) {
         const userDB = new UserDatabase(db);
         let user;
-        if(session && session.user) {
-            user = await userDB.findUserByID(session.user.id);
+        if(this.session && this.session.user) {
+            user = await userDB.findUserByID(this.session.user.id);
             if(!user)
                 throw new Error("No Session User Found");
         } else {

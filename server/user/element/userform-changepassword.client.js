@@ -6,13 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserProfileFormElement extends HTMLElement{
+    class HTMLUserChangePasswordFormElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
-                user: {id: -1, flags:[]}
+                user: {id: -1},
+                password_old: null,
+                password_new: null,
+                password_confirm: null,
             };
-            // this.state = {id:-1, flags:[]};
+            // this.state = {id:-1, changepasswords:[]};
         }
 
         setState(newState) {
@@ -48,16 +51,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         requestFormData(userID) {
             const xhr = new XMLHttpRequest();
-            xhr.onload = () => {
+            xhr.onload = (e) => {
                 // console.info(xhr.response);
-                if(!xhr.response || !xhr.response.user)
-                    throw new Error("Invalid Response");
-                this.setState(xhr.response);
-                // this.state = xhr.response.user;
-                // this.render();
+                if(xhr.status === 200) {
+                    if(!xhr.response || !xhr.response.user)
+                        throw new Error("Invalid Response");
+                    this.setState(xhr.response);
+                } else {
+                    const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+                    this.onError(e, response);
+                }
             };
             xhr.responseType = 'json';
-            xhr.open ("GET", `:user/${userID}/json?getAll=true`, true);
+            xhr.open ("GET", `:user/${userID}/json`, true);
             // xhr.setRequestHeader("Accept", "application/json");
             xhr.send ();
         }
@@ -90,47 +96,19 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.send(JSON.stringify(request));
         }
 
-        renderProfileField(field) {
-            const value = this.state.user.profile[field.name];
-            switch(field.type) {
-                case 'textarea':
-                    return `<textarea name="${field.name}" class="${field.class}" ${field.attributes}>${value}</textarea>`;
-                case 'select':
-                    return `<select name="${field.name}" class="${field.class}" ${field.attributes}></select>`;
-                default:
-                    return `<input name="${field.name}" type="${field.type||'text'}" class="${field.class}" value="${value}" ${field.attributes}/>`;
-            }
-        }
-
         render() {
-            let profileFields = [];
-            if(this.state.profileConfig) {
-                profileFields = this.state.profileConfig.slice(0);
-                if(this.state.user.profile) {
-                    Object.keys(this.state.user.profile).forEach(key => {
-                        for (var i = 0; i < profileFields.length; i++) {
-                            if (profileFields[i].name === key)
-                                return;
-                        }
-                        profileFields.push({
-                            name: key
-                        })
-                    });
-                }
-            }
-            console.log("RENDER", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.user.id}/profile" method="POST" class="userform userform-profile themed">
+                <form action="/:user/${this.state.user.id}/changepassword" method="POST" class="userform userform-changepassword themed">
                     <fieldset>
-                        <legend>Update Profile</legend>
+                        <legend>Change Password</legend>
                         <table>
                             <thead>
                                 <tr>
                                     <td colspan="2">
                                         ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
                                             ${this.state.response.message}
-                                        </div>` : "In order to update this profile, <br/>please modify this element and hit 'Update' below"}
+                                        </div>` : "In order to change password, <br/>please modify this element and hit 'Update' below"}
                                     </td>
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
@@ -142,21 +120,31 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <input type="email" name="email" value="${this.state.user.email}" disabled/>
                                     </td>
                                 </tr>
-                            ${profileFields.map(profileField => `
                                 <tr>
-                                    <td class="label">${profileField.name}:</td>
+                                    <td class="label">Old Password</td>
                                     <td>
-                                        ${this.renderProfileField(profileField, this.state.user.profile[profileField.name])}
+                                        <input type="password" name="password_old" value="${this.state.password_old||''}" required />
                                     </td>
                                 </tr>
-                            `).join('')}
+                                <tr>
+                                    <td class="label">New Password</td>
+                                    <td>
+                                        <input type="password" name="password_new" value="${this.state.password_new||''}" required />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Confirm Password</td>
+                                    <td>
+                                        <input type="password" name="password_confirm" value="${this.state.password_confirm||''}" required />
+                                    </td>
+                                </tr>
                             </tbody>
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td class="label"></td>
                                     <td>
-                                        <button type="submit">Update</button>
+                                        <button type="submit">Update Password</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -164,8 +152,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     </fieldset>
                 </form>
 `;
+            console.log("RENDER", this.state);
         }
     }
-    customElements.define('userform-profile', HTMLUserProfileFormElement);
+    customElements.define('userform-changepassword', HTMLUserChangePasswordFormElement);
 
 }

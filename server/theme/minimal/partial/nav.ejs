@@ -19,17 +19,25 @@
                     </li>
                 <%_ } %>
 
-                <%_ if(!req.session.user) { _%>
+                <%_ console.log(req.session.user); if(!req.session.user) { _%>
                     <li>
                         <a href=":user/login">Login</a>
                     </li>
                 <%_ } else { _%>
                     <li>
-                        <a href=":user/<%=req.session.user.id%>/profile">My Profile</a>
+                        <a href=":user/<%=req.session.user.id%>">My Profile</a>
                         <ul class="nav-submenu">
+                            <li>
+                                <a href=":user/<%=req.session.user.id%>/profile">Edit Profile</a>
+                            </li>
                             <li>
                                 <a href=":user/logout">Log out</a>
                             </li>
+                            <%_ if(typeof article !== 'undefined') { _%>
+                            <li>
+                                <a href=":article/<%=article.id%>/edit">Edit this page</a>
+                            </li>
+                            <%_ }  _%>
                         </ul>
                     </li>
                 <%_ } _%>
