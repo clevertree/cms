@@ -12,8 +12,8 @@ class MinimalTheme {
         this.menuData = null;
         this.renderOptions = {
             views: [
-                path.resolve(TEMPLATE_DIR + '/template/'),
-                path.resolve(BASE_DIR + '/server/template/')
+                path.resolve(TEMPLATE_DIR),
+                path.resolve(BASE_DIR + '/server/')
             ]
             // async: true
         };
@@ -31,7 +31,7 @@ class MinimalTheme {
 
         req.baseHref = this.getBaseHRef(req);
 
-        const templatePath = path.resolve(TEMPLATE_DIR + '/template/default.ejs');
+        const templatePath = path.resolve(TEMPLATE_DIR + '/theme.ejs');
         return await ejs.renderFile(templatePath, renderData, this.renderOptions);
     }
 

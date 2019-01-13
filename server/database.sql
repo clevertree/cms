@@ -9,6 +9,7 @@ CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(256) DEFAULT NULL,
   `password` varchar(256) DEFAULT NULL,
+  `profile` TEXT,
   `flags` SET('guest', 'admin'),
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_email_unique` (`email`)
@@ -90,7 +91,7 @@ CREATE TABLE `article_history` (
 #           (402, 401,    'Facebook',     '/contact-facebook',   'sub-menu', '<%- include("about.ejs") %>'),
 #           (403, 401,    'E-mail',       '/contact-email',   'sub-menu', '<%- include("about.ejs") %>'),
 
-#           (1001, null,  'Account',   '/account',     '', '<%- include("section/account.ejs") %>'),
+#           (1001, null,  'Account',   '/account',     '', '<%- include("section/user.ejs") %>'),
 #           (1002, null,  'Register',   '/register',     '', '<%- include("section/register.ejs") %>'),
 #           (1003, 1001,  'Log out',   '/logout',     '', '<%- include("section/logout.ejs") %>'),
 #           (1004, 1001,  'Log in',   '/login',     '', '<%- include("section/login.ejs") %>');

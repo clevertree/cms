@@ -10,10 +10,12 @@ class UserAPI {
 
     loadRoutes(router) {
         // API Routes
+        router.get('/:?user/:id/json', async (req, res, next) => await this.handleViewRequest(true, req.params.id, req, res, next));
+        router.all('/:?user/:id', async (req, res) => await this.handleViewRequest(false, req.params.id, req, res));
         router.all('/:?user/login', async (req, res) => await this.handleLoginRequest(req, res));
         router.all('/:?user/logout', async (req, res) => await this.handleLogoutRequest(req, res));
         router.all('/:?user/register', async (req, res) => await this.handleRegisterRequest(req, res));
-
+        router.all('/:?user/:id/profile', async (req, res) => await this.handleProfileRequest(req.params.id, req, res));
         // TODO: get json :user
     }
 
@@ -70,10 +72,7 @@ class UserAPI {
                 // Render Editor Form
                 res.send(
                     await this.app.getTheme()
-                        .render(req, `
-                            <script src="/server/user/form/userform.client.js"></script>
-                            <userform-login></userform-login>
-                        `)
+                        .render(req, `<%- include("user/section/login.ejs")%>`)
                 );
 
             } else {
@@ -98,10 +97,7 @@ class UserAPI {
                 // Render Editor Form
                 res.send(
                     await this.app.getTheme()
-                        .render(req, `
-                            <script src="/server/user/form/userform.client.js"></script>
-                            <userform-login></userform-login>
-                        `)
+                        .render(req, `<%- include("user/section/logout.ejs")%>`)
                 );
 
             } else {
@@ -126,10 +122,7 @@ class UserAPI {
                 // Render Editor Form
                 res.send(
                     await this.app.getTheme()
-                        .render(req, `
-                            <script src="/server/user/form/userform.client.js"></script>
-                            <userform-register></userform-register>
-                        `)
+                        .render(req, `<%- include("user/section/register.ejs")%>`)
                 );
 
             } else {
@@ -145,6 +138,64 @@ class UserAPI {
             }
         } catch (error) {
             res.status(400).json({message: "Error: " + error.message, error: error.stack});
+        }
+    }
+
+    async handleProfileRequest(userID, req, res) {
+        try {
+            if(!userID)
+                throw new Error("Invalid user id");
+            // const user = await this.userDB.findUserByID(userID);
+            if(req.method === 'GET') {
+                // Render Editor Form
+                res.send(
+                    await this.app.getTheme()
+                        .render(req, `<%- include("user/section/profile.ejs", {id: ${userID}})%>`)
+                );
+
+            } else {
+                // Handle Form (POST) Request
+                console.log("Profile Update Request", req.body);
+                const user = await this.updateProfile(req.body);
+
+                return res.json({
+                    redirect: '/:user/' + user.id,
+                    message: `User profile updated successfully: ${user.email}. <br/>Redirecting...`,
+                    user
+                });
+            }
+        } catch (error) {
+            res.status(400).json({message: "Error: " + error.message, error: error.stack});
+        }
+    }
+
+    async handleViewRequest(asJSON, userID, req, res) {
+        try {
+            if(!userID)
+                throw new Error("Invalid user id");
+            const user = await this.userDB.findUserByID(userID);
+            // Render View
+            if(asJSON) {
+                const response = {user};
+                if(req.query.getAll || req.query.getProfileConfig)
+                    response.profileConfig = this.app.config.user.profile;
+                res.json(response);
+
+            } else {
+                res.send(
+                    await this.app.getTheme()
+                        .render(req, `<%- include("user/section/user.ejs")%>`, {
+                            user
+                        })
+                );
+            }
+
+        } catch (error) {
+            res.status(400);
+            res.send(
+                await this.app.getTheme()
+                    .render(req, `<section class='error'>${error.stack}</section>`)
+            );
         }
     }
 

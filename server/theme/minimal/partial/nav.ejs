@@ -17,10 +17,15 @@
                         </ul>
                         <%_ } _%>
                     </li>
-                <%_ }
+                <%_ } %>
 
-                if(req.sessionUser) { _%>
-
-                <%_}
-                _%>
+                <%_ if(!req.session.user) { _%>
+                    <li>
+                        <a href=":user/login">Login</a>
+                    </li>
+                <%_ } else { _%>
+                    <li>
+                        <a href=":user/${req.session.user.id}/profile">Profile</a>
+                    </li>
+                <%_ } _%>
                 </ul>

@@ -19,7 +19,7 @@ form.userform > fieldset > table > caption {
 form.userform > fieldset > table > tbody > tr > td:first-child {
     width: 25%;
 }
-/*form.userform > fieldset > table > tbody > tr > td:nth-child(2){*/
+/*element.userform > fieldset > table > tbody > tr > td:nth-child(2){*/
     /*width: 25%;*/
 /*}*/
 form.form-article-edit .editor-iframe.fullscreen {

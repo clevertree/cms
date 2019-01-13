@@ -46,6 +46,7 @@ class UserEntry {
         this.id = row.id;
         this.email = row.email;
         this.password = row.password;
+        this.profile = row.profile ? JSON.parse(row.profile) : {};
         this.flags = row.flags ? row.flags.split(',') : [];
     }
 
