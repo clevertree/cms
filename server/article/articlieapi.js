@@ -26,6 +26,18 @@ class ArticleAPI {
             if(!article)
                 return next();
 
+            if(typeof req.query.r !== 'undefined') {
+                const articleRevisionID = parseInt(req.query.r);
+                const articleRevision = await this.articleDB.fetchArticleRevisionByID(articleRevisionID);
+                if(!articleRevision)
+                    throw new Error("Article Revision ID not found: " + articleRevisionID);
+
+                if(articleRevision.article_id !== article.id)
+                    throw new Error("Revision does not belong to article");
+                article.title = articleRevision.title;
+                article.content = articleRevision.content;
+            }
+
             res.send(
                 await this.app.getTheme(article.theme)
                     .render(req, article.content, {article})
@@ -45,6 +57,18 @@ class ArticleAPI {
             if(!article)
                 return next();
 
+            if(typeof req.query.r !== 'undefined') {
+                const articleRevisionID = parseInt(req.query.r);
+                const articleRevision = await this.articleDB.fetchArticleRevisionByID(articleRevisionID);
+                if(!articleRevision)
+                    throw new Error("Article Revision ID not found: " + articleRevisionID);
+
+                if(articleRevision.article_id !== article.id)
+                    throw new Error("Revision does not belong to article");
+                article.title = articleRevision.title;
+                article.content = articleRevision.content;
+            }
+
             if(asJSON) {
                 const response = {
                     redirect: '/:article/' + article.id + '/view',
@@ -53,9 +77,9 @@ class ArticleAPI {
                 };
                 if(req.query.getAll || req.query.getRevision) {
                     response.history = await this.articleDB.fetchArticleRevisionsByArticleID(article.id);
-                    response.revision = await this.articleDB.fetchArticleRevisionByDate(article.id, req.query.getRevision || null);
+                    response.revision = await this.articleDB.fetchArticleRevisionByID(article.id, req.query.getRevision || null);
                     if(!response.revision && response.history.length > 0)
-                        response.revision = await this.articleDB.fetchArticleRevisionByDate(article.id, response.history[0].created); // response.history[0]; // (await this.articleDB.fetchArticleRevisionsByArticleID(article.id))[0];
+                        response.revision = await this.articleDB.fetchArticleRevisionByID(article.id, response.history[0].id); // response.history[0]; // (await this.articleDB.fetchArticleRevisionsByArticleID(article.id))[0];
                 }
                 if(req.query.getAll) {
                     response.parentList = await this.articleDB.queryMenuData(false);
@@ -108,7 +132,7 @@ class ArticleAPI {
 
             } else {
                 // Handle POST
-                let insertArticleRevisionID;
+                let insertArticleRevisionID, revision;
                 switch (req.body.action) {
                     default:
                     case 'publish':
@@ -145,8 +169,9 @@ class ArticleAPI {
                             req.body.content,
                             sessionUser.id
                         );
+                        revision = await this.articleDB.fetchArticleRevisionByID(insertArticleRevisionID);
                         return res.json({
-                            redirect: '/:article/' + article.id + '/view',
+                            redirect: '/:article/' + article.id + '/view?r=' + revision.id,
                             message: "Draft saved successfully",
                             insertArticleRevisionID: insertArticleRevisionID,
                             article

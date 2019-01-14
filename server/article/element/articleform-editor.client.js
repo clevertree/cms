@@ -74,7 +74,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
             // this.render();
         };
         xhr.responseType = 'json';
-        xhr.open ("GET", `:article/${this.state.article.id}/json?getAll=true&getRevision=${this.state.revisionDate}`, true);
+        xhr.open ("GET", `:article/${this.state.article.id}/json?getAll=true&getRevision=${new Date(this.state.revisionDate).getTime()}`, true);
         // xhr.setRequestHeader("Accept", "application/json");
         xhr.send ();
         this.setState({processing: true});

@@ -102,11 +102,17 @@ class ArticleDatabase {
         return results.map(result => new ArticleRevisionEntry(result))
     }
 
-    async fetchArticleRevisionByDate(articleID, revisionDate) {
-        if(typeof revisionDate === "string")
-            revisionDate = new Date(revisionDate);
-        const revisions = await this.selectArticleRevision('*', 'ah.article_id = ? AND ah.created = ? LIMIT 1',
-            [articleID, revisionDate]);
+    // async fetchArticleRevisionByDate(articleID, revisionDate) {
+    //     if(["string", "number"].indexOf(typeof revisionDate) !== -1)
+    //         revisionDate = new Date(revisionDate);
+    //     const revisions = await this.selectArticleRevision('*', 'ah.article_id = ? AND ah.created = ? LIMIT 1',
+    //         [articleID, revisionDate]);
+    //     return revisions[0];
+    // }
+
+    async fetchArticleRevisionByID(id, selectSQL = '*') {
+        const revisions = await this.selectArticleRevision(selectSQL, `ah.id = ?`,
+            [id]);
         return revisions[0];
     }
 
