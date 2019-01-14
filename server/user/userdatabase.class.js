@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 
 class UserDatabase  {
     constructor(db) {

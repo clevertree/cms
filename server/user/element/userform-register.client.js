@@ -81,13 +81,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form action="/:user/register" method="POST" class="userform userform-register themed">
                     <fieldset>
                         <legend>Register a new account</legend>
-                        <table class="themed">
-                            <caption>
-                                To register a new account, <br/>please enter your email and password
-                                ${this.state.error ? `<div class="error">${this.state.error}</div>` : null}
-                            </caption>
-                            <tbody>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <td colspan="2">
+                                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
+                                            ${this.state.response.message}
+                                        </div>` : "To register a new account, <br/>please enter your email and password"}
+                                    </td>
+                                </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
+                            </thead>
+                            <tbody>
                                 <tr>
                                     <td class="label">Email</td>
                                     <td>
@@ -106,11 +111,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <input type="password" name="password_confirm" value="${this.state.password_confirm}" required />
                                     </td>
                                 </tr>
+                            </tbody>
+                            <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td class="label"></td>
                                     <td>
-                                        <button type="submit">Register</button>
+                                        <button type="submit">Log in</button>
                                     </td>
                                 </tr>
                             </tbody>

@@ -10,9 +10,9 @@ class UserAPI {
 
     loadRoutes(router) {
         // API Routes
-        router.get('/:?user/:id(\\d+)/json', async (req, res, next) => await this.handleViewRequest(true, req.params.id, req, res, next));
-        router.all('/:?user/:id(\\d+)', async (req, res) => await this.handleViewRequest(false, req.params.id, req, res));
-        router.all('/:?user/:id(\\d+)/profile', async (req, res) => await this.handleProfileRequest(req.params.id, req, res));
+        router.get('/:?user/:id(\\d+)/json', async (req, res, next) => await this.handleViewRequest(true, parseInt(req.params.id), req, res, next));
+        router.all('/:?user/:id(\\d+)', async (req, res) => await this.handleViewRequest(false, parseInt(req.params.id), req, res));
+        router.all('/:?user/:id(\\d+)/profile', async (req, res) => await this.handleProfileRequest(parseInt(req.params.id), req, res));
         router.all('/:?user/login', async (req, res) => await this.handleLoginRequest(req, res));
         router.all('/:?user/logout', async (req, res) => await this.handleLogoutRequest(req, res));
         router.all('/:?user/register', async (req, res) => await this.handleRegisterRequest(req, res));

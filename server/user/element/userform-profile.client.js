@@ -94,11 +94,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const value = this.state.user.profile[field.name];
             switch(field.type) {
                 case 'textarea':
-                    return `<textarea name="${field.name}" class="${field.class}" ${field.attributes}>${value}</textarea>`;
+                    return `<textarea name="${field.name}" class="${field.class}" ${field.attributes}>${value||''}</textarea>`;
                 case 'select':
                     return `<select name="${field.name}" class="${field.class}" ${field.attributes}></select>`;
                 default:
-                    return `<input name="${field.name}" type="${field.type||'text'}" class="${field.class}" value="${value}" ${field.attributes}/>`;
+                    return `<input name="${field.name}" type="${field.type||'text'}" class="${field.class}" value="${value||''}" ${field.attributes}/>`;
             }
         }
 
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr>
                                     <td class="label">${profileField.name}:</td>
                                     <td>
-                                        ${this.renderProfileField(profileField, this.state.user.profile[profileField.name])}
+                                        ${this.renderProfileField(profileField)}
                                     </td>
                                 </tr>
                             `).join('')}

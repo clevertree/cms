@@ -29,7 +29,7 @@ CREATE TABLE `article` (
   `title` varchar(256) DEFAULT NULL,
   `content` TEXT,
   `theme` varchar(256) DEFAULT NULL,
-  `flags` SET('main-menu', 'sub-menu', 'account-only', 'admin-only'),
+  `flags` SET('account-only', 'admin-only'),
   `created` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `updated` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -37,10 +37,10 @@ CREATE TABLE `article` (
   CONSTRAINT `fk:article.user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `article` (id, parent_id, title, path, flags, content)
-  VALUES  (1, null,   'Home',                 '/',          'main-menu', '<%- include("about.ejs") %>'),
-          (2, null,   'About Us',             '/about',     'sub-menu', '<%- include("about.ejs") %>'),
-          (3, 1,      'What We Do',           '/service',   'sub-menu', '<%- include("about.ejs") %>');
+INSERT INTO `article` (id, parent_id, title, path, content)
+  VALUES  (1, null,   'Home',                 '/',          '<%- include("about.ejs") %>'),
+          (2, null,   'About Us',             '/about',     '<%- include("about.ejs") %>'),
+          (3, 1,      'What We Do',           '/service',   '<%- include("about.ejs") %>');
 
 
 

@@ -21,7 +21,12 @@
 
                 <%_ if(!req.session.user) { _%>
                     <li>
-                        <a href=":user/login">Login</a>
+                        <a href=":user/login">Log in</a>
+                        <ul class="nav-submenu">
+                            <li>
+                                <a href=":user/register">Register</a>
+                            </li>
+                        </ul>
                     </li>
                 <%_ } else { _%>
                     <li>

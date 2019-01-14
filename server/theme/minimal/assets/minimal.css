@@ -243,8 +243,8 @@ body.theme-minimal {
 
 .theme-minimal ul.flex-list > li > img,
 .theme-minimal ul.flex-list > li > a > img {
-    /* max-width: 90%; */
-    /* max-height: 200px; */
+    max-width: 90%;
+    max-height: 200px;
 }
 
 /** Section effects **/
