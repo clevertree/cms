@@ -103,6 +103,8 @@ class ArticleDatabase {
     }
 
     async fetchArticleRevisionByDate(articleID, revisionDate) {
+        if(typeof revisionDate === "string")
+            revisionDate = new Date(revisionDate);
         const revisions = await this.selectArticleRevision('*', 'ah.article_id = ? AND ah.created = ? LIMIT 1',
             [articleID, revisionDate]);
         return revisions[0];

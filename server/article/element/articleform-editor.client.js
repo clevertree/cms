@@ -12,6 +12,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
         this.state = {
             revisionDate: null,
             article: {id: -1},
+            revision: {},
             history: [],
             parentList: [],
         };
@@ -111,7 +112,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
 
     render() {
         const articleFlags = this.state.article.flags || [];
-        // console.log("RENDER", this.state);
+        console.log("RENDER", this.state);
         this.innerHTML =
             `<form action="/:article/${this.state.article.id}/edit" method="POST" class="articleform themed">
             <input type="hidden" name="id" value="${this.state.article.id}" />
@@ -180,7 +181,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                             <td class="label">Content</td>
                             <td>
                                 <textarea class="editor-plain editor-iframe-target" name="content" style="width: 100%; height: 400px; display: none;"
-                                    >${this.state.article.content||''}</textarea>
+                                    >${this.state.revision.content || this.state.article.content ||''}</textarea>
                                 <iframe class="editor-iframe editor-iframe-trumbowyg" src="/server/article/element/iframe-trumbowyg.html"
                                         style="width: 100%; height: 400px; overflow-x: hidden; border: 0px"></iframe>
                             </td>
