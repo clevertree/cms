@@ -23,13 +23,6 @@ form.userform > fieldset > table > tbody > tr > td.label {
     /* font-weight: bold; */
     /* padding-right: 4px; */
 }
-form.form-article-edit .editor-iframe.fullscreen {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100% !important;
-}
-
 
 
 form.userform input[type=text],
