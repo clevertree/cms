@@ -137,9 +137,11 @@ class UserAPI {
         return user;
     }
 
-    async logout(req) {
+    async logout(req, res) {
         req.session.reset();
+        res.clearCookie('session_save');
         new UserSession(req.session).addMessage("User has been logged out");
+        // TODO: destroy db session
     }
 
     async handleViewRequest(asJSON, userID, req, res) {
@@ -245,7 +247,7 @@ class UserAPI {
             } else {
                 // Handle Form (POST) Request
                 console.log("Log out Request", req.body);
-                await this.logout(req);
+                await this.logout(req, res);
 
                 return res.json({
                     redirect: `/:user/login`,
