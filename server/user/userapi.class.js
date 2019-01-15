@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const { ForgotPasswordMail } = require("./mail/forgotpassword.class");
 
 const { UserDatabase } = require('./userdatabase.class');
 const { UserSession } = require('./usersession.class');
@@ -19,6 +20,7 @@ class UserAPI {
         router.all('/:?user/session', async (req, res) => await this.handleSessionLoginRequest(req, res));
         router.all('/:?user/logout', async (req, res) => await this.handleLogoutRequest(req, res));
         router.all('/:?user/register', async (req, res) => await this.handleRegisterRequest(req, res));
+        router.all('/:?user/forgotpassword', async (req, res) => await this.handleForgotPassword(req, res));
     }
 
     async checkForSessionLogin(req, res, next) {
@@ -284,6 +286,39 @@ class UserAPI {
                 return res.json({
                     redirect: `/:user/${user.id}/profile`,
                     message: `User registered successfully: ${user.email}. <br/>Redirecting...`,
+                    user
+                });
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(400).json({message: "Error: " + error.message, error: error.stack});
+        }
+    }
+
+    async handleForgotPassword(req, res) {
+        try {
+            if(req.method === 'GET') {
+                // Render Editor Form
+                res.send(
+                    await this.app.getTheme()
+                        .render(req, `<%- include("user/section/forgotpassword.ejs")%>`)
+                );
+
+            } else {
+                // Handle Form (POST) Request
+                // console.log("Log in Request", req.body);
+                const user = await this.userDB.fetchUserByEmail(req.body.email);
+                if(!user)
+                    throw new Error("User was not found: " + req.body.email);
+                const result = await this.userDB.createUserSession(user.id, 'reset');
+
+                const recoveryURL = this.app.config.server.baseHRef + `/:user/session?uuid=${result.uuid}&password=${result.password}`;
+                const mail = new ForgotPasswordMail(this.app, user, recoveryURL);
+                await mail.send();
+
+                return res.json({
+                    redirect: `/:user/login`,
+                    message: `Recovery email sent successfully to ${user.email}. <br/>Redirecting...`,
                     user
                 });
             }

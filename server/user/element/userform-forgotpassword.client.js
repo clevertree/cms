@@ -82,10 +82,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     ${this.state.error ? `<div class="error">${this.state.error}</div>` : null}
                     <fieldset>
                         <legend>Forgot Password</legend>
-                        <table class="themed">
+                        <table>
                             <caption>
-                                In order to recover your password, <br/>please enter your email
-                                ${this.state.error ? `<div class="error">${this.state.error}</div>` : null}
+                                In order to recover your password, <br/>please enter your email and hit submit below
+                                ${this.state.error ? `<div class="error">${this.state.error}</div>` : ''}
                                 </caption>
                             <tbody>
                                 <tr><td colspan="2"><hr/></td></tr>

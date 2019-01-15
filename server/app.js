@@ -4,6 +4,8 @@ const cookieParser = require('cookie-parser');
 const session = require('client-sessions');
 const path = require('path');
 const mysql = require('mysql');
+const nodemailer = require('nodemailer');
+const smtpTransport = require("nodemailer-smtp-transport");
 
 // const { UserSessionManager } = require('./user/usersession.class');
 const { UserAPI } = require('./user/userapi.class');
@@ -18,6 +20,13 @@ class App {
 
         this.loadConfig();
 
+        this.mail = nodemailer.createTransport(smtpTransport(this.config.mail));
+        this.mail.verify((error, success) => {
+            if (error || !success)
+                console.error(`Error connecting to ${this.config.mail.host}`, error, this.config.mail);
+            else
+                console.log(`Connected to ${this.config.mail.host}`);
+        });
 
         // this.db = new DatabaseManager(this);
 
@@ -55,8 +64,12 @@ class App {
     start() {
 
         // HTTP
-        this.express.listen(this.config.port);
-        console.log(`Listening on ${this.config.port}`);
+        this.express.listen(this.config.server.port);
+        console.log(`Listening on ${this.config.server.port}`);
+        if(this.config.server.debugPort) {
+            this.express.listen(this.config.server.debugPort);
+            console.log(`Listening on ${this.config.server.debugPort}`);
+        }
 
         this.createDBConnection();
     }

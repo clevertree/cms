@@ -115,6 +115,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <td class="label">Stay Logged In</td>
                                     <td>
                                         <input type="checkbox" name="session_save" value="1"/>
+                                        <div style="float: right">
+                                            <a href=":user/forgotpassword">Forgot Password?</a>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
