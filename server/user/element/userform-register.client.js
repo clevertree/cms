@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr>
                                     <td class="label"></td>
                                     <td>
-                                        <button type="submit">Log in</button>
+                                        <button type="submit">Register</button>
                                     </td>
                                 </tr>
                             </tbody>

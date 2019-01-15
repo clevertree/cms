@@ -117,8 +117,8 @@ class ArticleDatabase {
     }
 
     async fetchArticleRevisionsByArticleID(articleID, limit=20, selectSQL = '*, NULL as content') {
-        return await this.selectArticleRevision(selectSQL, `ah.article_id = ? ORDER BY ah.created DESC LIMIT ${limit}`,
-            [articleID]);
+        return await this.selectArticleRevision(`ah.article_id = ? ORDER BY ah.created DESC LIMIT ${limit}`,
+            [articleID], selectSQL);
     }
 
     // Inserting revision without updating article === draft
