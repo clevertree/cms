@@ -28,7 +28,10 @@ class UserDatabase  {
         const hash = await bcrypt.hash(password, salt);
         let SQL = `
           INSERT INTO user SET ?`;
-        await this.queryAsync(SQL, {email, hash});
+        await this.queryAsync(SQL, {
+            email,
+            password: hash
+        });
 
         const user = await this.fetchUserByEmail(email);
         console.info("User Created", user);
