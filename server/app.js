@@ -1,9 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const session = require('client-sessions');
 const path = require('path');
 const mysql = require('mysql');
 
-const { UserSessionManager } = require('./user/usersession.class');
+// const { UserSessionManager } = require('./user/usersession.class');
 const { UserAPI } = require('./user/userapi.class');
 const { ArticleAPI } = require('./article/articlieapi');
 
@@ -22,6 +24,9 @@ class App {
         this.express = express();
         this.express.use(bodyParser.urlencoded({ extended: true }));
         this.express.use(bodyParser.json());
+        this.express.use(cookieParser());
+        this.config.session.cookieName = 'session';
+        this.express.use(session(this.config.session));
 
 
         // Post wrapper
@@ -29,7 +34,7 @@ class App {
 
 
         // Routes
-        new UserSessionManager(this).loadRoutes(this.express);
+        // new UserSessionManager(this).loadRoutes(this.express);
         new UserAPI(this).loadRoutes(this.express);
         new ArticleAPI(this).loadRoutes(this.express);
 

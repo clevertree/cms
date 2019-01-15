@@ -9,6 +9,8 @@ class UserAPI {
     get userDB() { return new UserDatabase(this.app.db); }
 
     loadRoutes(router) {
+        // TODO: handle session_save login
+        router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
         // API Routes
         router.get('/:?user/:id(\\d+)/json', async (req, res, next) => await this.handleViewRequest(true, parseInt(req.params.id), req, res, next));
         router.all('/:?user/:id(\\d+)', async (req, res) => await this.handleViewRequest(false, parseInt(req.params.id), req, res));
@@ -16,7 +18,11 @@ class UserAPI {
         router.all('/:?user/login', async (req, res) => await this.handleLoginRequest(req, res));
         router.all('/:?user/logout', async (req, res) => await this.handleLogoutRequest(req, res));
         router.all('/:?user/register', async (req, res) => await this.handleRegisterRequest(req, res));
-        // TODO: get json :user
+    }
+
+    async checkForSessionLogin(req, res, next) {
+        console.log(req.session, req.cookies);
+        next();
     }
 
     async updateProfile(userID, profile) {
@@ -25,7 +31,7 @@ class UserAPI {
         if(!profile)
             throw new Error("Invalid Profile");
 
-        const user = await this.userDB.findUserByID(userID);
+        const user = await this.userDB.fetchUserByID(userID);
         if(!user)
             throw new Error("User not found: " + userID);
 
@@ -61,7 +67,7 @@ class UserAPI {
         return user;
     }
 
-    async login(session, email, password) {
+    async login(req, res, email, password, saveSession=false) {
         if(!email)
             throw new Error("Email is required");
         if(!UserAPI.validateEmail(email))
@@ -70,7 +76,7 @@ class UserAPI {
         if(!password)
             throw new Error("Password is required");
 
-        const user = await this.userDB.findUserByEmail(email);
+        const user = await this.userDB.fetchUserByEmail(email);
         if(!user)
             throw new Error("User not found: " + email);
 
@@ -79,8 +85,23 @@ class UserAPI {
             throw new Error("Invalid Password");
 
         // sets a cookie with the user's info
-        session.reset();
-        session.user = {id: user.id};
+        req.session.reset();
+        req.session.user = {id: user.id};
+
+        if(saveSession) {
+            const sessionData = {
+
+            };
+            const result = await this.userDB.createUserSession(user.id, 'active', sessionData);
+            req.session.user_session = {id: result.insertId};
+            res.cookie('session_save', JSON.stringify({
+                uuid: result.uuid,
+                password: result.password,
+            }), {
+                maxAge: 1000 * 60 * 60 * 24 * 7, // would expire after 7 days
+            })
+        }
+
         return user;
     }
 
@@ -92,7 +113,7 @@ class UserAPI {
         try {
             if(!userID)
                 throw new Error("Invalid user id");
-            const user = await this.userDB.findUserByID(userID);
+            const user = await this.userDB.fetchUserByID(userID);
             // Render View
             if(asJSON) {
                 const response = {user};
@@ -135,7 +156,7 @@ class UserAPI {
             } else {
                 // Handle Form (POST) Request
                 // console.log("Log in Request", req.body);
-                const user = await this.login(req.session, req.body.email, req.body.password);
+                const user = await this.login(req, res, req.body.email, req.body.password, req.body.session_save);
 
                 return res.json({
                     redirect: `/:user/${user.id}`,
@@ -209,7 +230,7 @@ class UserAPI {
                 throw new Error("Not authorized");
             if(!userID)
                 throw new Error("Invalid user id");
-            // const user = await this.userDB.findUserByID(userID);
+            // const user = await this.userDB.fetchUserByID(userID);
             if(req.method === 'GET') {
                 // Render Editor Form
                 res.send(

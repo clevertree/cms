@@ -91,7 +91,7 @@ class ArticleDatabase {
 
     /** Article Revision **/
 
-    async selectArticleRevision(selectSQL, whereSQL, values) {
+    async selectArticleRevision(whereSQL, values, selectSQL='ah.*') {
         let SQL = `
           SELECT ${selectSQL}
           FROM article_revision ah

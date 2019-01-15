@@ -1,34 +1,36 @@
 const bcrypt = require('bcryptjs');
+const uuidv4 = require('uuid/v4');
 
 class UserDatabase  {
     constructor(db) {
         this.db = db;
     }
 
-    async findUser(fieldName, fieldValues) {
+    /** User Table **/
+
+    async selectUsers(whereSQL, values, selectSQL='u.*') {
         let SQL = `
-          SELECT u.*
+          SELECT ${selectSQL}
           FROM user u
-          WHERE ${fieldName}`;
-        const results = await this.queryAsync(SQL, fieldValues);
-        return results && results.length > 0 ? new UserEntry(results[0]) : null
+          WHERE ${whereSQL}
+          `;
+
+        const results = await this.queryAsync(SQL, values);
+        return results.map(result => new UserEntry(result))
     }
 
-    async findUserByID(id) { return await this.findUser('u.id = ?', id); }
-    async findUserByEmail(email) { return await this.findUser('u.email = ?', email); }
-    async findGuestUser() { return await this.findUser('FIND_IN_SET(\'guest\', u.flags)', null); }
+    async fetchUserByID(id) { return (await this.selectUsers('u.id = ? LIMIT 1', id))[0]; }
+    async fetchUserByEmail(email) { return (await this.selectUsers('u.email = ? LIMIT 1', email))[0]; }
+    async fetchGuestUser() { return (await this.selectUsers('FIND_IN_SET(\'guest\', u.flags) LIMIT 1', null))[0]; }
 
     async createUser(email, password) {
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(password, salt);
         let SQL = `
-          INSERT INTO user SET 
-              email = ?,
-              password = ?`;
+          INSERT INTO user SET ?`;
+        await this.queryAsync(SQL, {email, hash});
 
-        await this.queryAsync(SQL, [email, hash]);
-
-        const user = await this.findUserByEmail(email);
+        const user = await this.fetchUserByEmail(email);
         console.info("User Created", user);
         return user;
     }
@@ -44,6 +46,47 @@ class UserDatabase  {
         await this.queryAsync(SQL, [JSON.stringify(profile), userID]);
     }
 
+    /** User Session Table **/
+
+    async selectUserSession(whereSQL, values, selectSQL='us.*') {
+        let SQL = `
+          SELECT ${selectSQL}
+          FROM user_session us
+          WHERE ${whereSQL}
+          `;
+
+        const results = await this.queryAsync(SQL, values);
+        return results.map(result => new UserSessionEntry(result))
+    }
+
+    async fetchUserSessionByID(id) { return await this.selectUserSession('us.id = ?', id); }
+
+
+    async createUserSession(user_id, status='active', sessionData=null) {
+        const uuid = uuidv4();
+        const password = uuidv4();
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(password, salt);
+        let SQL = `
+          INSERT INTO user_session SET ?`;
+        const results = await this.queryAsync(SQL, {
+            user_id,
+            uuid,
+            status,
+            session: sessionData ? JSON.stringify(sessionData) : null,
+            password: hash
+        });
+
+        // const userSession = await this.fetchUserSessionByID(results.insertId);
+        console.info("User Session Created", results.insertId);
+        return {
+            uuid, password,
+            insertId: results.insertId,
+        };
+    }
+
+
+
     queryAsync(sql, values) {
         return new Promise( ( resolve, reject ) => {
             this.db.query(sql, values, ( err, rows, fields ) => {
@@ -58,6 +101,7 @@ class UserEntry {
         this.id = row.id;
         this.email = row.email;
         this.password = row.password;
+        this.created = row.created;
         this.profile = {};
         try {
             this.profile = row.profile ? JSON.parse(row.profile) : {};
@@ -70,7 +114,29 @@ class UserEntry {
     hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
     isAdmin() { return this.hasFlag('admin'); }
     isGuest() { return this.hasFlag('guest'); }
-
 }
-module.exports = {UserEntry, UserDatabase};
+
+
+
+class UserSessionEntry {
+    constructor(row) {
+        this.id = row.id;
+        this.user_id = row.user_id;
+        this.password = row.password;
+        this.created = row.created;
+        this.status = row.status;
+        this.flags = row.flags ? row.flags.split(',') : [];
+        try {
+            this.session = row.profile ? JSON.parse(row.profile) : {};
+        } catch (e) {
+            this.session = {error: e.stack};
+            console.error(e);
+        }
+    }
+
+    hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
+    isAdmin() { return this.hasFlag('admin'); }
+    isGuest() { return this.hasFlag('guest'); }
+}
+module.exports = {UserEntry, UserSessionEntry, UserDatabase};
 

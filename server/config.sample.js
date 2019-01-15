@@ -10,7 +10,10 @@ module.exports = {
         ],
     },
     session: {
-        secret: 'random_string_goes_here'
+        secret: 'random_string_goes_here',
+        // cookieName: 'session',
+        duration: 12 * 60 * 60 * 1000,
+        activeDuration: 60 * 60 * 1000,
     },
     mysql: {
         database:   'afoh',

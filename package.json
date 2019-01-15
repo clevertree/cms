@@ -32,6 +32,7 @@
     "mysql": "^2.16.0",
     "nodemailer": "^5.1.1",
     "trumbowyg": "^2.13.0",
-    "cookies": "^0.7.3"
+    "cookie-parser": "^1.4.3",
+    "uuid": "^3.3.2"
   }
 }

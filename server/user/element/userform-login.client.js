@@ -111,6 +111,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <input type="password" name="password" value="${this.state.password}" required />
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td class="label">Stay Logged In</td>
+                                    <td>
+                                        <input type="checkbox" name="session_save" value="1"/>
+                                    </td>
+                                </tr>
                             </tbody>
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>

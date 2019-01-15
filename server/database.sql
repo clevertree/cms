@@ -10,6 +10,7 @@ CREATE TABLE `user` (
   `email` varchar(256) NOT NULL,
   `password` varchar(256) DEFAULT NULL,
   `profile` JSON DEFAULT NULL,
+  `created` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `flags` SET('guest', 'admin'),
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_email_unique` (`email`)
