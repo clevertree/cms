@@ -120,8 +120,12 @@ class UserAPI {
         req.session.user = {id: user.id};
 
         if(saveSession) {
+            var ip = (req.headers['x-forwarded-for'] || '').split(',').pop() ||
+                req.connection.remoteAddress ||
+                req.socket.remoteAddress ||
+                req.connection.socket.remoteAddress
             const sessionData = {
-                ip: req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress
+                ip
             };
             const result = await this.userDB.createUserSession(user.id, 'active', sessionData);
             req.session.user_session = {id: result.insertId};
