@@ -7,9 +7,9 @@ USE `afoh`;
 
 CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `email` varchar(256) DEFAULT NULL,
+  `email` varchar(256) NOT NULL,
   `password` varchar(256) DEFAULT NULL,
-  `profile` TEXT,
+  `profile` JSON DEFAULT NULL,
   `flags` SET('guest', 'admin'),
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_email_unique` (`email`)
@@ -19,17 +19,31 @@ INSERT INTO `user` (`id`, `email`, `flags`)
   VALUES (1, 'guest@localhost', 'guest');
 
 
+CREATE TABLE `user_session` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `uuid` varchar(256) NOT NULL,
+  `password` varchar(256) NOT NULL,
+  `created` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `status` ENUM('reset', 'active', 'inactive') NOT NULL,
+  `session` JSON,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk:user_session.uuid` (`uuid`),
+  CONSTRAINT `fk:user.user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 
 
 CREATE TABLE `article` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `parent_id` int(11) DEFAULT NULL,
-  `path` varchar(256),
+  `path` varchar(256) NOT NULL,
   `title` varchar(256) DEFAULT NULL,
-  `content` TEXT,
+  `content` TEXT DEFAULT NULL,
   `theme` varchar(256) DEFAULT NULL,
-  `flags` SET('account-only', 'admin-only'),
+  `flags` SET('logged-in-only', 'logged-out-only', 'admin-only'),
   `created` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `updated` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -41,8 +55,6 @@ INSERT INTO `article` (id, parent_id, title, path, content)
   VALUES  (1, null,   'Home',                 '/',          '<%- include("about.ejs") %>'),
           (2, null,   'About Us',             '/about',     '<%- include("about.ejs") %>'),
           (3, 1,      'What We Do',           '/service',   '<%- include("about.ejs") %>');
-
-
 
 
 CREATE TABLE `article_revision` (
