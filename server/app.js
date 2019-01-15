@@ -66,7 +66,7 @@ class App {
         // HTTP
         this.express.listen(this.config.server.port);
         console.log(`Listening on ${this.config.server.port}`);
-        if(this.config.server.debugPort) {
+        if(this.config.debug && this.config.server.debugPort) {
             this.express.listen(this.config.server.debugPort);
             console.log(`Listening on ${this.config.server.debugPort}`);
         }

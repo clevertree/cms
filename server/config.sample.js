@@ -5,7 +5,7 @@ module.exports = {
         debugPort: 80,
     },
     theme: 'minimal',
-    debug: false,
+    debug: require("os") === 'Kittenton',
     user: {
         profile: [
             {name: 'name'},
