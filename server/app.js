@@ -64,8 +64,12 @@ class App {
             this.db.end();
         this.db = db;
 
-        db.on('error', function (err){
+        db.on('error', (err) => {
             console.error("DB Error", err);
+            if(err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
+                setTimeout(() => this.createDBConnection(), 3000);
+                db.end();
+            }
         });
         db.connect({}, (err) => {
             if (err) {
