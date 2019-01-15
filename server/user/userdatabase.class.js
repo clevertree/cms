@@ -86,6 +86,10 @@ class UserDatabase  {
         };
     }
 
+    async deleteUserSessionByID(id) {
+        let SQL = `DELETE FROM user_session WHERE id = ?`;
+        await this.queryAsync(SQL, id);
+    }
 
 
     queryAsync(sql, values) {

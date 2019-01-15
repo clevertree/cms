@@ -121,7 +121,7 @@ class UserAPI {
 
         if(saveSession) {
             const sessionData = {
-
+                ip: req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress
             };
             const result = await this.userDB.createUserSession(user.id, 'active', sessionData);
             req.session.user_session = {id: result.insertId};
@@ -138,6 +138,9 @@ class UserAPI {
     }
 
     async logout(req, res) {
+        if(req.session.user_session) {
+            await this.userDB.deleteUserSessionByID(req.session.user_session);
+        }
         req.session.reset();
         res.clearCookie('session_save');
         new UserSession(req.session).addMessage("User has been logged out");
