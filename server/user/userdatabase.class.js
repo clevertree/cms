@@ -59,7 +59,8 @@ class UserDatabase  {
         return results.map(result => new UserSessionEntry(result))
     }
 
-    async fetchUserSessionByID(id) { return await this.selectUserSession('us.id = ?', id); }
+    async fetchUserSessionByID(id) { return (await this.selectUserSession('us.id = ?', id))[0]; }
+    async fetchUserSessionByUUID(uuid) { return (await this.selectUserSession('us.uuid = ?', uuid))[0]; }
 
 
     async createUserSession(user_id, status='active', sessionData=null) {

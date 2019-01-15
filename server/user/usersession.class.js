@@ -13,9 +13,9 @@ class UserSession {
     }
 
     popMessage() {
-        if(typeof this.session.messages === 'undefined')
+        if(typeof this.session.messages === 'undefined' || this.session.messages.length === 0)
             return null;
-        return this.session.messages.pop()
+        return this.session.messages.pop();
     }
 
     async getSessionUser(db) {

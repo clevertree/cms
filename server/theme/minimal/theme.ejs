@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <% if(req.baseHref) {%>
-        <base href="<%=req.baseHref;%>">
+        <% if(baseHRef) {%>
+        <base href="<%=baseHRef;%>">
         <% } %>
         <title>Arizona Friends of the Homeless</title>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -27,6 +27,15 @@
         </header>
 
         <article>
+            <%_ if(typeof userSession !== "undefined") {
+                const sessionMessage = userSession.popMessage();
+                if(sessionMessage) {
+            _%>
+            <section class="message" style="text-align: center; font-size: smaller;">
+                <%-sessionMessage.message%>
+            </section>
+            <%_ }} _%>
+
             <%_ if(typeof article !== "undefined" && typeof sessionUser !== "undefined" && sessionUser.isAdmin()) { _%>
             <section class="message" style="text-align: center; font-size: smaller;">
                 <a href=":article/<%=article.id%>/edit">Edit this page</a>

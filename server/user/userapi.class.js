@@ -16,12 +16,17 @@ class UserAPI {
         router.all('/:?user/:id(\\d+)', async (req, res) => await this.handleViewRequest(false, parseInt(req.params.id), req, res));
         router.all('/:?user/:id(\\d+)/profile', async (req, res) => await this.handleProfileRequest(parseInt(req.params.id), req, res));
         router.all('/:?user/login', async (req, res) => await this.handleLoginRequest(req, res));
+        router.all('/:?user/session', async (req, res) => await this.handleSessionLoginRequest(req, res));
         router.all('/:?user/logout', async (req, res) => await this.handleLogoutRequest(req, res));
         router.all('/:?user/register', async (req, res) => await this.handleRegisterRequest(req, res));
     }
 
     async checkForSessionLogin(req, res, next) {
-        console.log(req.session, req.cookies);
+        // console.log(req.session, req.cookies);
+        if(!req.session.user && req.cookies.session_save) {
+            const session_save = JSON.parse(req.cookies.session_save);
+            await this.loginSession(req, res, session_save.uuid, session_save.password);
+        }
         next();
     }
 
@@ -67,6 +72,32 @@ class UserAPI {
         return user;
     }
 
+    async loginSession(req, res, uuid, password) {
+        if(!uuid)
+            throw new Error("UUID is required");
+        if(!password)
+            throw new Error("Password is required");
+
+        const userSession = await this.userDB.fetchUserSessionByUUID(uuid);
+        if(!userSession)
+            throw new Error("User Session not found: " + uuid);
+
+        const matches = await bcrypt.compare(password, userSession.password);
+        if(matches !== true)
+            throw new Error("Invalid Password");
+
+        const user = await this.userDB.fetchUserByID(userSession.user_id);
+        if(!user)
+            throw new Error("User not found: " + userSession.user_id);
+
+        // sets a cookie with the user's info
+        req.session.reset();
+        req.session.user = {id: user.id};
+        new UserSession(req.session).addMessage("Session Login Successful: " + uuid);
+        return userSession;
+
+    }
+
     async login(req, res, email, password, saveSession=false) {
         if(!email)
             throw new Error("Email is required");
@@ -102,11 +133,13 @@ class UserAPI {
             })
         }
 
+        new UserSession(req.session).addMessage("Login Successful: " + email);
         return user;
     }
 
-    async logout(session) {
-        session.reset();
+    async logout(req) {
+        req.session.reset();
+        new UserSession(req.session).addMessage("User has been logged out");
     }
 
     async handleViewRequest(asJSON, userID, req, res) {
@@ -141,6 +174,36 @@ class UserAPI {
                         .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
                 );
             }
+        }
+    }
+
+    async handleSessionLoginRequest(req, res) {
+        try {
+            if(req.method === 'GET') {
+                if(req.query.uuid && req.query.password) {
+                    const userSession = await this.loginSession(req, res, req.query.uuid, req.query.password);
+                    return res.redirect(`/:user/${userSession.user_id}`);
+                }
+                // Render Editor Form
+                res.send(
+                    await this.app.getTheme()
+                        .render(req, `<%- include("user/section/session.ejs")%>`)
+                );
+
+            } else {
+                // Handle Form (POST) Request
+                // console.log("Log in Request", req.body);
+                const user = await this.loginSession(req, res, req.body.uuid, req.body.password);
+
+                return res.json({
+                    redirect: `/:user/${user.id}`,
+                    message: `User logged in successfully: ${user.email}. <br/>Redirecting...`,
+                    user
+                });
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(400).json({message: "Error: " + error.message, error: error.stack});
         }
     }
 
@@ -182,7 +245,7 @@ class UserAPI {
             } else {
                 // Handle Form (POST) Request
                 console.log("Log out Request", req.body);
-                await this.logout(req.session);
+                await this.logout(req);
 
                 return res.json({
                     redirect: `/:user/login`,

@@ -27,12 +27,13 @@ class MinimalTheme {
             if (!renderData)
                 renderData = {};
             renderData.app = app;
+            renderData.baseHRef = this.getBaseHRef(req);
             renderData.menu = await this.articleDB.queryMenuData(true);
-            renderData.sessionUser = await new UserSession(req.session).getSessionUser(this.app.db);
+            renderData.userSession = new UserSession(req.session);
+            renderData.sessionUser = await renderData.userSession.getSessionUser(this.app.db);
             renderData.req = req;
             renderData.content = content ? await ejs.render(content, renderData, this.renderOptions) : null;
 
-            req.baseHref = this.getBaseHRef(req);
 
             const templatePath = path.resolve(TEMPLATE_DIR + '/theme.ejs');
             return await ejs.renderFile(templatePath, renderData, this.renderOptions);
