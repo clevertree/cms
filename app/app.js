@@ -56,7 +56,7 @@ class App {
             themeName = this.config.theme;
         if(typeof this.themes[themeName] !== 'undefined')
             return this.themes[themeName];
-        const themeClass = require('../server/theme/' + themeName + '/theme.class.js');
+        const themeClass = require('../app/theme/' + themeName + '/theme.class.js');
         this.themes[themeName] = new themeClass(this);
         return this.themes[themeName];
     }

@@ -2,20 +2,18 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("server/user/element/userform.css");
+    })("app/user/element/userform.css");
 });
 
 {
-    class HTMLUserChangePasswordFormElement extends HTMLElement{
+    class HTMLUserRegisterFormElement extends HTMLElement {
         constructor() {
             super();
             this.state = {
-                user: {id: -1},
-                password_old: null,
-                password_new: null,
-                password_confirm: null,
+                email: "",
+                password: "",
             };
-            // this.state = {id:-1, changepasswords:[]};
+            // this.state = {id:-1, flags:[]};
         }
 
         setState(newState) {
@@ -28,55 +26,25 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('submit', this.onEvent);
 
             this.render();
-            const userID = this.getAttribute('id');
+            const userID = this.getAttribute('user-id');
             if(userID)
                 this.requestFormData(userID);
         }
 
         onSuccess(e, response) {
-            // setTimeout(() => window.location.href = response.redirect, 3000);
-            this.setState({
-                password_old: null,
-                password_new: null,
-                password_confirm: null,
-            })
+            setTimeout(() => window.location.href = response.redirect, 3000);
         }
         onError(e, response) {}
 
         onEvent(e) {
-            switch (e.type) {
+            switch (event.type) {
                 case 'submit':
                     this.submit(e);
                     break;
 
                 case 'change':
-                    let value = e.target.value;
-                    if(e.target.getAttribute('type') === 'checkbox')
-                        value = e.target.checked;
-                    if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
-                        this.state[e.target.name] = value;
-                    // console.log(this.state);
                     break;
             }
-        }
-
-        requestFormData(userID) {
-            const xhr = new XMLHttpRequest();
-            xhr.onload = (e) => {
-                // console.info(xhr.response);
-                if(xhr.status === 200) {
-                    if(!xhr.response || !xhr.response.user)
-                        throw new Error("Invalid Response");
-                    this.setState(xhr.response);
-                } else {
-                    const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                    this.onError(e, response);
-                }
-            };
-            xhr.responseType = 'json';
-            xhr.open ("GET", `:user/${userID}/json`, true);
-            // xhr.setRequestHeader("Accept", "application/json");
-            xhr.send ();
         }
 
         submit(e) {
@@ -110,43 +78,37 @@ document.addEventListener('DOMContentLoaded', function() {
         render() {
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.user.id}/changepassword" method="POST" class="userform userform-changepassword themed">
-                    <fieldset ${!this.state.editable ? 'disabled="disabled"' : ''}>
-                        <legend>Change Password</legend>
+                <form action="/:user/register" method="POST" class="userform userform-register themed">
+                    <fieldset>
+                        <legend>Register a new account</legend>
                         <table>
                             <thead>
                                 <tr>
                                     <td colspan="2">
                                         ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
                                             ${this.state.response.message}
-                                        </div>` : "In order to change password, <br/>please modify this element and hit 'Update' below"}
+                                        </div>` : "To register a new account, <br/>please enter your email and password"}
                                     </td>
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
                             </thead>
-                            <tbody class="themed">
+                            <tbody>
                                 <tr>
                                     <td class="label">Email</td>
                                     <td>
-                                        <input type="email" name="email" value="${this.state.user.email}" disabled/>
+                                        <input type="email" name="email" value="${this.state.email}" required />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="label">Old Password</td>
+                                    <td class="label">Password</td>
                                     <td>
-                                        <input type="password" name="password_old" value="${this.state.password_old||''}" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">New Password</td>
-                                    <td>
-                                        <input type="password" name="password_new" value="${this.state.password_new||''}" required />
+                                        <input type="password" name="password" value="${this.state.password}" required />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Confirm Password</td>
                                     <td>
-                                        <input type="password" name="password_confirm" value="${this.state.password_confirm||''}" required />
+                                        <input type="password" name="password_confirm" value="${this.state.password_confirm}" required />
                                     </td>
                                 </tr>
                             </tbody>
@@ -155,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr>
                                     <td class="label"></td>
                                     <td>
-                                        <button type="submit">Update Password</button>
+                                        <button type="submit">Register</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -163,9 +125,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     </fieldset>
                 </form>
 `;
-            console.log("RENDER", this.state);
         }
     }
-    customElements.define('userform-changepassword', HTMLUserChangePasswordFormElement);
+    customElements.define('userform-register', HTMLUserRegisterFormElement);
 
 }

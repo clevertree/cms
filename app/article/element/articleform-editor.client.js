@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("server/article/element/articleform.css");
+    })("app/article/element/articleform.css");
 });
 
 
@@ -11,11 +11,14 @@ class HTMLArticleFormEditorElement extends HTMLElement {
         super();
         this.state = {
             revisionDate: null,
+            editor: null,
             article: {id: -1},
             revision: {},
             history: [],
             parentList: [],
         };
+        this.removeWYSIWYGEditor = null;
+        this.loadedScripts = {};
         // this.state = {id:-1, flags:[]};
     }
 
@@ -56,6 +59,10 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         // this.setState({revisionDate});
                         this.setState({revisionDate});
                         this.requestFormData();
+                        break;
+                    case 'editor':
+                        this.state.editor = e.target.value;
+                        this.renderWYSIWYGEditor();
                         break;
                 }
                 break;
@@ -110,6 +117,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
 
 
 
+
     render() {
         const articleFlags = this.state.article.flags || [];
         // console.log("RENDER", this.state);
@@ -136,13 +144,13 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         <tr>
                             <td class="label">Title</td>
                             <td>
-                                <input type="text" name="title" value="${this.state.article.title||''}"/>
+                                <input type="text" name="title" value="${this.state.article.title || ''}"/>
                             </td>
                         </tr>
                         <tr>
                             <td class="label">Path</td>
                             <td>
-                                <input type="text" name="path" value="${this.state.article.path||''}" />
+                                <input type="text" name="path" value="${this.state.article.path || ''}" />
                             </td>
                         </tr>
                         <tr>
@@ -180,10 +188,24 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         <tr>
                             <td class="label">Content</td>
                             <td>
-                                <textarea class="editor-plain editor-iframe-target" name="content" style="width: 100%; height: 400px; display: none;"
-                                    >${this.state.revision.content || this.state.article.content ||''}</textarea>
-                                <iframe class="editor-iframe editor-iframe-trumbowyg" src="/server/article/element/iframe-trumbowyg.html"
-                                        style="width: 100%; height: 400px; overflow-x: hidden; border: 0px"></iframe>
+                                <textarea class="editor-plain editor-wysiwyg-target" name="content"
+                                    >${this.state.revision.content || this.state.article.content || ''}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">WYSIWYG Editor</td>
+                            <td>
+                                <label>
+                                    <select name="editor">
+                                    ${[
+                                        ['', 'Plain Text / HTML'], 
+                                        ['trumbowyg', 'Trumbowyg'], 
+                                        ['froala', 'Froala']
+                                    ].map(option => `
+                                        <option value="${option[0]}"${option[0] === this.state.editor ? ' selected="selected"' : ''}>${option[1]}</option>
+                                    `)}
+                                    </select>
+                                </label>
                             </td>
                         </tr>
                         <tr>
@@ -218,6 +240,110 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                 </table>
             </fieldset>
         </form>`;
+        this.renderWYSIWYGEditor();
+    }
+
+    renderWYSIWYGEditor() {
+        // console.log("RENDER", this.state);
+        switch(this.state.editor) {
+            default:
+                if(this.removeWYSIWYGEditor)
+                    this.removeWYSIWYGEditor();
+                break;
+                
+            case 'trumbowyg':
+                this.loadScripts([
+                    'https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js',
+                    'https://rawgit.com/RickStrahl/jquery-resizable/master/dist/jquery-resizable.min.js',
+
+                    'node_modules/trumbowyg/dist/trumbowyg.min.js',
+                    'node_modules/trumbowyg/dist/plugins/cleanpaste/trumbowyg.cleanpaste.min.js',
+                    'node_modules/trumbowyg/dist/plugins/pasteimage/trumbowyg.pasteimage.min.js'
+                ], () => {
+                    const target = jQuery('.editor-wysiwyg-target');
+                    target.trumbowyg();
+                    console.log("Loaded Trumbowyg WYSIWYG Editor", target);
+                });
+
+                [
+                    'node_modules/trumbowyg/dist/ui/trumbowyg.min.css'
+                ].forEach(INCLUDE_CSS => {
+                    if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
+                        document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
+                });
+
+                this.removeWYSIWYGEditor = () => {
+                    const target = jQuery('.editor-wysiwyg-target');
+                    target.trumbowyg('destroy');
+                    console.log("Unloaded Trumbowyg WYSIWYG Editor", target);
+                };
+                break;
+
+            case 'froala':
+                [
+                    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css',
+                    'https://cdn.jsdelivr.net/npm/froala-editor@2.9.0/css/froala_editor.pkgd.min.css',
+                    'https://cdn.jsdelivr.net/npm/froala-editor@2.9.0/css/froala_style.min.css',
+                ].forEach(INCLUDE_CSS => {
+                    if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
+                        document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
+                });
+
+                this.loadScripts([
+                    'https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js',
+                    'https://cdn.jsdelivr.net/npm/froala-editor@2.9.0/js/froala_editor.pkgd.min.js'
+                ], () => {
+                    const target = jQuery('.editor-wysiwyg-target');
+                    target.froalaEditor();
+                    console.log("Loaded Froala WYSIWYG Editor", target);
+                });
+
+                this.removeWYSIWYGEditor = () => {
+                    const target = jQuery('.editor-wysiwyg-target');
+                    target.froalaEditor('destroy');
+                    console.log("Unloaded Froala WYSIWYG Editor", target);
+                };
+
+                break;
+        }
+    }
+
+    loadScripts(scriptPaths, onLoaded) {
+        if(scriptPaths.length === 0)
+            return onLoaded && onLoaded();
+        const scriptPath = scriptPaths.shift();
+        this.loadScript(scriptPath, () => {
+            this.loadScripts(scriptPaths, onLoaded);
+        });
+    }
+
+    loadScript(scriptPath, onLoaded) {
+        if(typeof this.loadedScripts[scriptPath] !== "undefined") {
+            if(!onLoaded)
+                return;
+            if(this.loadedScripts[scriptPath].loaded === true) {
+                onLoaded();
+            } else {
+                this.loadedScripts[scriptPath].onLoad.push(onLoaded);
+            }
+            return;
+        }
+        const loadedScript = {path: scriptPath, loaded: false, onLoad: []};
+        this.loadedScripts[scriptPath] = loadedScript;
+        const newScriptElm = document.createElement('script');
+        newScriptElm.src = scriptPath;
+        newScriptElm.addEventListener('load', () => {
+            loadedScript.loaded = true;
+            if(onLoaded)
+                onLoaded();
+            for(var i=0; i<loadedScript.onLoad.length; i++)
+                loadedScript.onLoad[i]();
+            loadedScript.onLoad = [];
+            console.info("Loaded ", scriptPath, newScriptElm);
+        });
+        // console.info("Loading ", scriptPath, newScriptElm);
+        document.head.appendChild(newScriptElm);
+        return newScriptElm;
     }
 }
 customElements.define('articleform-editor', HTMLArticleFormEditorElement);

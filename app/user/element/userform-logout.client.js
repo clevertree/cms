@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("server/user/element/userform.css");
+    })("app/user/element/userform.css");
 });
 
 {
-    class HTMLUserForgotPasswordFormElement extends HTMLElement{
+    class HTMLUserLogoutFormElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
@@ -26,6 +26,9 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('submit', this.onEvent);
 
             this.render();
+            const userID = this.getAttribute('user-id');
+            if(userID)
+                this.requestFormData(userID);
         }
 
         onSuccess(e, response) {
@@ -34,14 +37,12 @@ document.addEventListener('DOMContentLoaded', function() {
         onError(e, response) {}
 
         onEvent(e) {
-            switch (e.type) {
+            switch (event.type) {
                 case 'submit':
                     this.submit(e);
                     break;
 
                 case 'change':
-                    if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
-                        this.state[e.target.name] = e.target.value;
                     break;
             }
         }
@@ -77,43 +78,34 @@ document.addEventListener('DOMContentLoaded', function() {
         render() {
             this.innerHTML =
                 `
-                <form action="/:user/forgotpassword" method="POST" class="userform userform-forgotpassword themed" style1="display: none;">
-                    <fieldset>
-                        <legend>Forgot Password</legend>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <td colspan="2">
-                                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
-                                            ${this.state.response.message}
-                                        </div>` : "In order to recover your password, <br/>please enter your email and hit submit below"}
-                                    </td>
-                                </tr>
-                                <tr><td colspan="2"><hr/></td></tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="label">Email</td>
-                                    <td>
-                                        <input type="email" name="email" value="${this.state.email}" required />
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr><td colspan="2"><hr/></td></tr>
-                                <tr>
-                                    <td class="label"></td>
-                                    <td>
-                                        <button type="submit">Submit</button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </fieldset>
-                </form>
+        <form action="/:user/logout" method="POST" class="userform userform-logout themed">
+            <fieldset>
+                <legend>Log Out</legend>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td colspan="2">
+                                    ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
+                                        ${this.state.response.message}
+                                    </div>` : "In order to end your session, <br/>please hit 'Log out' below"}
+                                </td>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr><td colspan="2"><hr/></td></tr>
+                            <tr>
+                                <td class="label"></td>
+                                <td>
+                                    <button type="submit">Log out</button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+            </fieldset>
+        </form>
 `;
         }
     }
-    customElements.define('userform-forgotpassword', HTMLUserForgotPasswordFormElement);
+    customElements.define('userform-logout', HTMLUserLogoutFormElement);
 
 }

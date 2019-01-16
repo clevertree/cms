@@ -14,7 +14,7 @@ class MinimalTheme {
         this.renderOptions = {
             views: [
                 path.resolve(TEMPLATE_DIR),
-                path.resolve(BASE_DIR + '/server/')
+                path.resolve(BASE_DIR + '/app/')
             ]
             // async: true
         };

@@ -40,6 +40,9 @@ form.articleform textarea {
     min-width: 90%;
 }
 
+form.articleform textarea.editor-plain {
+    min-height: 400px;
+}
 /** Form Messages **/
 
 form.articleform div.success,
