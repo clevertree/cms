@@ -17,8 +17,10 @@ class HTMLArticleFormEditorElement extends HTMLElement {
             history: [],
             parentList: [],
         };
+        this.renderEditorTimeout = null;
         this.removeWYSIWYGEditor = null;
         this.loadedScripts = {};
+
         // this.state = {id:-1, flags:[]};
     }
 
@@ -91,7 +93,6 @@ class HTMLArticleFormEditorElement extends HTMLElement {
     submit(e) {
         e.preventDefault();
         const form = e.target; // querySelector('element.user-login-element');
-        this.setState({processing: true});
         const request = {};
         new FormData(form).forEach(function (value, key) {
             request[key] = value;
@@ -114,6 +115,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
         // xhr.setRequestHeader("Accept", "application/json");
         xhr.responseType = 'json';
         xhr.send(JSON.stringify(request));
+        this.setState({processing: true});
     }
 
 
@@ -200,8 +202,9 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                                     <select name="editor">
                                     ${[
                                         ['', 'Plain Text / HTML'],
-                                        ['trumbowyg', 'Trumbowyg'], 
                                         ['summernote', 'SummerNote'], 
+                                        ['pell', 'Pell'], 
+                                        ['trumbowyg', 'Trumbowyg'], 
                                         ['froala', 'Froala (Not free)']
                                     ].map(option => `
                                         <option value="${option[0]}"${option[0] === this.state.editor ? ' selected="selected"' : ''}>${option[1]}</option>
@@ -242,7 +245,9 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                 </table>
             </fieldset>
         </form>`;
-        this.renderWYSIWYGEditor();
+
+        clearTimeout(this.renderEditorTimeout);
+        this.renderEditorTimeout = setTimeout(e => this.renderWYSIWYGEditor(), 100);
     }
 
     renderWYSIWYGEditor() {
@@ -252,7 +257,76 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                 if(this.removeWYSIWYGEditor)
                     this.removeWYSIWYGEditor();
                 break;
-                
+
+            case 'pell':
+                if(this.removeWYSIWYGEditor)
+                    this.removeWYSIWYGEditor();
+
+                this.loadScripts([
+                    'node_modules/pell/dist/pell.min.js',
+                ], () => {
+                    const target = document.querySelector('.editor-wysiwyg-target');
+                // Initialize pell on an HTMLElement
+                    pell.init({
+                        // <HTMLElement>, required
+                        element: target,
+
+                        // <Function>, required
+                        // Use the output html, triggered by element's `oninput` event
+                        onChange: html => console.log(html),
+
+                        // <string>, optional, default = 'div'
+                        // Instructs the editor which element to inject via the return key
+                        defaultParagraphSeparator: 'div',
+
+                        // <boolean>, optional, default = false
+                        // Outputs <span style="font-weight: bold;"></span> instead of <b></b>
+                        styleWithCSS: false,
+
+                        // <Array[string | Object]>, string if overwriting, object if customizing/creating
+                        // action.name<string> (only required if overwriting)
+                        // action.icon<string> (optional if overwriting, required if custom action)
+                        // action.title<string> (optional)
+                        // action.result<Function> (required)
+                        // Specify the actions you specifically want (in order)
+                        actions: [
+                            'bold',
+                            {
+                                name: 'custom',
+                                icon: 'C',
+                                title: 'Custom Action',
+                                result: () => console.log('Do something!')
+                            },
+                            'underline'
+                        ],
+
+                        // classes<Array[string]> (optional)
+                        // Choose your custom class names
+                        classes: {
+                            actionbar: 'pell-actionbar',
+                            button: 'pell-button',
+                            content: 'pell-content',
+                            selected: 'pell-button-selected'
+                        }
+                    });
+
+
+                    console.log("Loaded pell WYSIWYG Editor", target);
+                    // this.removeWYSIWYGEditor = () => {
+                    //     // target.trumbowyg('destroy');
+                    //     // console.log("Unloaded pell WYSIWYG Editor", target);
+                    // };
+                });
+
+                [
+                    'node_modules/pell/dist/pell.min.css',
+                ].forEach(INCLUDE_CSS => {
+                    if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
+                        document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
+                });
+
+                break;
+
             case 'trumbowyg':
                 if(this.removeWYSIWYGEditor)
                     this.removeWYSIWYGEditor();
@@ -375,7 +449,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
             for(var i=0; i<loadedScript.onLoad.length; i++)
                 loadedScript.onLoad[i]();
             loadedScript.onLoad = [];
-            console.info("Loaded ", scriptPath, newScriptElm);
+            // console.info("Loaded ", scriptPath, newScriptElm);
         });
         // console.info("Loading ", scriptPath, newScriptElm);
         document.head.appendChild(newScriptElm);
