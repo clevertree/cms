@@ -36,6 +36,7 @@
     "uuid": "^3.3.2",
     "greenlock-express": "^2.6.7",
     "trumbowyg": "^2.13.0",
-    "pell": "^1.0.6"
+    "pell": "^1.0.6",
+    "jodit": "^3.2.34"
   }
 }

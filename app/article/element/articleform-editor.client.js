@@ -202,8 +202,9 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                                     <select name="editor">
                                     ${[
                                         ['', 'Plain Text / HTML'],
-                                        ['summernote', 'SummerNote'], 
-                                        ['pell', 'Pell'], 
+                                        ['summernote', 'SummerNote'],
+                                        ['jodit', 'Jodit'],
+                                        ['pell', 'Pell'],
                                         ['trumbowyg', 'Trumbowyg'], 
                                         ['froala', 'Froala (Not free)']
                                     ].map(option => `
@@ -365,6 +366,44 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         const target = jQuery('.editor-wysiwyg-target');
                         target.summernote('destroy');
                         console.log("Unloaded Froala WYSIWYG Editor", target);
+                    };
+                });
+
+                break;
+
+            case 'jodit':
+                if(this.removeWYSIWYGEditor)
+                    this.removeWYSIWYGEditor();
+                this.removeWYSIWYGEditor = null;
+
+                [
+                    'node_modules/jodit/build/jodit.min.css',
+                ].forEach(INCLUDE_CSS => {
+                    if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
+                        document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
+                });
+
+                this.loadScripts([
+                    'node_modules/jodit/build/jodit.min.js',
+                ], () => {
+                    var editor = new Jodit('.editor-wysiwyg-target', {
+                        uploader: {
+                            url: 'http://localhost:8181/index-test.php?action=fileUpload'
+                        },
+                        filebrowser: {
+                            ajax: {
+                                url: 'http://localhost:8181/index-test.php'
+                            }
+                        }
+                    });
+                    // editor.value = '<p>start</p>';
+                    console.log("Loaded Jodit WYSIWYG Editor", editor);
+
+                    this.removeWYSIWYGEditor = () => {
+                        // const target = jQuery('.editor-wysiwyg-target');
+                        // target.summernote('destroy');
+                        editor.destruct();
+                        console.log("Unloaded Jodit WYSIWYG Editor", editor);
                     };
                 });
 
