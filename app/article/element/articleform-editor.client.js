@@ -43,7 +43,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
 
     onSuccess(e, response) {
         if(response.redirect)
-            setTimeout(() => window.location.href = response.redirect, 3000);
+            setTimeout(() => window.location.href = response.redirect, 2000);
     }
     onError(e, response) {}
 
@@ -256,52 +256,29 @@ class HTMLArticleFormEditorElement extends HTMLElement {
             default:
                 if(this.removeWYSIWYGEditor)
                     this.removeWYSIWYGEditor();
+                this.removeWYSIWYGEditor = null;
                 break;
 
             case 'pell':
                 if(this.removeWYSIWYGEditor)
                     this.removeWYSIWYGEditor();
+                this.removeWYSIWYGEditor = null;
 
                 this.loadScripts([
                     'node_modules/pell/dist/pell.min.js',
                 ], () => {
                     const target = document.querySelector('.editor-wysiwyg-target');
-                // Initialize pell on an HTMLElement
+                    const pellContainer = document.createElement('div');
+                    target.parentNode.appendChild(pellContainer);
+                    target.style.display = 'none';
+                    // pellContainer.innerHTML = target.value;
+                    // Initialize pell on an HTMLElement
                     pell.init({
                         // <HTMLElement>, required
-                        element: target,
-
-                        // <Function>, required
-                        // Use the output html, triggered by element's `oninput` event
-                        onChange: html => console.log(html),
-
-                        // <string>, optional, default = 'div'
-                        // Instructs the editor which element to inject via the return key
+                        element: pellContainer,
+                        onChange: html => target.value = html,
                         defaultParagraphSeparator: 'div',
-
-                        // <boolean>, optional, default = false
-                        // Outputs <span style="font-weight: bold;"></span> instead of <b></b>
                         styleWithCSS: false,
-
-                        // <Array[string | Object]>, string if overwriting, object if customizing/creating
-                        // action.name<string> (only required if overwriting)
-                        // action.icon<string> (optional if overwriting, required if custom action)
-                        // action.title<string> (optional)
-                        // action.result<Function> (required)
-                        // Specify the actions you specifically want (in order)
-                        actions: [
-                            'bold',
-                            {
-                                name: 'custom',
-                                icon: 'C',
-                                title: 'Custom Action',
-                                result: () => console.log('Do something!')
-                            },
-                            'underline'
-                        ],
-
-                        // classes<Array[string]> (optional)
-                        // Choose your custom class names
                         classes: {
                             actionbar: 'pell-actionbar',
                             button: 'pell-button',
@@ -309,13 +286,16 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                             selected: 'pell-button-selected'
                         }
                     });
+                    pellContainer.querySelector('.pell-content').innerHTML = target.value;
 
 
-                    console.log("Loaded pell WYSIWYG Editor", target);
-                    // this.removeWYSIWYGEditor = () => {
-                    //     // target.trumbowyg('destroy');
-                    //     // console.log("Unloaded pell WYSIWYG Editor", target);
-                    // };
+                    console.log("Loaded pell WYSIWYG Editor", pellContainer);
+                    this.removeWYSIWYGEditor = () => {
+                        pellContainer.parentNode.removeChild(pellContainer);
+                        target.setAttribute('style', '');
+                        // target.trumbowyg('destroy');
+                        console.log("Unloaded pell WYSIWYG Editor", target);
+                    };
                 });
 
                 [
@@ -330,6 +310,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
             case 'trumbowyg':
                 if(this.removeWYSIWYGEditor)
                     this.removeWYSIWYGEditor();
+                this.removeWYSIWYGEditor = null;
 
                 this.loadScripts([
                     'https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js',
@@ -361,6 +342,8 @@ class HTMLArticleFormEditorElement extends HTMLElement {
             case 'summernote':
                 if(this.removeWYSIWYGEditor)
                     this.removeWYSIWYGEditor();
+                this.removeWYSIWYGEditor = null;
+
                 [
                     'https://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css',
                     'https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote.css',
@@ -390,6 +373,8 @@ class HTMLArticleFormEditorElement extends HTMLElement {
             case 'froala':
                 if(this.removeWYSIWYGEditor)
                     this.removeWYSIWYGEditor();
+                this.removeWYSIWYGEditor = null;
+
                 [
                     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css',
                     'https://cdn.jsdelivr.net/npm/froala-editor@2.9.0/css/froala_editor.pkgd.min.css',
