@@ -12,7 +12,7 @@ class ArticleDatabase {
     
     /** Articles **/
 
-    async selectArticles(selectSQL, whereSQL, values) {
+    async selectArticles(whereSQL, values, selectSQL='a.*, null as content') {
         let SQL = `
           SELECT ${selectSQL}
           FROM article a
@@ -23,20 +23,20 @@ class ArticleDatabase {
     }
 
     async fetchArticleByPath(renderPath) {
-        const articles = await this.selectArticles('*', 'a.path = ? LIMIT 1', renderPath);
+        const articles = await this.selectArticles('a.path = ? LIMIT 1', renderPath, 'a.*');
         return articles[0];
     }
     async fetchArticleByID(renderPath) {
-        const articles = await this.selectArticles('*', 'a.id = ? LIMIT 1', renderPath);
+        const articles = await this.selectArticles('a.id = ? LIMIT 1', renderPath, 'a.*');
         return articles[0];
     }
 
-    async fetchArticlesByFlag(flags, selectSQL = 'id, parent_id, path, title, flags') {
-        if(!Array.isArray(flags))
-            flags = flags.split(',');
-        const whereSQL = flags.map(flag => 'FIND_IN_SET(?, a.flags)').join(' OR ');
-        return await this.selectArticles(selectSQL, whereSQL, flags);
-    }
+    // async fetchArticlesByFlag(flags, selectSQL = 'id, parent_id, path, title, flags') {
+    //     if(!Array.isArray(flags))
+    //         flags = flags.split(',');
+    //     const whereSQL = flags.map(flag => 'FIND_IN_SET(?, a.flags)').join(' OR ');
+    //     return await this.selectArticles(whereSQL, flags, selectSQL);
+    // }
 
     async insertArticle(title, content, path, user_id, parent_id, theme, flags) {
         let SQL = `

@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <button type="submit">Submit</button>
                                     </td>
                                 </tr>
-                            </tbody>
+                            </tfoot>
                         </table>
                     </fieldset>
                 </form>

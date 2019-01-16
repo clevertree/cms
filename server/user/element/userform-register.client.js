@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <button type="submit">Register</button>
                                     </td>
                                 </tr>
-                            </tbody>
+                            </tfoot>
                         </table>
                     </fieldset>
                 </form>

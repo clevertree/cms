@@ -208,9 +208,16 @@ class ArticleAPI {
 
             } else {
                 // Handle POST
+                let whereSQL = '1', values = null;
+                if(req.body.search) {
+                    whereSQL = 'a.title LIKE ? OR a.content LIKE ? OR a.path LIKE ?';
+                    values = ['%'+req.body.search+'%', '%'+req.body.search+'%', '%'+req.body.search+'%'];
+                }
+                const articles = await this.articleDB.selectArticles(whereSQL, values);
 
                 return res.json({
                     message: "Article list queried successfully",
+                    articles
                 });
             }
         } catch (error) {

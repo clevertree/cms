@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <button type="submit">Log out</button>
                                 </td>
                             </tr>
-                        </tbody>
+                        </tfoot>
                     </table>
             </fieldset>
         </form>

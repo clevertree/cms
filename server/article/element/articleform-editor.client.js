@@ -114,7 +114,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
         const articleFlags = this.state.article.flags || [];
         // console.log("RENDER", this.state);
         this.innerHTML =
-            `<form action="/:article/${this.state.article.id}/edit" method="POST" class="articleform themed">
+            `<form action="/:article/${this.state.article.id}/edit" method="POST" class="articleform articleform-editor themed">
             <input type="hidden" name="id" value="${this.state.article.id}" />
             <fieldset ${!this.state.editable ? 'disabled="disabled"' : ''}>
                 <table style="width: 100%;">
