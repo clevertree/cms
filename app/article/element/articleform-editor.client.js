@@ -11,7 +11,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
         super();
         this.state = {
             revisionDate: null,
-            editor: null,
+            editor: sessionStorage.getItem("articleform-editor:editor"),
             article: {id: -1},
             revision: {},
             history: [],
@@ -62,6 +62,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         break;
                     case 'editor':
                         this.state.editor = e.target.value;
+                        sessionStorage.setItem("articleform-editor:editor",this.state.editor);
                         this.renderWYSIWYGEditor();
                         break;
                 }
@@ -253,6 +254,9 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                 break;
                 
             case 'trumbowyg':
+                if(this.removeWYSIWYGEditor)
+                    this.removeWYSIWYGEditor();
+
                 this.loadScripts([
                     'https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js',
                     'https://rawgit.com/RickStrahl/jquery-resizable/master/dist/jquery-resizable.min.js',
@@ -264,6 +268,11 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                     const target = jQuery('.editor-wysiwyg-target');
                     target.trumbowyg();
                     console.log("Loaded Trumbowyg WYSIWYG Editor", target);
+                    this.removeWYSIWYGEditor = () => {
+                        const target = jQuery('.editor-wysiwyg-target');
+                        target.trumbowyg('destroy');
+                        console.log("Unloaded Trumbowyg WYSIWYG Editor", target);
+                    };
                 });
 
                 [
@@ -273,14 +282,11 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
                 });
 
-                this.removeWYSIWYGEditor = () => {
-                    const target = jQuery('.editor-wysiwyg-target');
-                    target.trumbowyg('destroy');
-                    console.log("Unloaded Trumbowyg WYSIWYG Editor", target);
-                };
                 break;
 
             case 'summernote':
+                if(this.removeWYSIWYGEditor)
+                    this.removeWYSIWYGEditor();
                 [
                     'http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css',
                     'http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote.css',
@@ -297,17 +303,19 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                     const target = jQuery('.editor-wysiwyg-target');
                     target.summernote();
                     console.log("Loaded Froala WYSIWYG Editor", target);
-                });
 
-                this.removeWYSIWYGEditor = () => {
-                    const target = jQuery('.editor-wysiwyg-target');
-                    target.summernote('destroy');
-                    console.log("Unloaded Froala WYSIWYG Editor", target);
-                };
+                    this.removeWYSIWYGEditor = () => {
+                        const target = jQuery('.editor-wysiwyg-target');
+                        target.summernote('destroy');
+                        console.log("Unloaded Froala WYSIWYG Editor", target);
+                    };
+                });
 
                 break;
 
             case 'froala':
+                if(this.removeWYSIWYGEditor)
+                    this.removeWYSIWYGEditor();
                 [
                     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css',
                     'https://cdn.jsdelivr.net/npm/froala-editor@2.9.0/css/froala_editor.pkgd.min.css',
@@ -324,13 +332,13 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                     const target = jQuery('.editor-wysiwyg-target');
                     target.froalaEditor();
                     console.log("Loaded Froala WYSIWYG Editor", target);
+                    this.removeWYSIWYGEditor = () => {
+                        const target = jQuery('.editor-wysiwyg-target');
+                        target.froalaEditor('destroy');
+                        console.log("Unloaded Froala WYSIWYG Editor", target);
+                    };
                 });
 
-                this.removeWYSIWYGEditor = () => {
-                    const target = jQuery('.editor-wysiwyg-target');
-                    target.froalaEditor('destroy');
-                    console.log("Unloaded Froala WYSIWYG Editor", target);
-                };
 
                 break;
         }
