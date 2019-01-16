@@ -288,17 +288,17 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                 if(this.removeWYSIWYGEditor)
                     this.removeWYSIWYGEditor();
                 [
-                    'http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css',
-                    'http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote.css',
+                    'https://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css',
+                    'https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote.css',
                 ].forEach(INCLUDE_CSS => {
                     if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
                         document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
                 });
 
                 this.loadScripts([
-                    'http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js',
-                    'http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js',
-                    'http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote.js'
+                    'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js',
+                    'https://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js',
+                    'https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote.js'
                 ], () => {
                     const target = jQuery('.editor-wysiwyg-target');
                     target.summernote();
