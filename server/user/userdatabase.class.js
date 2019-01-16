@@ -8,7 +8,7 @@ class UserDatabase  {
 
     /** User Table **/
 
-    async selectUsers(whereSQL, values, selectSQL='u.*') {
+    async selectUsers(whereSQL, values, selectSQL='u.*,null as password') {
         let SQL = `
           SELECT ${selectSQL}
           FROM user u
@@ -19,9 +19,9 @@ class UserDatabase  {
         return results.map(result => new UserEntry(result))
     }
 
-    async fetchUserByID(id) { return (await this.selectUsers('u.id = ? LIMIT 1', id))[0]; }
-    async fetchUserByEmail(email) { return (await this.selectUsers('u.email = ? LIMIT 1', email))[0]; }
-    async fetchGuestUser() { return (await this.selectUsers('FIND_IN_SET(\'guest\', u.flags) LIMIT 1', null))[0]; }
+    async fetchUserByID(id, selectSQL='u.*,null as password') { return (await this.selectUsers('u.id = ? LIMIT 1', id, selectSQL))[0]; }
+    async fetchUserByEmail(email, selectSQL='u.*,null as password') { return (await this.selectUsers('u.email = ? LIMIT 1', email, selectSQL))[0]; }
+    async fetchGuestUser(selectSQL='u.*,null as password') { return (await this.selectUsers('FIND_IN_SET(\'guest\', u.flags) LIMIT 1', null, selectSQL))[0]; }
 
     async createUser(email, password) {
         const salt = await bcrypt.genSalt(10);
@@ -42,11 +42,12 @@ class UserDatabase  {
         let set = {};
         if(email !== null) set.email = email;
         if(password !== null) set.password = password;
-        if(profile !== null) set.profile = profile;
-        if(flags !== null) set.flags = flags.join(',');
-        let SQL = `UPDATE user SET profile=? WHERE id = ?`;
+        if(profile !== null) set.profile = JSON.stringify(profile);
+        if(flags !== null) set.flags = Array.isArray(flags) ? flags.join(',') : flags;
+        let SQL = `UPDATE user SET ? WHERE id = ?`;
 
-        await this.queryAsync(SQL, [JSON.stringify(profile), userID]);
+        return (await this.queryAsync(SQL, [set, userID]))
+            .affectedRows;
     }
 
     /** User Session Table **/
@@ -108,7 +109,8 @@ class UserEntry {
     constructor(row) {
         this.id = row.id;
         this.email = row.email;
-        this.password = row.password;
+        if(row.password)
+            this.password = row.password;
         this.created = row.created;
         this.profile = {};
         try {

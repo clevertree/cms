@@ -34,6 +34,7 @@
     "nodemailer-smtp-transport": "^2.7.4",
     "trumbowyg": "^2.13.0",
     "cookie-parser": "^1.4.3",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "greenlock-express": "^2.6.7"
   }
 }

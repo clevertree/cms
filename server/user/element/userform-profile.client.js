@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
-                user: {id: -1, flags:[]}
+                user: {id: -1, profile: {}},
             };
             // this.state = {id:-1, flags:[]};
         }
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         connectedCallback() {
-            // this.addEventListener('change', this.onEvent);
+            this.addEventListener('change', this.onEvent);
             this.addEventListener('submit', this.onEvent);
 
             this.render();
@@ -36,12 +36,18 @@ document.addEventListener('DOMContentLoaded', function() {
         onError(e, response) {}
 
         onEvent(e) {
-            switch (event.type) {
+            switch (e.type) {
                 case 'submit':
                     this.submit(e);
                     break;
 
                 case 'change':
+                    let value = e.target.value;
+                    if(e.target.getAttribute('type') === 'checkbox')
+                        value = e.target.checked;
+                    if(e.target.name && typeof this.state.user.profile[e.target.name] !== 'undefined')
+                        this.state.user.profile[e.target.name] = value;
+                    // console.log(this.state);
                     break;
             }
         }
@@ -122,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/${this.state.user.id}/profile" method="POST" class="userform userform-profile themed">
-                    <fieldset>
+                    <fieldset ${!this.state.editable ? 'disabled="disabled"' : ''}>
                         <legend>Update Profile</legend>
                         <table>
                             <thead>

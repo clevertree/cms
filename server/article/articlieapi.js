@@ -17,7 +17,8 @@ class ArticleAPI {
 
         router.get('/:?article/:id/json', async (req, res, next) => await this.renderArticleByID(true, req, res, next));
         router.get(['/:?article/:id/view', '/:?article/:id'], async (req, res, next) => await this.renderArticleByID(false, req, res, next));
-        router.all('/:?article/:id/edit', async (req, res, next) => await this.renderArticleEditorByID(req, res, next));
+        router.all('/:?article/:id/edit', async (req, res) => await this.renderArticleEditorByID(req, res));
+        router.all(['/:?article', '/:?article/list'], async (req, res) => await this.renderArticleBrowser(req, res));
     }
 
     async renderArticleByPath(req, res, next) {
@@ -73,8 +74,12 @@ class ArticleAPI {
                 const response = {
                     redirect: '/:article/' + article.id + '/view',
                     message: "Article Queried Successfully",
+                    editable: false,
                     article
                 };
+                const sessionUser = await new UserSession(req.session).getSessionUser(this.app.db);
+                if(sessionUser.isAdmin() || sessionUser.id === article.user_id)
+                    response.editable = true;
                 if(req.query.getAll || req.query.getRevision) {
                     response.history = await this.articleDB.fetchArticleRevisionsByArticleID(article.id);
                     response.revision = await this.articleDB.fetchArticleRevisionByID(article.id, req.query.getRevision || null);
@@ -124,10 +129,7 @@ class ArticleAPI {
                 // Render Editor
                 res.send(
                     await this.app.getTheme(article.theme)
-                        .render(req, `
-                            <script src="/server/article/element/articleform-editor.client.js"></script>
-                            <articleform-editor id="${article.id}"></articleform-editor>
-                        `)
+                        .render(req, `<%- include("article/section/editor.ejs")%>`, article)
                 );
 
             } else {
@@ -191,6 +193,39 @@ class ArticleAPI {
         }
     }
 
+    async renderArticleBrowser(req, res) {
+        try {
+            // const session = new UserSession(req.session);
+            // const sessionUser = await session.getSessionUser(this.app.db);
+            // if (!sessionUser)
+            //     throw new Error("Must be logged in");
+
+            if (req.method === 'GET') {
+                res.send(
+                    await this.app.getTheme()
+                        .render(req, `<%- include("article/section/browser.ejs")%>`)
+                );
+
+            } else {
+                // Handle POST
+
+                return res.json({
+                    message: "Article list queried successfully",
+                });
+            }
+        } catch (error) {
+            res.status(400);
+            if(req.method === 'GET') {
+                res.send(
+                    await this.app.getTheme()
+                        .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+                );
+            } else {
+                res.json({message: error.stack});
+            }
+        }
+
+    }
 }
 
 

@@ -26,9 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('submit', this.onEvent);
 
             this.render();
-            const userID = this.getAttribute('user-id');
-            if(userID)
-                this.requestFormData(userID);
         }
 
         onSuccess(e, response) {
@@ -37,12 +34,14 @@ document.addEventListener('DOMContentLoaded', function() {
         onError(e, response) {}
 
         onEvent(e) {
-            switch (event.type) {
+            switch (e.type) {
                 case 'submit':
                     this.submit(e);
                     break;
 
                 case 'change':
+                    if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
+                        this.state[e.target.name] = e.target.value;
                     break;
             }
         }
@@ -79,22 +78,28 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/forgotpassword" method="POST" class="userform userform-forgotpassword themed" style1="display: none;">
-                    ${this.state.error ? `<div class="error">${this.state.error}</div>` : null}
                     <fieldset>
                         <legend>Forgot Password</legend>
                         <table>
-                            <caption>
-                                In order to recover your password, <br/>please enter your email and hit submit below
-                                ${this.state.error ? `<div class="error">${this.state.error}</div>` : ''}
-                                </caption>
-                            <tbody>
+                            <thead>
+                                <tr>
+                                    <td colspan="2">
+                                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
+                                            ${this.state.response.message}
+                                        </div>` : "In order to recover your password, <br/>please enter your email and hit submit below"}
+                                    </td>
+                                </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
+                            </thead>
+                            <tbody>
                                 <tr>
                                     <td class="label">Email</td>
                                     <td>
                                         <input type="email" name="email" value="${this.state.email}" required />
                                     </td>
                                 </tr>
+                            </tbody>
+                            <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td class="label"></td>

@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 response: null,
                 email: "",
                 password: "",
+                session_save: false,
             };
             // this.state = {id:-1, flags:[]};
         }
@@ -37,12 +38,18 @@ document.addEventListener('DOMContentLoaded', function() {
         onError(e, response) {}
 
         onEvent(e) {
-            switch (event.type) {
+            switch (e.type) {
                 case 'submit':
                     this.submit(e);
                     break;
 
                 case 'change':
+                    let value = e.target.value;
+                    if(e.target.getAttribute('type') === 'checkbox')
+                        value = e.target.checked;
+                    if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
+                        this.state[e.target.name] = value;
+                    // console.log(this.state);
                     break;
             }
         }
@@ -114,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr>
                                     <td class="label">Stay Logged In</td>
                                     <td>
-                                        <input type="checkbox" name="session_save" value="1"/>
+                                        <input type="checkbox" name="session_save" ${this.state.session_save ? 'checked="checked"' : ''}/>
                                         <div style="float: right">
                                             <a href=":user/forgotpassword">Forgot Password?</a>
                                         </div>

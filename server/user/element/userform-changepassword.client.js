@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         connectedCallback() {
-            // this.addEventListener('change', this.onEvent);
+            this.addEventListener('change', this.onEvent);
             this.addEventListener('submit', this.onEvent);
 
             this.render();
@@ -35,16 +35,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
         onSuccess(e, response) {
             // setTimeout(() => window.location.href = response.redirect, 3000);
+            this.setState({
+                password_old: null,
+                password_new: null,
+                password_confirm: null,
+            })
         }
         onError(e, response) {}
 
         onEvent(e) {
-            switch (event.type) {
+            switch (e.type) {
                 case 'submit':
                     this.submit(e);
                     break;
 
                 case 'change':
+                    let value = e.target.value;
+                    if(e.target.getAttribute('type') === 'checkbox')
+                        value = e.target.checked;
+                    if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
+                        this.state[e.target.name] = value;
+                    // console.log(this.state);
                     break;
             }
         }
@@ -87,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     this.onError(e, response);
                 }
-                this.setState({response, user:response.user, processing: false});
+                this.setState({response, processing: false});
             };
             xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -100,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/${this.state.user.id}/changepassword" method="POST" class="userform userform-changepassword themed">
-                    <fieldset>
+                    <fieldset ${!this.state.editable ? 'disabled="disabled"' : ''}>
                         <legend>Change Password</legend>
                         <table>
                             <thead>

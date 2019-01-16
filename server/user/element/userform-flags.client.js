@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         connectedCallback() {
-            // this.addEventListener('change', this.onEvent);
+            this.addEventListener('change', this.onEvent);
             this.addEventListener('submit', this.onEvent);
 
             this.render();
@@ -36,12 +36,28 @@ document.addEventListener('DOMContentLoaded', function() {
         onError(e, response) {}
 
         onEvent(e) {
-            switch (event.type) {
+            switch (e.type) {
                 case 'submit':
                     this.submit(e);
                     break;
 
                 case 'change':
+                    let value = e.target.value;
+                    if(e.target.getAttribute('type') === 'checkbox')
+                        value = e.target.checked;
+                    if(e.target.name && typeof this.state.user.profile[e.target.name] !== 'undefined')
+                        this.state.user.flags[e.target.name] = value;
+                    if(e.target.getAttribute('type') === 'checkbox') {
+                        if(e.target.checked) {
+                            this.state.user.flags =
+                                this.state.user.flags.concat(e.target.name)
+                                    .filter((v, i, a) => a.indexOf(v) === i);
+                        } else {
+                            this.state.user.flags =
+                                this.state.user.flags.filter((v) => v !== e.target.name);
+                        }
+                    }
+                    console.log(this.state);
                     break;
             }
         }
@@ -97,8 +113,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("RENDER", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.user.id}/flag" method="POST" class="userform userform-flag themed">
-                    <fieldset>
+                <form action="/:user/${this.state.user.id}/flags" method="POST" class="userform userform-flags themed">
+                    <fieldset ${!this.state.editable ? 'disabled="disabled"' : ''}>
                         <legend>Update User Flags</legend>
                         <table>
                             <thead>
@@ -121,9 +137,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr>
                                     <td class="label">Flags</td>
                                     <td>
-                                        ${['Guest', 'Admin'].map(flagName => `
+                                        ${['admin'].map(flagName => `
                                         <label>
-                                            <input type="checkbox" class="themed" name="flags[${flagName.toLowerCase()}]"  ${this.state.user.flags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
+                                            <input type="checkbox" class="themed" name="${flagName.toLowerCase()}" value="1" ${this.state.user.flags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
                                             ${flagName.replace('-', ' ')}
                                         </label>
                                         `).join('')}
@@ -145,6 +161,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('userform-flag', HTMLUserFlagFormElement);
+    customElements.define('userform-flags', HTMLUserFlagFormElement);
 
 }
