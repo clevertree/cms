@@ -221,7 +221,7 @@ class UserAPI {
                 //     throw new Error("Must be logged in");
                 const response = {user, editable: false};
                 if(sessionUser.isAdmin() || sessionUser.id === userID)
-                    response.editable = true;
+                    response.editable = sessionUser.isAdmin() ? 'admin' : 'user';
                 if(req.query.getAll || req.query.getProfileConfig)
                     response.profileConfig = this.app.config.user.profile;
                 res.json(response);
@@ -405,7 +405,7 @@ class UserAPI {
                 );
 
             } else {
-                if(!sessionUser.isAdmin() && sessionUser.id !== userID)
+                if(!sessionUser.isAdmin())
                     throw new Error("Not authorized");
 
                 // Handle Form (POST) Request

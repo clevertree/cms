@@ -131,24 +131,28 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <input type="email" name="email" value="${this.state.user.email}" disabled/>
                                     </td>
                                 </tr>
+                                ${this.state.editable !== 'admin' ? `
                                 <tr>
                                     <td class="label">Old Password</td>
                                     <td>
                                         <input type="password" name="password_old" value="${this.state.password_old||''}" required />
                                     </td>
                                 </tr>
+                                ` : ''}
                                 <tr>
                                     <td class="label">New Password</td>
                                     <td>
                                         <input type="password" name="password_new" value="${this.state.password_new||''}" required />
                                     </td>
                                 </tr>
+                                ${this.state.editable !== 'admin' ? `
                                 <tr>
                                     <td class="label">Confirm Password</td>
                                     <td>
                                         <input type="password" name="password_confirm" value="${this.state.password_confirm||''}" required />
                                     </td>
                                 </tr>
+                                ` : ''}
                             </tbody>
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>

@@ -387,12 +387,44 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                     'node_modules/jodit/build/jodit.min.js',
                 ], () => {
                     var editor = new Jodit('.editor-wysiwyg-target', {
+                        enableDragAndDropFileToEditor: true,
                         uploader: {
-                            url: 'http://localhost:8181/index-test.php?action=fileUpload'
-                        },
-                        filebrowser: {
-                            ajax: {
-                                url: 'http://localhost:8181/index-test.php'
+                            url: ':file/upload',
+                            format: 'json',
+                            pathVariableName: 'path',
+                            filesVariableName: 'images',
+                            prepareData: function (data) {
+                                return data;
+                            },
+                            isSuccess: function (resp) {
+                                return !resp.error;
+                            },
+                            getMsg: function (resp) {
+                                return resp.msg.join !== undefined ? resp.msg.join(' ') : resp.msg;
+                            },
+                            process: function (resp) {
+                                return {
+                                    files: resp[this.options.filesVariableName] || [],
+                                    path: resp.path,
+                                    baseurl: resp.baseurl,
+                                    error: resp.error,
+                                    msg: resp.msg
+                                };
+                            },
+                            error: function (e) {
+                                console.error(e);
+                                // this.events.fire('errorPopap', [e.getMessage(), 'error', 4000]);
+                            },
+                            defaultHandlerSuccess: function (data, resp) {
+                                var i, field = this.options.uploader.filesVariableName;
+                                if (data[field] && data[field].length) {
+                                    for (i = 0; i < data[field].length; i += 1) {
+                                        this.selection.insertImage(data.baseurl + data[field][i]);
+                                    }
+                                }
+                            },
+                            defaultHandlerError: function (resp) {
+                                this.events.fire('errorPopap', [this.options.uploader.getMsg(resp)]);
                             }
                         }
                     });

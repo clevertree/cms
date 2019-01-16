@@ -11,9 +11,7 @@ class ArticleAPI {
 
     loadRoutes(router) {
         // Handle Article requests
-        router.get(['/[\\w/]+(?:\.ejs)?', '/'], async (req, res, next) => await this.renderArticleByPath(req, res,next));
-        // router.get(['/[\\w/]+(?:\.ejs)?/json', '/json'], async (req, res, next) => await this.renderArticleByPath(req, res,next));
-
+        router.get(['/[\\w/]+', '/'], async (req, res, next) => await this.renderArticleByPath(req, res,next));
 
         router.get('/:?article/:id/json', async (req, res, next) => await this.renderArticleByID(true, req, res, next));
         router.get(['/:?article/:id/view', '/:?article/:id'], async (req, res, next) => await this.renderArticleByID(false, req, res, next));

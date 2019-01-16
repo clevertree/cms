@@ -1,15 +1,17 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('client-sessions');
 const path = require('path');
 const mysql = require('mysql');
 const nodemailer = require('nodemailer');
 const smtpTransport = require("nodemailer-smtp-transport");
+const formidableMiddleware = require('express-formidable');
 
 // const { UserSessionManager } = require('./user/usersession.class');
 const { UserAPI } = require('./user/userapi.class');
 const { ArticleAPI } = require('./article/articlieapi');
+const { FileAPI } = require('./file/fileapi');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
@@ -31,11 +33,12 @@ class App {
         // this.db = new DatabaseManager(this);
 
         this.express = express();
-        this.express.use(bodyParser.urlencoded({ extended: true }));
-        this.express.use(bodyParser.json());
+        // this.express.use(bodyParser.urlencoded({ extended: true }));
+        // this.express.use(bodyParser.json());
         this.express.use(cookieParser());
         this.config.session.cookieName = 'session';
         this.express.use(session(this.config.session));
+        // this.express.use(formidableMiddleware());
 
 
         // Post wrapper
@@ -46,6 +49,7 @@ class App {
         // new UserSessionManager(this).loadRoutes(this.express);
         new UserAPI(this).loadRoutes(this.express);
         new ArticleAPI(this).loadRoutes(this.express);
+        new FileAPI(this).loadRoutes(this.express);
 
         // Asset files
         this.express.use(express.static(BASE_DIR));

@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/${this.state.user.id}/flags" method="POST" class="userform userform-flags themed">
-                    <fieldset ${!this.state.editable ? 'disabled="disabled"' : ''}>
+                    <fieldset ${this.state.editable !== 'admin' ? 'disabled="disabled"' : ''}>
                         <legend>Update User Flags</legend>
                         <table>
                             <thead>
