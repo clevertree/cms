@@ -198,9 +198,10 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                                 <label>
                                     <select name="editor">
                                     ${[
-                                        ['', 'Plain Text / HTML'], 
+                                        ['', 'Plain Text / HTML'],
                                         ['trumbowyg', 'Trumbowyg'], 
-                                        ['froala', 'Froala']
+                                        ['summernote', 'SummerNote'], 
+                                        ['froala', 'Froala (Not free)']
                                     ].map(option => `
                                         <option value="${option[0]}"${option[0] === this.state.editor ? ' selected="selected"' : ''}>${option[1]}</option>
                                     `)}
@@ -277,6 +278,33 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                     target.trumbowyg('destroy');
                     console.log("Unloaded Trumbowyg WYSIWYG Editor", target);
                 };
+                break;
+
+            case 'summernote':
+                [
+                    'http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css',
+                    'http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote.css',
+                ].forEach(INCLUDE_CSS => {
+                    if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
+                        document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
+                });
+
+                this.loadScripts([
+                    'http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js',
+                    'http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js',
+                    'http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote.js'
+                ], () => {
+                    const target = jQuery('.editor-wysiwyg-target');
+                    target.summernote();
+                    console.log("Loaded Froala WYSIWYG Editor", target);
+                });
+
+                this.removeWYSIWYGEditor = () => {
+                    const target = jQuery('.editor-wysiwyg-target');
+                    target.summernote('destroy');
+                    console.log("Unloaded Froala WYSIWYG Editor", target);
+                };
+
                 break;
 
             case 'froala':
