@@ -1,7 +1,7 @@
 // const fs = require('fs');
 const path = require('path');
 const ejs = require('ejs');
-const { ArticleDatabase } = require('../../article/articledatabase');
+const { ArticleDatabase } = require('../../article/articledatabase.class');
 const { UserSession } = require('../../user/usersession.class');
 
 const TEMPLATE_DIR = path.resolve(__dirname);

@@ -1,4 +1,4 @@
-const {ArticleDatabase} = require("./articledatabase");
+const {ArticleDatabase} = require("./articledatabase.class");
 const {UserSession} = require('../user/usersession.class');
 // const {UserDatabase} = require("../user/userdatabase.class");
 

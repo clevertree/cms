@@ -48,7 +48,7 @@ CREATE TABLE `article` (
   `created` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `updated` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `article_path_unique` (`path`),
+  UNIQUE KEY `uk:article.path` (`path`),
   CONSTRAINT `fk:article.user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -71,6 +71,20 @@ CREATE TABLE `article_revision` (
 
   CONSTRAINT `fk:article_revision.article_id` FOREIGN KEY (`article_id`) REFERENCES `article` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk:article_revision.user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE `file` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `user_id` int(11) DEFAULT NULL,
+   `path` varchar(256) NOT NULL,
+   `info` JSON DEFAULT NULL,
+   `content` MEDIUMBLOB,
+   `created` DATETIME DEFAULT CURRENT_TIMESTAMP,
+   `updated` DATETIME DEFAULT CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   UNIQUE KEY `uk:file.path` (`path`),
+   CONSTRAINT `fk:file.user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

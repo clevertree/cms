@@ -10,8 +10,8 @@ const formidableMiddleware = require('express-formidable');
 
 // const { UserSessionManager } = require('./user/usersession.class');
 const { UserAPI } = require('./user/userapi.class');
-const { ArticleAPI } = require('./article/articlieapi');
-const { FileAPI } = require('./file/fileapi');
+const { ArticleAPI } = require('./article/articlieapi.class');
+const { FileAPI } = require('./file/fileapi.class');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
@@ -81,23 +81,25 @@ class App {
     createDBConnection() {
         // Mysql
         const dbConfig = this.config.mysql;
-        const db = mysql.createConnection(dbConfig);
         if(this.db)
             this.db.end();
+        const db = mysql.createConnection(dbConfig);
         this.db = db;
+
+        setTimeout(() => this.createDBConnection(), 300000);
 
         db.on('error', (err) => {
             console.error("DB Error", err);
             if(err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
                 setTimeout(() => this.createDBConnection(), 3000);
-                db.end();
+                // db.end();
             }
         });
         db.connect({}, (err) => {
             if (err) {
                 console.error(`DB Connection to '${dbConfig.database}' Failed`, err.message);
                 setTimeout(() => this.createDBConnection(), 3000);
-                db.end();
+                // db.end();
             } else {
                 console.info(`DB Connecting to '${dbConfig.database}' Successful`);
             }

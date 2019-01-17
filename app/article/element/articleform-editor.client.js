@@ -424,6 +424,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                                 }
                             },
                             defaultHandlerError: function (resp) {
+                                console.error(e);
                                 this.events.fire('errorPopap', [this.options.uploader.getMsg(resp)]);
                             }
                         }
