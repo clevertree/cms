@@ -10,19 +10,22 @@ class UserAPI {
     get userDB() { return new UserDatabase(this.app.db); }
 
     loadRoutes(router) {
+        const bodyParser = require('body-parser');
+        const PM = [bodyParser.urlencoded(), bodyParser.json()];
+
         // TODO: handle session_save login
         router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
         // API Routes
-        router.get('/:?user/:id(\\d+)/json', async (req, res, next) => await this.handleViewRequest(true, parseInt(req.params.id), req, res, next));
-        router.all('/:?user/:id(\\d+)', async (req, res) => await this.handleViewRequest(false, parseInt(req.params.id), req, res));
-        router.all('/:?user/:id(\\d+)/profile', async (req, res) => await this.handleUpdateRequest('profile', parseInt(req.params.id), req, res));
-        router.all('/:?user/:id(\\d+)/flags', async (req, res) => await this.handleUpdateRequest('flags', parseInt(req.params.id), req, res));
-        router.all('/:?user/:id(\\d+)/changepassword', async (req, res) => await this.handleUpdateRequest('changepassword', parseInt(req.params.id), req, res));
-        router.all('/:?user/login', async (req, res) => await this.handleLoginRequest(req, res));
-        router.all('/:?user/session', async (req, res) => await this.handleSessionLoginRequest(req, res));
-        router.all('/:?user/logout', async (req, res) => await this.handleLogoutRequest(req, res));
-        router.all('/:?user/register', async (req, res) => await this.handleRegisterRequest(req, res));
-        router.all('/:?user/forgotpassword', async (req, res) => await this.handleForgotPassword(req, res));
+        router.get('/:?user/:id(\\d+)/json',                async (req, res, next) => await this.handleViewRequest(true, parseInt(req.params.id), req, res, next));
+        router.get('/:?user/:id(\\d+)',                     async (req, res, next) => await this.handleViewRequest(false, parseInt(req.params.id), req, res, next));
+        router.all('/:?user/:id(\\d+)/profile',         PM, async (req, res) => await this.handleUpdateRequest('profile', parseInt(req.params.id), req, res));
+        router.all('/:?user/:id(\\d+)/flags',           PM, async (req, res) => await this.handleUpdateRequest('flags', parseInt(req.params.id), req, res));
+        router.all('/:?user/:id(\\d+)/changepassword',  PM, async (req, res) => await this.handleUpdateRequest('changepassword', parseInt(req.params.id), req, res));
+        router.all('/:?user/login',                     PM, async (req, res) => await this.handleLoginRequest(req, res));
+        router.all('/:?user/session',                   PM, async (req, res) => await this.handleSessionLoginRequest(req, res));
+        router.all('/:?user/logout',                    PM, async (req, res) => await this.handleLogoutRequest(req, res));
+        router.all('/:?user/register',                  PM, async (req, res) => await this.handleRegisterRequest(req, res));
+        router.all('/:?user/forgotpassword',            PM, async (req, res) => await this.handleForgotPassword(req, res));
     }
 
     async checkForSessionLogin(req, res, next) {

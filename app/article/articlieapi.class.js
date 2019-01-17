@@ -10,13 +10,15 @@ class ArticleAPI {
     get articleDB () { return new ArticleDatabase(this.app.db); }
 
     loadRoutes(router) {
+        const bodyParser = require('body-parser');
+        const postMiddleware = [bodyParser.urlencoded(), bodyParser.json()];
         // Handle Article requests
         router.get(['/[\\w/]+', '/'], async (req, res, next) => await this.renderArticleByPath(req, res,next));
 
         router.get('/:?article/:id/json', async (req, res, next) => await this.renderArticleByID(true, req, res, next));
         router.get(['/:?article/:id/view', '/:?article/:id'], async (req, res, next) => await this.renderArticleByID(false, req, res, next));
-        router.all('/:?article/:id/edit', async (req, res) => await this.renderArticleEditorByID(req, res));
-        router.all(['/:?article', '/:?article/list'], async (req, res) => await this.renderArticleBrowser(req, res));
+        router.all('/:?article/:id/edit', postMiddleware, async (req, res) => await this.renderArticleEditorByID(req, res));
+        router.all(['/:?article', '/:?article/list'], postMiddleware, async (req, res) => await this.renderArticleBrowser(req, res));
     }
 
     async renderArticleByPath(req, res, next) {
@@ -42,6 +44,7 @@ class ArticleAPI {
                     .render(req, article.content, {article})
             );
         } catch (error) {
+            console.log(error);
             res.status(400);
             res.send(
                 await this.app.getTheme()
@@ -97,6 +100,7 @@ class ArticleAPI {
                 );
             }
         } catch (error) {
+            console.log(error);
             res.status(400);
             if(asJSON) {
                 res.json({message: error.stack});
@@ -179,6 +183,7 @@ class ArticleAPI {
                 }
             }
         } catch (error) {
+            console.log(error);
             res.status(400);
             if(req.method === 'GET') {          // Handle GET
                 res.send(
@@ -219,6 +224,7 @@ class ArticleAPI {
                 });
             }
         } catch (error) {
+            console.log(error);
             res.status(400);
             if(req.method === 'GET') {
                 res.send(

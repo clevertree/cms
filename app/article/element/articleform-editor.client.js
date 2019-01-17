@@ -388,11 +388,24 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                 ], () => {
                     var editor = new Jodit('.editor-wysiwyg-target', {
                         enableDragAndDropFileToEditor: true,
+                        filebrowser: {
+                            ajax: {
+                                url: ':file/:browse',
+                                format: 'json',
+                            },
+                            process: function (resp) {
+                                console.log(resp);
+                            },
+                            error: function (e) {
+                                console.error(e);
+                                // this.events.fire('errorPopap', [e.getMessage(), 'error', 4000]);
+                            }
+                        },
                         uploader: {
-                            url: ':file/upload',
+                            url: ':file/:upload',
                             format: 'json',
                             pathVariableName: 'path',
-                            filesVariableName: 'images',
+                            filesVariableName: 'files',
                             prepareData: function (data) {
                                 return data;
                             },
@@ -430,7 +443,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         }
                     });
                     // editor.value = '<p>start</p>';
-                    console.log("Loaded Jodit WYSIWYG Editor", editor);
+                    // console.log("Loaded Jodit WYSIWYG Editor", editor);
 
                     this.removeWYSIWYGEditor = () => {
                         // const target = jQuery('.editor-wysiwyg-target');

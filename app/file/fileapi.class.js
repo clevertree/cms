@@ -1,4 +1,6 @@
-const formidable = require('formidable');
+const formidableMiddleware = require('express-formidable');
+// const bodyParser = require('body-parser');
+// const formidable = require('formidable');
 const fs = require('fs');
 
 const { FileDatabase } = require("./filedatabase.class");
@@ -13,7 +15,8 @@ class FileapiClass {
 
     loadRoutes(router) {
         router.get(/^\/?:file(.*)/, async (req, res) => await this.renderFileByPath(req, res));
-        router.post(/^\/?:file/, async (req, res) => await this.handleFileUpload(req, res));
+        router.post('/:?file/[:]upload', formidableMiddleware(), async (req, res) => await this.handleFileUpload(req, res));
+        router.all('/:?file/[:]browse', formidableMiddleware(), async (req, res) => await this.handleFileBrowseRequest(req, res));
     }
 
     async renderFileByPath(req, res, next) {
@@ -23,7 +26,7 @@ class FileapiClass {
             // res.writeHead(200, {'Content-Type': 'image/jpeg' });
             // res.end(fileEntry.content.toString('utf-8'));
             res.setHeader('Content-Description','File Transfer');
-            res.setHeader('Content-Disposition', 'attachment; filename=print.jpeg');
+            // res.setHeader('Content-Disposition', 'attachment; filename=print.jpeg');
             res.setHeader('Content-Type', 'image/jpeg');
             res.setHeader('Content-Length', fileEntry.info.size);
             res.end(fileEntry.content);
@@ -31,6 +34,7 @@ class FileapiClass {
             // console.log(err, fields, files);
             // res.json({msg: 'File ', error: err, images: ['/images/asdasdasd.png'], path});
         } catch (error) {
+            console.log(error);
             res.status(400);
             res.json({message: error.message, error: error.stack});
             // res.send(
@@ -41,10 +45,9 @@ class FileapiClass {
     }
 
 
-    async handleFileUpload(req, res, next) {
+    async handleFileUpload(req, res) {
         try {
-            const {files, fields} = await this.parseFileRequest(req);
-            const file = Object.values(files)[0];
+            const file = Object.values(req.files)[0];
             if(!file)
                 throw new Error("Invalid File");
             const path = '/uploads/' + file.name
@@ -64,7 +67,7 @@ class FileapiClass {
             const result = await this.fileDB.insertFile(content, path, sessionUser.id, info);
             res.json({
                 msg: 'File was uploaded successfully',
-                images: [`/:file${path}`],
+                files: [`/:file${path}`],
                 baseurl: req.headers.origin,
                 result
             });
@@ -74,6 +77,7 @@ class FileapiClass {
             //         .render(req, file.content, {file})
             // );
         } catch (error) {
+            console.log(error);
             res.status(400);
             res.json({message: error.message, error: error.stack});
             // res.send(
@@ -83,7 +87,57 @@ class FileapiClass {
         }
     }
 
-    readFileContent(filePath, options='utf8') {
+
+
+    async handleFileBrowseRequest(req, res) {
+        try {
+            const response = {
+                success: true,
+                data: {
+                    // messages?: string[];
+                    sources: {
+                        'local': {
+                            path: ':file/',
+                            baseurl: req.headers.origin,
+                            files: [
+                                {
+                                    file: 'file',
+                                    // thumb: string;
+                                    // thumbIsAbsolute?: boolean;
+                                    // changed: string;
+                                    // size: string;
+                                    // isImage: boolean;
+                                }
+                            ]
+                        }
+                    }
+                    // code: number;
+                    // path: string;
+                    // name: string;
+                    // source: string;
+                    // permissions?: IPermissions | null;
+                }
+            };
+
+
+            res.json(response);
+
+            // res.send(
+            //     await this.app.getTheme(file.theme)
+            //         .render(req, file.content, {file})
+            // );
+        } catch (error) {
+            console.log(error);
+            res.status(400);
+            res.json({message: error.message, error: error.stack});
+            // res.send(
+            //     await this.app.getTheme()
+            //         .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+            // );
+        }
+    }
+
+    readFileContent(filePath, options=null) {
         return new Promise( ( resolve, reject ) => {
             fs.readFile(filePath, options, (err, contents) => {
                 err ? reject (err) : resolve (contents);
@@ -99,15 +153,15 @@ class FileapiClass {
         });
     }
 
-    parseFileRequest(req) {
-        return new Promise( ( resolve, reject ) => {
-            var form = new formidable.IncomingForm();
-            // form.keepExtensions = false; // Include the extensions of the original files.
-            form.parse(req, function (err, fields, files) {
-                err ? reject (err) : resolve ({files, fields});
-            });
-        });
-    }
+    // parseFileRequest(req) {
+    //     return new Promise( ( resolve, reject ) => {
+    //         var form = new formidable.IncomingForm();
+    //         // form.keepExtensions = false; // Include the extensions of the original files.
+    //         form.parse(req, function (err, fields, files) {
+    //             err ? reject (err) : resolve ({files, fields});
+    //         });
+    //     });
+    // }
 
 }
 

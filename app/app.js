@@ -6,7 +6,7 @@ const path = require('path');
 const mysql = require('mysql');
 const nodemailer = require('nodemailer');
 const smtpTransport = require("nodemailer-smtp-transport");
-const formidableMiddleware = require('express-formidable');
+// const formidableMiddleware = require('express-formidable');
 
 // const { UserSessionManager } = require('./user/usersession.class');
 const { UserAPI } = require('./user/userapi.class');

@@ -38,7 +38,6 @@
     "nodemailer-smtp-transport": "^2.7.4",
     "pell": "^1.0.6",
     "trumbowyg": "^2.13.0",
-    "uuid": "^3.3.2",
-    "formidable": "^1.2.1"
+    "uuid": "^3.3.2"
   }
 }
