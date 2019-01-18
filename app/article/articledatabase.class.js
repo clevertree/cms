@@ -38,22 +38,31 @@ class ArticleDatabase {
     //     return await this.selectArticles(whereSQL, flags, selectSQL);
     // }
 
-    async insertArticle(title, content, path, user_id, parent_id, theme, flags) {
+    async insertArticle(title, content, path, user_id, parent_id, theme, data) {
         let SQL = `
           INSERT INTO article
           SET ?
         `;
-        return await this.queryAsync(SQL, {title, content, path, user_id, parent_id, theme, flags})
+        data = data !== null && typeof data === "object" ? JSON.stringify(data) : null;
+        return await this.queryAsync(SQL, {title, content, path, user_id, parent_id, theme, data})
             .insertId;
     }
 
-    async updateArticle(id, title, content, path, user_id, parent_id, theme, flags) {
+    async updateArticle(id, title, content, path, user_id, parent_id, theme, data) {
+        let set = {};
+        if(title) set.title = title;
+        if(content) set.content = content;
+        if(path) set.path = path;
+        if(user_id !== null) set.user_id = user_id;
+        if(parent_id !== null) set.parent_id = parent_id;
+        if(theme) set.theme = theme;
+        if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
           UPDATE article a
           SET ?
           WHERE a.id = ?
         `;
-        const results = await this.queryAsync(SQL, [{title, content, path, user_id, parent_id, theme, flags}, id]);
+        const results = await this.queryAsync(SQL, [{title, content, path, user_id, parent_id, theme, data}, id]);
         return results.affectedRows;
     }
 
@@ -150,13 +159,13 @@ class ArticleEntry {
         this.path = row.path;
         this.title = row.title;
         this.theme = row.theme;
-        this.flags = row.flags ? row.flags.split(',') : [];
+        // this.flags = row.flags ? row.flags.split(',') : [];
         this.content = row.content;
         this.created = row.created;
         this.updated = row.updated;
     }
 
-    hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
+    // hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
 }
 
 class ArticleRevisionEntry {

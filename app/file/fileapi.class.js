@@ -54,31 +54,58 @@ class FileapiClass {
             const files = Object.values(req.files);
             if(files.length === 0)
                 throw new Error("Invalid File(s)");
-            const paths = [];
+            const response = {
+                message: 'No Action. ',
+                files: [],
+                errors: [],
+                duplicates: 0,
+                inserted: 0,
+            };
             for(var i=0; i<files.length; i++) {
                 const file = files[i];
-                const path = '/uploads/' + file.name
+                let path = '/uploads/' + file.name
                     .replace('.jpg.jpeg', '.jpeg')
                     .replace('.jpeg.jpeg', '.jpeg')
                     .replace('.gif.gif', '.gif')
                     .replace('.png.png', '.png');
-                const stats = await this.readFileStats(file.path);
-                const hash = await this.calculateFileHash(file.path);
-                const content = await this.readFileContent(file.path);
-                const sessionUser = await new UserSession(req.session).getSessionUser(this.app.db);
-                // const info = {
-                //     size: stats.size,
-                //     ctime: stats.ctime,
-                //     mtime: stats.mtime
-                // };
+                try {
+                    const stats = await this.readFileStats(file.path);
+                    const hash = await this.calculateFileHash(file.path);
+                    const content = await this.readFileContent(file.path);
+                    const sessionUser = await new UserSession(req.session).getSessionUser(this.app.db);
+                    // const info = {
+                    //     size: stats.size,
+                    //     ctime: stats.ctime,
+                    //     mtime: stats.mtime
+                    // };
 
-                const result = await this.fileDB.insertFile(content, path, stats.size, hash, sessionUser.id);
-                paths.push(`/:file${path}`);
+                    const duplicateFilePathEntry = await this.fileDB.fetchFileByPath(path);
+                    const duplicateFileHashEntry = await this.fileDB.fetchFileByHash(hash);
+                    if(duplicateFilePathEntry || duplicateFileHashEntry) {
+                        if(duplicateFilePathEntry && !duplicateFileHashEntry)
+                            throw new Error("This path already exists with a different hash. Please rename your file and try the upload again");
+
+                        path = (duplicateFilePathEntry || duplicateFileHashEntry).path;
+                        response.duplicates++;
+                    } else {
+                        await this.fileDB.insertFile(content, path, stats.size, hash, sessionUser.id);
+                        response.inserted++;
+                    }
+                    response.files.push(`/:file${path}`);
+
+                } catch (error) {
+                    // if(error)
+                    response.errors.push({message: error.message, error: error.stack, file: files[i].name});
+                }
             }
-            res.json({
-                message: 'File was uploaded successfully',
-                files: paths,
-            });
+            if(response.inserted > 0)
+                response.message = `Inserted ${response.inserted} File${response.inserted > 1 ? 's' : ''}. `;
+            if(response.duplicates > 0)
+                response.message += `${response.duplicates} Duplicate file${response.duplicates > 1 ? 's' : ''} found`;
+
+            if(response.errors.length > 0)
+                res.status(400);
+            res.json(response);
 
             // res.send(
             //     await this.app.getTheme(file.theme)

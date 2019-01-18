@@ -20,7 +20,8 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
 
     setState(newState) {
         Object.assign(this.state, newState);
-        this.render();
+        // this.render();
+        this.renderResults();
     }
 
     connectedCallback() {
@@ -127,24 +128,16 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
                         </tr>
                         <tr><td colspan="4"><hr/></td></tr>
                     </thead>
-                    <tbody>
+                    <tbody class="results">
                         <tr>
                             <th>ID</th>
                             <th>Title</th>
                             <th>Path</th>
                             <th>Actions</th>
                         </tr>
-                        ${this.state.articles.map(article => `
                         <tr>
-                            <th>${article.id}</th>
-                            <td><a href=":article/${article.id}/edit">${article.title}</a></td>
-                            <td><a href=":article/${article.id}/edit">${article.path||''}</a></td>
-                            <td>
-                                <a href=":article/${article.id}/edit">[edit]</a>
-                                <a href=":article/${article.id}/delete">[delete]</a>
-                            </td>
+                            <th colspan="4">No Results</th>
                         </tr>
-                        `).join('')}
                     </tbody>
                     <tfoot>
                         <tr><td colspan="4"><hr/></td></tr>
@@ -163,6 +156,29 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
         searchField.focus();
         if(selectionStart)
             searchField.selectionStart = selectionStart;
+        this.renderResults();
+    }
+
+    renderResults() {
+        const trElement = this.querySelector('tbody.results');
+        trElement.innerHTML =
+                        `<tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Path</th>
+                            <th>Actions</th>
+                        </tr>`
+            + this.state.articles.map(article => `
+                        <tr class="results">
+                            <th>${article.id}</th>
+                            <td><a href=":article/${article.id}/edit">${article.title}</a></td>
+                            <td><a href=":article/${article.id}/edit">${article.path||''}</a></td>
+                            <td>
+                                <a href=":article/${article.id}/edit">[edit]</a>
+                                <a href=":article/${article.id}/delete">[delete]</a>
+                            </td>
+                        </tr>
+                        `).join('');
     }
 }
 customElements.define('articleform-browser', HTMLArticleFormBrowserElement);

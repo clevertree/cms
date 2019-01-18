@@ -26,6 +26,10 @@ class FileDatabase {
         const files = await this.selectFiles('f.path = ? LIMIT 1', renderPath, 'f.*');
         return files[0];
     }
+    async fetchFileByHash(hash) {
+        const files = await this.selectFiles('f.hash = ? LIMIT 1', hash, 'f.*');
+        return files[0];
+    }
     async fetchFileByID(renderPath) {
         const files = await this.selectFiles('f.id = ? LIMIT 1', renderPath, 'f.*');
         return files[0];

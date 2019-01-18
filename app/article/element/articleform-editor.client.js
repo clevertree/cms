@@ -67,6 +67,14 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         sessionStorage.setItem("articleform-editor:editor",this.state.editor);
                         this.renderWYSIWYGEditor();
                         break;
+                    case 'title':
+                    case 'path':
+                    case 'theme':
+                    case 'parent_id':
+                    case 'content':
+                        this.state.article[e.target.name] = e.target.value;
+                        console.log(this.state.article);
+                        break;
                 }
                 break;
         }
@@ -93,10 +101,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
     submit(e) {
         e.preventDefault();
         const form = e.target; // querySelector('element.user-login-element');
-        const request = {};
-        new FormData(form).forEach(function (value, key) {
-            request[key] = value;
-        });
+        const request = this.getFormData(form);
 
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
@@ -120,9 +125,19 @@ class HTMLArticleFormEditorElement extends HTMLElement {
 
 
 
+    getFormData(form) {
+        form = form || this.querySelector('form');
+        const formData = {};
+        if(form) {
+            new FormData(form).forEach(function (value, key) {
+                formData[key] = value;
+            });
+        }
+        return formData;
+    }
 
     render() {
-        const articleFlags = this.state.article.flags || [];
+        const formData = this.getFormData();
         // console.log("RENDER", this.state);
         this.innerHTML =
             `<form action="/:article/${this.state.article.id}/edit" method="POST" class="articleform articleform-editor themed">
@@ -175,17 +190,6 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                                 <select name="theme">
                                     <option value="">Default Site Theme</option>
                                 </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Flags</td>
-                            <td>
-                                ${['Main-Menu', 'Sub-Menu', 'Account-Only', 'Admin-Only'].map(flagName => `
-                                <label>
-                                    <input type="checkbox" class="themed" name="flags[${flagName.toLowerCase()}]"  ${articleFlags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
-                                    ${flagName.replace('-', ' ')}
-                                </label>
-                                `).join('')}
                             </td>
                         </tr>
                         <tr>
@@ -296,6 +300,11 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         target.setAttribute('style', '');
                         // target.trumbowyg('destroy');
                         console.log("Unloaded pell WYSIWYG Editor", target);
+                        ["pell.min.css"]
+                            .forEach(sel => {
+                                const cssLink = document.head.querySelector("link[href$='" + sel + "']");
+                                if(cssLink) cssLink.parentNode.removeChild(cssLink);
+                            });
                     };
                 });
 
@@ -328,6 +337,11 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         const target = jQuery('.editor-wysiwyg-target');
                         target.trumbowyg('destroy');
                         console.log("Unloaded Trumbowyg WYSIWYG Editor", target);
+                        ["trumbowyg.min.css"]
+                            .forEach(sel => {
+                                const cssLink = document.head.querySelector("link[href$='" + sel + "']");
+                                if(cssLink) cssLink.parentNode.removeChild(cssLink);
+                            });
                     };
                 });
 
@@ -365,7 +379,11 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                     this.removeWYSIWYGEditor = () => {
                         const target = jQuery('.editor-wysiwyg-target');
                         target.summernote('destroy');
-                        console.log("Unloaded Froala WYSIWYG Editor", target);
+
+                        ["bootstrap.css", "summernote.css"].forEach(sel => {
+                            const cssLink = document.head.querySelector("link[href$='" + sel + "']");
+                            if(cssLink) cssLink.parentNode.removeChild(cssLink);
+                        });
                     };
                 });
 
@@ -400,7 +418,13 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                                             sources: {
                                                 'local': {
                                                     files: resp.files.map(fileEntry => { return {
-                                                        file: fileEntry.path
+                                                        file: fileEntry.path,
+                                                        name: fileEntry.title || fileEntry.path
+                                                        // thumb: string;
+                                                        // thumbIsAbsolute?: boolean;
+                                                        // changed: string;
+                                                        // size: string;
+                                                        // isImage: boolean;
                                                     }}),
                                                     folders: resp.folders,
                                                     path: resp.path,
@@ -432,9 +456,19 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                             format: 'json',
                             pathVariableName: 'path',
                             filesVariableName: 'files',
-                            prepareData: function (data) {
-                                return data;
-                            },
+                            // prepareData: function (data) {
+                            //     for (var key of data.keys()) {
+                            //         var field = data.get(key);
+                            //         if(typeof field === "object") {
+                            //             field.name = field.name
+                            //                 .replace('.jpg.jpeg', '.jpeg')
+                            //                 .replace('.jpeg.jpeg', '.jpeg')
+                            //                 .replace('.gif.gif', '.gif')
+                            //                 .replace('.png.png', '.png')
+                            //         }
+                            //     }
+                            //     return data;
+                            // },
                             isSuccess: function (resp) {
                                 return !resp.error;
                             },
@@ -478,6 +512,11 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         // target.summernote('destroy');
                         editor.destruct();
                         console.log("Unloaded Jodit WYSIWYG Editor", editor);
+
+                        ["jodit.min.css"].forEach(sel => {
+                            const cssLink = document.head.querySelector("link[href$='" + sel + "']");
+                            if(cssLink) cssLink.parentNode.removeChild(cssLink);
+                        });
                     };
                 });
 
@@ -508,6 +547,11 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         const target = jQuery('.editor-wysiwyg-target');
                         target.froalaEditor('destroy');
                         console.log("Unloaded Froala WYSIWYG Editor", target);
+                        ["font-awesome.min.css", "froala_editor.pkgd.min.css", "froala_style.min.css"]
+                            .forEach(sel => {
+                            const cssLink = document.head.querySelector("link[href$='" + sel + "']");
+                            if(cssLink) cssLink.parentNode.removeChild(cssLink);
+                        });
                     };
                 });
 
