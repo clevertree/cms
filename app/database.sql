@@ -102,17 +102,18 @@ CREATE TABLE `article_revision` (
   CONSTRAINT `fk:article_revision.user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 CREATE TABLE `file` (
    `id` int(11) NOT NULL AUTO_INCREMENT,
    `user_id` int(11) DEFAULT NULL,
    `path` varchar(256) NOT NULL,
-   `info` JSON DEFAULT NULL,
+   `hash` varchar(256) NOT NULL,
+   `size` BIGINT(11) DEFAULT NULL,
    `content` MEDIUMBLOB,
    `created` DATETIME DEFAULT CURRENT_TIMESTAMP,
    `updated` DATETIME DEFAULT CURRENT_TIMESTAMP,
    PRIMARY KEY (`id`),
    UNIQUE KEY `uk:file.path` (`path`),
+   UNIQUE KEY `uk:file.hash` (`hash`),
    CONSTRAINT `fk:file.user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

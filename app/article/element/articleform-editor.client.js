@@ -442,13 +442,15 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                                 return resp.msg.join !== undefined ? resp.msg.join(' ') : resp.msg;
                             },
                             process: function (resp) {
-                                return {
+                                resp = {
                                     files: resp[this.options.filesVariableName] || [],
                                     path: resp.path,
-                                    baseurl: resp.baseurl,
+                                    baseurl: window.origin,
                                     error: resp.error,
-                                    msg: resp.msg
+                                    msg: resp.message
                                 };
+                                console.log(resp);
+                                return resp;
                             },
                             error: function (e) {
                                 console.error(e);

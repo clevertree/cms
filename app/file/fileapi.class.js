@@ -2,6 +2,8 @@ const formidableMiddleware = require('express-formidable');
 // const bodyParser = require('body-parser');
 // const formidable = require('formidable');
 const fs = require('fs');
+const crypto = require('crypto');
+
 
 const { FileDatabase } = require("./filedatabase.class");
 const { UserSession } = require('../user/usersession.class');
@@ -30,7 +32,7 @@ class FileapiClass {
             res.setHeader('Content-Description','File Transfer');
             // res.setHeader('Content-Disposition', 'attachment; filename=print.jpeg');
             res.setHeader('Content-Type', 'image/jpeg');
-            res.setHeader('Content-Length', fileEntry.info.size);
+            res.setHeader('Content-Length', fileEntry.size);
             res.end(fileEntry.content);
             // res.end(fileEntry.content.toString('utf-8'));
             // console.log(err, fields, files);
@@ -49,29 +51,33 @@ class FileapiClass {
 
     async handleFileUpload(req, res) {
         try {
-            const file = Object.values(req.files)[0];
-            if(!file)
-                throw new Error("Invalid File");
-            const path = '/uploads/' + file.name
-                .replace('.jpg.jpeg', '.jpeg')
-                .replace('.jpeg.jpeg', '.jpeg')
-                .replace('.gif.gif', '.gif')
-                .replace('.png.png', '.png');
-            const stats = await this.readFileStats(file.path);
-            const content = await this.readFileContent(file.path);
-            const sessionUser = await new UserSession(req.session).getSessionUser(this.app.db);
-            const info = {
-                size: stats.size,
-                ctime: stats.ctime,
-                mtime: stats.mtime
-            };
+            const files = Object.values(req.files);
+            if(files.length === 0)
+                throw new Error("Invalid File(s)");
+            const paths = [];
+            for(var i=0; i<files.length; i++) {
+                const file = files[i];
+                const path = '/uploads/' + file.name
+                    .replace('.jpg.jpeg', '.jpeg')
+                    .replace('.jpeg.jpeg', '.jpeg')
+                    .replace('.gif.gif', '.gif')
+                    .replace('.png.png', '.png');
+                const stats = await this.readFileStats(file.path);
+                const hash = await this.calculateFileHash(file.path);
+                const content = await this.readFileContent(file.path);
+                const sessionUser = await new UserSession(req.session).getSessionUser(this.app.db);
+                // const info = {
+                //     size: stats.size,
+                //     ctime: stats.ctime,
+                //     mtime: stats.mtime
+                // };
 
-            const result = await this.fileDB.insertFile(content, path, sessionUser.id, info);
+                const result = await this.fileDB.insertFile(content, path, stats.size, hash, sessionUser.id);
+                paths.push(`/:file${path}`);
+            }
             res.json({
-                msg: 'File was uploaded successfully',
-                files: [`/:file${path}`],
-                baseurl: req.headers.origin,
-                result
+                message: 'File was uploaded successfully',
+                files: paths,
             });
 
             // res.send(
@@ -118,6 +124,17 @@ class FileapiClass {
             //         .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
             // );
         }
+    }
+
+    calculateFileHash(filePath) {
+        return new Promise( ( resolve, reject ) => {
+            fs.createReadStream(filePath).
+                pipe(crypto.createHash('sha1').setEncoding('hex')).
+                    on('finish', function () {
+                        resolve (this.read()) //the hash
+                    })
+                    .on('error', reject);
+        });
     }
 
     readFileContent(filePath, options=null) {

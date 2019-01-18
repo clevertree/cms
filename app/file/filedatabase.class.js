@@ -31,13 +31,12 @@ class FileDatabase {
         return files[0];
     }
 
-    async insertFile(content, path, user_id=null, info=null) {
+    async insertFile(content, path, size, hash=null, user_id=null) {
         let SQL = `
           INSERT INTO file
           SET ?
         `;
-        if(info !== null) info = JSON.stringify(info);
-        const results = await this.queryAsync(SQL, {content, path, user_id, info});
+        const results = await this.queryAsync(SQL, {content, path, user_id, size, hash});
         return results.insertId;
     }
 
@@ -71,9 +70,11 @@ class FileEntry {
         this.user_id = row.user_id;
         this.path = row.path;
         this.content = row.content;
-        this.info = row.info ? JSON.parse(row.info) : null;
-        if(this.info.ctime) this.info.ctime = new Date(this.info.ctime);
-        if(this.info.mtime) this.info.mtime = new Date(this.info.mtime);
+        // this.info = row.info ? JSON.parse(row.info) : null;
+        // if(this.info.ctime) this.info.ctime = new Date(this.info.ctime);
+        // if(this.info.mtime) this.info.mtime = new Date(this.info.mtime);
+        this.hash = row.hash;
+        this.size = row.size;
         this.created = row.created;
         this.updated = row.updated;
     }
