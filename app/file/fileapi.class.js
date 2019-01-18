@@ -14,15 +14,17 @@ class FileapiClass {
     get fileDB () { return new FileDatabase(this.app.db); }
 
     loadRoutes(router) {
-        router.get(/^\/?:file(.*)/, async (req, res) => await this.renderFileByPath(req, res));
         router.post('/:?file/[:]upload', formidableMiddleware(), async (req, res) => await this.handleFileUpload(req, res));
         router.all('/:?file/[:]browse', formidableMiddleware(), async (req, res) => await this.handleFileBrowseRequest(req, res));
+        router.get(/^\/?:file(.*)/, async (req, res, next) => await this.renderFileByPath(req, res, next));
     }
 
     async renderFileByPath(req, res, next) {
         try {
             const path = req.params[0];
             const fileEntry = await this.fileDB.fetchFileByPath(path);
+            if(!fileEntry)
+                return next();
             // res.writeHead(200, {'Content-Type': 'image/jpeg' });
             // res.end(fileEntry.content.toString('utf-8'));
             res.setHeader('Content-Description','File Transfer');
@@ -91,32 +93,13 @@ class FileapiClass {
 
     async handleFileBrowseRequest(req, res) {
         try {
+
+            const files = await this.fileDB.selectFiles("1 ORDER BY f.created DESC");
             const response = {
                 success: true,
-                data: {
-                    // messages?: string[];
-                    sources: {
-                        'local': {
-                            path: ':file/',
-                            baseurl: req.headers.origin,
-                            files: [
-                                {
-                                    file: 'file',
-                                    // thumb: string;
-                                    // thumbIsAbsolute?: boolean;
-                                    // changed: string;
-                                    // size: string;
-                                    // isImage: boolean;
-                                }
-                            ]
-                        }
-                    }
-                    // code: number;
-                    // path: string;
-                    // name: string;
-                    // source: string;
-                    // permissions?: IPermissions | null;
-                }
+                files: files,
+                path: '/:file/',
+                folders: ['/:file/']
             };
 
 

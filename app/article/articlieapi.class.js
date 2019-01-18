@@ -11,7 +11,7 @@ class ArticleAPI {
 
     loadRoutes(router) {
         const bodyParser = require('body-parser');
-        const postMiddleware = [bodyParser.urlencoded(), bodyParser.json()];
+        const postMiddleware = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
         // Handle Article requests
         router.get(['/[\\w/]+', '/'], async (req, res, next) => await this.renderArticleByPath(req, res,next));
 

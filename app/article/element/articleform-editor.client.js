@@ -392,9 +392,35 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                             ajax: {
                                 url: ':file/:browse',
                                 format: 'json',
+                                process: function (resp) {
+                                    resp = {
+                                        success: resp.success,
+                                        data: {
+                                            // messages?: string[];
+                                            sources: {
+                                                'local': {
+                                                    files: resp.files.map(fileEntry => { return {
+                                                        file: fileEntry.path
+                                                    }}),
+                                                    folders: resp.folders,
+                                                    path: resp.path,
+                                                    baseurl: window.origin,
+                                                }
+                                            },
+                                            // code: number;
+                                            // path: string;
+                                            // name: string;
+                                            // source: string;
+                                            permissions: null,
+                                        }
+                                    };
+                                    console.log(resp);
+                                    return resp;
+                                },
                             },
-                            process: function (resp) {
-                                console.log(resp);
+                            prepareData: function (data) {
+                                console.log(data);
+                                return data;
                             },
                             error: function (e) {
                                 console.error(e);

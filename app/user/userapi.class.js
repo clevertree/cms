@@ -11,7 +11,7 @@ class UserAPI {
 
     loadRoutes(router) {
         const bodyParser = require('body-parser');
-        const PM = [bodyParser.urlencoded(), bodyParser.json()];
+        const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
 
         // TODO: handle session_save login
         router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
@@ -29,10 +29,16 @@ class UserAPI {
     }
 
     async checkForSessionLogin(req, res, next) {
-        // console.log(req.session, req.cookies);
-        if(!req.session.user && req.cookies.session_save) {
-            const session_save = JSON.parse(req.cookies.session_save);
-            await this.loginSession(req, res, session_save.uuid, session_save.password);
+        try {
+            // console.log(req.session, req.cookies);
+            if (!req.session.user && req.cookies.session_save) {
+                const session_save = JSON.parse(req.cookies.session_save);
+                await this.loginSession(req, res, session_save.uuid, session_save.password);
+            }
+        } catch (error) {
+            res.clearCookie('session_save');
+            new UserSession(req.session).addMessage("User has been logged out: " + error.message);
+            console.error(error);
         }
         next();
     }
@@ -153,7 +159,6 @@ class UserAPI {
         req.session.user = {id: user.id};
         new UserSession(req.session).addMessage("Session Login Successful: " + uuid);
         return userSession;
-
     }
 
     async login(req, res, email, password, saveSession=false) {
