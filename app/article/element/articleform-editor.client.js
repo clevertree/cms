@@ -207,10 +207,11 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                                     ${[
                                         ['', 'Plain Text / HTML'],
                                         ['summernote', 'SummerNote'],
-                                        ['jodit', 'Jodit'],
+                                        ['jodit', 'Jodit (Image Uploads)'],
+                                        ['trumbowyg', 'Trumbowyg'],
                                         ['pell', 'Pell'],
-                                        ['trumbowyg', 'Trumbowyg'], 
-                                        ['froala', 'Froala (Not free)']
+                                        ['froala', 'Froala (Not free)'],
+                                        ['quill', 'Quill (Broken)'],
                                     ].map(option => `
                                         <option value="${option[0]}"${option[0] === this.state.editor ? ' selected="selected"' : ''}>${option[1]}</option>
                                     `)}
@@ -381,6 +382,49 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         target.summernote('destroy');
 
                         ["bootstrap.css", "summernote.css"].forEach(sel => {
+                            const cssLink = document.head.querySelector("link[href$='" + sel + "']");
+                            if(cssLink) cssLink.parentNode.removeChild(cssLink);
+                        });
+                    };
+                });
+
+                break;
+
+            case 'quill':
+                if(this.removeWYSIWYGEditor)
+                    this.removeWYSIWYGEditor();
+                this.removeWYSIWYGEditor = null;
+
+                [
+                    'https://cdn.quilljs.com/1.3.6/quill.snow.css',
+                ].forEach(INCLUDE_CSS => {
+                    if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
+                        document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
+                });
+
+                this.loadScripts([
+                    'https://cdn.quilljs.com/1.3.6/quill.js'
+                ], () => {
+                    const target = document.querySelector('.editor-wysiwyg-target');
+                    target.style.display = 'none';
+                    const divContainer = document.createElement('div');
+                    divContainer.classList.add('editor-wysiwyg-container');
+                    divContainer.innerHTML = target.value;
+                    target.parentNode.appendChild(divContainer);
+                    var quill = new Quill('.editor-wysiwyg-container', {
+                        theme: 'snow'
+                    });
+                    quill.on('editor-change', (eventName) => {
+                        if (eventName === 'text-change') {
+                            target.value = quill.container.firstChild.innerHTML;
+                        }
+                    });
+                    console.log("Loaded Quill WYSIWYG Editor", quill);
+
+                    this.removeWYSIWYGEditor = () => {
+                        this.render();
+
+                        ["quill.snow.css"].forEach(sel => {
                             const cssLink = document.head.querySelector("link[href$='" + sel + "']");
                             if(cssLink) cssLink.parentNode.removeChild(cssLink);
                         });
