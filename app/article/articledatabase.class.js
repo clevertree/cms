@@ -66,7 +66,7 @@ class ArticleDatabase {
         if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
           UPDATE article a
-          SET ?
+          SET ?, updated = UTC_TIMESTAMP()
           WHERE a.id = ?
         `;
         const results = await this.queryAsync(SQL, [set, id]);
@@ -171,6 +171,7 @@ class ArticleEntry {
         this.path = row.path;
         this.title = row.title;
         this.theme = row.theme;
+        this.status = row.status;
         // this.flags = row.flags ? row.flags.split(',') : [];
         this.content = row.content;
         this.created = row.created;
