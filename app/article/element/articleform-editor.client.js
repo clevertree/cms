@@ -228,7 +228,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                             </td>
                         </tr>
                         <tr>
-                            <td class="label">WYSIWYG Editor</td>
+                            <td class="label">Switch Editor</td>
                             <td>
                                 <label>
                                     <select name="editor">
