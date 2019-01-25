@@ -71,8 +71,8 @@ body.theme-minimal {
 /** Anchors **/
 
 .theme-minimal a {
-    color: white;
-    text-decoration: none;
+    color: #c88200;
+    /* text-decoration: none; */
 }
 
 .theme-minimal a:hover {
@@ -113,11 +113,12 @@ body.theme-minimal {
 
 .theme-minimal ul.nav-menu > li > a,
 .theme-minimal ul.nav-submenu > li > a {
-    /* color: white; */
+    color: white;
     /* font-weight: bold; */
     font-size: 18px;
     display: block;
     padding: 12px;
+    text-decoration: none;
 }
 
 /** Sub Menu **/
@@ -273,6 +274,8 @@ body.theme-minimal {
 
 .theme-minimal ul.flex-list > li > h2 {
     margin: 0 0;
+    font-family: Helvetica;
+    font-size: 1.4em;
 }
 
 /** Section effects **/
