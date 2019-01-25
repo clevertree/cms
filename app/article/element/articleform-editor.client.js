@@ -78,6 +78,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         if(typeof html_beautify !== "undefined")
                             e.target.value = html_beautify(e.target.value);
                         this.state.article[e.target.name] = e.target.value;
+                        this.renderPreview(e.target.value);
                         break;
                 }
 
@@ -86,15 +87,20 @@ class HTMLArticleFormEditorElement extends HTMLElement {
             case 'keyup':
                 switch(e.target.name) {
                     case 'content':
-                        const previewContent = document.querySelector('.articleform-preview-content');
-                        if(previewContent)
-                            previewContent.innerHTML = e.target.value;
+                        this.renderPreview(e.target.value);
                         // console.log(e.target.name, previewContent);
                         break;
                 }
 
                 break;
         }
+    }
+
+
+    renderPreview(html) {
+        const previewContent = document.querySelector('.articleform-preview-content');
+        if(previewContent)
+            previewContent.innerHTML = html;
     }
 
     requestFormData() {
@@ -159,6 +165,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
 
     render() {
         const formData = this.getFormData();
+
         // console.log("RENDER", this.state);
         this.innerHTML =
             `<form action="/:article/${this.state.article.id}/edit" method="POST" class="articleform articleform-editor themed">
@@ -278,6 +285,9 @@ class HTMLArticleFormEditorElement extends HTMLElement {
     }
 
     renderWYSIWYGEditor() {
+        if(this.state.article.content)
+            this.renderPreview(this.state.article.content);
+
         // console.log("RENDER", this.state);
         switch(this.state.editor) {
             default:
