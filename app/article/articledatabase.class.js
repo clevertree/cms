@@ -120,8 +120,13 @@ class ArticleDatabase {
     // }
 
     async fetchArticleRevisionByID(id, selectSQL = '*') {
-        const revisions = await this.selectArticleRevision(selectSQL, `ah.id = ?`,
-            [id]);
+        const revisions = await this.selectArticleRevision(`ah.id = ?`,
+            [id], selectSQL);
+        return revisions[0];
+    }
+    async fetchArticleRevisionByDate(created, selectSQL = '*') {
+        const revisions = await this.selectArticleRevision(`ah.created = ?`,
+            [created], selectSQL);
         return revisions[0];
     }
 

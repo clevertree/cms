@@ -17,6 +17,9 @@ class ArticleAPI {
 
         router.get('/:?article/:id/json', async (req, res, next) => await this.renderArticleByID(true, req, res, next));
         router.get(['/:?article/:id/view', '/:?article/:id'], async (req, res, next) => await this.renderArticleByID(false, req, res, next));
+        router.get('/:?article/sync', async (req, res) => await this.renderArticleBrowser(req, res));
+        // TODO: sync
+
         router.all('/:?article/:id/edit', postMiddleware, async (req, res) => await this.renderArticleEditorByID(req, res));
         router.all(['/:?article', '/:?article/list'], postMiddleware, async (req, res) => await this.renderArticleBrowser(req, res));
     }
@@ -59,9 +62,10 @@ class ArticleAPI {
             if(!article)
                 return next();
 
+            let articleRevision = null;
             if(typeof req.query.r !== 'undefined') {
                 const articleRevisionID = parseInt(req.query.r);
-                const articleRevision = await this.articleDB.fetchArticleRevisionByID(articleRevisionID);
+                articleRevision = await this.articleDB.fetchArticleRevisionByID(articleRevisionID);
                 if(!articleRevision)
                     throw new Error("Article Revision ID not found: " + articleRevisionID);
 
@@ -81,12 +85,14 @@ class ArticleAPI {
                 const sessionUser = await new UserSession(req.session).getSessionUser(this.app.db);
                 if(sessionUser.isAdmin() || sessionUser.id === article.user_id)
                     response.editable = true;
-                if(req.query.getAll || req.query.getRevision) {
+                if(req.query.getAll || req.query.getHistory) {
                     response.history = await this.articleDB.fetchArticleRevisionsByArticleID(article.id);
-                    response.revision = await this.articleDB.fetchArticleRevisionByID(article.id, req.query.getRevision || null);
-                    if(!response.revision && response.history.length > 0)
-                        response.revision = await this.articleDB.fetchArticleRevisionByID(article.id, response.history[0].id); // response.history[0]; // (await this.articleDB.fetchArticleRevisionsByArticleID(article.id))[0];
+                    // response.revision = await this.articleDB.fetchArticleRevisionByID(article.id, req.query.getRevision || null);
+                    if(!articleRevision && response.history.length > 0)
+                        articleRevision = await this.articleDB.fetchArticleRevisionByID(response.history[0].id); // response.history[0]; // (await this.articleDB.fetchArticleRevisionsByArticleID(article.id))[0];
                 }
+                if(articleRevision)
+                    response.revision = articleRevision;
                 if(req.query.getAll) {
                     response.parentList = await this.articleDB.queryMenuData(false);
                 }
@@ -131,7 +137,7 @@ class ArticleAPI {
                 // Render Editor
                 res.send(
                     await this.app.getTheme(article.theme)
-                        .render(req, `<%- include("article/section/editor.ejs")%>`, article)
+                        .render(req, `<%- include("article/section/editor.ejs", {article})%>`, {article})
                 );
 
             } else {

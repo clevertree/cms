@@ -241,14 +241,19 @@ body.theme-minimal {
     max-width: 400px;
     padding: 0.5em 1em;
 }
-.theme-minimal ul.flex-list > li > * {
-    vertical-align: middle;
-}
 
-.theme-minimal ul.flex-list > li > img,
-.theme-minimal ul.flex-list > li > a > img {
+.theme-minimal div.image-container > img,
+.theme-minimal div.image-container > a > img {
     max-width: 90%;
     max-height: 200px;
+}
+
+.theme-minimal div.image-container {
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px 0px;
 }
 
 .theme-minimal ul.flex-list > li > h2 {

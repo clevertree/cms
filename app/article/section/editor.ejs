@@ -1,4 +1,11 @@
 <section style="max-width: 1600px;">
     <script src="/app/article/element/articleform-editor.client.js"></script>
-    <articleform-editor id="<%=id%>"></articleform-editor>
+    <articleform-editor id="<%=article.id%>"></articleform-editor>
+</section>
+<section class="articleform-preview-container">
+    <h1 style="text-align: center;">Preview</h1>
+    <hr/>
+    <div class="articleform-preview-content">
+        <%-article.content%>
+    </div>
 </section>

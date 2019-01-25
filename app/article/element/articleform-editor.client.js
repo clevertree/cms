@@ -10,7 +10,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
-            revisionDate: null,
+            revisionID: null,
             editor: sessionStorage.getItem("articleform-editor:editor"),
             article: {id: -1},
             revision: {},
@@ -31,6 +31,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
 
     connectedCallback() {
         this.addEventListener('change', this.onEvent);
+        this.addEventListener('keyup', this.onEvent);
         this.addEventListener('submit', this.onEvent);
 
         const articleID = this.getAttribute('id');
@@ -56,10 +57,10 @@ class HTMLArticleFormEditorElement extends HTMLElement {
             case 'change':
                 switch(e.target.name) {
                     case 'revision':
-                        const revisionDate = e.target.value;
-                        console.log("Load Revision: " + revisionDate);
-                        // this.setState({revisionDate});
-                        this.setState({revisionDate});
+                        const revisionID = e.target.value;
+                        console.log("Load Revision: " + revisionID);
+                        // this.setState({revisionID});
+                        this.setState({revisionID});
                         this.requestFormData();
                         break;
                     case 'editor':
@@ -71,11 +72,27 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                     case 'path':
                     case 'theme':
                     case 'parent_id':
-                    case 'content':
                         this.state.article[e.target.name] = e.target.value;
-                        console.log(this.state.article);
+                        break;
+                    case 'content':
+                        if(typeof html_beautify !== "undefined")
+                            e.target.value = html_beautify(e.target.value);
+                        this.state.article[e.target.name] = e.target.value;
                         break;
                 }
+
+                break;
+
+            case 'keyup':
+                switch(e.target.name) {
+                    case 'content':
+                        const previewContent = document.querySelector('.articleform-preview-content');
+                        if(previewContent)
+                            previewContent.innerHTML = e.target.value;
+                        // console.log(e.target.name, previewContent);
+                        break;
+                }
+
                 break;
         }
     }
@@ -92,7 +109,11 @@ class HTMLArticleFormEditorElement extends HTMLElement {
             // this.render();
         };
         xhr.responseType = 'json';
-        xhr.open ("GET", `:article/${this.state.article.id}/json?getAll=true&getRevision=${new Date(this.state.revisionDate).getTime()}`, true);
+        let params = 'getAll=true';
+        if(this.state.revisionID)
+            params += `&r=${this.state.revisionID}`;
+        params += '&t=' + new Date().getTime();
+        xhr.open ("GET", `:article/${this.state.article.id}/json?${params}`, true);
         // xhr.setRequestHeader("Accept", "application/json");
         xhr.send ();
         this.setState({processing: true});
@@ -225,7 +246,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                                 <select name="revision">
                                     <option value="">Load a revision</option>
                                 ${this.state.history.map(revision => `
-                                    <option value="${revision.created}">${new Date(revision.created).toLocaleString()}</option>
+                                    <option value="${revision.id}">${new Date(revision.created).toLocaleString()}</option>
                                 `)}
                                 </select>
                             </td>
@@ -263,6 +284,12 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                 if(this.removeWYSIWYGEditor)
                     this.removeWYSIWYGEditor();
                 this.removeWYSIWYGEditor = null;
+
+                this.loadScripts([
+                    'https://cdn.rawgit.com/beautify-web/js-beautify/v1.9.0-beta3/js/lib/beautify.js',
+                    // 'https://cdn.rawgit.com/beautify-web/js-beautify/v1.9.0-beta3/js/lib/beautify-css.js',
+                    'https://cdn.rawgit.com/beautify-web/js-beautify/v1.9.0-beta3/js/lib/beautify-html.js',
+                ]);
                 break;
 
             case 'pell':
@@ -641,5 +668,6 @@ class HTMLArticleFormEditorElement extends HTMLElement {
         document.head.appendChild(newScriptElm);
         return newScriptElm;
     }
+
 }
 customElements.define('articleform-editor', HTMLArticleFormEditorElement);
