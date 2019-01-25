@@ -36,8 +36,11 @@
                             <li>
                                 <a href=":article/<%=article.id%>/edit">Edit current article (ID: <%=article.id%>)</a>
                             </li>
-                            <li><hr/></li>
                             <%_ }  _%>
+                            <li>
+                                <a href=":article">List Articles</a>
+                            </li>
+                            <li><hr/></li>
                             <li>
                                 <a href=":user/<%=req.session.user.id%>/profile">Edit Profile</a>
                             </li>

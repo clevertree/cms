@@ -82,7 +82,7 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
             this.setState({processing: false});
-            console.log(e, xhr.response);
+            // console.log(e, xhr.response);
             const response = xhr.response && typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
             response.status = xhr.status;
             if(xhr.status === 200) {

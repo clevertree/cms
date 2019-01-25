@@ -21,6 +21,7 @@ class ArticleAPI {
         // TODO: sync
 
         router.all('/:?article/:id/edit', postMiddleware, async (req, res) => await this.renderArticleEditorByID(req, res));
+        router.all('/:?article/add', postMiddleware, async (req, res) => await this.renderArticleAdd(req, res));
         router.all(['/:?article', '/:?article/list'], postMiddleware, async (req, res) => await this.renderArticleBrowser(req, res));
     }
 
@@ -187,6 +188,55 @@ class ArticleAPI {
                             article
                         });
                 }
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(400);
+            if(req.method === 'GET') {          // Handle GET
+                res.send(
+                    await this.app.getTheme()
+                        .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+                );
+            } else {
+                res.json({message: error.stack});
+            }
+        }
+    }
+
+    async renderArticleAdd(req, res) {
+        try {
+            const session = new UserSession(req.session);
+            const sessionUser = await session.getSessionUser(this.app.db);
+            if(!sessionUser)
+                throw new Error("Must be logged in");
+
+            if(!sessionUser.isAdmin())
+                throw new Error("Not authorized");
+
+            if(req.method === 'GET') {          // Handle GET
+                // Render Editor
+                res.send(
+                    await this.app.getTheme()
+                        .render(req, `<%- include("article/section/add.ejs")%>`)
+                );
+
+            } else {
+                // Handle POST
+                const insertID = await this.articleDB.insertArticle(
+                    req.body.title,
+                    req.body.content,
+                    req.body.path,
+                    sessionUser.id,
+                    req.body.parent_id ? parseInt(req.body.parent_id) : null,
+                    req.body.theme
+                );
+                const article = await this.articleDB.fetchArticleByID(insertID);
+                return res.json({
+                    redirect: '/:article/' + insertID + '/edit',
+                    message: "Article created successfully. Redirecting...",
+                    insertID: insertID,
+                    article
+                });
             }
         } catch (error) {
             console.log(error);

@@ -10,6 +10,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
+            mode: null,
             revisionID: null,
             editor: sessionStorage.getItem("articleform-editor:editor"),
             article: {id: -1},
@@ -36,10 +37,15 @@ class HTMLArticleFormEditorElement extends HTMLElement {
 
         const articleID = this.getAttribute('id');
         if(articleID) {
-            this.setState({article: {id: articleID}})
-            this.requestFormData();
+            this.setState({article: {id: articleID}, mode: 'edit'});
         }
+        const mode = this.getAttribute('mode');
+        if(mode)
+            this.setState({mode});
+        if(!this.state.mode)
+            console.error("No mode='' attribute set for editor ", this);
         this.render();
+        this.requestFormData();
     }
 
     onSuccess(e, response) {
@@ -165,19 +171,33 @@ class HTMLArticleFormEditorElement extends HTMLElement {
 
     render() {
         const formData = this.getFormData();
+        let action = null;
+        let message = null;
+        switch(this.state.mode) {
+            case 'edit':
+                action = `/:article/${this.state.article.id}/edit`;
+                message = `Editing article ID ${this.state.article.id}`;
+                break;
+            case 'add':
+                action = `/:article/add`;
+                message = `Add a new article`;
+                break;
+            default:
+                console.error("Invalid editor mode", this.state.mode);
+        }
 
         // console.log("RENDER", this.state);
         this.innerHTML =
-            `<form action="/:article/${this.state.article.id}/edit" method="POST" class="articleform articleform-editor themed">
+            `<form action="${action}" method="POST" class="articleform articleform-editor themed">
             <input type="hidden" name="id" value="${this.state.article.id}" />
-            <fieldset ${!this.state.editable ? 'disabled="disabled"' : ''}>
+            <fieldset ${this.state.mode === 'edit' && !this.state.editable ? 'disabled="disabled"' : ''}>
                 <table style="width: 100%;">
                     <thead>
                         <tr>
                             <td colspan="2">
                                 ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
                                     ${this.state.response.message}
-                                </div>` : `Editing article ID ${this.state.article.id}`}
+                                </div>` : message}
                             </td>
                         </tr>
                         <tr><td colspan="2"><hr/></td></tr>
@@ -190,13 +210,13 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         <tr>
                             <td class="label">Title</td>
                             <td>
-                                <input type="text" name="title" value="${this.state.article.title || ''}"/>
+                                <input type="text" name="title" value="${this.state.article.title || ''}" required/>
                             </td>
                         </tr>
                         <tr>
                             <td class="label">Path</td>
                             <td>
-                                <input type="text" name="path" value="${this.state.article.path || ''}" />
+                                <input type="text" name="path" placeholder="/path/to/article/" value="${this.state.article.path || ''}" />
                             </td>
                         </tr>
                         <tr>
@@ -269,13 +289,16 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                                 </label>
                             </td>
                         </tr>
+                    </tbody>
+                    <tfoot>
                         <tr>
+                            <tr><td colspan="2"><hr/></td></tr>
                             <td class="label"></td>
                             <td>
                                 <button type="submit">Publish</button>
                             </td>
                         </tr>
-                    </tbody>
+                    </tfoot>
                 </table>
             </fieldset>
         </form>`;
