@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("app/article/element/articleform.css");
+    })("app/article/form/articleform.css");
 });
 
 
@@ -133,7 +133,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
 
     submit(e) {
         e.preventDefault();
-        const form = e.target; // querySelector('element.user-login-element');
+        const form = e.target; // querySelector('form.user-login-form');
         const request = this.getFormData(form);
 
         const xhr = new XMLHttpRequest();
@@ -147,6 +147,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                 this.onError(e, response);
             }
             this.setState({response, user:response.user, processing: false});
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
         xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");

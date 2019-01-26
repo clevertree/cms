@@ -2,15 +2,15 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("app/user/element/userform.css");
+    })("app/user/form/userform.css");
 });
 
 {
-    class HTMLUserFlagFormElement extends HTMLElement{
+    class HTMLUserProfileFormElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
-                user: {id: -1, flags:[]}
+                user: {id: -1, profile: {}},
             };
             // this.state = {id:-1, flags:[]};
         }
@@ -46,44 +46,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     if(e.target.getAttribute('type') === 'checkbox')
                         value = e.target.checked;
                     if(e.target.name && typeof this.state.user.profile[e.target.name] !== 'undefined')
-                        this.state.user.flags[e.target.name] = value;
-                    if(e.target.getAttribute('type') === 'checkbox') {
-                        if(e.target.checked) {
-                            this.state.user.flags =
-                                this.state.user.flags.concat(e.target.name)
-                                    .filter((v, i, a) => a.indexOf(v) === i);
-                        } else {
-                            this.state.user.flags =
-                                this.state.user.flags.filter((v) => v !== e.target.name);
-                        }
-                    }
-                    console.log(this.state);
+                        this.state.user.profile[e.target.name] = value;
+                    // console.log(this.state);
                     break;
             }
         }
 
         requestFormData(userID) {
             const xhr = new XMLHttpRequest();
-            xhr.onload = (e) => {
+            xhr.onload = () => {
                 // console.info(xhr.response);
-                if(xhr.status === 200) {
-                    if(!xhr.response || !xhr.response.user)
-                        throw new Error("Invalid Response");
-                    this.setState(xhr.response);
-                } else {
-                    const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                    this.onError(e, response);
-                }
+                if(!xhr.response || !xhr.response.user)
+                    throw new Error("Invalid Response");
+                this.setState(xhr.response);
+                // this.state = xhr.response.user;
+                // this.render();
             };
             xhr.responseType = 'json';
-            xhr.open ("GET", `:user/${userID}/json`, true);
+            xhr.open ("GET", `:user/${userID}/json?getAll=true`, true);
             // xhr.setRequestHeader("Accept", "application/json");
             xhr.send ();
         }
 
         submit(e) {
             e.preventDefault();
-            const form = e.target; // querySelector('element.user-login-element');
+            const form = e.target; // querySelector('form.user-login-form');
             this.setState({processing: true});
             const request = {};
             new FormData(form).forEach(function (value, key) {
@@ -109,20 +96,47 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.send(JSON.stringify(request));
         }
 
+        renderProfileField(field) {
+            const value = this.state.user.profile[field.name];
+            switch(field.type) {
+                case 'textarea':
+                    return `<textarea name="${field.name}" class="${field.class}" ${field.attributes}>${value||''}</textarea>`;
+                case 'select':
+                    return `<select name="${field.name}" class="${field.class}" ${field.attributes}></select>`;
+                default:
+                    return `<input name="${field.name}" type="${field.type||'text'}" class="${field.class}" value="${value||''}" ${field.attributes}/>`;
+            }
+        }
+
         render() {
+            let profileFields = [];
+            if(this.state.profileConfig) {
+                profileFields = this.state.profileConfig.slice(0);
+                if(this.state.user.profile) {
+                    Object.keys(this.state.user.profile).forEach(key => {
+                        for (var i = 0; i < profileFields.length; i++) {
+                            if (profileFields[i].name === key)
+                                return;
+                        }
+                        profileFields.push({
+                            name: key
+                        })
+                    });
+                }
+            }
             console.log("RENDER", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.user.id}/flags" method="POST" class="userform userform-flags themed">
-                    <fieldset ${this.state.editable !== 'admin' ? 'disabled="disabled"' : ''}>
-                        <legend>Update User Flags</legend>
+                <form action="/:user/${this.state.user.id}/profile" method="POST" class="userform userform-profile themed">
+                    <fieldset ${!this.state.editable ? 'disabled="disabled"' : ''}>
+                        <legend>Update Profile</legend>
                         <table>
                             <thead>
                                 <tr>
                                     <td colspan="2">
                                         ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
                                             ${this.state.response.message}
-                                        </div>` : "In order to update this flag, <br/>please modify this element and hit 'Update' below"}
+                                        </div>` : "In order to update this profile, <br/>please modify this form and hit 'Update' below"}
                                     </td>
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
@@ -134,17 +148,14 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <input type="email" name="email" value="${this.state.user.email}" disabled/>
                                     </td>
                                 </tr>
+                            ${profileFields.map(profileField => `
                                 <tr>
-                                    <td class="label">Flags</td>
+                                    <td class="label">${profileField.name}:</td>
                                     <td>
-                                        ${['admin'].map(flagName => `
-                                        <label>
-                                            <input type="checkbox" class="themed" name="${flagName.toLowerCase()}" value="1" ${this.state.user.flags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
-                                            ${flagName.replace('-', ' ')}
-                                        </label>
-                                        `).join('')}
+                                        ${this.renderProfileField(profileField)}
                                     </td>
                                 </tr>
+                            `).join('')}
                             </tbody>
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
@@ -161,6 +172,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('userform-flags', HTMLUserFlagFormElement);
+    customElements.define('userform-profile', HTMLUserProfileFormElement);
 
 }

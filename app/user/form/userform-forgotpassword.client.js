@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("app/user/element/userform.css");
+    })("app/user/form/userform.css");
 });
 
 {
-    class HTMLUserRegisterFormElement extends HTMLElement {
+    class HTMLUserForgotPasswordFormElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
@@ -26,9 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('submit', this.onEvent);
 
             this.render();
-            const userID = this.getAttribute('user-id');
-            if(userID)
-                this.requestFormData(userID);
         }
 
         onSuccess(e, response) {
@@ -37,19 +34,21 @@ document.addEventListener('DOMContentLoaded', function() {
         onError(e, response) {}
 
         onEvent(e) {
-            switch (event.type) {
+            switch (e.type) {
                 case 'submit':
                     this.submit(e);
                     break;
 
                 case 'change':
+                    if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
+                        this.state[e.target.name] = e.target.value;
                     break;
             }
         }
 
         submit(e) {
             e.preventDefault();
-            const form = e.target; // querySelector('element.user-login-element');
+            const form = e.target; // querySelector('form.user-login-form');
             this.setState({processing: true});
             const request = {};
             new FormData(form).forEach(function (value, key) {
@@ -78,16 +77,16 @@ document.addEventListener('DOMContentLoaded', function() {
         render() {
             this.innerHTML =
                 `
-                <form action="/:user/register" method="POST" class="userform userform-register themed">
+                <form action="/:user/forgotpassword" method="POST" class="userform userform-forgotpassword themed" style1="display: none;">
                     <fieldset>
-                        <legend>Register a new account</legend>
+                        <legend>Forgot Password</legend>
                         <table>
                             <thead>
                                 <tr>
                                     <td colspan="2">
                                         ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
                                             ${this.state.response.message}
-                                        </div>` : "To register a new account, <br/>please enter your email and password"}
+                                        </div>` : "In order to recover your password, <br/>please enter your email and hit submit below"}
                                     </td>
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
@@ -99,25 +98,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <input type="email" name="email" value="${this.state.email}" required />
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td class="label">Password</td>
-                                    <td>
-                                        <input type="password" name="password" value="${this.state.password}" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Confirm Password</td>
-                                    <td>
-                                        <input type="password" name="password_confirm" value="${this.state.password_confirm}" required />
-                                    </td>
-                                </tr>
                             </tbody>
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td class="label"></td>
                                     <td>
-                                        <button type="submit">Register</button>
+                                        <button type="submit">Submit</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -127,6 +114,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('userform-register', HTMLUserRegisterFormElement);
+    customElements.define('userform-forgotpassword', HTMLUserForgotPasswordFormElement);
 
 }
