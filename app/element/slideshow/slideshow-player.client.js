@@ -39,7 +39,7 @@ class HTMLSlideShowPlayerElement extends HTMLElement {
         if(currentSlide >= this.children.length)
             currentSlide = 0;
         this.children[currentSlide].classList.add('current');
-        console.log("Update", this.children[currentSlide]);
+        // console.log("Update", this.children[currentSlide]);
     }
 }
 customElements.define('slideshow-player', HTMLSlideShowPlayerElement);

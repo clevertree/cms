@@ -138,7 +138,7 @@ class ArticleDatabase {
     }
 
     async fetchArticleRevisionsByArticleID(articleID, limit=20, selectSQL = '*, NULL as content') {
-        return await this.selectArticleRevision(`ah.article_id = ? ORDER BY ah.created DESC LIMIT ${limit}`,
+        return await this.selectArticleRevision(`ah.article_id = ? ORDER BY ah.id DESC LIMIT ${limit}`,
             [articleID], selectSQL);
     }
 
