@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("app/user/element/userform.css");
+    })("app/user/form/userform.css");
 });
 
 {
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         submit(e) {
             e.preventDefault();
-            const form = e.target; // querySelector('element.user-login-element');
+            const form = e.target; // querySelector('form.user-login-form');
             this.setState({processing: true});
             const request = {};
             new FormData(form).forEach(function (value, key) {

@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("app/article/element/articleform.css");
+    })("app/article/form/articleform.css");
 });
 
 
@@ -82,7 +82,7 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
             this.setState({processing: false});
-            console.log(e, xhr.response);
+            // console.log(e, xhr.response);
             const response = xhr.response && typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
             response.status = xhr.status;
             if(xhr.status === 200) {

@@ -26,8 +26,8 @@ class ArticleDatabase {
         const articles = await this.selectArticles('a.path = ? LIMIT 1', renderPath, 'a.*');
         return articles[0];
     }
-    async fetchArticleByID(renderPath) {
-        const articles = await this.selectArticles('a.id = ? LIMIT 1', renderPath, 'a.*');
+    async fetchArticleByID(articleID) {
+        const articles = await this.selectArticles('a.id = ? LIMIT 1', articleID, 'a.*');
         return articles[0];
     }
 
@@ -39,13 +39,20 @@ class ArticleDatabase {
     // }
 
     async insertArticle(title, content, path, user_id, parent_id, theme, data) {
+        let set = {};
+        if(title) set.title = title;
+        if(content) set.content = content;
+        if(path) set.path = path;
+        if(user_id !== null) set.user_id = user_id;
+        if(parent_id !== null) set.parent_id = parent_id;
+        if(theme) set.theme = theme;
+        if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
           INSERT INTO article
           SET ?
         `;
-        data = data !== null && typeof data === "object" ? JSON.stringify(data) : null;
-        return await this.queryAsync(SQL, {title, content, path, user_id, parent_id, theme, data})
-            .insertId;
+        const results = await this.queryAsync(SQL, set);
+        return results.insertId;
     }
 
     async updateArticle(id, title, content, path, user_id, parent_id, theme, data) {
@@ -59,10 +66,10 @@ class ArticleDatabase {
         if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
           UPDATE article a
-          SET ?
+          SET ?, updated = UTC_TIMESTAMP()
           WHERE a.id = ?
         `;
-        const results = await this.queryAsync(SQL, [{title, content, path, user_id, parent_id, theme, data}, id]);
+        const results = await this.queryAsync(SQL, [set, id]);
         return results.affectedRows;
     }
 
@@ -83,7 +90,7 @@ class ArticleDatabase {
         const mainMenu = [];
         for(let i=0; i<menuEntries.length; i++) {
             const menuEntry = new ArticleEntry(menuEntries[i]);
-            if(menuEntry.parent_id === null) {
+            if(menuEntry.parent_id === null) { // parent_id === null indicates top level menu
                 const subMenu = [];
                 mainMenu.push([menuEntry, subMenu]);
                 for(let j=0; j<menuEntries.length; j++) {
@@ -164,6 +171,7 @@ class ArticleEntry {
         this.path = row.path;
         this.title = row.title;
         this.theme = row.theme;
+        this.status = row.status;
         // this.flags = row.flags ? row.flags.split(',') : [];
         this.content = row.content;
         this.created = row.created;

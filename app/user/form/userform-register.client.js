@@ -2,19 +2,16 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("app/user/element/userform.css");
+    })("app/user/form/userform.css");
 });
 
 {
-    class HTMLUserLoginFormElement extends HTMLElement {
+    class HTMLUserRegisterFormElement extends HTMLElement {
         constructor() {
             super();
             this.state = {
-                processing: false,
-                response: null,
                 email: "",
                 password: "",
-                session_save: false,
             };
             // this.state = {id:-1, flags:[]};
         }
@@ -34,29 +31,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.requestFormData(userID);
         }
 
-        onSuccess(e, response) {}
+        onSuccess(e, response) {
+            setTimeout(() => window.location.href = response.redirect, 3000);
+        }
         onError(e, response) {}
 
         onEvent(e) {
-            switch (e.type) {
+            switch (event.type) {
                 case 'submit':
                     this.submit(e);
                     break;
 
                 case 'change':
-                    let value = e.target.value;
-                    if(e.target.getAttribute('type') === 'checkbox')
-                        value = e.target.checked;
-                    if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
-                        this.state[e.target.name] = value;
-                    // console.log(this.state);
                     break;
             }
         }
 
         submit(e) {
             e.preventDefault();
-            const form = e.target; // querySelector('element.user-login-element');
+            const form = e.target; // querySelector('form.user-login-form');
             this.setState({processing: true});
             const request = {};
             new FormData(form).forEach(function (value, key) {
@@ -82,25 +75,19 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.send(JSON.stringify(request));
         }
 
-
-        onSuccess(e, response) {
-            setTimeout(() => window.location.href = response.redirect, 3000);
-        }
-
         render() {
-            console.log("Render", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/login" method="POST" class="userform userform-login themed">
-                    <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
-                        <legend>Log In</legend>
+                <form action="/:user/register" method="POST" class="userform userform-register themed">
+                    <fieldset>
+                        <legend>Register a new account</legend>
                         <table>
                             <thead>
                                 <tr>
                                     <td colspan="2">
                                         ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
                                             ${this.state.response.message}
-                                        </div>` : "In order to start a new session, <br/>please enter your email and password and hit 'Log in' below"}
+                                        </div>` : "To register a new account, <br/>please enter your email and password"}
                                     </td>
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
@@ -119,12 +106,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="label">Stay Logged In</td>
+                                    <td class="label">Confirm Password</td>
                                     <td>
-                                        <input type="checkbox" name="session_save" ${this.state.session_save ? 'checked="checked"' : ''}/>
-                                        <div style="float: right">
-                                            <a href=":user/forgotpassword">Forgot Password?</a>
-                                        </div>
+                                        <input type="password" name="password_confirm" value="${this.state.password_confirm}" required />
                                     </td>
                                 </tr>
                             </tbody>
@@ -133,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr>
                                     <td class="label"></td>
                                     <td>
-                                        <button type="submit">Log in</button>
+                                        <button type="submit">Register</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -143,5 +127,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('userform-login', HTMLUserLoginFormElement);
+    customElements.define('userform-register', HTMLUserRegisterFormElement);
+
 }

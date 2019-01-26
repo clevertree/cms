@@ -23,8 +23,6 @@ INSERT INTO `user` (`id`, `email`, `password`, `profile`, `flags`) VALUES
 (6, 'ari.asulin@gmail.com', '$2a$10$TAG1S.apbF2rr1nKstYj5.n1caQ1Wj2q188sw2QCcLrAIs9K9vK3K', NULL, 'admin');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 
-
-
 CREATE TABLE `user_session` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -38,7 +36,9 @@ CREATE TABLE `user_session` (
   CONSTRAINT `fk:user.user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- Dumping structure for table afoh.article
+
+
+
 CREATE TABLE IF NOT EXISTS `article` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `article` (
   `content` text DEFAULT NULL,
   `theme` varchar(256) DEFAULT NULL,
   `data` JSON DEFAULT NULL,
+  `status` ENUM('draft', 'published') DEFAULT 'draft',
   `created` datetime DEFAULT current_timestamp(),
   `updated` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),

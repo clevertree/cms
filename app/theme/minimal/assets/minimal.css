@@ -71,8 +71,8 @@ body.theme-minimal {
 /** Anchors **/
 
 .theme-minimal a {
-    /* color: white; */
-    text-decoration: none;
+    color: #c88200;
+    /* text-decoration: none; */
 }
 
 .theme-minimal a:hover {
@@ -118,6 +118,7 @@ body.theme-minimal {
     font-size: 18px;
     display: block;
     padding: 12px;
+    text-decoration: none;
 }
 
 /** Sub Menu **/
@@ -158,7 +159,6 @@ body.theme-minimal {
     background: #f5e7a8;
 }
 
-.theme-minimal p.highlight,
 .theme-minimal div.highlight,
 .theme-minimal section.highlight {
     background-color: #ab6428ed;
@@ -197,10 +197,14 @@ body.theme-minimal {
     text-align: justify;
     text-indent: 8px;
     /* max-width: 960px; */
-    margin: 13px 4px 8px 4px;
+    padding: 4px 8px;
     line-height: 20px;
     /* font-weight: 300; */
     /* text-shadow: #000 1px 1px 1px; */
+}
+.theme-minimal p.highlight {
+    background-color: #0003;
+    border-radius: 4px;
 }
 
 .theme-minimal section > p > img {
@@ -209,12 +213,23 @@ body.theme-minimal {
     /* margin-left: 2em; */
 }
 
-.theme-minimal .page-quote {
-    font-size: 1em;
-    font-weight: bold;
-    text-align: center;
-    padding: 5px 0 12px 0;
+/** Custom Text **/
+.theme-minimal .text-bottom-right {
+    position: absolute;
+    right: 9px;
+    bottom: 2px;
 }
+
+.theme-minimal .page-quote,
+.theme-minimal .text-quote {
+    font-size: 1.2em;
+    /* font-weight: bold; */
+    text-align: center;
+    /* padding: 5px 0 12px 0; */
+    transform: scaleY(0.7);
+    color: white;
+}
+
 
 /** Flex List **/
 
@@ -253,11 +268,14 @@ body.theme-minimal {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     padding: 10px 0px;
 }
 
 .theme-minimal ul.flex-list > li > h2 {
     margin: 0 0;
+    font-family: Helvetica;
+    font-size: 1.4em;
 }
 
 /** Section effects **/
@@ -270,7 +288,8 @@ body.theme-minimal {
 .theme-minimal .box-shadow {
     box-shadow: 0px 0px 8px #000;
     z-index: 1;
-    position: relative;
+    /* position: relative; */
+    border-radius: 4px;
 }
 
 /** Footer **/
@@ -309,15 +328,6 @@ body.theme-minimal {
     overflow: hidden;
 }
 
-
-/** Custom Text **/
-.theme-minimal .text-bottom-right {
-    position: absolute;
-    right: 11px;
-    bottom: 5px;
-    transform: scaleY(1.5);
-    color: white;
-}
 
 /** Image **/
 .theme-minimal img.themed {

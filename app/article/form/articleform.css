@@ -41,7 +41,7 @@ form.articleform textarea {
 }
 
 form.articleform textarea.editor-plain {
-    min-height: 400px;
+    min-height: 600px;
 }
 /** Form Messages **/
 
