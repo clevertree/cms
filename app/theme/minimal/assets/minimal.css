@@ -192,11 +192,9 @@ body.theme-minimal {
 }
 
 /** Paragraphs **/
-.theme-minimal p.themed,
-.theme-minimal section > p {
+.theme-minimal p.themed {
     text-align: justify;
     text-indent: 8px;
-    /* max-width: 960px; */
     padding: 4px 8px;
     line-height: 20px;
     /* font-weight: 300; */
@@ -274,11 +272,14 @@ body.theme-minimal {
 
 .theme-minimal ul.flex-list > li > h2 {
     margin: 0 0;
-    font-family: "Advent Pro", Helvetica;
+    font-family: "Advent Pro", Helvetica, serif;
     font-size: 1.4em;
 }
 .theme-minimal ul.flex-list > li > p {
     text-align: justify;
+    text-indent: 8px;
+    padding: 4px 8px;
+    line-height: 20px;
 }
 
 
