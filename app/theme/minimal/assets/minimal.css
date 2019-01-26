@@ -274,9 +274,13 @@ body.theme-minimal {
 
 .theme-minimal ul.flex-list > li > h2 {
     margin: 0 0;
-    font-family: Helvetica;
+    font-family: "Advent Pro", Helvetica;
     font-size: 1.4em;
 }
+.theme-minimal ul.flex-list > li > p {
+    text-align: justify;
+}
+
 
 /** Section effects **/
 
