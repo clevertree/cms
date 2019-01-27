@@ -12,7 +12,7 @@ const smtpTransport = require("nodemailer-smtp-transport");
 const { UserAPI } = require('./user/userapi.class');
 const { ArticleAPI } = require('./article/articlieapi.class');
 const { FileAPI } = require('./file/fileapi.class');
-const { Database } = require('./database/database.class');
+const { DatabaseManager } = require('./database/database.class');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
@@ -23,10 +23,7 @@ class App {
 
 
     async start() {
-
-        this.themes = {};
-        this.db = new Database();
-        await this.db.init();
+        await DatabaseManager.init();
 
         // this.loadConfig();
 
