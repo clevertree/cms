@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <% if(baseHRef) {%>
+        <base href="<%=baseHRef;%>">
+        <% } %>
+        <title>Arizona Friends of the Homeless</title>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="keywords" CONTENT="arizona, friends of the homeless, resources, links">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link href="app/theme/minimal/assets/minimal.css" rel="stylesheet" />
+        <script src="app/theme/minimal/assets/theme.client.js"></script>
+        <link href='https://fonts.googleapis.com/css?family=Advent Pro' rel='stylesheet'>
+    </head>
+    <body class='theme-minimal'>
+        <header>
+            <div class="logo-container">
+                <div class="logo"></div>
+                <a href="" class="logo-text">
+                    Arizona Friends of Homeless
+                </a>
+            </div>
+            <nav>
+                <%- include('./partial/nav.ejs') %>
+            </nav>
+        </header>
+
+        <article>
+            <%_ if(typeof userSession !== "undefined") {
+                const sessionMessage = userSession.popMessage();
+                if(sessionMessage) {
+            _%>
+            <section class="message" style="text-align: center; font-size: smaller;">
+                <%-sessionMessage.message%>
+            </section>
+            <%_ }} _%>
+
+            <%_ if(typeof article !== "undefined" && typeof sessionUser !== "undefined" && sessionUser.isAdmin()) { _%>
+            <section class="page-edit" style="text-align: center; font-size: smaller;">
+                <a href=":article/<%=article.id%>/edit">Edit this page</a>
+            </section>
+            <%_ } _%>
+            <%-content%>
+        </article>
+
+        <footer>
+            <ul class="flex-list" style="align-items: normal;">
+                <li>
+                    <h2>Acts of Kindness</h2>
+                    <p>
+                    </p>
+                    <a class="created-by" target='_blank' href='https://github.com/clevertree/afoh-site'>Created by CleverTree</a>
+                </li>
+                <li>
+                    <h2>Get Involved!</h2>
+                    <p style="text-align: justify;">
+                        AFOH is on Facebook!  Join for updates, events, ways to volunteer or support outreach efforts.
+                        <br/>
+                        Donate! There are many projects that need help!
+                        <br/>
+                        AFOH Amazon Wishlist, ship items directly to AFOH for our outreach efforts!
+                        <br/>
+                        Volunteer for sandwich making, and more!
+                    </p>
+                </li>
+                <li>
+                    <h2>Contact Us</h2>
+                    <p style="text-align: left;">
+                        2233 N. Laurel Ave.
+                        <br/>
+                        Phoenix, AZ
+                        <br/>
+                        Email: <a href="mailto:admin@afoh.info">admin@afoh.info</a>
+                        <br/>
+                        Copyright Clevertree LLC
+                    </p>
+                </li>
+            </ul>
+        </footer>
+    </body>
+</html>
