@@ -3,6 +3,7 @@ const path = require('path');
 const mysql = require('mysql');
 
 const { ConfigManager } = require('../config/config.manager');
+const { FileManager } = require('../file/file.manager');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
@@ -36,8 +37,7 @@ class DatabaseManager {
         }
 
         const dbConfig = await this.loadConfig(host);
-        const db = new Database(dbConfig);
-        await db.init();
+        const db = await this.initDatabase(dbConfig);
 
         this.hosts[dbConfig.host] = db;
         return db;
@@ -45,80 +45,53 @@ class DatabaseManager {
 
 
     async loadConfig(hostname) {
-        const globalConfig = ConfigManager.getConfig();
+        const dbConfig = await ConfigManager.getOrCreate('database');
         hostname = (hostname || require('os').hostname()).toLowerCase();
-        let dbConfig = globalConfig.db;
-        if(!dbConfig)
-            throw new Error("Invalid Database Config");
 
         if(!dbConfig.database || !dbConfig.user || !dbConfig.host) {
-            dbConfig.database = (await this.prompt(`Please enter the Database Name`, dbConfig.database || 'ct_' + hostname));
-            dbConfig.user = (await this.prompt(`Please enter the Database User Name`, dbConfig.user || 'root')).trim();
-            dbConfig.password = (await this.prompt(`Please enter the Password for Database User '${dbConfig.user}'`));
-            dbConfig.host = (await this.prompt(`Please enter the Database Host`, dbConfig.host || hostname));
+            dbConfig.database = (await ConfigManager.prompt(`Please enter the Database Name`, dbConfig.database || 'ct_' + hostname));
+            dbConfig.user = (await ConfigManager.prompt(`Please enter the Database User Name`, dbConfig.user || 'root')).trim();
+            dbConfig.password = (await ConfigManager.prompt(`Please enter the Password for Database User '${dbConfig.user}'`));
+            dbConfig.host = (await ConfigManager.prompt(`Please enter the Database Host`, dbConfig.host || hostname));
         }
 
         return dbConfig;
     }
 
-    async prompt(text, defaultValue=null) {
-        var standard_input = process.stdin;
-        standard_input.setEncoding('utf-8');
-        return new Promise( ( resolve, reject ) => {
-            process.stdout.write(text + ` [${(defaultValue === null ? 'null' : defaultValue)}]: `);
-            standard_input.on('data', function (data) {
-                data = data.trim() || defaultValue;
-                resolve (data);
-            });
-        });
-    }
-
-    sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-}
-
-class Database {
-    constructor(config) {
+    async initDatabase(config) {
         if(!config.database)
             throw new Error("Missing property: database");
-        if(!config.user)
-            throw new Error("Missing property: user");
-        if(!config.host)
-            throw new Error("Missing property: host");
-        this.config = config;
-        config.debug = true;
-        this.db = null;
-    }
-
-
-    async init() {
-        // const connectConfig = Object.assign({}, this.config);
-        // delete connectConfig.database;
-
-
+        // if(!config.user)
+        //     throw new Error("Missing property: user");
+        // if(!config.host)
+        //     throw new Error("Missing property: host");
+        // this.config = config;
+        // config.debug = true;
+        let db = null;
         try {
-            this.db = await this.createConnection(this.config);
-            await this.query(`USE ${this.config.database}`);
+            db = await this.createConnection(config);
+            await this.queryAsync(db, `USE ${config.database}`);
         } catch (e) {
             if(e.code === "ER_BAD_DB_ERROR") {
-                const repairConfig = Object.assign({}, this.config);
+                const repairConfig = Object.assign({}, config);
                 delete repairConfig.database;
                 repairConfig.multipleStatements = true;
                 this.db = await this.createConnection(repairConfig);
                 const repairSQLPath = path.resolve(__dirname + '/database.sql');
-                let repairSQL = await fs.readFileSync(repairSQLPath, "utf8");
-                repairSQL = `CREATE SCHEMA \`${this.config.database}\`; USE \`${this.config.database}\`; ` + repairSQL;
-                await this.query(repairSQL);
-                this.db = await this.createConnection(this.config);
+                let repairSQL = await await FileManager.readFileAsync(repairSQLPath, "utf8");
+                repairSQL = `CREATE SCHEMA \`${config.database}\`; USE \`${config.database}\`; ` + repairSQL;
+                await this.queryAsync(db, repairSQL);
+                this.db = await this.createConnection(config);
                 return;
             }
             throw e;
         }
 
         // Save working config. TODO: every init?
-        ConfigManager.save();
+        await ConfigManager.saveAll();
+        return db;
     }
+
 
 
     async createConnection(config) {
@@ -142,18 +115,22 @@ class Database {
         });
     }
 
-    query(sql, values, cb) {
+    queryAsync(db, sql, values, cb) {
         if(cb)
-            return this.db.query(sql, values, cb);
+            return db.query(sql, values, cb);
         return new Promise( ( resolve, reject ) => {
             console.log(sql);
-            this.db.query(sql, values, ( err, rows ) => {
-                if(this.config.debug)
+            db.query(sql, values, ( err, rows ) => {
+                // if(ConfigManager.get('debug', false))
                     err ? console.error (err.message, sql, values || "No Values") : console.log (sql, values || "No Values");
                 err ? reject (err) : resolve (rows);
             });
         });
     }
+
+    // sleep(ms) {
+    //     return new Promise(resolve => setTimeout(resolve, ms));
+    // }
 }
 
 exports.DatabaseManager = new DatabaseManager();

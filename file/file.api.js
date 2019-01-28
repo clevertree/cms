@@ -3,22 +3,26 @@ const formidableMiddleware = require('express-formidable');
 // const formidable = require('formidable');
 const fs = require('fs');
 const crypto = require('crypto');
+const express = require('express');
 
 
 const { FileDatabase } = require("./filedatabase.class");
 const { UserSession } = require('../user/usersession.class');
 
-class FileapiClass {
-    constructor(app) {
-        this.app = app;
+class FileAPI {
+    constructor() {
     }
 
     get fileDB () { return new FileDatabase(this.app.db); }
 
-    loadRoutes(router) {
+    get middleware() {
+        const router = express.Router();
         router.post('/:?file/[:]upload', formidableMiddleware(), async (req, res) => await this.handleFileUpload(req, res));
         router.all('/:?file/[:]browse', formidableMiddleware(), async (req, res) => await this.handleFileBrowseRequest(req, res));
         router.get(/^\/?:file(.*)/, async (req, res, next) => await this.renderFileByPath(req, res, next));
+        return (req, res, next) => {
+            return router(req, res, next);
+        }
     }
 
     async renderFileByPath(req, res, next) {
@@ -193,5 +197,5 @@ class FileapiClass {
 }
 
 
-module.exports = {FileAPI: FileapiClass};
+module.exports = {FileAPI: new FileAPI()};
 

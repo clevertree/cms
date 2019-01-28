@@ -143,20 +143,25 @@ class ArticleDatabase {
     }
 
     // Inserting revision without updating article === draft
-    async insertArticleRevision(article_id, title, content, user_id, callback) {
+    async insertArticleRevision(article_id, title, content, user_id) {
         let SQL = `
           INSERT INTO article_revision
           SET ?
         `;
-        const results = await this.queryAsync(SQL, {article_id, user_id, title, content})
+        const results = await this.queryAsync(SQL, {article_id, user_id, title, content});
         return results.insertId;
     }
 
 
 
-    queryAsync(sql, values) {
+    queryAsync(sql, values, cb) {
+        if(cb)
+            return this.db.query(sql, values, cb);
         return new Promise( ( resolve, reject ) => {
+            console.log(sql);
             this.db.query(sql, values, ( err, rows ) => {
+                if(this.config.debug)
+                    err ? console.error (err.message, sql, values || "No Values") : console.log (sql, values || "No Values");
                 err ? reject (err) : resolve (rows);
             });
         });

@@ -1,67 +1,65 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
-const cookieParser = require('cookie-parser');
-const session = require('client-sessions');
 
 const { DatabaseManager } = require('../database/database.manager');
+const { UserAPI } = require('../user/user.api');
+const { ArticleAPI } = require('../article/article.api');
+const { FileAPI } = require('../file/file.api');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
 class APIManager {
     constructor() {
-        this.dbm = null;
+        this.router = null;
     }
 
-    getRouter() {
-        if(!this.router)
-            this.init();
-        return this.router;
-    }
-
-    async listen() {
-        // Init Database
-        this.dbm = await DatabaseManager.get();
-
-
-
-        // this.loadConfig();
-
-
-        // this.db = new DatabaseManager(this);
-
-        this.express = express();
-        // this.express.use(bodyParser.urlencoded({ extended: true }));
-        // this.express.use(bodyParser.json());
-        this.express.use(cookieParser());
-        this.config.session.cookieName = 'session';
-        this.express.use(session(this.config.session));
-        // this.express.use(formidableMiddleware());
-
-
-        // Post wrapper
-        // this.express.post('*', this.postMiddleware);
+    get middleware() {
+        const router = express.Router();
+        // router.use(cookieParser());
+        // this.config.session.cookieName = 'session';
+        // router.use(session(serverConfig.session));
 
 
         // Routes
         // new UserSessionManager(this).loadRoutes(this.express);
-        new UserAPI(this).loadRoutes(this.express);
-        new ArticleAPI(this).loadRoutes(this.express);
-        new FileAPI(this).loadRoutes(this.express);
+        router.use(UserAPI.middleware);
+        router.use(ArticleAPI.middleware);
+        router.use(FileAPI.middleware);
 
-        // Asset files
-        this.express.use(express.static(BASE_DIR));
+        // CMS Asset files
+        router.use(express.static(BASE_DIR));
 
-        // this.createDBConnection();
-
-        // HTTP
-        this.express.listen(this.config.server.port);
-        console.log(`Listening on ${this.config.server.port}`);
-        if(this.config.debug && this.config.server.debugPort) {
-            this.express.listen(this.config.server.debugPort);
-            console.log(`Listening on ${this.config.server.debugPort}`);
+        return (req, res, next) => {
+            return router(req, res, next);
         }
     }
+
+    async listen() {
+        const serverConfig = await ConfigManager.getOrCreate('server');
+        // hostname = (hostname || require('os').hostname()).toLowerCase();
+        // if(typeof serverConfig.session === 'undefined') {
+        //     serverConfig.session = {};
+        // }
+
+        if(typeof serverConfig.port === 'undefined') {
+            serverConfig.port = (await ConfigManager.prompt(`Please enter the Server Port`, serverConfig.port || 8080));
+        }
+
+
+        const express = express();
+        express.use(this.middleware);
+
+        // HTTP
+        const ports = Array.isArray(serverConfig.port) ? serverConfig.port : [serverConfig.port];
+        for(let i=0; i<ports.length; i++) {
+            express.listen(ports[i]);
+            console.log(`Listening on ${ports[i]}`);
+        }
+        return express;
+    }
+
+
 }
 
 exports.APIServer = new APIManager();

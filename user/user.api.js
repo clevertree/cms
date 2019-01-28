@@ -1,17 +1,25 @@
 const bcrypt = require('bcryptjs');
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const session = require('client-sessions');
+
 const { ForgotPasswordMail } = require("./mail/forgotpassword.class");
 
 const { UserDatabase } = require('./userdatabase.class');
 const { UserSession } = require('./usersession.class');
 class UserAPI {
-    constructor(app) {
-        this.app = app;
+    constructor() {
     }
     get userDB() { return new UserDatabase(this.app.db); }
 
-    loadRoutes(router) {
+    get middleware() {
+        const router = express.Router();
         const bodyParser = require('body-parser');
         const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
+
+        // router.use(cookieParser());
+        // this.config.session.cookieName = 'session';
+        // router.use(session(serverConfig.session));
 
         // TODO: handle session_save login
         router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
@@ -26,6 +34,9 @@ class UserAPI {
         router.all('/:?user/logout',                    PM, async (req, res) => await this.handleLogoutRequest(req, res));
         router.all('/:?user/register',                  PM, async (req, res) => await this.handleRegisterRequest(req, res));
         router.all('/:?user/forgotpassword',            PM, async (req, res) => await this.handleForgotPassword(req, res));
+        return (req, res, next) => {
+            return router(req, res, next);
+        }
     }
 
     async checkForSessionLogin(req, res, next) {
@@ -451,7 +462,7 @@ class UserAPI {
 }
 
 
-module.exports = {UserAPI};
+module.exports = {UserAPI: new UserAPI()};
 
 function encodeHTML(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');

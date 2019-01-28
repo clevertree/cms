@@ -1,15 +1,17 @@
+const express = require('express');
+
 const {ArticleDatabase} = require("./articledatabase.class");
 const {UserSession} = require('../user/usersession.class');
 // const {UserDatabase} = require("../user/userdatabase.class");
 
 class ArticleAPI {
-    constructor(app) {
-        this.app = app;
+    constructor() {
     }
 
     get articleDB () { return new ArticleDatabase(this.app.db); }
 
-    loadRoutes(router) {
+    get middleware() {
+        const router = express.Router();
         const bodyParser = require('body-parser');
         const postMiddleware = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
         // Handle Article requests
@@ -23,6 +25,9 @@ class ArticleAPI {
         router.all('/:?article/:id/edit', postMiddleware, async (req, res) => await this.renderArticleEditorByID(req, res));
         router.all('/:?article/add', postMiddleware, async (req, res) => await this.renderArticleAdd(req, res));
         router.all(['/:?article', '/:?article/list'], postMiddleware, async (req, res) => await this.renderArticleBrowser(req, res));
+        return (req, res, next) => {
+            return router(req, res, next);
+        }
     }
 
     async renderArticleByPath(req, res, next) {
@@ -296,5 +301,5 @@ class ArticleAPI {
 }
 
 
-module.exports = {ArticleAPI};
+module.exports = {ArticleAPI: new ArticleAPI()};
 
