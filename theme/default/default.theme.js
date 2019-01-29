@@ -6,7 +6,7 @@ const { UserSession } = require('../../user/usersession.class');
 const { DatabaseManager } = require('../../database/database.manager');
 
 const TEMPLATE_DIR = path.resolve(__dirname);
-const BASE_DIR = path.resolve(path.dirname(path.dirname(path.dirname(__dirname))));
+const BASE_DIR = path.resolve((path.dirname(path.dirname(__dirname))));
 
 class DefaultTheme {
     constructor() {
@@ -14,7 +14,7 @@ class DefaultTheme {
         this.renderOptions = {
             views: [
                 path.resolve(TEMPLATE_DIR),
-                path.resolve(BASE_DIR + '/app/')
+                path.resolve(BASE_DIR)
             ]
             // async: true
         };
@@ -36,9 +36,8 @@ class DefaultTheme {
             renderData.userSession = new UserSession(req.session);
             renderData.sessionUser = await renderData.userSession.getSessionUser(articleDB.db);
             renderData.req = req;
-            renderData.content = content ? await ejs.render(content, renderData, this.renderOptions) : null;
             renderData.hostname = require('os').hostname();
-
+            renderData.content = content ? await ejs.render(content, renderData, this.renderOptions) : null;
 
             const templatePath = path.resolve(TEMPLATE_DIR + '/theme.ejs');
             return await ejs.renderFile(templatePath, renderData, this.renderOptions);

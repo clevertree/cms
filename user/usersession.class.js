@@ -1,5 +1,5 @@
 
-const {UserDatabase} = require("./userdatabase.class");
+const {UserDatabase} = require("./user.database");
 
 class UserSession {
     constructor(session) {

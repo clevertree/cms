@@ -161,7 +161,6 @@ class ArticleDatabase {
         if(cb)
             return this.db.query(sql, values, cb);
         return new Promise( ( resolve, reject ) => {
-            console.log(sql);
             this.db.query(sql, values, ( err, rows ) => {
                 if(this.debug)
                     err ? console.error (err.message, sql, values || "No Values") : console.log (sql, values || "No Values");

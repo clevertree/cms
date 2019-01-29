@@ -26,9 +26,10 @@ class DatabaseManager {
     //     }
     // }
 
-    async get(reconnect=false, host=null) {
+    async get(host=null, reconnect=false) {
         if(!host)
             host = require('os').hostname();
+        host = host.toLowerCase();
 
         if (typeof this.hosts[host] !== "undefined"){
             if(!reconnect)
@@ -39,7 +40,7 @@ class DatabaseManager {
         const dbConfig = await this.loadConfig(host);
         const db = await this.initDatabase(dbConfig);
 
-        this.hosts[dbConfig.host] = db;
+        this.hosts[host] = db;
         return db;
     }
 
@@ -119,7 +120,6 @@ class DatabaseManager {
         if(cb)
             return db.query(sql, values, cb);
         return new Promise( ( resolve, reject ) => {
-            console.log(sql);
             db.query(sql, values, ( err, rows ) => {
                 // if(ConfigManager.get('debug', false))
                     err ? console.error (err.message, sql, values || "No Values") : console.log (sql, values || "No Values");

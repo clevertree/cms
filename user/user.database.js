@@ -2,8 +2,9 @@ const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 
 class UserDatabase  {
-    constructor(db) {
+    constructor(db, debug=true) {
         this.db = db;
+        this.debug = debug;
     }
 
     /** User Table **/
@@ -96,9 +97,13 @@ class UserDatabase  {
     }
 
 
-    queryAsync(sql, values) {
+    queryAsync(sql, values, cb) {
+        if(cb)
+            return this.db.query(sql, values, cb);
         return new Promise( ( resolve, reject ) => {
-            this.db.query(sql, values, ( err, rows, fields ) => {
+            this.db.query(sql, values, ( err, rows ) => {
+                if(this.debug)
+                    err ? console.error (err.message, sql, values || "No Values") : console.log (sql, values || "No Values");
                 err ? reject (err) : resolve (rows);
             });
         });

@@ -5,7 +5,7 @@ const session = require('client-sessions');
 
 const { ConfigManager } = require('../config/config.manager');
 const { ThemeManager } = require('../theme/theme.manager');
-const { UserDatabase } = require('./userdatabase.class');
+const { UserDatabase } = require('./user.database');
 const { UserSession } = require('./usersession.class');
 const { ForgotPasswordMail } = require("./mail/forgotpassword.class");
 
