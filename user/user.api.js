@@ -32,7 +32,7 @@ class UserAPI {
         router.use(cookieParser(configCookie));
 
         // TODO: handle session_save login
-        router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
+        // router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
         // API Routes
         router.get('/:?user/:id(\\d+)/json',                async (req, res, next) => await this.handleViewRequest(true, parseInt(req.params.id), req, res, next));
         router.get('/:?user/:id(\\d+)',                     async (req, res, next) => await this.handleViewRequest(false, parseInt(req.params.id), req, res, next));
@@ -50,20 +50,20 @@ class UserAPI {
         }
     }
 
-    async checkForSessionLogin(req, res, next) {
-        try {
-            // console.log(req.session, req.cookies);
-            if (!req.session.user && req.cookies.session_save) {
-                const session_save = JSON.parse(req.cookies.session_save);
-                await this.loginSession(req, res, session_save.uuid, session_save.password);
-            }
-        } catch (error) {
-            res.clearCookie('session_save');
-            new UserSession(req.session).addMessage("User has been logged out: " + error.message);
-            console.error(error);
-        }
-        next();
-    }
+    // async checkForSessionLogin(req, res, next) {
+    //     try {
+    //         // console.log(req.session, req.cookies);
+    //         if (!req.session.user && req.cookies.session_save) {
+    //             const session_save = JSON.parse(req.cookies.session_save);
+    //             await this.loginSession(req, res, session_save.uuid, session_save.password);
+    //         }
+    //     } catch (error) {
+    //         res.clearCookie('session_save');
+    //         new UserSession(req.session).addMessage("User has been logged out: " + error.message);
+    //         console.error(error);
+    //     }
+    //     next();
+    // }
 
     async updateProfile(userID, profile) {
         if(!userID)
@@ -207,21 +207,22 @@ class UserAPI {
         req.session.user = {id: user.id};
 
         if(saveSession) {
-            var ip = (req.headers['x-forwarded-for'] || '').split(',').pop() ||
-                req.connection.remoteAddress ||
-                req.socket.remoteAddress ||
-                req.connection.socket.remoteAddress
-            const sessionData = {
-                ip
-            };
-            const result = await this.userDB.createUserSession(user.id, 'active', sessionData);
-            req.session.user_session = {id: result.insertId};
-            res.cookie('session_save', JSON.stringify({
-                uuid: result.uuid,
-                password: result.password,
-            }), {
-                maxAge: 1000 * 60 * 60 * 24 * 7, // would expire after 7 days
-            })
+            // TODO: set maxAge 2 weeks
+            // var ip = (req.headers['x-forwarded-for'] || '').split(',').pop() ||
+            //     req.connection.remoteAddress ||
+            //     req.socket.remoteAddress ||
+            //     req.connection.socket.remoteAddress
+            // const sessionData = {
+            //     ip
+            // };
+            // const result = await this.userDB.createUserSession(user.id, 'active', sessionData);
+            // req.session.user_session = {id: result.insertId};
+            // res.cookie('session_save', JSON.stringify({
+            //     uuid: result.uuid,
+            //     password: result.password,
+            // }), {
+            //     maxAge: 1000 * 60 * 60 * 24 * 7, // would expire after 7 days
+            // })
         }
 
         new UserSession(req.session).addMessage("Login Successful: " + email);
@@ -402,6 +403,7 @@ class UserAPI {
                 if(!user)
                     throw new Error("User was not found: " + req.body.email);
                 const result = await this.userDB.createUserSession(user.id, 'reset');
+                // TODO: store password reset in memory, not database!
 
                 const recoveryURL = this.app.config.server.baseHRef + `/:user/session?uuid=${result.uuid}&password=${result.password}`;
                 const mail = new ForgotPasswordMail(this.app, user, recoveryURL);

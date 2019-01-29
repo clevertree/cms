@@ -3,6 +3,7 @@
 CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(256) NOT NULL,
+  `username` varchar(256) NOT NULL,
   `password` varchar(256) DEFAULT NULL,
   `profile` JSON DEFAULT NULL,
   `created` DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -11,22 +12,8 @@ CREATE TABLE `user` (
   UNIQUE KEY `user_email_unique` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `user` (`id`, `email`, `password`, `profile`, `flags`) VALUES
-(1, 'guest@localhost', NULL, NULL, 'guest');
-
-CREATE TABLE `user_session` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `uuid` varchar(256) NOT NULL,
-  `password` varchar(256) NOT NULL,
-  `created` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `status` SET('reset', 'active'),
-  `session` JSON,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk:user_session.uuid` (`uuid`),
-  CONSTRAINT `fk:user.user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+INSERT INTO `user` (`id`, `email`, `username`, `password`, `profile`, `flags`) VALUES
+(1, 'guest@localhost', 'guest', NULL, NULL, 'guest');
 
 
 
