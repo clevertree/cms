@@ -3,10 +3,12 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const session = require('client-sessions');
 
-const { ForgotPasswordMail } = require("./mail/forgotpassword.class");
-
+const { ConfigManager } = require('../config/config.manager');
+const { ThemeManager } = require('../theme/theme.manager');
 const { UserDatabase } = require('./userdatabase.class');
 const { UserSession } = require('./usersession.class');
+const { ForgotPasswordMail } = require("./mail/forgotpassword.class");
+
 class UserAPI {
     constructor() {
     }
@@ -17,23 +19,32 @@ class UserAPI {
         const bodyParser = require('body-parser');
         const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
 
-        // router.use(cookieParser());
-        // this.config.session.cookieName = 'session';
-        // router.use(session(serverConfig.session));
+        ConfigManager.getAll()
+            .then((config) => {
+                if(!config) config = {};
+                if(!config.user) config.user = {};
+                if(!config.user.cookie) config.user.cookie = {};
+                if(!config.user.session) config.user.session = {};
+                if(!config.user.session.secret) config.user.session.secret = require('uuid/v4')();
+                config.user.session.cookieName = 'session';
+                router.use(cookieParser(Object.assign({}, config.user.cookie)));
+                router.use(session(Object.assign({}, config.user.session)));
 
-        // TODO: handle session_save login
-        router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
-        // API Routes
-        router.get('/:?user/:id(\\d+)/json',                async (req, res, next) => await this.handleViewRequest(true, parseInt(req.params.id), req, res, next));
-        router.get('/:?user/:id(\\d+)',                     async (req, res, next) => await this.handleViewRequest(false, parseInt(req.params.id), req, res, next));
-        router.all('/:?user/:id(\\d+)/profile',         PM, async (req, res) => await this.handleUpdateRequest('profile', parseInt(req.params.id), req, res));
-        router.all('/:?user/:id(\\d+)/flags',           PM, async (req, res) => await this.handleUpdateRequest('flags', parseInt(req.params.id), req, res));
-        router.all('/:?user/:id(\\d+)/changepassword',  PM, async (req, res) => await this.handleUpdateRequest('changepassword', parseInt(req.params.id), req, res));
-        router.all('/:?user/login',                     PM, async (req, res) => await this.handleLoginRequest(req, res));
-        router.all('/:?user/session',                   PM, async (req, res) => await this.handleSessionLoginRequest(req, res));
-        router.all('/:?user/logout',                    PM, async (req, res) => await this.handleLogoutRequest(req, res));
-        router.all('/:?user/register',                  PM, async (req, res) => await this.handleRegisterRequest(req, res));
-        router.all('/:?user/forgotpassword',            PM, async (req, res) => await this.handleForgotPassword(req, res));
+                // TODO: handle session_save login
+                router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
+                // API Routes
+                router.get('/:?user/:id(\\d+)/json',                async (req, res, next) => await this.handleViewRequest(true, parseInt(req.params.id), req, res, next));
+                router.get('/:?user/:id(\\d+)',                     async (req, res, next) => await this.handleViewRequest(false, parseInt(req.params.id), req, res, next));
+                router.all('/:?user/:id(\\d+)/profile',         PM, async (req, res) => await this.handleUpdateRequest('profile', parseInt(req.params.id), req, res));
+                router.all('/:?user/:id(\\d+)/flags',           PM, async (req, res) => await this.handleUpdateRequest('flags', parseInt(req.params.id), req, res));
+                router.all('/:?user/:id(\\d+)/changepassword',  PM, async (req, res) => await this.handleUpdateRequest('changepassword', parseInt(req.params.id), req, res));
+                router.all('/:?user/login',                     PM, async (req, res) => await this.handleLoginRequest(req, res));
+                router.all('/:?user/session',                   PM, async (req, res) => await this.handleSessionLoginRequest(req, res));
+                router.all('/:?user/logout',                    PM, async (req, res) => await this.handleLogoutRequest(req, res));
+                router.all('/:?user/register',                  PM, async (req, res) => await this.handleRegisterRequest(req, res));
+                router.all('/:?user/forgotpassword',            PM, async (req, res) => await this.handleForgotPassword(req, res));
+            });
+
         return (req, res, next) => {
             return router(req, res, next);
         }
@@ -247,7 +258,7 @@ class UserAPI {
 
             } else {
                 res.send(
-                    await this.app.getTheme()
+                    await ThemeManager.get()
                         .render(req, `<%- include("user/section/user.ejs")%>`, {
                             user
                         })
@@ -261,7 +272,7 @@ class UserAPI {
             } else {
                 res.status(400);
                 res.send(
-                    await this.app.getTheme()
+                    await ThemeManager.get()
                         .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
                 );
             }
@@ -277,7 +288,7 @@ class UserAPI {
                 }
                 // Render Editor Form
                 res.send(
-                    await this.app.getTheme()
+                    await ThemeManager.get()
                         .render(req, `<%- include("user/section/session.ejs")%>`)
                 );
 
@@ -303,7 +314,7 @@ class UserAPI {
             if(req.method === 'GET') {
                 // Render Editor Form
                 res.send(
-                    await this.app.getTheme()
+                    await ThemeManager.get()
                         .render(req, `<%- include("user/section/login.ejs")%>`)
                 );
 
@@ -329,7 +340,7 @@ class UserAPI {
             if(req.method === 'GET') {
                 // Render Editor Form
                 res.send(
-                    await this.app.getTheme()
+                    await ThemeManager.get()
                         .render(req, `<%- include("user/section/logout.ejs")%>`)
                 );
 
@@ -354,7 +365,7 @@ class UserAPI {
             if(req.method === 'GET') {
                 // Render Editor Form
                 res.send(
-                    await this.app.getTheme()
+                    await ThemeManager.get()
                         .render(req, `<%- include("user/section/register.ejs")%>`)
                 );
 
@@ -380,7 +391,7 @@ class UserAPI {
             if(req.method === 'GET') {
                 // Render Editor Form
                 res.send(
-                    await this.app.getTheme()
+                    await ThemeManager.get()
                         .render(req, `<%- include("user/section/forgotpassword.ejs")%>`)
                 );
 
@@ -419,7 +430,7 @@ class UserAPI {
             if(req.method === 'GET') {
                 // Render Editor Form
                 res.send(
-                    await this.app.getTheme()
+                    await ThemeManager.get()
                         .render(req, `<%- include("user/section/${type}.ejs", {id: ${userID}})%>`)
                 );
 

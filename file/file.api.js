@@ -46,7 +46,7 @@ class FileAPI {
             res.status(400);
             res.json({message: error.message, error: error.stack});
             // res.send(
-            //     await this.app.getTheme()
+            //     await ThemeManager.get()
             //         .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
             // );
         }
@@ -112,7 +112,7 @@ class FileAPI {
             res.json(response);
 
             // res.send(
-            //     await this.app.getTheme(file.theme)
+            //     await ThemeManager.get(file.theme)
             //         .render(req, file.content, {file})
             // );
         } catch (error) {
@@ -120,7 +120,7 @@ class FileAPI {
             res.status(400);
             res.json({message: error.message, error: error.stack});
             // res.send(
-            //     await this.app.getTheme()
+            //     await ThemeManager.get()
             //         .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
             // );
         }
@@ -143,7 +143,7 @@ class FileAPI {
             res.json(response);
 
             // res.send(
-            //     await this.app.getTheme(file.theme)
+            //     await ThemeManager.get(file.theme)
             //         .render(req, file.content, {file})
             // );
         } catch (error) {
@@ -151,7 +151,7 @@ class FileAPI {
             res.status(400);
             res.json({message: error.message, error: error.stack});
             // res.send(
-            //     await this.app.getTheme()
+            //     await ThemeManager.get()
             //         .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
             // );
         }

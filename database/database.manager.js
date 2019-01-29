@@ -76,12 +76,12 @@ class DatabaseManager {
                 const repairConfig = Object.assign({}, config);
                 delete repairConfig.database;
                 repairConfig.multipleStatements = true;
-                this.db = await this.createConnection(repairConfig);
+                db = await this.createConnection(repairConfig);
                 const repairSQLPath = path.resolve(__dirname + '/database.sql');
                 let repairSQL = await await FileManager.readFileAsync(repairSQLPath, "utf8");
                 repairSQL = `CREATE SCHEMA \`${config.database}\`; USE \`${config.database}\`; ` + repairSQL;
                 await this.queryAsync(db, repairSQL);
-                this.db = await this.createConnection(config);
+                db = await this.createConnection(config);
                 return;
             }
             throw e;

@@ -47,7 +47,7 @@ class ConfigManager {
         try {
             oldConfigJSON = await FileManager.readFileAsync(configPath, "utf8");
         } catch (e) {
-            console.info(e.message);
+            console.error(e.message);
         }
         if(newConfigJSON === oldConfigJSON)
             return false;

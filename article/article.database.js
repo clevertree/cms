@@ -6,8 +6,11 @@
 
 // Init
 class ArticleDatabase {
-    constructor(db) {
+    constructor(db, debug=false) {
+        if(!db)
+            throw new Error("Invalid database");
         this.db = db;
+        this.debug = debug;
     }
     
     /** Articles **/
@@ -160,7 +163,7 @@ class ArticleDatabase {
         return new Promise( ( resolve, reject ) => {
             console.log(sql);
             this.db.query(sql, values, ( err, rows ) => {
-                if(this.config.debug)
+                if(this.debug)
                     err ? console.error (err.message, sql, values || "No Values") : console.log (sql, values || "No Values");
                 err ? reject (err) : resolve (rows);
             });
@@ -175,7 +178,7 @@ class ArticleEntry {
         this.user_id = row.user_id;
         this.path = row.path;
         this.title = row.title;
-        this.theme = row.theme;
+        this.theme = row.theme || 'default';
         this.status = row.status;
         // this.flags = row.flags ? row.flags.split(',') : [];
         this.content = row.content;

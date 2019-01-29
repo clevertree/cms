@@ -1,10 +1,10 @@
 /** Background Image **/
-body.theme-minimal {
+body.theme-default {
     background: #3d9be9 url(texture/default.background.png) no-repeat fixed center;
 }
 
-/** Theme: Minimal **/
-.theme-minimal {
+/** Theme: Default **/
+.theme-default {
     color: #2b2b2b;
     margin: 0 auto;
     font-family: 'Advent Pro', monospace;
@@ -12,26 +12,26 @@ body.theme-minimal {
     /* line-height: 20px; */
 }
 
-.theme-minimal .highlight {
+.theme-default .highlight {
     color: #f5efd5;
     text-shadow: #000 1px 1px 1px;
     /* font-weight: bold; */
 }
 
 /** Header **/
-.theme-minimal > header {
+.theme-default > header {
     background: url(texture/header.background.png);
     background-size: contain;
     /* padding: 1em; */
 }
 
-.theme-minimal > header .logo-container {
+.theme-default > header .logo-container {
     max-width: 490px;
     margin: 0px auto;
     padding-top: 10px;
 }
 
-.theme-minimal > header .logo {
+.theme-default > header .logo {
     background: url(logo/logo-header.png) no-repeat;
     margin: 0px auto;
     background-size: 100% auto;
@@ -42,7 +42,7 @@ body.theme-minimal {
     /* float: right; */
 }
 
-.theme-minimal .logo-text {
+.theme-default .logo-text {
     display: block;
     font-size: 3em;
     font-weight: bold;
@@ -53,7 +53,7 @@ body.theme-minimal {
 }
 
 @media only screen and (min-width: 600px) {
-    .theme-minimal > header .logo {
+    .theme-default > header .logo {
         width: 182px;
         height: 112px;
         float: right;
@@ -62,7 +62,7 @@ body.theme-minimal {
         /* height: 22vw; */
     }
 
-    .theme-minimal .logo-text {
+    .theme-default .logo-text {
         text-align: center;
         text-shadow: #0008 4px 3px 9px;
     }
@@ -70,22 +70,22 @@ body.theme-minimal {
 
 /** Anchors **/
 
-.theme-minimal a {
+.theme-default a {
     color: #c88200;
     /* text-decoration: none; */
 }
 
-.theme-minimal a:hover {
+.theme-default a:hover {
     color: #f5ffa6;
 }
 
 /** Navigation **/
 
-.theme-minimal nav {
+.theme-default nav {
     /*background-color: #333333;*/
 }
 
-.theme-minimal ul.nav-menu {
+.theme-default ul.nav-menu {
     list-style-type: none;
     margin: 0 auto;
     padding: 0;
@@ -96,23 +96,23 @@ body.theme-minimal {
     width: 85%;
 }
 
-.theme-minimal ul.nav-menu > li {
+.theme-default ul.nav-menu > li {
     display: table-cell;
 }
 
-.theme-minimal ul.nav-menu > li:hover {
+.theme-default ul.nav-menu > li:hover {
     background-color: #6190a0;
     z-index: 2;
     border-radius: 4px 4px 0px 0;
 }
 
-.theme-minimal ul.nav-menu > li:hover > ul.nav-submenu > li:hover {
+.theme-default ul.nav-menu > li:hover > ul.nav-submenu > li:hover {
     background-color: #444;
     font-weight: bold;
 }
 
-.theme-minimal ul.nav-menu > li > a,
-.theme-minimal ul.nav-submenu > li > a {
+.theme-default ul.nav-menu > li > a,
+.theme-default ul.nav-submenu > li > a {
     color: white;
     /* font-weight: bold; */
     font-size: 18px;
@@ -122,7 +122,7 @@ body.theme-minimal {
 }
 
 /** Sub Menu **/
-.theme-minimal ul.nav-submenu {
+.theme-default ul.nav-submenu {
     position: absolute;
     z-index: 2;
     background-color: #6190a0;
@@ -132,7 +132,7 @@ body.theme-minimal {
     border-radius: 0px 0px 4px 4px;
 }
 
-.theme-minimal ul.nav-submenu > li > a {
+.theme-default ul.nav-submenu > li > a {
     /* font-weight: bold; */
     font-size: 14px;
     display: block;
@@ -142,57 +142,57 @@ body.theme-minimal {
     text-decoration: none;
 }
 
-.theme-minimal li:not(:hover) > ul.nav-submenu {
+.theme-default li:not(:hover) > ul.nav-submenu {
     display: none;
 }
 
 /** Page Articles **/
-.theme-minimal > article {
+.theme-default > article {
     padding: 0 0;
     background: #EEC455;
 }
 
-.theme-minimal > article > section {
+.theme-default > article > section {
     max-width: 800px;
     margin: 0 auto;
     padding: 0.5em;
     background: #f5e7a8;
 }
 
-.theme-minimal div.highlight,
-.theme-minimal section.highlight {
+.theme-default div.highlight,
+.theme-default section.highlight {
     background-color: #ab6428ed;
 }
 
-.theme-minimal div.message,
-.theme-minimal section.message {
+.theme-default div.message,
+.theme-default section.message {
     background-color: rgba(111, 171, 102, 0.93);
 }
 
 /** Page Headings **/
-.theme-minimal h1.themed,
-.theme-minimal section > h1 {
+.theme-default h1.themed,
+.theme-default section > h1 {
     font-size: 2.5em;
     margin: 0px 0px 6px 0px;
     /* color: rgb(0, 101, 169); */
     font-weight: bold;
 }
 
-.theme-minimal h2.themed,
-.theme-minimal section > h2 {
+.theme-default h2.themed,
+.theme-default section > h2 {
     font-size: x-large;
     /*     padding: 0 0.5em; */
     /* margin-top: 0; */
 }
 
-.theme-minimal h3.themed,
-.theme-minimal section > h3 {
+.theme-default h3.themed,
+.theme-default section > h3 {
     font-size: larger;
     margin-left: .5em;
 }
 
 /** Paragraphs **/
-.theme-minimal p.themed {
+.theme-default p.themed {
     text-align: justify;
     text-indent: 8px;
     padding: 4px 8px;
@@ -200,26 +200,26 @@ body.theme-minimal {
     /* font-weight: 300; */
     /* text-shadow: #000 1px 1px 1px; */
 }
-.theme-minimal p.highlight {
+.theme-default p.highlight {
     background-color: #0003;
     border-radius: 4px;
 }
 
-.theme-minimal section > p > img {
+.theme-default section > p > img {
     /* float: right; */
     max-width: 100%;
     /* margin-left: 2em; */
 }
 
 /** Custom Text **/
-.theme-minimal .text-bottom-right {
+.theme-default .text-bottom-right {
     position: absolute;
     right: 9px;
     bottom: 2px;
 }
 
-.theme-minimal .page-quote,
-.theme-minimal .text-quote {
+.theme-default .page-quote,
+.theme-default .text-quote {
     font-size: 1.2em;
     /* font-weight: bold; */
     text-align: center;
@@ -231,7 +231,7 @@ body.theme-minimal {
 
 /** Flex List **/
 
-.theme-minimal ul.flex-list {
+.theme-default ul.flex-list {
     list-style: none;
     padding: 0 0;
     margin: 0 0;
@@ -240,14 +240,14 @@ body.theme-minimal {
 }
 
 @media only screen and (min-width: 600px) {
-    .theme-minimal ul.flex-list {
+    .theme-default ul.flex-list {
         display: flex;
         /* flex-wrap: wrap; */
         /* justify-content: center; */
     }
 }
 
-.theme-minimal ul.flex-list > li {
+.theme-default ul.flex-list > li {
     display: block;
     flex-grow: 1;
     flex-basis: 0;
@@ -255,13 +255,13 @@ body.theme-minimal {
     padding: 0.5em 1em;
 }
 
-.theme-minimal div.image-container > img,
-.theme-minimal div.image-container > a > img {
+.theme-default div.image-container > img,
+.theme-default div.image-container > a > img {
     max-width: 90%;
     max-height: 200px;
 }
 
-.theme-minimal div.image-container {
+.theme-default div.image-container {
     height: 200px;
     display: flex;
     flex-direction: column;
@@ -270,12 +270,12 @@ body.theme-minimal {
     padding: 10px 0px;
 }
 
-.theme-minimal ul.flex-list > li > h2 {
+.theme-default ul.flex-list > li > h2 {
     margin: 0 0;
     font-family: "Advent Pro", Helvetica, serif;
     font-size: 1.4em;
 }
-.theme-minimal ul.flex-list > li > p {
+.theme-default ul.flex-list > li > p {
     text-align: justify;
     text-indent: 8px;
     padding: 4px 8px;
@@ -285,12 +285,12 @@ body.theme-minimal {
 
 /** Section effects **/
 
-.theme-minimal .section-photo {
+.theme-default .section-photo {
 }
 
 /** Box effects **/
 
-.theme-minimal .box-shadow {
+.theme-default .box-shadow {
     box-shadow: 0px 0px 8px #000;
     z-index: 1;
     /* position: relative; */
@@ -299,7 +299,7 @@ body.theme-minimal {
 
 /** Footer **/
 
-.theme-minimal > footer {
+.theme-default > footer {
     /* text-align: center; */
     margin: 0 auto;
     max-width: 800px;
@@ -308,7 +308,7 @@ body.theme-minimal {
     color: #fff6d4;
 }
 
-.theme-minimal > footer a {
+.theme-default > footer a {
     color: #d4dfff;
     /* text-decoration: none; */
     /* text-transform: lowercase; */
@@ -319,13 +319,13 @@ body.theme-minimal {
 
 /** Page Article **/
 
-.theme-minimal .page-view {
+.theme-default .page-view {
     transition: opacity 0.8s, height 0.5s;
     opacity: 1;
     width: 100%;
 }
 
-.theme-minimal .page-view1:not(.selected) {
+.theme-default .page-view1:not(.selected) {
     /* display: none; */
     opacity: 0;
     position: absolute;
@@ -335,7 +335,7 @@ body.theme-minimal {
 
 
 /** Image **/
-.theme-minimal img.themed {
+.theme-default img.themed {
     /* object-position: 50% 0%; */
     box-shadow: 0px 0px 8px #000;
     max-width: 80%;
@@ -345,19 +345,19 @@ body.theme-minimal {
 
 /** Forms **/
 
-.theme-minimal form.themed {
+.theme-default form.themed {
     padding: 0.5em;
     margin: 0 auto;
 }
 
 
-.theme-minimal form.themed > fieldset {
+.theme-default form.themed > fieldset {
     padding: 1em 1em;
     border-radius: 8px;
     border: 1px outset #DDD;
     background: #CCC;
 }
-.theme-minimal form.themed > fieldset > legend {
+.theme-default form.themed > fieldset > legend {
     /* margin: 0 auto; */
     padding: 2px 8px;
     font-weight: bold;
@@ -368,20 +368,20 @@ body.theme-minimal {
 }
 
 
-.theme-minimal .themed input,
-.theme-minimal .themed select,
-.theme-minimal .themed textarea,
-.theme-minimal .themed button {
+.theme-default .themed input,
+.theme-default .themed select,
+.theme-default .themed textarea,
+.theme-default .themed button {
     padding: 2px 6px;
     margin: 0px 0px;
     border-radius: 4px;
     border-width: 1px;
     font-size: large;
 }
-.theme-minimal .themed textarea {
+.theme-default .themed textarea {
     min-height: 100px;
 }
-.theme-minimal .themed input[type=checkbox] {
+.theme-default .themed input[type=checkbox] {
     width: 16px;
     height: 16px;
     vertical-align: middle;
@@ -390,7 +390,7 @@ body.theme-minimal {
 
 /** Table **/
 
-.theme-minimal table.themed {
+.theme-default table.themed {
     margin: 0 auto;
     padding: 0.5em;
     border-radius: 8px;
@@ -398,9 +398,9 @@ body.theme-minimal {
     background: #CCC;
 }
 
-.theme-minimal table.themed > tbody {
+.theme-default table.themed > tbody {
 }
-.theme-minimal table.themed > caption {
+.theme-default table.themed > caption {
     padding: 2px 8px;
     font-weight: bold;
     border-radius: 8px;
@@ -408,7 +408,7 @@ body.theme-minimal {
     background: #CCC;
 }
 
-.theme-minimal .themed td.label {
+.theme-default .themed td.label {
     padding-right: 6px;
     text-align: right;
     font-weight: bold;

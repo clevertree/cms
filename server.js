@@ -1,12 +1,15 @@
 const express = require('express');
 
-// const { DatabaseManager } = require('./database/database.manager');
+const { DatabaseManager } = require('./database/database.manager');
 const { APIServer } = require('./api/api.server');
 const { MailServer } = require('./mail/mail.server');
 
 (async () => {
     // Listen for HTTP(S)
     // await APIServer.listen();
+
+    // Init Database
+    await DatabaseManager.get();
 
     const server = express();
     server.use(APIServer.middleware);

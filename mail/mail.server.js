@@ -14,11 +14,11 @@ class MailServer {
     }
 
 
-    async listen() {
+    async listen(prompt = false) {
         const mailConfig = await ConfigManager.getOrCreate('mail');
         if(typeof mailConfig.auth === "undefined")
             mailConfig.auth = {};
-        if(!mailConfig.host || !mailConfig.port || !mailConfig.auth.user || !mailConfig.auth.pass) {
+        if(prompt || !mailConfig.host || !mailConfig.port || !mailConfig.auth.user || !mailConfig.auth.pass) {
             const hostname = 'mail.' + require('os').hostname();
 
             mailConfig.host = (await ConfigManager.prompt(`Please enter the Mail Server Host`, mailConfig.host || hostname));
@@ -27,18 +27,23 @@ class MailServer {
             mailConfig.auth.pass = (await ConfigManager.prompt(`Please enter the Mail Server Password`, mailConfig.auth.pass));
         }
 
-        this.server = nodemailer.createTransport(smtpTransport(mailConfig));
-        await new Promise( ( resolve, reject ) => {
-            this.server.verify((error, success) => {
-                if (error || !success)
-                    reject(`Error connecting to ${mailConfig.host}`);
-                else
-                    resolve(true);
+        try {
+            this.server = nodemailer.createTransport(smtpTransport(mailConfig));
+            await new Promise((resolve, reject) => {
+                this.server.verify((error, success) => {
+                    if (error || !success)
+                        reject(error);
+                    else
+                        resolve(true);
+                });
             });
-        });
+            console.info(`Connection to Mail Server '${mailConfig.host}' Successful`);
+            await ConfigManager.saveAll();
 
-        console.info(`Connection to Mail Server '${mailConfig.host}' Successful`);
-        await ConfigManager.saveAll();
+        } catch (e) {
+            console.error(`Error connecting to ${mailConfig.host}: ${e}`);
+            await this.listen(true);
+        }
     }
 }
 

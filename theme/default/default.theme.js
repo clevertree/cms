@@ -7,7 +7,7 @@ const { UserSession } = require('../../user/usersession.class');
 const TEMPLATE_DIR = path.resolve(__dirname);
 const BASE_DIR = path.resolve(path.dirname(path.dirname(path.dirname(__dirname))));
 
-class MinimalTheme {
+class DefaultTheme {
     constructor(app) {
         this.app = app;
         this.menuData = null;
@@ -54,7 +54,7 @@ class MinimalTheme {
 
 }
 
-module.exports = MinimalTheme;
+module.exports = DefaultTheme;
 
 function sendErr(res, e) {
     console.error(e);

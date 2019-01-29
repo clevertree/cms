@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 
+const { ConfigManager } = require('../config/config.manager');
 const { DatabaseManager } = require('../database/database.manager');
 const { UserAPI } = require('../user/user.api');
 const { ArticleAPI } = require('../article/article.api');

@@ -1,14 +1,18 @@
 const express = require('express');
 
-const {ArticleDatabase} = require("./articledatabase.class");
+const { DatabaseManager } = require('../database/database.manager');
+const { ThemeManager } = require('../theme/theme.manager');
+const { ArticleDatabase } = require("./article.database");
 const {UserSession} = require('../user/usersession.class');
 // const {UserDatabase} = require("../user/userdatabase.class");
-
 class ArticleAPI {
     constructor() {
     }
 
-    get articleDB () { return new ArticleDatabase(this.app.db); }
+    async getArticleDB(req=null) {
+        const host = req ? req.headers.host.split(':')[0] : null;
+        return new ArticleDatabase(await DatabaseManager.get(host));
+    }
 
     get middleware() {
         const router = express.Router();
@@ -32,13 +36,14 @@ class ArticleAPI {
 
     async renderArticleByPath(req, res, next) {
         try {
-            const article = await this.articleDB.fetchArticleByPath(req.url);
+            const articleDB = await this.getArticleDB(req);
+            const article = await articleDB.fetchArticleByPath(req.url);
             if(!article)
                 return next();
 
             if(typeof req.query.r !== 'undefined') {
                 const articleRevisionID = parseInt(req.query.r);
-                const articleRevision = await this.articleDB.fetchArticleRevisionByID(articleRevisionID);
+                const articleRevision = await articleDB.fetchArticleRevisionByID(articleRevisionID);
                 if(!articleRevision)
                     throw new Error("Article Revision ID not found: " + articleRevisionID);
 
@@ -49,14 +54,14 @@ class ArticleAPI {
             }
 
             res.send(
-                await this.app.getTheme(article.theme)
+                await ThemeManager.get(article.theme)
                     .render(req, article.content, {article})
             );
         } catch (error) {
             console.log(error);
             res.status(400);
             res.send(
-                await this.app.getTheme()
+                await ThemeManager.get()
                     .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
             );
         }
@@ -64,14 +69,15 @@ class ArticleAPI {
 
     async renderArticleByID(asJSON, req, res, next) {
         try {
-            const article = await this.articleDB.fetchArticleByID(req.params.id);
+            const articleDB = await this.getArticleDB();
+            const article = await articleDB.fetchArticleByID(req.params.id);
             if(!article)
                 return next();
 
             let articleRevision = null;
             if(typeof req.query.r !== 'undefined') {
                 const articleRevisionID = parseInt(req.query.r);
-                articleRevision = await this.articleDB.fetchArticleRevisionByID(articleRevisionID);
+                articleRevision = await articleDB.fetchArticleRevisionByID(articleRevisionID);
                 if(!articleRevision)
                     throw new Error("Article Revision ID not found: " + articleRevisionID);
 
@@ -92,22 +98,22 @@ class ArticleAPI {
                 if(sessionUser.isAdmin() || sessionUser.id === article.user_id)
                     response.editable = true;
                 if(req.query.getAll || req.query.getHistory) {
-                    response.history = await this.articleDB.fetchArticleRevisionsByArticleID(article.id);
-                    // response.revision = await this.articleDB.fetchArticleRevisionByID(article.id, req.query.getRevision || null);
+                    response.history = await articleDB.fetchArticleRevisionsByArticleID(article.id);
+                    // response.revision = await articleDB.fetchArticleRevisionByID(article.id, req.query.getRevision || null);
                     if(!articleRevision && response.history.length > 0)
-                        articleRevision = await this.articleDB.fetchArticleRevisionByID(response.history[0].id); // response.history[0]; // (await this.articleDB.fetchArticleRevisionsByArticleID(article.id))[0];
+                        articleRevision = await articleDB.fetchArticleRevisionByID(response.history[0].id); // response.history[0]; // (await this.articleDB.fetchArticleRevisionsByArticleID(article.id))[0];
                 }
                 if(articleRevision)
                     response.revision = articleRevision;
                 if(req.query.getAll) {
-                    response.parentList = await this.articleDB.queryMenuData(false);
+                    response.parentList = await articleDB.queryMenuData(false);
                 }
 
                 res.json(response);
 
             } else {
                 res.send(
-                    await this.app.getTheme(article.theme)
+                    await ThemeManager.get(article.theme)
                         .render(req, article.content, {article})
                 );
             }
@@ -118,7 +124,7 @@ class ArticleAPI {
                 res.json({message: error.stack});
             } else {
                 res.send(
-                    await this.app.getTheme()
+                    await ThemeManager.get()
                         .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
                 );
             }
@@ -142,7 +148,7 @@ class ArticleAPI {
             if(req.method === 'GET') {          // Handle GET
                 // Render Editor
                 res.send(
-                    await this.app.getTheme(article.theme)
+                    await ThemeManager.get(article.theme)
                         .render(req, `<%- include("article/section/editor.ejs", {article})%>`, {article})
                 );
 
@@ -199,7 +205,7 @@ class ArticleAPI {
             res.status(400);
             if(req.method === 'GET') {          // Handle GET
                 res.send(
-                    await this.app.getTheme()
+                    await ThemeManager.get()
                         .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
                 );
             } else {
@@ -221,7 +227,7 @@ class ArticleAPI {
             if(req.method === 'GET') {          // Handle GET
                 // Render Editor
                 res.send(
-                    await this.app.getTheme()
+                    await ThemeManager.get()
                         .render(req, `<%- include("article/section/add.ejs")%>`)
                 );
 
@@ -248,7 +254,7 @@ class ArticleAPI {
             res.status(400);
             if(req.method === 'GET') {          // Handle GET
                 res.send(
-                    await this.app.getTheme()
+                    await ThemeManager.get()
                         .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
                 );
             } else {
@@ -266,7 +272,7 @@ class ArticleAPI {
 
             if (req.method === 'GET') {
                 res.send(
-                    await this.app.getTheme()
+                    await ThemeManager.get()
                         .render(req, `<%- include("article/section/browser.ejs")%>`)
                 );
 
@@ -289,7 +295,7 @@ class ArticleAPI {
             res.status(400);
             if(req.method === 'GET') {
                 res.send(
-                    await this.app.getTheme()
+                    await ThemeManager.get()
                         .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
                 );
             } else {
