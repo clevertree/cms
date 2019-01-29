@@ -21,9 +21,6 @@ class APIManager {
         await UserAPI.configure(prompt);
         await ArticleAPI.configure(prompt);
         await FileAPI.configure(prompt);
-    }
-
-    async getMiddleware() {
         const router = express.Router();
         // router.use(cookieParser());
         // this.config.session.cookieName = 'session';
@@ -32,15 +29,21 @@ class APIManager {
 
         // Routes
         // new UserSessionManager(this).loadRoutes(this.express);
-        router.use(await UserAPI.getMiddleware());
-        router.use(await ArticleAPI.getMiddleware());
-        router.use(await FileAPI.getMiddleware());
+        router.use(UserAPI.getMiddleware());
+        router.use(ArticleAPI.getMiddleware());
+        router.use(FileAPI.getMiddleware());
 
         // CMS Asset files
         router.use(express.static(BASE_DIR));
+        this.router = router;
+    }
+
+    getMiddleware() {
+        if(!this.router)
+            this.configure(false);
 
         return (req, res, next) => {
-            return router(req, res, next);
+            return this.router(req, res, next);
         }
     }
 

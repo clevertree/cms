@@ -7,13 +7,24 @@ const {UserSession} = require('../user/usersession.class');
 // const {UserDatabase} = require("../user/user.database");
 class ArticleAPI {
     constructor() {
+        this.router = null;
     }
 
     async getArticleDB(req=null) {
         return new ArticleDatabase(await DatabaseManager.get(req));
     }
 
-    async getMiddleware() {
+
+    getMiddleware() {
+        if(!this.router)
+            this.configure(false);
+
+        return (req, res, next) => {
+            return this.router(req, res, next);
+        }
+    }
+
+    async configure(prompt=false) {
         const router = express.Router();
         const bodyParser = require('body-parser');
         const postMiddleware = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
@@ -28,9 +39,7 @@ class ArticleAPI {
         router.all('/:?article/:id/edit', postMiddleware, async (req, res) => await this.renderArticleEditorByID(req, res));
         router.all('/:?article/add', postMiddleware, async (req, res) => await this.renderArticleAdd(req, res));
         router.all(['/:?article', '/:?article/list'], postMiddleware, async (req, res) => await this.renderArticleBrowser(req, res));
-        return (req, res, next) => {
-            return router(req, res, next);
-        }
+        this.router = router;
     }
 
     async renderArticleByPath(req, res, next) {

@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const session = require('client-sessions');
 
 const { ConfigManager } = require('../config/config.manager');
+const { DatabaseManager } = require('../database/database.manager');
 const { ThemeManager } = require('../theme/theme.manager');
 const { UserDatabase } = require('./user.database');
 const { UserSession } = require('./usersession.class');
@@ -11,29 +12,31 @@ const { ForgotPasswordMail } = require("./mail/forgotpassword.class");
 
 class UserAPI {
     constructor() {
+        this.router = null;
     }
     async getUserDB(req=null) { return new UserDatabase(await DatabaseManager.get(req)); }
 
     async configure(prompt=false) {
+        // Configure Database
         const userDB = await this.getUserDB();
-    }
-
-    async getMiddleware() {
-        const router = express.Router();
-        const bodyParser = require('body-parser');
-        const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
+        await userDB.configure(prompt);
 
         let config = await ConfigManager.getAll();
         if(!config) config = {};
         if(!config.user) config.user = {};
-
         let configSession = Object.assign({}, config.user.session || {});
         if(!configSession.secret) configSession.secret = require('uuid/v4')();
-        router.use(session(configSession));
 
         let configCookie = Object.assign({}, config.user.cookie || {});
         configSession.cookieName = 'session';
+        const router = express.Router();
+        router.use(session(configSession));
+
         router.use(cookieParser(configCookie));
+
+        const bodyParser = require('body-parser');
+        const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
+
 
         // TODO: create admin account on boot
         // TODO: handle session_save login
@@ -50,8 +53,15 @@ class UserAPI {
         router.all('/:?user/register',                  PM, async (req, res) => await this.handleRegisterRequest(req, res));
         router.all('/:?user/forgotpassword',            PM, async (req, res) => await this.handleForgotPassword(req, res));
 
+        this.router = router;
+    }
+
+    getMiddleware() {
+        if(!this.router)
+            this.configure(false);
+
         return (req, res, next) => {
-            return router(req, res, next);
+            return this.router(req, res, next);
         }
     }
 

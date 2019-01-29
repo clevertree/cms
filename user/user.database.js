@@ -1,10 +1,73 @@
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 
+const { ConfigManager } = require('../config/config.manager');
+
 class UserDatabase  {
+    get SQL_TABLE() {
+        return `
+CREATE TABLE \`user\` (
+  \`id\` int(11) NOT NULL AUTO_INCREMENT,
+  \`email\` varchar(256) NOT NULL,
+  \`username\` varchar(256) NOT NULL,
+  \`password\` varchar(256) DEFAULT NULL,
+  \`profile\` JSON DEFAULT NULL,
+  \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  \`flags\` SET("guest", "admin"),
+  PRIMARY KEY (\`id\`),
+  UNIQUE KEY \`user_email_unique\` (\`email\`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+`
+    }
     constructor(db, debug=true) {
         this.db = db;
         this.debug = debug;
+    }
+
+    async configure(prompt=false) {
+        // Check for table
+        const tableName = 'user';
+        try {
+            await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
+        } catch (e) {
+            if(e.code === 'ER_NO_SUCH_TABLE') {
+                await this.queryAsync(this.SQL_TABLE);
+                await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
+                console.info(`Inserted table: ${tableName}`)
+            } else {
+                throw e;
+            }
+        }
+
+        // Insert admin user
+        let adminUser = await this.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
+        if(adminUser) {
+            console.info("Admin user found: " + adminUser.id);
+        } else {
+            if(prompt) {
+                for (let i = 0; i < 4; i++) {
+                    try {
+                        const hostname = require('os').hostname().toLowerCase();
+                        let adminUsername = await ConfigManager.prompt(`Please enter an Administrator username`, 'admin');
+                        let adminEmail = await ConfigManager.prompt(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + hostname);
+                        let adminPassword = await ConfigManager.prompt(`Please enter a password for ${adminUsername}`, "");
+                        let adminPassword2 = await ConfigManager.prompt(`Please re-enter a password for ${adminUsername}`, "");
+                        if(!adminPassword) {
+                            adminPassword = (await bcrypt.genSalt(10)).replace(/\W/g, '').substr(0, 8);
+                            adminPassword2 = adminPassword;
+                            console.info("Using generated password: " + adminPassword);
+                        }
+                        if (adminPassword !== adminPassword2)
+                            throw new Error("Password mismatch");
+                        adminUser = await this.createUser(adminUsername, adminEmail, adminPassword, 'admin');
+                        console.info("Admin user created: " + adminUser.id);
+                        break;
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            }
+        }
     }
 
     /** User Table **/
@@ -20,18 +83,27 @@ class UserDatabase  {
         return results.map(result => new UserEntry(result))
     }
 
-    async fetchUserByID(id, selectSQL='u.*,null as password') { return (await this.selectUsers('u.id = ? LIMIT 1', id, selectSQL))[0]; }
-    async fetchUserByEmail(email, selectSQL='u.*,null as password') { return (await this.selectUsers('u.email = ? LIMIT 1', email, selectSQL))[0]; }
-    async fetchGuestUser(selectSQL='u.*,null as password') { return (await this.selectUsers('FIND_IN_SET(\'guest\', u.flags) LIMIT 1', null, selectSQL))[0]; }
+    async fetchUser(whereSQL, values, selectSQL='u.*,null as password') { return (await this.selectUsers(whereSQL, values, selectSQL))[0]; }
+    async fetchUserByID(id, selectSQL='u.*,null as password') { return await this.fetchUser('u.id = ? LIMIT 1', id, selectSQL); }
+    async fetchUserByEmail(email, selectSQL='u.*,null as password') { return await this.fetchUser('u.email = ? LIMIT 1', email, selectSQL); }
+    // async fetchGuestUser(selectSQL='u.*,null as password') { return await this.fetchUser('FIND_IN_SET(\'guest\', u.flags) LIMIT 1', null, selectSQL); }
 
-    async createUser(email, password) {
-        const salt = await bcrypt.genSalt(10);
-        const hash = await bcrypt.hash(password, salt);
+    async createUser(username, email, password, flags='') {
+        if(Array.isArray(flags))
+            flags = flgas.join(',');
+        if(!username) throw new Error("Invalid username");
+        if(!email) throw new Error("Invalid email");
+        if(password) {
+            const salt = await bcrypt.genSalt(10);
+            password = await bcrypt.hash(password, salt);
+        }
         let SQL = `
           INSERT INTO user SET ?`;
         await this.queryAsync(SQL, {
+            username,
             email,
-            password: hash
+            password,
+            flags
         });
 
         const user = await this.fetchUserByEmail(email);

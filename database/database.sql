@@ -12,9 +12,6 @@ CREATE TABLE `user` (
   UNIQUE KEY `user_email_unique` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `user` (`id`, `email`, `username`, `password`, `profile`, `flags`) VALUES
-(1, 'guest@localhost', 'guest', NULL, NULL, 'guest');
-
 
 
 CREATE TABLE IF NOT EXISTS `theme` (

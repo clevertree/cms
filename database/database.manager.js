@@ -27,25 +27,52 @@ class DatabaseManager {
     // }
 
     async configure(prompt=false) {
+        const dbConfig = await ConfigManager.getOrCreate('database');
+        // if(!dbConfig.database && !prompt)
+        //     throw new Error("Prompt required to select database name")
         for(let i=0; i<4; i++) {
             try {
-                const dbConfig = await ConfigManager.getOrCreate('database');
 
                 if(!dbConfig.database || !dbConfig.user || !dbConfig.host) {
-                    let hostname = (require('os').hostname()).toLowerCase();
-                    dbConfig.database = (await ConfigManager.prompt(`Please enter the Database Name`, dbConfig.database || 'ct_' + hostname));
-                    dbConfig.user = (await ConfigManager.prompt(`Please enter the Database User Name`, dbConfig.user || 'root')).trim();
-                    dbConfig.password = (await ConfigManager.prompt(`Please enter the Password for Database User '${dbConfig.user}'`));
-                    dbConfig.host = (await ConfigManager.prompt(`Please enter the Database Host`, dbConfig.host || hostname));
-                }
-                await this.get();
-                return;
-            } catch (e) {
+                    let hostname        = (require('os').hostname()).toLowerCase();
+                    dbConfig.database   = dbConfig.database || 'ct_' + hostname;
+                    dbConfig.user       = dbConfig.user || 'root';
+                    dbConfig.host       = dbConfig.host || hostname;
 
+                    if(prompt) {
+                        dbConfig.database = await ConfigManager.prompt(`Please enter the Database Name`, dbConfig.database);
+                        dbConfig.user = await ConfigManager.prompt(`Please enter the Database User Name`, dbConfig.user);
+                        dbConfig.password = await ConfigManager.prompt(`Please enter the Password for Database User '${dbConfig.user}'`);
+                        dbConfig.host = await ConfigManager.prompt(`Please enter the Database Host`, dbConfig.host);
+                    }
+                }
+
+                try {
+                    await this.createConnection(dbConfig);
+                } catch (e) {
+                    if(e.code === "ER_BAD_DB_ERROR") {
+                        const repairConfig = Object.assign({}, dbConfig);
+                        delete repairConfig.database;
+                        const repairDB = await this.createConnection(repairConfig);
+                        await this.queryAsync(repairDB, `CREATE SCHEMA \`${dbConfig.database}\``);
+                        await this.queryAsync(repairDB, `USE \`${dbConfig.database}\``);
+                        console.info(`Created new schema: \`${dbConfig.database}\``)
+                    } else {
+                        throw e;
+                    }
+                }
+
+                // Save working config. TODO: every init?
+                await ConfigManager.saveAll();
+            } catch (e) {
                 console.error(e);
+                continue;
             }
+            break;
         }
-        throw new Error("Could not configure Database");
+
+
+
     }
 
     async get(req=null, reconnect=false) {
@@ -61,7 +88,7 @@ class DatabaseManager {
         }
 
         const dbConfig = await ConfigManager.getOrCreate('database');
-        const db = await this.initDatabase(dbConfig);
+        const db = await this.createConnection(dbConfig);
 
         this.hosts[host] = db;
         return db;
@@ -86,20 +113,18 @@ class DatabaseManager {
             if(e.code === "ER_BAD_DB_ERROR") {
                 const repairConfig = Object.assign({}, config);
                 delete repairConfig.database;
-                repairConfig.multipleStatements = true;
+                // repairConfig.multipleStatements = true;
                 db = await this.createConnection(repairConfig);
-                const repairSQLPath = path.resolve(__dirname + '/database.sql');
-                let repairSQL = await await FileManager.readFileAsync(repairSQLPath, "utf8");
-                repairSQL = `CREATE SCHEMA \`${config.database}\`; USE \`${config.database}\`; ` + repairSQL;
-                await this.queryAsync(db, repairSQL);
-                db = await this.createConnection(config);
+                // const repairSQLPath = path.resolve(__dirname + '/database.sql');
+                // let repairSQL = await await FileManager.readFileAsync(repairSQLPath, "utf8");
+                await this.queryAsync(db, `CREATE SCHEMA "${config.database}"`);
+                await this.queryAsync(db, `USE "${config.database}"`);
+                // db = await this.createConnection(config);
                 return;
             }
             throw e;
         }
 
-        // Save working config. TODO: every init?
-        await ConfigManager.saveAll();
         return db;
     }
 
