@@ -16,10 +16,10 @@ class UserAPI {
     }
     async getUserDB(req=null) { return new UserDatabase(await DatabaseManager.get(req)); }
 
-    async configure(prompt=false) {
+    async configure(interactive=false) {
         // Configure Database
         const userDB = await this.getUserDB();
-        await userDB.configure(prompt);
+        await userDB.configure(interactive);
 
         let config = await ConfigManager.getAll();
         if(!config) config = {};

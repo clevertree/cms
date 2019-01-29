@@ -13,22 +13,30 @@ const BASE_DIR = path.resolve(path.dirname(__dirname));
 class APIManager {
     constructor() {
         this.router = null;
+        this.config = null;
     }
 
-    async configure(prompt=true) {
+    async configure(interactive=true) {
+        const serverConfig = await ConfigManager.getOrCreate('server');
+        // hostname = (hostname || require('os').hostname()).toLowerCase();
+        // if(typeof serverConfig.session === 'undefined') {
+        //     serverConfig.session = {};
+        // }
+
+        if(typeof serverConfig.port === 'undefined') {
+            serverConfig.port = (await ConfigManager.prompt(`Please enter the Server Port`, serverConfig.port || 8080));
+        }
+        this.config = serverConfig;
+
+
         // Init Database
-        await DatabaseManager.configure(prompt);
-        await UserAPI.configure(prompt);
-        await ArticleAPI.configure(prompt);
-        await FileAPI.configure(prompt);
+        await DatabaseManager.configure(interactive);
+        await UserAPI.configure(interactive);
+        await ArticleAPI.configure(interactive);
+        await FileAPI.configure(interactive);
+
         const router = express.Router();
-        // router.use(cookieParser());
-        // this.config.session.cookieName = 'session';
-        // router.use(session(serverConfig.session));
-
-
         // Routes
-        // new UserSessionManager(this).loadRoutes(this.express);
         router.use(UserAPI.getMiddleware());
         router.use(ArticleAPI.getMiddleware());
         router.use(FileAPI.getMiddleware());
@@ -36,6 +44,7 @@ class APIManager {
         // CMS Asset files
         router.use(express.static(BASE_DIR));
         this.router = router;
+
     }
 
     getMiddleware() {
@@ -48,19 +57,9 @@ class APIManager {
     }
 
     async listen() {
-        const serverConfig = await ConfigManager.getOrCreate('server');
-        // hostname = (hostname || require('os').hostname()).toLowerCase();
-        // if(typeof serverConfig.session === 'undefined') {
-        //     serverConfig.session = {};
-        // }
-
-        if(typeof serverConfig.port === 'undefined') {
-            serverConfig.port = (await ConfigManager.prompt(`Please enter the Server Port`, serverConfig.port || 8080));
-        }
-
 
         const express = express();
-        express.use(this.middleware);
+        express.use(this.getMiddleware());
 
         // HTTP
         const ports = Array.isArray(serverConfig.port) ? serverConfig.port : [serverConfig.port];

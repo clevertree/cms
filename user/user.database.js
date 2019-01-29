@@ -19,7 +19,7 @@ CREATE TABLE \`user\` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 `
     }
-    constructor(db, debug=true) {
+    constructor(db, debug=false) {
         this.db = db;
         this.debug = debug;
     }

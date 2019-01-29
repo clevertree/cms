@@ -20,10 +20,7 @@ class DefaultTheme {
         };
     }
 
-    async getArticleDB(req=null) {
-        const host = req ? req.headers.host.split(':')[0] : null;
-        return new ArticleDatabase(await DatabaseManager.get(host));
-    }
+    async getArticleDB(req=null) { return new ArticleDatabase(await DatabaseManager.get(req)); }
 
     async render(req, content, renderData) {
         try {
