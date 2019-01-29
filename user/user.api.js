@@ -14,36 +14,36 @@ class UserAPI {
     }
     get userDB() { return new UserDatabase(this.app.db); }
 
-    get middleware() {
+    async getMiddleware() {
         const router = express.Router();
         const bodyParser = require('body-parser');
         const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
 
-        ConfigManager.getAll()
-            .then((config) => {
-                if(!config) config = {};
-                if(!config.user) config.user = {};
-                if(!config.user.cookie) config.user.cookie = {};
-                if(!config.user.session) config.user.session = {};
-                if(!config.user.session.secret) config.user.session.secret = require('uuid/v4')();
-                config.user.session.cookieName = 'session';
-                router.use(cookieParser(Object.assign({}, config.user.cookie)));
-                router.use(session(Object.assign({}, config.user.session)));
+        let config = await ConfigManager.getAll();
+        if(!config) config = {};
+        if(!config.user) config.user = {};
 
-                // TODO: handle session_save login
-                router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
-                // API Routes
-                router.get('/:?user/:id(\\d+)/json',                async (req, res, next) => await this.handleViewRequest(true, parseInt(req.params.id), req, res, next));
-                router.get('/:?user/:id(\\d+)',                     async (req, res, next) => await this.handleViewRequest(false, parseInt(req.params.id), req, res, next));
-                router.all('/:?user/:id(\\d+)/profile',         PM, async (req, res) => await this.handleUpdateRequest('profile', parseInt(req.params.id), req, res));
-                router.all('/:?user/:id(\\d+)/flags',           PM, async (req, res) => await this.handleUpdateRequest('flags', parseInt(req.params.id), req, res));
-                router.all('/:?user/:id(\\d+)/changepassword',  PM, async (req, res) => await this.handleUpdateRequest('changepassword', parseInt(req.params.id), req, res));
-                router.all('/:?user/login',                     PM, async (req, res) => await this.handleLoginRequest(req, res));
-                router.all('/:?user/session',                   PM, async (req, res) => await this.handleSessionLoginRequest(req, res));
-                router.all('/:?user/logout',                    PM, async (req, res) => await this.handleLogoutRequest(req, res));
-                router.all('/:?user/register',                  PM, async (req, res) => await this.handleRegisterRequest(req, res));
-                router.all('/:?user/forgotpassword',            PM, async (req, res) => await this.handleForgotPassword(req, res));
-            });
+        let configSession = Object.assign({}, config.user.session || {});
+        if(!configSession.secret) configSession.secret = require('uuid/v4')();
+        router.use(session(configSession));
+
+        let configCookie = Object.assign({}, config.user.cookie || {});
+        configSession.cookieName = 'session';
+        router.use(cookieParser(configCookie));
+
+        // TODO: handle session_save login
+        router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
+        // API Routes
+        router.get('/:?user/:id(\\d+)/json',                async (req, res, next) => await this.handleViewRequest(true, parseInt(req.params.id), req, res, next));
+        router.get('/:?user/:id(\\d+)',                     async (req, res, next) => await this.handleViewRequest(false, parseInt(req.params.id), req, res, next));
+        router.all('/:?user/:id(\\d+)/profile',         PM, async (req, res) => await this.handleUpdateRequest('profile', parseInt(req.params.id), req, res));
+        router.all('/:?user/:id(\\d+)/flags',           PM, async (req, res) => await this.handleUpdateRequest('flags', parseInt(req.params.id), req, res));
+        router.all('/:?user/:id(\\d+)/changepassword',  PM, async (req, res) => await this.handleUpdateRequest('changepassword', parseInt(req.params.id), req, res));
+        router.all('/:?user/login',                     PM, async (req, res) => await this.handleLoginRequest(req, res));
+        router.all('/:?user/session',                   PM, async (req, res) => await this.handleSessionLoginRequest(req, res));
+        router.all('/:?user/logout',                    PM, async (req, res) => await this.handleLogoutRequest(req, res));
+        router.all('/:?user/register',                  PM, async (req, res) => await this.handleRegisterRequest(req, res));
+        router.all('/:?user/forgotpassword',            PM, async (req, res) => await this.handleForgotPassword(req, res));
 
         return (req, res, next) => {
             return router(req, res, next);

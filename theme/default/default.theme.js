@@ -1,15 +1,15 @@
 // const fs = require('fs');
 const path = require('path');
 const ejs = require('ejs');
-const { ArticleDatabase } = require('../../article/articledatabase.class');
+const { ArticleDatabase } = require('../../article/article.database');
 const { UserSession } = require('../../user/usersession.class');
+const { DatabaseManager } = require('../../database/database.manager');
 
 const TEMPLATE_DIR = path.resolve(__dirname);
 const BASE_DIR = path.resolve(path.dirname(path.dirname(path.dirname(__dirname))));
 
 class DefaultTheme {
-    constructor(app) {
-        this.app = app;
+    constructor() {
         this.menuData = null;
         this.renderOptions = {
             views: [
@@ -19,20 +19,25 @@ class DefaultTheme {
             // async: true
         };
     }
-    get articleDB() { return new ArticleDatabase(this.app.db); }
+
+    async getArticleDB(req=null) {
+        const host = req ? req.headers.host.split(':')[0] : null;
+        return new ArticleDatabase(await DatabaseManager.get(host));
+    }
 
     async render(req, content, renderData) {
         try {
-            const app = this.app;
+            const articleDB = await this.getArticleDB(req);
+
             if (!renderData)
                 renderData = {};
-            renderData.app = app;
             renderData.baseHRef = this.getBaseHRef(req);
-            renderData.menu = await this.articleDB.queryMenuData(true);
+            renderData.menu = await articleDB.queryMenuData(true);
             renderData.userSession = new UserSession(req.session);
-            renderData.sessionUser = await renderData.userSession.getSessionUser(this.app.db);
+            renderData.sessionUser = await renderData.userSession.getSessionUser(articleDB.db);
             renderData.req = req;
             renderData.content = content ? await ejs.render(content, renderData, this.renderOptions) : null;
+            renderData.hostname = require('os').hostname();
 
 
             const templatePath = path.resolve(TEMPLATE_DIR + '/theme.ejs');

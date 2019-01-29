@@ -4,21 +4,20 @@
         <% if(baseHRef) {%>
         <base href="<%=baseHRef;%>">
         <% } %>
-        <title>Arizona Friends of the Homeless</title>
+        <title><%=hostname || "Website"%></title>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <meta name="keywords" CONTENT="arizona, friends of the homeless, resources, links">
+        <meta name="keywords" CONTENT="<%=hostname || "Website"%>">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link href="theme/default/assets/default.theme.css" rel="stylesheet" />
         <script src="theme/default/assets/default.theme.client.js"></script>
-        <link href='https://fonts.googleapis.com/css?family=Advent Pro' rel='stylesheet'>
     </head>
     <body class='theme-default'>
         <header>
             <div class="logo-container">
                 <div class="logo"></div>
                 <a href="" class="logo-text">
-                    Arizona Friends of Homeless
+                    <%=hostname || "Website"%>
                 </a>
             </div>
             <nav>
@@ -50,7 +49,7 @@
                     <h2>Acts of Kindness</h2>
                     <p>
                     </p>
-                    <a class="created-by" target='_blank' href='https://github.com/clevertree/afoh-site'>Created by CleverTree</a>
+                    <a class="created-by" target='_blank' href='https://github.com/clevertree/cms'>Created with CleverTree CMS</a>
                 </li>
                 <li>
                     <h2>Get Involved!</h2>

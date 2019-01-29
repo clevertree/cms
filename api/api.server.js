@@ -15,7 +15,7 @@ class APIManager {
         this.router = null;
     }
 
-    get middleware() {
+    async getMiddleware() {
         const router = express.Router();
         // router.use(cookieParser());
         // this.config.session.cookieName = 'session';
@@ -24,9 +24,9 @@ class APIManager {
 
         // Routes
         // new UserSessionManager(this).loadRoutes(this.express);
-        router.use(UserAPI.middleware);
-        router.use(ArticleAPI.middleware);
-        router.use(FileAPI.middleware);
+        router.use(await UserAPI.getMiddleware());
+        router.use(await ArticleAPI.getMiddleware());
+        router.use(await FileAPI.getMiddleware());
 
         // CMS Asset files
         router.use(express.static(BASE_DIR));

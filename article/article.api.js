@@ -14,7 +14,7 @@ class ArticleAPI {
         return new ArticleDatabase(await DatabaseManager.get(host));
     }
 
-    get middleware() {
+    async getMiddleware() {
         const router = express.Router();
         const bodyParser = require('body-parser');
         const postMiddleware = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];

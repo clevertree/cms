@@ -12,7 +12,7 @@ const { MailServer } = require('./mail/mail.server');
     await DatabaseManager.get();
 
     const server = express();
-    server.use(APIServer.middleware);
+    server.use(await APIServer.getMiddleware());
     const port = 8080;
     server.listen(port);
     console.log(`Listening on ${port}`);
