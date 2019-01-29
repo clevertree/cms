@@ -10,8 +10,7 @@ class ArticleAPI {
     }
 
     async getArticleDB(req=null) {
-        const host = req ? req.headers.host.split(':')[0] : null;
-        return new ArticleDatabase(await DatabaseManager.get(host));
+        return new ArticleDatabase(await DatabaseManager.get(req));
     }
 
     async getMiddleware() {

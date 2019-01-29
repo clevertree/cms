@@ -8,8 +8,7 @@ const { MailServer } = require('./mail/mail.server');
     // Listen for HTTP(S)
     // await APIServer.listen();
 
-    // Init Database
-    await DatabaseManager.get();
+    await APIServer.configure(true);
 
     const server = express();
     server.use(await APIServer.getMiddleware());

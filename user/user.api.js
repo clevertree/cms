@@ -12,7 +12,11 @@ const { ForgotPasswordMail } = require("./mail/forgotpassword.class");
 class UserAPI {
     constructor() {
     }
-    get userDB() { return new UserDatabase(this.app.db); }
+    async getUserDB(req=null) { return new UserDatabase(await DatabaseManager.get(req)); }
+
+    async configure(prompt=false) {
+        const userDB = await this.getUserDB();
+    }
 
     async getMiddleware() {
         const router = express.Router();
@@ -31,6 +35,7 @@ class UserAPI {
         configSession.cookieName = 'session';
         router.use(cookieParser(configCookie));
 
+        // TODO: create admin account on boot
         // TODO: handle session_save login
         // router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
         // API Routes
@@ -40,7 +45,7 @@ class UserAPI {
         router.all('/:?user/:id(\\d+)/flags',           PM, async (req, res) => await this.handleUpdateRequest('flags', parseInt(req.params.id), req, res));
         router.all('/:?user/:id(\\d+)/changepassword',  PM, async (req, res) => await this.handleUpdateRequest('changepassword', parseInt(req.params.id), req, res));
         router.all('/:?user/login',                     PM, async (req, res) => await this.handleLoginRequest(req, res));
-        router.all('/:?user/session',                   PM, async (req, res) => await this.handleSessionLoginRequest(req, res));
+        // router.all('/:?user/session',                   PM, async (req, res) => await this.handleSessionLoginRequest(req, res));
         router.all('/:?user/logout',                    PM, async (req, res) => await this.handleLogoutRequest(req, res));
         router.all('/:?user/register',                  PM, async (req, res) => await this.handleRegisterRequest(req, res));
         router.all('/:?user/forgotpassword',            PM, async (req, res) => await this.handleForgotPassword(req, res));
@@ -65,13 +70,14 @@ class UserAPI {
     //     next();
     // }
 
-    async updateProfile(userID, profile) {
+    async updateProfile(req, userID, profile) {
         if(!userID)
             throw new Error("Invalid User ID");
         if(!profile)
             throw new Error("Invalid Profile");
 
-        const user = await this.userDB.fetchUserByID(userID);
+        const userDB = await this.getUserDB(req);
+        const user = await userDB.fetchUserByID(userID);
         if(!user)
             throw new Error("User not found: " + userID);
 
@@ -82,13 +88,13 @@ class UserAPI {
             user.profile[profileField.name] = value;
         }
 
-        return await this.userDB.updateUser(userID, null, null, user.profile, null);
+        return await userDB.updateUser(userID, null, null, user.profile, null);
         // console.info("SET PROFILE", user, profile);
         // return user;
     }
 
 
-    async updateFlags(userID, flags) {
+    async updateFlags(req, userID, flags) {
         if(!userID)
             throw new Error("Invalid User ID");
         // const user = await this.userDB.fetchUserByID(userID);
@@ -109,13 +115,15 @@ class UserAPI {
             }
         }
 
-        return await this.userDB.updateUser(userID, null, null, null, flags);
+        const userDB = await this.getUserDB(req);
+        return await userDB.updateUser(userID, null, null, null, flags);
     }
 
-    async updatePassword(userID, password_old, password_new, password_confirm) {
+    async updatePassword(req, userID, password_old, password_new, password_confirm) {
         if(!userID)
             throw new Error("Invalid User ID");
-        const user = await this.userDB.fetchUserByID(userID, 'u.*');
+        const userDB = await this.getUserDB(req);
+        const user = await userDB.fetchUserByID(userID, 'u.*');
         if(!user)
             throw new Error("User not found: " + userID);
         const encryptedPassword = user.password;
@@ -134,10 +142,10 @@ class UserAPI {
                 throw new Error("Old password is not correct. Please re-enter");
         }
 
-        return await this.userDB.updateUser(userID, null, password_new, null, null);
+        return await userDB.updateUser(userID, null, password_new, null, null);
     }
 
-    async register(session, email, password, password_confirm) {
+    async register(req, email, password, password_confirm) {
         if(!email)
             throw new Error("Email is required");
         if(!UserAPI.validateEmail(email))
@@ -149,11 +157,12 @@ class UserAPI {
         if(password !== password_confirm && password_confirm !== null)
             throw new Error("Confirm & Password do not match");
 
-        const user = await this.userDB.createUser(email, password);
+        const userDB = await this.getUserDB(req);
+        const user = await userDB.createUser(email, password);
 
         // sets a cookie with the user's info
-        session.reset();
-        session.user = {id: user.id};
+        req.session.reset();
+        req.session.user = {id: user.id};
         return user;
     }
 
@@ -164,7 +173,8 @@ class UserAPI {
         if(!password)
             throw new Error("Password is required");
 
-        const userSession = await this.userDB.fetchUserSessionByUUID(uuid);
+        const userDB = await this.getUserDB(req);
+        const userSession = await userDB.fetchUserSessionByUUID(uuid);
         if(!userSession)
             throw new Error("User Session not found: " + uuid);
 
@@ -172,7 +182,7 @@ class UserAPI {
         if(matches !== true)
             throw new Error("Invalid Password");
 
-        const user = await this.userDB.fetchUserByID(userSession.user_id);
+        const user = await userDB.fetchUserByID(userSession.user_id);
         if(!user)
             throw new Error("User not found: " + userSession.user_id);
 
@@ -183,7 +193,7 @@ class UserAPI {
         return userSession;
     }
 
-    async login(req, res, email, password, saveSession=false) {
+    async login(req, email, password, saveSession=false) {
         if(!email)
             throw new Error("Email is required");
         if(!UserAPI.validateEmail(email))
@@ -192,7 +202,8 @@ class UserAPI {
         if(!password)
             throw new Error("Password is required");
 
-        const user = await this.userDB.fetchUserByEmail(email, 'u.*');
+        const userDB = await this.getUserDB(req);
+        const user = await userDB.fetchUserByEmail(email, 'u.*');
         if(!user)
             throw new Error("User not found: " + email);
         const encryptedPassword = user.password;
@@ -230,8 +241,9 @@ class UserAPI {
     }
 
     async logout(req, res) {
+        const userDB = await this.getUserDB(req);
         if(req.session.user_session) {
-            await this.userDB.deleteUserSessionByID(req.session.user_session);
+            await userDB.deleteUserSessionByID(req.session.user_session);
         }
         req.session.reset();
         res.clearCookie('session_save');
@@ -243,7 +255,8 @@ class UserAPI {
         try {
             if(!userID)
                 throw new Error("Invalid user id");
-            const user = await this.userDB.fetchUserByID(userID);
+            const userDB = await this.getUserDB(req);
+            const user = await userDB.fetchUserByID(userID);
 
             // Render View
             if(asJSON) {
@@ -280,35 +293,35 @@ class UserAPI {
         }
     }
 
-    async handleSessionLoginRequest(req, res) {
-        try {
-            if(req.method === 'GET') {
-                if(req.query.uuid && req.query.password) {
-                    const userSession = await this.loginSession(req, res, req.query.uuid, req.query.password);
-                    return res.redirect(`/:user/${userSession.user_id}`);
-                }
-                // Render Editor Form
-                res.send(
-                    await ThemeManager.get()
-                        .render(req, `<%- include("user/section/session.ejs")%>`)
-                );
-
-            } else {
-                // Handle Form (POST) Request
-                // console.log("Log in Request", req.body);
-                const user = await this.loginSession(req, res, req.body.uuid, req.body.password);
-
-                return res.json({
-                    redirect: `/:user/${user.id}`,
-                    message: `User logged in successfully: ${user.email}. <br/>Redirecting...`,
-                    user
-                });
-            }
-        } catch (error) {
-            console.error(error);
-            res.status(400).json({message: "Error: " + error.message, error: error.stack});
-        }
-    }
+    // async handleSessionLoginRequest(req, res) {
+    //     try {
+    //         if(req.method === 'GET') {
+    //             if(req.query.uuid && req.query.password) {
+    //                 const userSession = await this.loginSession(req, res, req.query.uuid, req.query.password);
+    //                 return res.redirect(`/:user/${userSession.user_id}`);
+    //             }
+    //             // Render Editor Form
+    //             res.send(
+    //                 await ThemeManager.get()
+    //                     .render(req, `<%- include("user/section/session.ejs")%>`)
+    //             );
+    //
+    //         } else {
+    //             // Handle Form (POST) Request
+    //             // console.log("Log in Request", req.body);
+    //             const user = await this.loginSession(req, req.body.uuid, req.body.password);
+    //
+    //             return res.json({
+    //                 redirect: `/:user/${user.id}`,
+    //                 message: `User logged in successfully: ${user.email}. <br/>Redirecting...`,
+    //                 user
+    //             });
+    //         }
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(400).json({message: "Error: " + error.message, error: error.stack});
+    //     }
+    // }
 
     async handleLoginRequest(req, res) {
         try {
@@ -322,7 +335,7 @@ class UserAPI {
             } else {
                 // Handle Form (POST) Request
                 // console.log("Log in Request", req.body);
-                const user = await this.login(req, res, req.body.email, req.body.password, req.body.session_save);
+                const user = await this.login(req, req.body.email, req.body.password, req.body.session_save);
 
                 return res.json({
                     redirect: `/:user/${user.id}`,
@@ -373,7 +386,7 @@ class UserAPI {
             } else {
                 // Handle Form (POST) Request
                 console.log("Registration Request", req.body);
-                const user = await this.register(req.session, req.body.email, req.body.password, req.body.password_confirm);
+                const user = await this.register(req, req.body.email, req.body.password, req.body.password_confirm);
 
                 return res.json({
                     redirect: `/:user/${user.id}/profile`,
@@ -399,10 +412,11 @@ class UserAPI {
             } else {
                 // Handle Form (POST) Request
                 // console.log("Log in Request", req.body);
-                const user = await this.userDB.fetchUserByEmail(req.body.email);
+                const userDB = await this.getUserDB(req);
+                const user = await userDB.fetchUserByEmail(req.body.email);
                 if(!user)
                     throw new Error("User was not found: " + req.body.email);
-                const result = await this.userDB.createUserSession(user.id, 'reset');
+                const result = await userDB.createUserSession(user.id, 'reset');
                 // TODO: store password reset in memory, not database!
 
                 const recoveryURL = this.app.config.server.baseHRef + `/:user/session?uuid=${result.uuid}&password=${result.password}`;
@@ -423,6 +437,7 @@ class UserAPI {
 
     async handleUpdateRequest(type, userID, req, res) {
         try {
+            const userDB = await this.getUserDB(req);
             const sessionUser = await new UserSession(req.session).getSessionUser(this.app.db);
             if(!sessionUser)
                 throw new Error("Must be logged in");
@@ -454,7 +469,7 @@ class UserAPI {
                         affectedRows = await this.updatePassword(userID, sessionUser.isAdmin ? null : req.body.password_old, req.body.password_new, req.body.password_confirm);
                         break;
                 }
-                const user = await this.userDB.fetchUserByID(userID);
+                const user = await userDB.fetchUserByID(userID);
 
                 return res.json({
                     // redirect: `/:user/${user.id}`,

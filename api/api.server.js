@@ -15,6 +15,14 @@ class APIManager {
         this.router = null;
     }
 
+    async configure(prompt=true) {
+        // Init Database
+        await DatabaseManager.configure(prompt);
+        await UserAPI.configure(prompt);
+        await ArticleAPI.configure(prompt);
+        await FileAPI.configure(prompt);
+    }
+
     async getMiddleware() {
         const router = express.Router();
         // router.use(cookieParser());

@@ -26,7 +26,30 @@ class DatabaseManager {
     //     }
     // }
 
-    async get(host=null, reconnect=false) {
+    async configure(prompt=false) {
+        for(let i=0; i<4; i++) {
+            try {
+                const dbConfig = await ConfigManager.getOrCreate('database');
+
+                if(!dbConfig.database || !dbConfig.user || !dbConfig.host) {
+                    let hostname = (require('os').hostname()).toLowerCase();
+                    dbConfig.database = (await ConfigManager.prompt(`Please enter the Database Name`, dbConfig.database || 'ct_' + hostname));
+                    dbConfig.user = (await ConfigManager.prompt(`Please enter the Database User Name`, dbConfig.user || 'root')).trim();
+                    dbConfig.password = (await ConfigManager.prompt(`Please enter the Password for Database User '${dbConfig.user}'`));
+                    dbConfig.host = (await ConfigManager.prompt(`Please enter the Database Host`, dbConfig.host || hostname));
+                }
+                await this.get();
+                return;
+            } catch (e) {
+
+                console.error(e);
+            }
+        }
+        throw new Error("Could not configure Database");
+    }
+
+    async get(req=null, reconnect=false) {
+        let host = req ? req.headers.host.split(':')[0] : null;
         if(!host)
             host = require('os').hostname();
         host = host.toLowerCase();
@@ -37,7 +60,7 @@ class DatabaseManager {
             this.hosts[host].end();
         }
 
-        const dbConfig = await this.loadConfig(host);
+        const dbConfig = await ConfigManager.getOrCreate('database');
         const db = await this.initDatabase(dbConfig);
 
         this.hosts[host] = db;
@@ -45,19 +68,6 @@ class DatabaseManager {
     }
 
 
-    async loadConfig(hostname) {
-        const dbConfig = await ConfigManager.getOrCreate('database');
-        hostname = (hostname || require('os').hostname()).toLowerCase();
-
-        if(!dbConfig.database || !dbConfig.user || !dbConfig.host) {
-            dbConfig.database = (await ConfigManager.prompt(`Please enter the Database Name`, dbConfig.database || 'ct_' + hostname));
-            dbConfig.user = (await ConfigManager.prompt(`Please enter the Database User Name`, dbConfig.user || 'root')).trim();
-            dbConfig.password = (await ConfigManager.prompt(`Please enter the Password for Database User '${dbConfig.user}'`));
-            dbConfig.host = (await ConfigManager.prompt(`Please enter the Database Host`, dbConfig.host || hostname));
-        }
-
-        return dbConfig;
-    }
 
     async initDatabase(config) {
         if(!config.database)
