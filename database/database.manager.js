@@ -5,6 +5,9 @@ const mysql = require('mysql');
 const { ConfigManager } = require('../config/config.manager');
 const { FileManager } = require('../file/file.manager');
 
+const { ArticleDatabase } = require('../article/article.database');
+const { UserDatabase } = require('../user/user.database');
+
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
 class DatabaseManager {
@@ -13,20 +16,11 @@ class DatabaseManager {
 
     }
 
-    // async init() {
-    //     for(var i=0; i<4; i++) {
-    //         try {
-    //             await this.get();
-    //             break;
-    //         } catch (e) {
-    //             console.error(e);
-    //             await this.sleep(3000);
-    //             // await this.loadConfig();
-    //         }
-    //     }
-    // }
+    async getArticleDB(req=null)    { return new ArticleDatabase(await this.get(req)); }
+    async getUserDB(req=null)       { return new UserDatabase(await this.get(req)); }
 
-    async configure(prompt=false) {
+
+    async configure(interactive=false, req=null) {
         const dbConfig = await ConfigManager.getOrCreate('database');
         // if(!dbConfig.database && !prompt)
         //     throw new Error("Prompt required to select database name")
@@ -39,7 +33,7 @@ class DatabaseManager {
                     dbConfig.user       = dbConfig.user || 'root';
                     dbConfig.host       = dbConfig.host || hostname;
 
-                    if(prompt) {
+                    if(interactive) {
                         dbConfig.database = await ConfigManager.prompt(`Please enter the Database Name`, dbConfig.database);
                         dbConfig.user = await ConfigManager.prompt(`Please enter the Database User Name`, dbConfig.user);
                         dbConfig.password = await ConfigManager.prompt(`Please enter the Password for Database User '${dbConfig.user}'`);
@@ -72,6 +66,13 @@ class DatabaseManager {
         }
 
 
+        // Configure Databases
+        const databases = [
+            await this.getArticleDB(req),
+            await this.getUserDB(req),
+        ];
+        for(var i=0; i<databases.length; i++)
+            await databases[i].configure(interactive);
 
     }
 

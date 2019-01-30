@@ -26,20 +26,22 @@
         </header>
 
         <article>
-            <%_ if(typeof userSession !== "undefined") {
-                const sessionMessage = userSession.popMessage();
-                if(sessionMessage) {
+            <%_ if(typeof req !== "undefined" && req.session) {
+                    if(req.session.messages && req.session.messages.length > 0) {
+                        const sessionMessage = req.session.messages.pop();
             _%>
-            <section class="message" style="text-align: center; font-size: smaller;">
+            <section class="message">
                 <%-sessionMessage.message%>
             </section>
-            <%_ }} _%>
+            <%_     } _%>
 
-            <%_ if(typeof article !== "undefined" && typeof sessionUser !== "undefined" && sessionUser.isAdmin()) { _%>
+            <%_     if(typeof article !== "undefined") { _%>
             <section class="page-edit" style="text-align: center; font-size: smaller;">
                 <a href=":article/<%=article.id%>/edit">Edit this page</a>
             </section>
+            <%_     } _%>
             <%_ } _%>
+
             <%-content%>
         </article>
 

@@ -7,7 +7,6 @@ const express = require('express');
 
 
 const { FileDatabase } = require("./filedatabase.class");
-const { UserSession } = require('../user/usersession.class');
 
 class FileAPI {
     constructor() {
@@ -84,7 +83,7 @@ class FileAPI {
                     const stats = await this.readFileStats(file.path);
                     const hash = await this.calculateFileHash(file.path);
                     const content = await this.readFileContent(file.path);
-                    const sessionUser = await new UserSession(req.session).getSessionUser(this.app.db);
+
                     // const info = {
                     //     size: stats.size,
                     //     ctime: stats.ctime,
@@ -100,7 +99,7 @@ class FileAPI {
                         path = (duplicateFilePathEntry || duplicateFileHashEntry).path;
                         response.duplicates++;
                     } else {
-                        await this.fileDB.insertFile(content, path, stats.size, hash, sessionUser.id);
+                        await this.fileDB.insertFile(content, path, stats.size, hash, req.session & req.session.userID);
                         response.inserted++;
                     }
                     response.files.push(`/:file${path}`);

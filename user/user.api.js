@@ -7,22 +7,14 @@ const { ConfigManager } = require('../config/config.manager');
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeManager } = require('../theme/theme.manager');
 const { UserDatabase } = require('./user.database');
-const { UserSession } = require('./usersession.class');
 const { ForgotPasswordMail } = require("./mail/forgotpassword.class");
 
 class UserAPI {
     constructor() {
         this.router = null;
     }
-    async getUserDB(req=null) {
-        return new UserDatabase(await DatabaseManager.get(req));
-    }
 
     async configure(interactive=false) {
-        // Configure Database
-        const userDB = await this.getUserDB();
-        await userDB.configure(interactive);
-
         // Configure
         let config = await ConfigManager.getAll();
         if(!config) config = {};
@@ -68,20 +60,18 @@ class UserAPI {
         }
     }
 
-    // async checkForSessionLogin(req, res, next) {
-    //     try {
-    //         // console.log(req.session, req.cookies);
-    //         if (!req.session.user && req.cookies.session_save) {
-    //             const session_save = JSON.parse(req.cookies.session_save);
-    //             await this.loginSession(req, res, session_save.uuid, session_save.password);
-    //         }
-    //     } catch (error) {
-    //         res.clearCookie('session_save');
-    //         new UserSession(req.session).addMessage("User has been logged out: " + error.message);
-    //         console.error(error);
-    //     }
-    //     next();
-    // }
+
+    addSessionMessage(req, message, status) {
+        if(typeof req.session.messages === 'undefined')
+            req.session.messages = [];
+        req.session.messages.push({message, status})
+    }
+
+    popSessionMessage(req) {
+        if(typeof req.session.messages === 'undefined' || req.session.messages.length === 0)
+            return null;
+        return req.session.messages.pop();
+    }
 
     async updateProfile(req, userID, profile) {
         if(!userID)
@@ -89,7 +79,7 @@ class UserAPI {
         if(!profile)
             throw new Error("Invalid Profile");
 
-        const userDB = await this.getUserDB(req);
+        const userDB = await DatabaseManager.getUserDB(req);
         const user = await userDB.fetchUserByID(userID);
         if(!user)
             throw new Error("User not found: " + userID);
@@ -108,7 +98,7 @@ class UserAPI {
 
 
     async updateFlags(req, userID, flags) {
-        const userDB = await this.getUserDB(req);
+        const userDB = await DatabaseManager.getUserDB(req);
         if(!userID)
             throw new Error("Invalid User ID");
         // const user = await this.userDB.fetchUserByID(userID);
@@ -135,7 +125,7 @@ class UserAPI {
     async updatePassword(req, userID, password_old, password_new, password_confirm) {
         if(!userID)
             throw new Error("Invalid User ID");
-        const userDB = await this.getUserDB(req);
+        const userDB = await DatabaseManager.getUserDB(req);
         const user = await userDB.fetchUserByID(userID, 'u.*');
         if(!user)
             throw new Error("User not found: " + userID);
@@ -172,7 +162,7 @@ class UserAPI {
         if(password !== password_confirm && password_confirm !== null)
             throw new Error("Confirm & Password do not match");
 
-        const userDB = await this.getUserDB(req);
+        const userDB = await DatabaseManager.getUserDB(req);
         const user = await userDB.createUser(username, email, password);
 
         // sets a cookie with the user's info
@@ -181,32 +171,6 @@ class UserAPI {
         return user;
     }
 
-
-    async loginSession(req, res, uuid, password) {
-        if(!uuid)
-            throw new Error("UUID is required");
-        if(!password)
-            throw new Error("Password is required");
-
-        const userDB = await this.getUserDB(req);
-        const userSession = await userDB.fetchUserSessionByUUID(uuid);
-        if(!userSession)
-            throw new Error("User Session not found: " + uuid);
-
-        const matches = await bcrypt.compare(password, userSession.password);
-        if(matches !== true)
-            throw new Error("Invalid Password");
-
-        const user = await userDB.fetchUserByID(userSession.user_id);
-        if(!user)
-            throw new Error("User not found: " + userSession.user_id);
-
-        // sets a cookie with the user's info
-        req.session.reset();
-        req.session.user = {id: user.id};
-        new UserSession(req.session).addMessage("Session Login Successful: " + uuid);
-        return userSession;
-    }
 
     async login(req, email, password, saveSession=false) {
         if(!email)
@@ -217,7 +181,7 @@ class UserAPI {
         if(!password)
             throw new Error("Password is required");
 
-        const userDB = await this.getUserDB(req);
+        const userDB = await DatabaseManager.getUserDB(req);
         const user = await userDB.fetchUserByEmail(email, 'u.*');
         if(!user)
             throw new Error("User not found: " + email);
@@ -251,18 +215,18 @@ class UserAPI {
             // })
         }
 
-        new UserSession(req.session).addMessage("Login Successful: " + email);
+        this.addSessionMessage(req,"Login Successful: " + email);
         return user;
     }
 
     async logout(req, res) {
-        const userDB = await this.getUserDB(req);
+        const userDB = await DatabaseManager.getUserDB(req);
         if(req.session.user_session) {
             await userDB.deleteUserSessionByID(req.session.user_session);
         }
         req.session.reset();
         res.clearCookie('session_save');
-        new UserSession(req.session).addMessage("User has been logged out");
+        this.addSessionMessage(req,"User has been logged out");
         // TODO: destroy db session
     }
 
@@ -270,17 +234,17 @@ class UserAPI {
         try {
             if(!userID)
                 throw new Error("Invalid user id");
-            const userDB = await this.getUserDB(req);
+            const userDB = await DatabaseManager.getUserDB(req);
             const user = await userDB.fetchUserByID(userID);
 
             // Render View
             if(asJSON) {
-                const sessionUser = await new UserSession(req.session).getSessionUser(this.app.db);
-                // if(!sessionUser)
-                //     throw new Error("Must be logged in");
                 const response = {user, editable: false};
-                if(sessionUser.isAdmin() || sessionUser.id === userID)
-                    response.editable = sessionUser.isAdmin() ? 'admin' : 'user';
+                if(req.session && req.session.userID) {
+                    const sessionUser = await userDB.fetchUserByID(req.session.userID);
+                    if (sessionUser.isAdmin() || sessionUser.id === article.user_id)
+                        response.editable = sessionUser.isAdmin() ? 'admin' : 'user';
+                }
                 if(req.query.getAll || req.query.getProfileConfig)
                     response.profileConfig = this.app.config.user.profile;
                 res.json(response);
@@ -427,7 +391,7 @@ class UserAPI {
             } else {
                 // Handle Form (POST) Request
                 // console.log("Log in Request", req.body);
-                const userDB = await this.getUserDB(req);
+                const userDB = await DatabaseManager.getUserDB(req);
                 const user = await userDB.fetchUserByEmail(req.body.email);
                 if(!user)
                     throw new Error("User was not found: " + req.body.email);
@@ -452,10 +416,7 @@ class UserAPI {
 
     async handleUpdateRequest(type, userID, req, res) {
         try {
-            const userDB = await this.getUserDB(req);
-            const sessionUser = await new UserSession(req.session).getSessionUser(this.app.db);
-            if(!sessionUser)
-                throw new Error("Must be logged in");
+            const userDB = await DatabaseManager.getUserDB(req);
             if(!userID)
                 throw new Error("Invalid user id");
             // const user = await this.userDB.fetchUserByID(userID);
@@ -467,6 +428,9 @@ class UserAPI {
                 );
 
             } else {
+                if(!req.session || !req.session.userID)
+                    throw new Error("Must be logged in");
+                const sessionUser = await userDB.getSessionUser(req.session.userID);
                 if(!sessionUser.isAdmin())
                     throw new Error("Not authorized");
 
@@ -511,19 +475,3 @@ module.exports = {UserAPI: new UserAPI()};
 function encodeHTML(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 }
-// function isJSON(req) {
-//     return req.headers.accept.split(',').indexOf('application/json') !== -1;
-// }
-
-// function sendResponse(req, res, response, redirect) {
-//     if(!redirect)
-//         redirect = req.url;
-//     if(typeof response === "string")
-//         response = {message: response, redirect};
-//     if(isJSON(req)) {
-//         res.json(response);
-//     } else {
-//         new UserSession(req.session).addMessage(response.message);
-//         res.redirect(redirect);
-//     }
-// }

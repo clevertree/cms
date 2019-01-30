@@ -3,15 +3,11 @@ const express = require('express');
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeManager } = require('../theme/theme.manager');
 const { ArticleDatabase } = require("./article.database");
-const { UserSession } = require('../user/usersession.class');
-// const {UserDatabase} = require("../user/user.database");
+const { UserDatabase } = require("../user/user.database");
+
 class ArticleAPI {
     constructor() {
         this.router = null;
-    }
-
-    async getArticleDB(req=null) {
-        return new ArticleDatabase(await DatabaseManager.get(req));
     }
 
 
@@ -25,10 +21,6 @@ class ArticleAPI {
     }
 
     async configure(interactive=false) {
-        // Configure Database
-        const articleDB = await this.getArticleDB(null);
-        await articleDB.configure(interactive);
-
         // Configure Routes
         const router = express.Router();
         const bodyParser = require('body-parser');
@@ -49,7 +41,7 @@ class ArticleAPI {
 
     async renderArticleByPath(req, res, next) {
         try {
-            const articleDB = await this.getArticleDB(req);
+            const articleDB = await DatabaseManager.getArticleDB(req);
             const article = await articleDB.fetchArticleByPath(req.url);
             if(!article)
                 return next();
@@ -82,7 +74,7 @@ class ArticleAPI {
 
     async renderArticleByID(asJSON, req, res, next) {
         try {
-            const articleDB = await this.getArticleDB(req);
+            const articleDB = await DatabaseManager.getArticleDB(req);
             const article = await articleDB.fetchArticleByID(req.params.id);
             if(!article)
                 return next();
@@ -107,9 +99,12 @@ class ArticleAPI {
                     editable: false,
                     article
                 };
-                const sessionUser = await new UserSession(req.session).getSessionUser(this.app.db);
-                if(sessionUser.isAdmin() || sessionUser.id === article.user_id)
-                    response.editable = true;
+                if(req.session && req.session.userID) {
+                    const userDB = await DatabaseManager.getUserDB(req);
+                    const sessionUser = await userDB.fetchUserByID(req.session.userID);
+                    if (sessionUser.isAdmin() || sessionUser.id === article.user_id)
+                        response.editable = true;
+                }
                 if(req.query.getAll || req.query.getHistory) {
                     response.history = await articleDB.fetchArticleRevisionsByArticleID(article.id);
                     // response.revision = await articleDB.fetchArticleRevisionByID(article.id, req.query.getRevision || null);
@@ -146,11 +141,12 @@ class ArticleAPI {
 
     async renderArticleEditorByID(req, res, next) {
         try {
-            const articleDB = await this.getArticleDB(req);
-            const session = new UserSession(req.session);
-            const sessionUser = await session.getSessionUser(this.app.db);
-            if(!sessionUser)
+            const articleDB = await DatabaseManager.getArticleDB(req);
+            const userDB = await DatabaseManager.getUserDB(req);
+
+            if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
+            const sessionUser = await userDB.fetchUserByID(req.session.userID);
 
             const article = await articleDB.fetchArticleByID(req.params.id);
             if(!article)
@@ -230,11 +226,11 @@ class ArticleAPI {
 
     async renderArticleAdd(req, res) {
         try {
-            const articleDB = await this.getArticleDB(req);
-            const session = new UserSession(req.session);
-            const sessionUser = await session.getSessionUser(this.app.db);
-            if(!sessionUser)
+            const articleDB = await DatabaseManager.getArticleDB(req);
+            const userDB = await DatabaseManager.getUserDB(req);
+            if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
+            const sessionUser = await userDB.fetchUserByID(req.session.userID);
 
             if(!sessionUser.isAdmin())
                 throw new Error("Not authorized");
@@ -280,11 +276,7 @@ class ArticleAPI {
 
     async renderArticleBrowser(req, res) {
         try {
-            const articleDB = await this.getArticleDB(req);
-            // const session = new UserSession(req.session);
-            // const sessionUser = await session.getSessionUser(this.app.db);
-            // if (!sessionUser)
-            //     throw new Error("Must be logged in");
+            const articleDB = await DatabaseManager.getArticleDB(req);
 
             if (req.method === 'GET') {
                 res.send(

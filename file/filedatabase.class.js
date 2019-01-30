@@ -2,7 +2,6 @@
 // const path = require('path');
 // const ejs = require('ejs');
 // const express = require('express');
-// const {UserSession} = require('./user.js');
 
 // Init
 class FileDatabase {
