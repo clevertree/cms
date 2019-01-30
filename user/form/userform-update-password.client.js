@@ -6,13 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserFlagFormElement extends HTMLElement{
+    class HTMLUserChangePasswordFormElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
-                user: {id: -1, flags:[]}
+                user: {id: -1},
+                password_old: null,
+                password_new: null,
+                password_confirm: null,
             };
-            // this.state = {id:-1, flags:[]};
+            // this.state = {id:-1, changepasswords:[]};
         }
 
         setState(newState) {
@@ -32,6 +35,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         onSuccess(e, response) {
             // setTimeout(() => window.location.href = response.redirect, 3000);
+            this.setState({
+                password_old: null,
+                password_new: null,
+                password_confirm: null,
+            })
         }
         onError(e, response) {}
 
@@ -45,19 +53,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     let value = e.target.value;
                     if(e.target.getAttribute('type') === 'checkbox')
                         value = e.target.checked;
-                    if(e.target.name && typeof this.state.user.profile[e.target.name] !== 'undefined')
-                        this.state.user.flags[e.target.name] = value;
-                    if(e.target.getAttribute('type') === 'checkbox') {
-                        if(e.target.checked) {
-                            this.state.user.flags =
-                                this.state.user.flags.concat(e.target.name)
-                                    .filter((v, i, a) => a.indexOf(v) === i);
-                        } else {
-                            this.state.user.flags =
-                                this.state.user.flags.filter((v) => v !== e.target.name);
-                        }
-                    }
-                    console.log(this.state);
+                    if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
+                        this.state[e.target.name] = value;
+                    // console.log(this.state);
                     break;
             }
         }
@@ -100,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     this.onError(e, response);
                 }
-                this.setState({response, user:response.user, processing: false});
+                this.setState({response, processing: false});
             };
             xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -110,19 +108,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
-            console.log("RENDER", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.user.id}/:flags" method="POST" class="userform userform-flags themed">
-                    <fieldset ${this.state.editable !== 'admin' ? 'disabled="disabled"' : ''}>
-                        <legend>Update User Flags</legend>
+                <form action="/:user/${this.state.user.id}/:password" method="POST" class="userform userform-update-password themed">
+                    <fieldset ${!this.state.editable ? 'disabled="disabled"' : ''}>
+                        <legend>Change Password</legend>
                         <table>
                             <thead>
                                 <tr>
                                     <td colspan="2">
                                         ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
                                             ${this.state.response.message}
-                                        </div>` : "In order to update this flag, <br/>please modify this form and hit 'Update' below"}
+                                        </div>` : "In order to change password, <br/>please modify this form and hit 'Update' below"}
                                     </td>
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
@@ -134,24 +131,35 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <input type="email" name="email" value="${this.state.user.email}" disabled/>
                                     </td>
                                 </tr>
+                                ${this.state.editable !== 'admin' ? `
                                 <tr>
-                                    <td class="label">Flags</td>
+                                    <td class="label">Old Password</td>
                                     <td>
-                                        ${['admin'].map(flagName => `
-                                        <label>
-                                            <input type="checkbox" class="themed" name="${flagName.toLowerCase()}" value="1" ${this.state.user.flags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
-                                            ${flagName.replace('-', ' ')}
-                                        </label>
-                                        `).join('')}
+                                        <input type="password" name="password_old" value="${this.state.password_old||''}" required />
                                     </td>
                                 </tr>
+                                ` : ''}
+                                <tr>
+                                    <td class="label">New Password</td>
+                                    <td>
+                                        <input type="password" name="password_new" value="${this.state.password_new||''}" required />
+                                    </td>
+                                </tr>
+                                ${this.state.editable !== 'admin' ? `
+                                <tr>
+                                    <td class="label">Confirm Password</td>
+                                    <td>
+                                        <input type="password" name="password_confirm" value="${this.state.password_confirm||''}" required />
+                                    </td>
+                                </tr>
+                                ` : ''}
                             </tbody>
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td class="label"></td>
                                     <td>
-                                        <button type="submit">Update</button>
+                                        <button type="submit">Update Password</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -159,8 +167,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     </fieldset>
                 </form>
 `;
+            console.log("RENDER", this.state);
         }
     }
-    customElements.define('userform-flags', HTMLUserFlagFormElement);
+    customElements.define('userform-update-password', HTMLUserChangePasswordFormElement);
 
 }

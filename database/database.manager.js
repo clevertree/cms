@@ -68,8 +68,8 @@ class DatabaseManager {
 
         // Configure Databases
         const databases = [
+            await this.getUserDB(req), // TODO: users first
             await this.getArticleDB(req),
-            await this.getUserDB(req),
         ];
         for(var i=0; i<databases.length; i++)
             await databases[i].configure(interactive);

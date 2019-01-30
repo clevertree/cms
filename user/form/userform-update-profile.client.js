@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("RENDER", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.user.id}/:profile" method="POST" class="userform userform-profile themed">
+                <form action="/:user/${this.state.user.id}/:profile" method="POST" class="userform userform-update-profile themed">
                     <fieldset ${!this.state.editable ? 'disabled="disabled"' : ''}>
                         <legend>Update Profile</legend>
                         <table>
@@ -172,6 +172,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('userform-profile', HTMLUserProfileFormElement);
+    customElements.define('userform-update-profile', HTMLUserProfileFormElement);
 
 }

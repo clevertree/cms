@@ -87,8 +87,6 @@ class UserDatabase  {
 
     async fetchUser(whereSQL, values, selectSQL='u.*,null as password') {
         const users = await this.selectUsers(whereSQL, values, selectSQL);
-        if(users.length === 0)
-            throw new Error("User not found: " + values);
         return users[0];
     }
     async fetchUserByID(userID, selectSQL='u.*,null as password') {
@@ -163,7 +161,8 @@ CREATE TABLE \`user\` (
   \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
   \`flags\` SET("guest", "admin"),
   PRIMARY KEY (\`id\`),
-  UNIQUE KEY \`user_email_unique\` (\`email\`)
+  UNIQUE KEY \`uk.user.email\` (\`email\`),
+  UNIQUE KEY \`uk.user.username\` (\`username\`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 `
     }

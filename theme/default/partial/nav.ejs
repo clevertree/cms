@@ -19,7 +19,7 @@
                     </li>
                 <%_ } %>
 
-                <%_ if(!req.session.user) { _%>
+                <%_ if(!req.session.userID) { _%>
                     <li>
                         <a href=":user/:login">Log in</a>
                         <ul class="nav-submenu">
@@ -30,7 +30,7 @@
                     </li>
                 <%_ } else { _%>
                     <li>
-                        <a href=":user/<%=req.session.user.id%>">My Profile</a>
+                        <a href=":user/<%=req.session.userID%>">My Profile</a>
                         <ul class="nav-submenu">
                             <%_ if(typeof article !== 'undefined') { _%>
                             <li>
@@ -42,7 +42,7 @@
                             </li>
                             <li><hr/></li>
                             <li>
-                                <a href=":user/<%=req.session.user.id%>/:profile">Edit Profile</a>
+                                <a href=":user/<%=req.session.userID%>/:profile">Edit Profile</a>
                             </li>
                             <li>
                                 <a href=":user/:logout">Log out</a>

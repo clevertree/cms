@@ -41,7 +41,7 @@ class UserAPI {
         router.get('/[:]user/:userID(\\w+)',                     async (req, res, next) => await this.handleViewRequest(false, (req.params.userID), req, res, next));
         router.all('/[:]user/:userID(\\w+)/[:]profile',         PM, async (req, res) => await this.handleUpdateRequest('profile', (req.params.userID), req, res));
         router.all('/[:]user/:userID(\\w+)/[:]flags',           PM, async (req, res) => await this.handleUpdateRequest('flags', (req.params.userID), req, res));
-        router.all('/[:]user/:userID(\\w+)/[:]changepassword',  PM, async (req, res) => await this.handleUpdateRequest('changepassword', (req.params.userID), req, res));
+        router.all('/[:]user/:userID(\\w+)/[:]password',  PM, async (req, res) => await this.handleUpdateRequest('password', (req.params.userID), req, res));
         router.all('/[:]user/[:]login',                     PM, async (req, res) => await this.handleLoginRequest(req, res));
         // router.all('/[:]user/session',                   PM, async (req, res) => await this.handleSessionLoginRequest(req, res));
         router.all('/[:]user/[:]logout',                    PM, async (req, res) => await this.handleLogoutRequest(req, res));
@@ -165,26 +165,24 @@ class UserAPI {
         const userDB = await DatabaseManager.getUserDB(req);
         const user = await userDB.createUser(username, email, password);
 
-        // sets a cookie with the user's info
-        req.session.reset();
-        req.session.user = {id: user.id};
+        await this.login(req, user.id, password);
         return user;
     }
 
 
-    async login(req, email, password, saveSession=false) {
-        if(!email)
-            throw new Error("Email is required");
-        if(!UserAPI.validateEmail(email))
-            throw new Error("Email format is invalid");
+    async login(req, userID, password, saveSession=false) {
+        if(!userID)
+            throw new Error("Username or Email is required");
+        // if(!UserAPI.validateEmail(userID))
+        //     throw new Error("Email format is invalid");
 
         if(!password)
             throw new Error("Password is required");
 
         const userDB = await DatabaseManager.getUserDB(req);
-        const user = await userDB.fetchUserByEmail(email, 'u.*');
+        const user = await userDB.fetchUserByID(userID, 'u.*');
         if(!user)
-            throw new Error("User not found: " + email);
+            throw new Error("User not found: " + userID);
         const encryptedPassword = user.password;
         delete user.password;
 
@@ -215,7 +213,7 @@ class UserAPI {
             // })
         }
 
-        this.addSessionMessage(req,"Login Successful: " + email);
+        this.addSessionMessage(req,"Login Successful: " + user.username);
         return user;
     }
 
@@ -239,6 +237,9 @@ class UserAPI {
             if(asJSON) {
                 const userDB = await DatabaseManager.getUserDB(req);
                 const user = await userDB.fetchUserByID(userID);
+                if(!user)
+                    throw new Error("User not found: " + userID);
+
                 const response = {user};
                 if(req.query['getAll'] || req.query['getSessionUser']) {
                     response.sessionUser = null;
@@ -309,7 +310,7 @@ class UserAPI {
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<%- include("user/section/login.ejs")%>`)
+                        .render(req, `<%- include("user/form/userform.ejs", {form: 'login'})%>`)
                 );
 
             } else {
@@ -335,7 +336,7 @@ class UserAPI {
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<%- include("user/section/logout.ejs")%>`)
+                        .render(req, `<%- include("user/form/userform.ejs", {form: 'logout'})%>`)
                 );
 
             } else {
@@ -360,13 +361,13 @@ class UserAPI {
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<%- include("user/section/register.ejs")%>`)
+                        .render(req, `<%- include("user/form/userform.ejs", {form: 'register'})%>`)
                 );
 
             } else {
                 // Handle Form (POST) Request
                 console.log("Registration Request", req.body);
-                const user = await this.register(req, req.body.email, req.body.password, req.body.password_confirm);
+                const user = await this.register(req, req.body.username, req.body.email, req.body.password, req.body.password_confirm);
 
                 return res.json({
                     redirect: `/:user/${user.id}/:profile`,
@@ -376,7 +377,12 @@ class UserAPI {
             }
         } catch (error) {
             console.error(error);
-            res.status(400).json({message: "Error: " + error.message, error: error.stack});
+            res.status(400).json({
+                message: "Error: " + error.message,
+                error: error.stack,
+                code: error.code,
+                duplicateRegistration: error.code === "ER_DUP_ENTRY"
+            });
         }
     }
 
@@ -386,7 +392,7 @@ class UserAPI {
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<%- include("user/section/forgotpassword.ejs")%>`)
+                        .render(req, `<%- include("user/form/userform.ejs", {form: 'forgotpassword'})%>`)
                 );
 
             } else {
@@ -425,7 +431,7 @@ class UserAPI {
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<%- include("user/section/${type}.ejs", {id: ${userID}})%>`)
+                        .render(req, `<%- include("user/form/userform.ejs")%>`, {id: userID, form: type})
                 );
 
             } else {
@@ -445,7 +451,7 @@ class UserAPI {
                     case 'flags':
                         affectedRows = await this.updateFlags(req, userID, req.body);
                         break;
-                    case 'changepassword':
+                    case 'password':
                         affectedRows = await this.updatePassword(req, userID, sessionUser.isAdmin ? null : req.body.password_old, req.body.password_new, req.body.password_confirm);
                         break;
                 }
