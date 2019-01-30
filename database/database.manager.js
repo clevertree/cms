@@ -96,39 +96,6 @@ class DatabaseManager {
 
 
 
-    async initDatabase(config) {
-        if(!config.database)
-            throw new Error("Missing property: database");
-        // if(!config.user)
-        //     throw new Error("Missing property: user");
-        // if(!config.host)
-        //     throw new Error("Missing property: host");
-        // this.config = config;
-        // config.debug = true;
-        let db = null;
-        try {
-            db = await this.createConnection(config);
-            await this.queryAsync(db, `USE ${config.database}`);
-        } catch (e) {
-            if(e.code === "ER_BAD_DB_ERROR") {
-                const repairConfig = Object.assign({}, config);
-                delete repairConfig.database;
-                // repairConfig.multipleStatements = true;
-                db = await this.createConnection(repairConfig);
-                // const repairSQLPath = path.resolve(__dirname + '/database.sql');
-                // let repairSQL = await await FileManager.readFileAsync(repairSQLPath, "utf8");
-                await this.queryAsync(db, `CREATE SCHEMA "${config.database}"`);
-                await this.queryAsync(db, `USE "${config.database}"`);
-                // db = await this.createConnection(config);
-                return;
-            }
-            throw e;
-        }
-
-        return db;
-    }
-
-
 
     async createConnection(config) {
         return await new Promise( ( resolve, reject ) => {

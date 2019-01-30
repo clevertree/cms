@@ -414,4 +414,5 @@ body.theme-default {
     font-weight: bold;
     /* max-width: 36px; */
     text-transform: capitalize;
+    white-space: nowrap;
 }

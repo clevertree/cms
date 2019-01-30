@@ -10,9 +10,14 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
-                email: "",
-                password: "",
-            };
+                response: null,
+                processing: false
+            }
+            // this.state = {
+            //     username: "",
+            //     email: "",
+            //     password: "",
+            // };
             // this.state = {id:-1, flags:[]};
         }
 
@@ -37,13 +42,20 @@ document.addEventListener('DOMContentLoaded', function() {
         onError(e, response) {}
 
         onEvent(e) {
+            const form = e.target.form || e.target;
             switch (event.type) {
                 case 'submit':
                     this.submit(e);
                     break;
 
                 case 'change':
-                    break;
+                    // if(typeof this.state[e.target.name] !== "undefined")
+                    //     this.state[e.target.name] = e.target.value;
+                    if(!form.username.value && form.email.value) {
+                        form.username.value = form.email.value.split('@')[0];
+                    }
+                    // console.log(this.state);
+                break;
             }
         }
 
@@ -75,7 +87,21 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.send(JSON.stringify(request));
         }
 
+        getFormData() {
+            const form = this.querySelector('form');
+            const formData = {};
+            if(form) {
+                new FormData(form).forEach(function (value, key) {
+                    formData[key] = value;
+                });
+            }
+            return formData;
+        }
+
         render() {
+            const formData = this.getFormData();
+            // console.log(formData);
+            const hostname = document.location.host.split(':')[0];
             this.innerHTML =
                 `
                 <form action="/:user/register" method="POST" class="userform userform-register themed">
@@ -96,19 +122,25 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr>
                                     <td class="label">Email</td>
                                     <td>
-                                        <input type="email" name="email" value="${this.state.email}" required />
+                                        <input type="email" name="email" value="${formData.email||''}" required />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Username</td>
+                                    <td>
+                                        <input type="username" name="username" value="${formData.username||''}" required /> @${hostname}
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Password</td>
                                     <td>
-                                        <input type="password" name="password" value="${this.state.password}" required />
+                                        <input type="password" name="password" value="${formData.password||''}" autocomplete="off" required />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="label">Confirm Password</td>
+                                    <td class="label">Confirm</td>
                                     <td>
-                                        <input type="password" name="password_confirm" value="${this.state.password_confirm}" required />
+                                        <input type="password" name="password_confirm" value="${formData.password_confirm||''}" autocomplete="off" required/>
                                     </td>
                                 </tr>
                             </tbody>

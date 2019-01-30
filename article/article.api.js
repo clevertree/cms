@@ -3,7 +3,7 @@ const express = require('express');
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeManager } = require('../theme/theme.manager');
 const { ArticleDatabase } = require("./article.database");
-const {UserSession} = require('../user/usersession.class');
+const { UserSession } = require('../user/usersession.class');
 // const {UserDatabase} = require("../user/user.database");
 class ArticleAPI {
     constructor() {
@@ -24,7 +24,12 @@ class ArticleAPI {
         }
     }
 
-    async configure(prompt=false) {
+    async configure(interactive=false) {
+        // Configure Database
+        const articleDB = await this.getArticleDB(null);
+        await articleDB.configure(interactive);
+
+        // Configure Routes
         const router = express.Router();
         const bodyParser = require('body-parser');
         const postMiddleware = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
@@ -77,7 +82,7 @@ class ArticleAPI {
 
     async renderArticleByID(asJSON, req, res, next) {
         try {
-            const articleDB = await this.getArticleDB();
+            const articleDB = await this.getArticleDB(req);
             const article = await articleDB.fetchArticleByID(req.params.id);
             if(!article)
                 return next();
@@ -109,7 +114,7 @@ class ArticleAPI {
                     response.history = await articleDB.fetchArticleRevisionsByArticleID(article.id);
                     // response.revision = await articleDB.fetchArticleRevisionByID(article.id, req.query.getRevision || null);
                     if(!articleRevision && response.history.length > 0)
-                        articleRevision = await articleDB.fetchArticleRevisionByID(response.history[0].id); // response.history[0]; // (await this.articleDB.fetchArticleRevisionsByArticleID(article.id))[0];
+                        articleRevision = await articleDB.fetchArticleRevisionByID(response.history[0].id); // response.history[0]; // (await articleDB.fetchArticleRevisionsByArticleID(article.id))[0];
                 }
                 if(articleRevision)
                     response.revision = articleRevision;
@@ -141,12 +146,13 @@ class ArticleAPI {
 
     async renderArticleEditorByID(req, res, next) {
         try {
+            const articleDB = await this.getArticleDB(req);
             const session = new UserSession(req.session);
             const sessionUser = await session.getSessionUser(this.app.db);
             if(!sessionUser)
                 throw new Error("Must be logged in");
 
-            const article = await this.articleDB.fetchArticleByID(req.params.id);
+            const article = await articleDB.fetchArticleByID(req.params.id);
             if(!article)
                 return next();
 
@@ -166,7 +172,7 @@ class ArticleAPI {
                 switch (req.body.action) {
                     default:
                     case 'publish':
-                        const affectedRows = await this.articleDB.updateArticle(
+                        const affectedRows = await articleDB.updateArticle(
                             article.id,
                             req.body.title,
                             req.body.content,
@@ -177,7 +183,7 @@ class ArticleAPI {
                             req.body.flags
                         );
 
-                        insertArticleRevisionID = await this.articleDB.insertArticleRevision(
+                        insertArticleRevisionID = await articleDB.insertArticleRevision(
                             article.id,
                             req.body.title,
                             req.body.content,
@@ -193,13 +199,13 @@ class ArticleAPI {
                         });
 
                     case 'draft':
-                        insertArticleRevisionID = await this.articleDB.insertArticleRevision(
+                        insertArticleRevisionID = await articleDB.insertArticleRevision(
                             article.id,
                             req.body.title,
                             req.body.content,
                             sessionUser.id
                         );
-                        revision = await this.articleDB.fetchArticleRevisionByID(insertArticleRevisionID);
+                        revision = await articleDB.fetchArticleRevisionByID(insertArticleRevisionID);
                         return res.json({
                             redirect: '/:article/' + article.id + '/view?r=' + revision.id,
                             message: "Draft saved successfully",
@@ -224,6 +230,7 @@ class ArticleAPI {
 
     async renderArticleAdd(req, res) {
         try {
+            const articleDB = await this.getArticleDB(req);
             const session = new UserSession(req.session);
             const sessionUser = await session.getSessionUser(this.app.db);
             if(!sessionUser)
@@ -241,7 +248,7 @@ class ArticleAPI {
 
             } else {
                 // Handle POST
-                const insertID = await this.articleDB.insertArticle(
+                const insertID = await articleDB.insertArticle(
                     req.body.title,
                     req.body.content,
                     req.body.path,
@@ -249,7 +256,7 @@ class ArticleAPI {
                     req.body.parent_id ? parseInt(req.body.parent_id) : null,
                     req.body.theme
                 );
-                const article = await this.articleDB.fetchArticleByID(insertID);
+                const article = await articleDB.fetchArticleByID(insertID);
                 return res.json({
                     redirect: '/:article/' + insertID + '/edit',
                     message: "Article created successfully. Redirecting...",
@@ -273,6 +280,7 @@ class ArticleAPI {
 
     async renderArticleBrowser(req, res) {
         try {
+            const articleDB = await this.getArticleDB(req);
             // const session = new UserSession(req.session);
             // const sessionUser = await session.getSessionUser(this.app.db);
             // if (!sessionUser)
@@ -291,7 +299,7 @@ class ArticleAPI {
                     whereSQL = 'a.title LIKE ? OR a.content LIKE ? OR a.path LIKE ?';
                     values = ['%'+req.body.search+'%', '%'+req.body.search+'%', '%'+req.body.search+'%'];
                 }
-                const articles = await this.articleDB.selectArticles(whereSQL, values);
+                const articles = await articleDB.selectArticles(whereSQL, values);
 
                 return res.json({
                     message: "Article list queried successfully",

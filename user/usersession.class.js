@@ -20,15 +20,15 @@ class UserSession {
 
     async getSessionUser(db) {
         const userDB = new UserDatabase(db);
-        let user;
+        let user = null;
         if(this.session && this.session.user) {
             user = await userDB.fetchUserByID(this.session.user.id);
             if(!user)
                 throw new Error("No Session User Found");
-        } else {
-            user = await userDB.fetchGuestUser();
-            if(!user)
-                throw new Error("No Guest User Found");
+        // } else {
+            // user = await userDB.fetchGuestUser();
+            // if(!user)
+            //     throw new Error("No Guest User Found");
         }
         return user;
     }

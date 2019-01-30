@@ -4,6 +4,8 @@
 // const express = require('express');
 // const {UserSession} = require('./user.js');
 
+const { ConfigManager } = require('../config/config.manager');
+
 // Init
 class ArticleDatabase {
     constructor(db, debug=false) {
@@ -12,7 +14,52 @@ class ArticleDatabase {
         this.db = db;
         this.debug = debug;
     }
-    
+
+    async configureTable(tableName, tableSQL) {
+        // Check for table
+        try {
+            await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
+        } catch (e) {
+            if(e.code === 'ER_NO_SUCH_TABLE') {
+                await this.queryAsync(tableSQL);
+                await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
+                console.info(`Inserted table: ${tableName}`)
+            } else {
+                throw e;
+            }
+        }
+
+    }
+
+    async configure(interactive=false) {
+        // Check for tables
+        await this.configureTable('article',            ArticleRow.SQL_TABLE);
+        await this.configureTable('article_revision',    ArticleRevisionRow.SQL_TABLE);
+
+        // Insert home page
+        let homeArticle = await this.fetchArticleByPath("/");
+        if(homeArticle) {
+            console.info("Home Article Found: " + homeArticle.id);
+        } else {
+            if(interactive) {
+                for (let i = 0; i < 4; i++) {
+                    try {
+                        let homeArticleTitle = 'Home';
+                        let homeArticleContent = '<%- include("article/home.ejs")%>';
+                        if(interactive) {
+                            homeArticleTitle = await ConfigManager.prompt(`Please enter a title for the Home Page`, "Home");
+                        }
+                        const homeArticleID = await this.insertArticle(homeArticleTitle, homeArticleContent, "/");
+                        console.info("Home Article Created: " + homeArticleID);
+                        break;
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            }
+        }
+    }
+
     /** Articles **/
 
     async selectArticles(whereSQL, values, selectSQL='a.*, null as content') {
@@ -22,17 +69,15 @@ class ArticleDatabase {
           WHERE ${whereSQL}`;
 
         const results = await this.queryAsync(SQL, values);
-        return results ? results.map(result => new ArticleEntry(result)) : null;
+        return results ? results.map(result => new ArticleRow(result)) : null;
+    }
+    async fetchArticle(whereSQL, values, selectSQL='a.*, null as content') {
+        const articles = await this.selectArticles(whereSQL, values, selectSQL);
+        return articles[0];
     }
 
-    async fetchArticleByPath(renderPath) {
-        const articles = await this.selectArticles('a.path = ? LIMIT 1', renderPath, 'a.*');
-        return articles[0];
-    }
-    async fetchArticleByID(articleID) {
-        const articles = await this.selectArticles('a.id = ? LIMIT 1', articleID, 'a.*');
-        return articles[0];
-    }
+    async fetchArticleByPath(renderPath) { return await this.fetchArticle('a.path = ? LIMIT 1', renderPath, 'a.*'); }
+    async fetchArticleByID(articleID) { return await this.fetchArticle('a.id = ? LIMIT 1', articleID, 'a.*'); }
 
     // async fetchArticlesByFlag(flags, selectSQL = 'id, parent_id, path, title, flags') {
     //     if(!Array.isArray(flags))
@@ -92,12 +137,12 @@ class ArticleDatabase {
 
         const mainMenu = [];
         for(let i=0; i<menuEntries.length; i++) {
-            const menuEntry = new ArticleEntry(menuEntries[i]);
+            const menuEntry = new ArticleRow(menuEntries[i]);
             if(menuEntry.parent_id === null) { // parent_id === null indicates top level menu
                 const subMenu = [];
                 mainMenu.push([menuEntry, subMenu]);
                 for(let j=0; j<menuEntries.length; j++) {
-                    const menuEntry2 = new ArticleEntry(menuEntries[j]);
+                    const menuEntry2 = new ArticleRow(menuEntries[j]);
                     if(menuEntry.id === menuEntry2.parent_id) {
                         subMenu.push([menuEntry2, []]);
                     }
@@ -118,7 +163,7 @@ class ArticleDatabase {
           `;
 
         const results = await this.queryAsync(SQL, values);
-        return results.map(result => new ArticleRevisionEntry(result))
+        return results.map(result => new ArticleRevisionRow(result))
     }
 
     // async fetchArticleRevisionByDate(articleID, revisionDate) {
@@ -170,7 +215,28 @@ class ArticleDatabase {
     }
 }
 
-class ArticleEntry {
+class ArticleRow {
+    static get SQL_TABLE() {
+        return `
+CREATE TABLE IF NOT EXISTS \`article\` (
+  \`id\` int(11) NOT NULL AUTO_INCREMENT,
+  \`user_id\` int(11) DEFAULT NULL,
+  \`parent_id\` int(11) DEFAULT NULL,
+  \`path\` varchar(256) DEFAULT NULL,
+  \`title\` varchar(256) DEFAULT NULL,
+  \`content\` text DEFAULT NULL,
+  \`data\` JSON DEFAULT NULL,
+  \`status\` SET('published') DEFAULT '',
+  \`created\` datetime DEFAULT current_timestamp(),
+  \`updated\` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (\`id\`),
+  UNIQUE KEY \`uk:article.path\` (\`path\`),
+  KEY \`fk:article.user_id\` (\`user_id\`),
+  CONSTRAINT \`fk:article.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=404 DEFAULT CHARSET=utf8;
+`
+    }
+
     constructor(row) {
         this.id = row.id;
         this.parent_id = row.parent_id;
@@ -188,7 +254,26 @@ class ArticleEntry {
     // hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
 }
 
-class ArticleRevisionEntry {
+class ArticleRevisionRow {
+    static get SQL_TABLE() {
+        return `
+CREATE TABLE \`article_revision\` (
+  \`id\` int(11) NOT NULL AUTO_INCREMENT,
+  \`article_id\` int(11) NOT NULL,
+  \`user_id\` int(11) NOT NULL,
+  \`title\` varchar(256) DEFAULT NULL,
+  \`content\` TEXT,
+  \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (\`id\`),
+  KEY \`idx:article_revision.article_id\` (\`article_id\` ASC),
+  KEY \`idx:article_revision.user_id\` (\`user_id\` ASC),
+
+  CONSTRAINT \`fk:article_revision.article_id\` FOREIGN KEY (\`article_id\`) REFERENCES \`article\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT \`fk:article_revision.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+`
+    }
+
     constructor(row) {
         this.id = row.id;
         this.article_id = row.article_id;
@@ -200,5 +285,5 @@ class ArticleRevisionEntry {
     }
 }
 
-module.exports = {ArticleDatabase, ArticleEntry, ArticleRevisionEntry};
+module.exports = {ArticleDatabase, ArticleEntry: ArticleRow, ArticleRevisionEntry: ArticleRevisionRow};
 

@@ -14,13 +14,16 @@ class UserAPI {
     constructor() {
         this.router = null;
     }
-    async getUserDB(req=null) { return new UserDatabase(await DatabaseManager.get(req)); }
+    async getUserDB(req=null) {
+        return new UserDatabase(await DatabaseManager.get(req));
+    }
 
     async configure(interactive=false) {
         // Configure Database
         const userDB = await this.getUserDB();
         await userDB.configure(interactive);
 
+        // Configure
         let config = await ConfigManager.getAll();
         if(!config) config = {};
         if(!config.user) config.user = {};
@@ -105,6 +108,7 @@ class UserAPI {
 
 
     async updateFlags(req, userID, flags) {
+        const userDB = await this.getUserDB(req);
         if(!userID)
             throw new Error("Invalid User ID");
         // const user = await this.userDB.fetchUserByID(userID);
@@ -125,7 +129,6 @@ class UserAPI {
             }
         }
 
-        const userDB = await this.getUserDB(req);
         return await userDB.updateUser(userID, null, null, null, flags);
     }
 
@@ -155,7 +158,9 @@ class UserAPI {
         return await userDB.updateUser(userID, null, password_new, null, null);
     }
 
-    async register(req, email, password, password_confirm) {
+    async register(req, username, email, password, password_confirm) {
+        if(!username)
+            throw new Error("username is required");
         if(!email)
             throw new Error("Email is required");
         if(!UserAPI.validateEmail(email))
@@ -168,7 +173,7 @@ class UserAPI {
             throw new Error("Confirm & Password do not match");
 
         const userDB = await this.getUserDB(req);
-        const user = await userDB.createUser(email, password);
+        const user = await userDB.createUser(username, email, password);
 
         // sets a cookie with the user's info
         req.session.reset();
@@ -494,8 +499,9 @@ class UserAPI {
     }
 
     static validateEmail(email) {
-        var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(String(email).toLowerCase());
+        return email.indexOf('@') !== -1;
+        // var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        // return re.test(String(email).toLowerCase());
     }
 }
 

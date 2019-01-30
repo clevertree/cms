@@ -34,7 +34,6 @@ CREATE TABLE IF NOT EXISTS `article` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
   `parent_id` int(11) DEFAULT NULL,
-  `theme_id` int(11) DEFAULT NULL,
   `path` varchar(256) DEFAULT NULL,
   `title` varchar(256) DEFAULT NULL,
   `content` text DEFAULT NULL,
@@ -45,8 +44,7 @@ CREATE TABLE IF NOT EXISTS `article` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk:article.path` (`path`),
   KEY `fk:article.user_id` (`user_id`),
-  CONSTRAINT `fk:article.user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk:article.theme_id` FOREIGN KEY (`theme_id`) REFERENCES `theme` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk:article.user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=404 DEFAULT CHARSET=utf8;
 
 
