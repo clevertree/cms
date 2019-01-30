@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             };
             xhr.responseType = 'json';
-            xhr.open ("GET", `:user/${userID}/json`, true);
+            xhr.open ("GET", `:user/${userID}/:json`, true);
             // xhr.setRequestHeader("Accept", "application/json");
             xhr.send ();
         }
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
         render() {
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.user.id}/changepassword" method="POST" class="userform userform-changepassword themed">
+                <form action="/:user/${this.state.user.id}/:changepassword" method="POST" class="userform userform-changepassword themed">
                     <fieldset ${!this.state.editable ? 'disabled="disabled"' : ''}>
                         <legend>Change Password</legend>
                         <table>

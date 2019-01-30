@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
         render() {
             this.innerHTML =
                 `
-                <form action="/:user/forgotpassword" method="POST" class="userform userform-forgotpassword themed" style1="display: none;">
+                <form action="/:user/:forgotpassword" method="POST" class="userform userform-forgotpassword themed" style1="display: none;">
                     <fieldset>
                         <legend>Forgot Password</legend>
                         <table>

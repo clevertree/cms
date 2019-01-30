@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const hostname = document.location.host.split(':')[0];
             this.innerHTML =
                 `
-                <form action="/:user/register" method="POST" class="userform userform-register themed">
+                <form action="/:user/:register" method="POST" class="userform userform-register themed">
                     <fieldset>
                         <legend>Register a new account</legend>
                         <table>

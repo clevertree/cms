@@ -72,7 +72,7 @@ class ArticleDatabase {
     }
     async fetchArticle(whereSQL, values, selectSQL='a.*, null as content') {
         const articles = await this.selectArticles(whereSQL, values, selectSQL);
-        return articles[0];
+        return articles[0] || null;
     }
 
     async fetchArticleByPath(renderPath) { return await this.fetchArticle('a.path = ? LIMIT 1', renderPath, 'a.*'); }

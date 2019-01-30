@@ -37,16 +37,16 @@ class UserAPI {
         // TODO: handle session_save login
         // router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
         // API Routes
-        router.get('/:?user/:id(\\d+)/json',                async (req, res, next) => await this.handleViewRequest(true, parseInt(req.params.id), req, res, next));
-        router.get('/:?user/:id(\\d+)',                     async (req, res, next) => await this.handleViewRequest(false, parseInt(req.params.id), req, res, next));
-        router.all('/:?user/:id(\\d+)/profile',         PM, async (req, res) => await this.handleUpdateRequest('profile', parseInt(req.params.id), req, res));
-        router.all('/:?user/:id(\\d+)/flags',           PM, async (req, res) => await this.handleUpdateRequest('flags', parseInt(req.params.id), req, res));
-        router.all('/:?user/:id(\\d+)/changepassword',  PM, async (req, res) => await this.handleUpdateRequest('changepassword', parseInt(req.params.id), req, res));
-        router.all('/:?user/login',                     PM, async (req, res) => await this.handleLoginRequest(req, res));
-        // router.all('/:?user/session',                   PM, async (req, res) => await this.handleSessionLoginRequest(req, res));
-        router.all('/:?user/logout',                    PM, async (req, res) => await this.handleLogoutRequest(req, res));
-        router.all('/:?user/register',                  PM, async (req, res) => await this.handleRegisterRequest(req, res));
-        router.all('/:?user/forgotpassword',            PM, async (req, res) => await this.handleForgotPassword(req, res));
+        router.get('/[:]user/:userID(\\w+)/[:]json',                async (req, res, next) => await this.handleViewRequest(true, (req.params.userID), req, res, next));
+        router.get('/[:]user/:userID(\\w+)',                     async (req, res, next) => await this.handleViewRequest(false, (req.params.userID), req, res, next));
+        router.all('/[:]user/:userID(\\w+)/[:]profile',         PM, async (req, res) => await this.handleUpdateRequest('profile', (req.params.userID), req, res));
+        router.all('/[:]user/:userID(\\w+)/[:]flags',           PM, async (req, res) => await this.handleUpdateRequest('flags', (req.params.userID), req, res));
+        router.all('/[:]user/:userID(\\w+)/[:]changepassword',  PM, async (req, res) => await this.handleUpdateRequest('changepassword', (req.params.userID), req, res));
+        router.all('/[:]user/[:]login',                     PM, async (req, res) => await this.handleLoginRequest(req, res));
+        // router.all('/[:]user/session',                   PM, async (req, res) => await this.handleSessionLoginRequest(req, res));
+        router.all('/[:]user/[:]logout',                    PM, async (req, res) => await this.handleLogoutRequest(req, res));
+        router.all('/[:]user/[:]register',                  PM, async (req, res) => await this.handleRegisterRequest(req, res));
+        router.all('/[:]user/[:]forgotpassword',            PM, async (req, res) => await this.handleForgotPassword(req, res));
 
         this.router = router;
     }
@@ -194,7 +194,7 @@ class UserAPI {
 
         // sets a cookie with the user's info
         req.session.reset();
-        req.session.user = {id: user.id};
+        req.session.userID = user.id;
 
         if(saveSession) {
             // TODO: set maxAge 2 weeks
@@ -234,26 +234,27 @@ class UserAPI {
         try {
             if(!userID)
                 throw new Error("Invalid user id");
-            const userDB = await DatabaseManager.getUserDB(req);
-            const user = await userDB.fetchUserByID(userID);
 
             // Render View
             if(asJSON) {
-                const response = {user, editable: false};
-                if(req.session && req.session.userID) {
-                    const sessionUser = await userDB.fetchUserByID(req.session.userID);
-                    if (sessionUser.isAdmin() || sessionUser.id === article.user_id)
-                        response.editable = sessionUser.isAdmin() ? 'admin' : 'user';
+                const userDB = await DatabaseManager.getUserDB(req);
+                const user = await userDB.fetchUserByID(userID);
+                const response = {user};
+                if(req.query['getAll'] || req.query['getSessionUser']) {
+                    response.sessionUser = null;
+                    if (req.session && req.session.userID) {
+                        response.sessionUser = await userDB.fetchUserByID(req.session.userID);
+                    }
                 }
-                if(req.query.getAll || req.query.getProfileConfig)
-                    response.profileConfig = this.app.config.user.profile;
+                // if(req.query.getAll || req.query.getProfileConfig)
+                //     response.profileConfig = this.app.config.user.profile;
                 res.json(response);
 
             } else {
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<%- include("user/section/user.ejs")%>`, {
-                            user
+                        .render(req, `<%- include("user/element/user-profile.ejs")%>`, {
+                            id: userID
                         })
                 );
             }
@@ -343,7 +344,7 @@ class UserAPI {
                 await this.logout(req, res);
 
                 return res.json({
-                    redirect: `/:user/login`,
+                    redirect: `/:user/:login`,
                     message: `User logged out successfully. <br/>Redirecting...`
                 });
             }
@@ -368,7 +369,7 @@ class UserAPI {
                 const user = await this.register(req, req.body.email, req.body.password, req.body.password_confirm);
 
                 return res.json({
-                    redirect: `/:user/${user.id}/profile`,
+                    redirect: `/:user/${user.id}/:profile`,
                     message: `User registered successfully: ${user.email}. <br/>Redirecting...`,
                     user
                 });
@@ -403,7 +404,7 @@ class UserAPI {
                 await mail.send();
 
                 return res.json({
-                    redirect: `/:user/login`,
+                    redirect: `/:user/:login`,
                     message: `Recovery email sent successfully to ${user.email}. <br/>Redirecting...`,
                     user
                 });
@@ -439,13 +440,13 @@ class UserAPI {
                 let affectedRows = -1;
                 switch(type) {
                     case 'profile':
-                        affectedRows = await this.updateProfile(userID, req.body);
+                        affectedRows = await this.updateProfile(req, userID, req.body);
                         break;
                     case 'flags':
-                        affectedRows = await this.updateFlags(userID, req.body);
+                        affectedRows = await this.updateFlags(req, userID, req.body);
                         break;
                     case 'changepassword':
-                        affectedRows = await this.updatePassword(userID, sessionUser.isAdmin ? null : req.body.password_old, req.body.password_new, req.body.password_confirm);
+                        affectedRows = await this.updatePassword(req, userID, sessionUser.isAdmin ? null : req.body.password_old, req.body.password_new, req.body.password_confirm);
                         break;
                 }
                 const user = await userDB.fetchUserByID(userID);

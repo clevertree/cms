@@ -21,10 +21,10 @@
 
                 <%_ if(!req.session.user) { _%>
                     <li>
-                        <a href=":user/login">Log in</a>
+                        <a href=":user/:login">Log in</a>
                         <ul class="nav-submenu">
                             <li>
-                                <a href=":user/register">Register</a>
+                                <a href=":user/:register">Register</a>
                             </li>
                         </ul>
                     </li>
@@ -42,10 +42,10 @@
                             </li>
                             <li><hr/></li>
                             <li>
-                                <a href=":user/<%=req.session.user.id%>/profile">Edit Profile</a>
+                                <a href=":user/<%=req.session.user.id%>/:profile">Edit Profile</a>
                             </li>
                             <li>
-                                <a href=":user/logout">Log out</a>
+                                <a href=":user/:logout">Log out</a>
                             </li>
                         </ul>
                     </li>

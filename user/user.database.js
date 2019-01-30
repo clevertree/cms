@@ -77,10 +77,30 @@ class UserDatabase  {
         const results = await this.queryAsync(SQL, values);
         return results.map(result => new UserRow(result))
     }
+    // async searchUsers(search, selectSQL='u.*,null as password') {
+    //     if(!isNaN(parseInt(search)) && isFinite(search)) {
+    //         return await this.selectUsers('? IN (u.id)', search, selectSQL);
+    //     } else {
+    //         return await this.selectUsers('? IN (u.email, u.username)', search, selectSQL);
+    //     }
+    // }
 
-    async fetchUser(whereSQL, values, selectSQL='u.*,null as password') { return (await this.selectUsers(whereSQL, values, selectSQL))[0]; }
-    async fetchUserByID(id, selectSQL='u.*,null as password') { return await this.fetchUser('u.id = ? LIMIT 1', id, selectSQL); }
-    async fetchUserByEmail(email, selectSQL='u.*,null as password') { return await this.fetchUser('u.email = ? LIMIT 1', email, selectSQL); }
+    async fetchUser(whereSQL, values, selectSQL='u.*,null as password') {
+        const users = await this.selectUsers(whereSQL, values, selectSQL);
+        if(users.length === 0)
+            throw new Error("User not found: " + values);
+        return users[0];
+    }
+    async fetchUserByID(userID, selectSQL='u.*,null as password') {
+        if(!isNaN(parseInt(userID)) && isFinite(userID)) {
+            return await this.fetchUser('? IN (u.id)', userID, selectSQL);
+        } else {
+            return await this.fetchUser('? IN (u.email, u.username)', userID, selectSQL);
+        }
+    }
+    async fetchUserByEmail(email, selectSQL='u.*,null as password') {
+        return await this.fetchUser('u.email = ? LIMIT 1', email, selectSQL);
+    }
     // async fetchGuestUser(selectSQL='u.*,null as password') { return await this.fetchUser('FIND_IN_SET(\'guest\', u.flags) LIMIT 1', null, selectSQL); }
 
     async createUser(username, email, password, flags='') {

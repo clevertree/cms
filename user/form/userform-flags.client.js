@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             };
             xhr.responseType = 'json';
-            xhr.open ("GET", `:user/${userID}/json`, true);
+            xhr.open ("GET", `:user/${userID}/:json`, true);
             // xhr.setRequestHeader("Accept", "application/json");
             xhr.send ();
         }
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("RENDER", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.user.id}/flags" method="POST" class="userform userform-flags themed">
+                <form action="/:user/${this.state.user.id}/:flags" method="POST" class="userform userform-flags themed">
                     <fieldset ${this.state.editable !== 'admin' ? 'disabled="disabled"' : ''}>
                         <legend>Update User Flags</legend>
                         <table>

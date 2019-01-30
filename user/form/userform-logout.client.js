@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
         render() {
             this.innerHTML =
                 `
-        <form action="/:user/logout" method="POST" class="userform userform-logout themed">
+        <form action="/:user/:logout" method="POST" class="userform userform-logout themed">
             <fieldset>
                 <legend>Log Out</legend>
                     <table>

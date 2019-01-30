@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // this.render();
             };
             xhr.responseType = 'json';
-            xhr.open ("GET", `:user/${userID}/json?getAll=true`, true);
+            xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
             // xhr.setRequestHeader("Accept", "application/json");
             xhr.send ();
         }
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("RENDER", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.user.id}/profile" method="POST" class="userform userform-profile themed">
+                <form action="/:user/${this.state.user.id}/:profile" method="POST" class="userform userform-profile themed">
                     <fieldset ${!this.state.editable ? 'disabled="disabled"' : ''}>
                         <legend>Update Profile</legend>
                         <table>

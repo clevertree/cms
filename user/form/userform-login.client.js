@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("Render", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/login" method="POST" class="userform userform-login themed">
+                <form action="/:user/:login" method="POST" class="userform userform-login themed">
                     <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
                         <legend>Log In</legend>
                         <table>
