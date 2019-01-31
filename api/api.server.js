@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 
-const { ConfigManager } = require('../config/config.manager');
+const { ConfigDatabase } = require('../config/config.database');
+
 const { DatabaseManager } = require('../database/database.manager');
 const { UserAPI } = require('../user/user.api');
 const { ArticleAPI } = require('../article/article.api');
@@ -13,24 +14,38 @@ const BASE_DIR = path.resolve(path.dirname(__dirname));
 class APIManager {
     constructor() {
         this.router = null;
-        this.config = null;
     }
 
-    async configure(interactive=true) {
-        const serverConfig = await ConfigManager.getOrCreate('server');
+    async configure(configCallback=null) {
+        // TODO: use local config with save and prompt vs memory config (no save, no prompt)
+        if(!configCallback)
+            configCallback = this.configPromptAndSave;
+        if(typeof configCallback === "object")
+            configCallback = this.configObject(configCallback);
+
+        // let saveConfig = false;
+        // if(!configCallback) {
+        //     saveConfig = true;
+        // }
+        if(typeof configCallback.server === "undefined")      configCallback.server = {};
+        if(typeof configCallback.server.port === "undefined") configCallback.server.port = 8080;
+        if(typeof configCallback.database === "undefined")      configCallback.database = {};
+        // Init Database
+
         // hostname = (hostname || require('os').hostname()).toLowerCase();
-        // if(typeof serverConfig.session === 'undefined') {
-        //     serverConfig.session = {};
+        // if(typeof globalConfig.server.session === 'undefined') {
+        //     globalConfig.server.session = {};
         // }
 
-        if(typeof serverConfig.port === 'undefined') {
-            serverConfig.port = (await ConfigManager.prompt(`Please enter the Server Port`, serverConfig.port || 8080));
+        if(promptCallback) {
+            configCallback.server.port = await promptCallback(`Please enter the Server Port`, configCallback.server.port);
+            // globalConfig.server = await configDB.getConfigValues('server%');
         }
-        this.config = serverConfig;
+        if(saveConfig)
+            LocalConfigManager.saveAll();
 
 
-        // Init Database
-        await DatabaseManager.configure(interactive);
+        await DatabaseManager.configure();
         await UserAPI.configure(interactive);
         await ArticleAPI.configure(interactive);
         await FileAPI.configure(interactive);
@@ -44,7 +59,7 @@ class APIManager {
         // CMS Asset files
         router.use(express.static(BASE_DIR));
         this.router = router;
-
+        return configCallback;
     }
 
     getMiddleware() {
@@ -56,21 +71,45 @@ class APIManager {
         }
     }
 
-    async listen() {
-
+    async listen(ports=null) {
+        if(!ports)
+            ports = (await LocalConfigManager.get('server')).port;
         const express = express();
         express.use(this.getMiddleware());
 
         // HTTP
-        const ports = Array.isArray(serverConfig.port) ? serverConfig.port : [serverConfig.port];
-        for(let i=0; i<ports.length; i++) {
+        ports = Array.isArray(ports) ? ports : [ports];
+        for(let i=0; i<ports.length; i++) try {
             express.listen(ports[i]);
             console.log(`Listening on ${ports[i]}`);
+        } catch (e) {
+            console.log(`Could not listen on ${ports[i]}: ${e.message}`);
         }
         return express;
     }
 
+    async configObject(config) {
+        return function(path, text, defaultValue) {
 
+        }
+    }
+
+    async configPromptAndSave(path, text, defaultValue) {
+        const globalConfig = await LocalConfigManager.getAll();
+
+    }
+
+    async prompt(text, defaultValue=null) {
+        var standard_input = process.stdin;
+        standard_input.setEncoding('utf-8');
+        return new Promise( ( resolve, reject ) => {
+            process.stdout.write(text + ` [${(defaultValue === null ? 'null' : defaultValue)}]: `);
+            standard_input.on('data', function (data) {
+                data = data.trim() || defaultValue;
+                resolve (data);
+            });
+        });
+    }
 }
 
 exports.APIServer = new APIManager();

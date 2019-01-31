@@ -7,7 +7,7 @@ const { FileManager } = require('../file/file.manager');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
-class ConfigManager {
+class LocalConfigManager {
     constructor() {
         this.config = null;
     }
@@ -96,4 +96,4 @@ class ConfigManager {
 //     debug: true,
 // };
 
-exports.ConfigManager = new ConfigManager();
+exports.LocalConfigManager = new LocalConfigManager();

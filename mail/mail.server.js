@@ -4,7 +4,7 @@ const express = require('express');
 const nodemailer = require('nodemailer');
 const smtpTransport = require("nodemailer-smtp-transport");
 
-const { ConfigManager } = require('../config/config.manager');
+const { DatabaseManager } = require('../database/database.manager');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
@@ -15,16 +15,18 @@ class MailServer {
 
 
     async listen(prompt = false) {
-        const mailConfig = await ConfigManager.getOrCreate('mail');
+        const configDB = await DatabaseManager.getConfigDB();
+        let mailConfig = await configDB.getConfigValues('mail%');
         if(typeof mailConfig.auth === "undefined")
             mailConfig.auth = {};
         if(prompt || !mailConfig.host || !mailConfig.port || !mailConfig.auth.user || !mailConfig.auth.pass) {
             const hostname = 'mail.' + require('os').hostname();
 
-            mailConfig.host = (await ConfigManager.prompt(`Please enter the Mail Server Host`, mailConfig.host || hostname));
-            mailConfig.port = (await ConfigManager.prompt(`Please enter the Mail Server Port`, mailConfig.port || 587));
-            mailConfig.auth.user = (await ConfigManager.prompt(`Please enter the Mail Server Username`, mailConfig.auth.user));
-            mailConfig.auth.pass = (await ConfigManager.prompt(`Please enter the Mail Server Password`, mailConfig.auth.pass));
+            await configDB.promptSet('mail.host', `Please enter the Mail Server Host`, mailConfig.host || hostname);
+            await configDB.promptSet('mail.port', `Please enter the Mail Server Port`, mailConfig.port || 587);
+            await configDB.promptSet('mail.auth.user', `Please enter the Mail Server Username`, mailConfig.auth.user);
+            await configDB.promptSet('mail.auth.pass', `Please enter the Mail Server Password`, mailConfig.auth.pass);
+            mailConfig = await configDB.getConfigValues('mail%');
         }
 
         try {
@@ -38,7 +40,7 @@ class MailServer {
                 });
             });
             console.info(`Connection to Mail Server '${mailConfig.host}' Successful`);
-            await ConfigManager.saveAll();
+            // await configDB.saveAll();
 
         } catch (e) {
             console.error(`Error connecting to ${mailConfig.host}: ${e}`);

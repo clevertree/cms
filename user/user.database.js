@@ -1,14 +1,9 @@
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 
-const { ConfigManager } = require('../config/config.manager');
+// const { ConfigManager } = require('../config/config.manager');
 
 class UserDatabase  {
-    static get(req=null) {
-        return async () => new UserDatabase(await DatabaseManager.get(req));
-    }
-
-
     constructor(db, debug=false) {
         this.db = db;
         this.debug = debug;

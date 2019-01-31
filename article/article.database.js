@@ -3,7 +3,6 @@
 // const ejs = require('ejs');
 // const express = require('express');
 
-const { ConfigManager } = require('../config/config.manager');
 
 // Init
 class ArticleDatabase {
@@ -34,7 +33,7 @@ class ArticleDatabase {
         // Check for tables
         await this.configureTable('article',            ArticleRow.SQL_TABLE);
         await this.configureTable('article_revision',    ArticleRevisionRow.SQL_TABLE);
-
+// TODO: ask for server title
         // Insert home page
         let homeArticle = await this.fetchArticleByPath("/");
         if(homeArticle) {
@@ -46,7 +45,7 @@ class ArticleDatabase {
                         let homeArticleTitle = 'Home';
                         let homeArticleContent = '<%- include("article/home.ejs")%>';
                         if(interactive) {
-                            homeArticleTitle = await ConfigManager.prompt(`Please enter a title for the Home Page`, "Home");
+                            // homeArticleTitle = await ConfigManager.prompt(`Please enter a title for the Home Page`, "Home");
                         }
                         const homeArticleID = await this.insertArticle(homeArticleTitle, homeArticleContent, "/");
                         console.info("Home Article Created: " + homeArticleID);

@@ -6,7 +6,7 @@ const crypto = require('crypto');
 const express = require('express');
 
 
-const { FileDatabase } = require("./filedatabase.class");
+const { FileDatabase } = require("./file.database");
 
 class FileAPI {
     constructor() {

@@ -6,15 +6,16 @@ const { MailServer } = require('./mail/mail.server');
 
 (async () => {
     // Listen for HTTP(S)
-    // await APIServer.listen();
+    await APIServer.listen();
 
-    await APIServer.configure(true);
-
-    const server = express();
-    server.use(APIServer.getMiddleware());
-    const port = APIServer.config.port || 8080;
-    server.listen(port);
-    console.log(`Listening on ${port}`);
+    // await DatabaseManager.configure(true);
+    // const config = await APIServer.configure(true);
+    //
+    // const server = express();
+    // server.use(APIServer.getMiddleware());
+    // const port = config.port || 8080;
+    // server.listen(port);
+    // console.log(`Listening on ${port}`);
 
     // Listen for Mail ports
     await MailServer.listen();

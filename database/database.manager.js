@@ -1,43 +1,51 @@
+
 const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql');
 
-const { ConfigManager } = require('../config/config.manager');
+const { LocalConfigManager } = require('../config/localconfig.manager');
 const { FileManager } = require('../file/file.manager');
 
 const { ArticleDatabase } = require('../article/article.database');
 const { UserDatabase } = require('../user/user.database');
+const { ConfigDatabase } = require('../config/config.database');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
 class DatabaseManager {
     constructor() {
         this.hosts = {};
-
+        // this.config = null;
     }
 
+    // TODO: database name instead of req
     async getArticleDB(req=null)    { return new ArticleDatabase(await this.get(req)); }
     async getUserDB(req=null)       { return new UserDatabase(await this.get(req)); }
+    async getConfigDB(req=null)     { return new ConfigDatabase(await this.get(req)); }
 
 
-    async configure(interactive=false, req=null) {
-        const dbConfig = await ConfigManager.getOrCreate('database');
+    async configure(dbConfig=null, promptCallback=false) {
+        let saveConfig = false;
+        if(!dbConfig) {
+            dbConfig = await LocalConfigManager.get('database');
+            saveConfig = true;
+        }
         // if(!dbConfig.database && !prompt)
         //     throw new Error("Prompt required to select database name")
         for(let i=0; i<4; i++) {
             try {
 
-                if(!dbConfig.database || !dbConfig.user || !dbConfig.host) {
+                if(!dbConfig.name || !dbConfig.user || !dbConfig.host) {
                     let hostname        = (require('os').hostname()).toLowerCase();
-                    dbConfig.database   = dbConfig.database || 'ct_' + hostname;
+                    dbConfig.name       = dbConfig.name || 'cms_' + hostname;
                     dbConfig.user       = dbConfig.user || 'root';
                     dbConfig.host       = dbConfig.host || hostname;
 
-                    if(interactive) {
-                        dbConfig.database = await ConfigManager.prompt(`Please enter the Database Name`, dbConfig.database);
-                        dbConfig.user = await ConfigManager.prompt(`Please enter the Database User Name`, dbConfig.user);
-                        dbConfig.password = await ConfigManager.prompt(`Please enter the Password for Database User '${dbConfig.user}'`);
-                        dbConfig.host = await ConfigManager.prompt(`Please enter the Database Host`, dbConfig.host);
+                    if(promptCallback) {
+                        dbConfig.name = await promptCallback(`Please enter the Database Name`, dbConfig.name);
+                        dbConfig.user = await promptCallback(`Please enter the Database User Name`, dbConfig.user);
+                        dbConfig.password = await promptCallback(`Please enter the Password for Database User '${dbConfig.user}'`);
+                        dbConfig.host = await promptCallback(`Please enter the Database Host`, dbConfig.host);
                     }
                 }
 
@@ -46,18 +54,18 @@ class DatabaseManager {
                 } catch (e) {
                     if(e.code === "ER_BAD_DB_ERROR") {
                         const repairConfig = Object.assign({}, dbConfig);
-                        delete repairConfig.database;
+                        delete repairConfig.name;
                         const repairDB = await this.createConnection(repairConfig);
-                        await this.queryAsync(repairDB, `CREATE SCHEMA \`${dbConfig.database}\``);
-                        await this.queryAsync(repairDB, `USE \`${dbConfig.database}\``);
-                        console.info(`Created new schema: \`${dbConfig.database}\``)
+                        await this.queryAsync(repairDB, `CREATE SCHEMA \`${dbConfig.name}\``);
+                        await this.queryAsync(repairDB, `USE \`${dbConfig.name}\``);
+                        console.info(`Created new schema: \`${dbConfig.name}\``)
                     } else {
                         throw e;
                     }
                 }
 
-                // Save working config. TODO: every init?
-                await ConfigManager.saveAll();
+                if(saveConfig)
+                    LocalConfigManager.saveAll();
             } catch (e) {
                 console.error(e);
                 continue;
@@ -68,12 +76,14 @@ class DatabaseManager {
 
         // Configure Databases
         const databases = [
-            await this.getUserDB(req), // TODO: users first
-            await this.getArticleDB(req),
+            await this.getUserDB(), // TODO: users first
+            await this.getArticleDB(),
+            await this.getConfigDB(),
         ];
         for(var i=0; i<databases.length; i++)
-            await databases[i].configure(interactive);
+            await databases[i].configure(promptCallback);
 
+        return dbConfig;
     }
 
     async get(req=null, reconnect=false) {
@@ -88,7 +98,7 @@ class DatabaseManager {
             this.hosts[host].end();
         }
 
-        const dbConfig = await ConfigManager.getOrCreate('database');
+        const dbConfig = await LocalConfigManager.getOrCreate('database');
         const db = await this.createConnection(dbConfig);
 
         this.hosts[host] = db;
@@ -131,9 +141,6 @@ class DatabaseManager {
         });
     }
 
-    // sleep(ms) {
-    //     return new Promise(resolve => setTimeout(resolve, ms));
-    // }
 }
 
 exports.DatabaseManager = new DatabaseManager();
