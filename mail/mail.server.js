@@ -10,13 +10,13 @@ class MailServer {
         this.server = null;
     }
 
-    async configure(interactive=false)
+    async configure(interactive=false, forcePrompt=false)
     {
         const configDB = await DatabaseManager.getConfigDB();
         let mailConfig = await configDB.getConfigValues('mail');
         if(typeof mailConfig.auth === "undefined")
             mailConfig.auth = {};
-        if(interactive || !mailConfig.host || !mailConfig.port || !mailConfig.auth.user) {
+        if(forcePrompt || !mailConfig.host || !mailConfig.port || !mailConfig.auth.user) {
             const hostname = 'mail.' + require('os').hostname();
 
             await configDB.promptValue('mail.host', `Please enter the Mail Server Host`, mailConfig.host || hostname);
@@ -34,8 +34,8 @@ class MailServer {
 
         } catch (e) {
             console.error(`Error connecting to ${mailConfig.host}: ${e}`);
-            if(interactive === false)
-                return await this.configure(true);
+            if(forcePrompt === false)
+                return await this.configure(interactive, true);
             throw e;
         }
         return mailConfig;

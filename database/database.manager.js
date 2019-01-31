@@ -24,13 +24,13 @@ class DatabaseManager {
     async getConfigDB(req=null)     { return new ConfigDatabase(await this.get(req)); }
 
 
-    async configure(interactive=false, config=null) {
+    async configure(interactive=false, config=null, forcePrompt=false) {
         const localConfig = new LocalConfig(interactive, config, !config);
         const dbConfig = await localConfig.getOrCreate('database');
 
         let hostname        = (require('os').hostname()).toLowerCase();
 
-        if(interactive || !dbConfig.database || !dbConfig.user || !dbConfig.host) {
+        if(forcePrompt || !dbConfig.database || !dbConfig.user || !dbConfig.host) {
             await localConfig.promptValue('database.host', `Please enter the Database Host`, dbConfig.host || hostname);
             await localConfig.promptValue('database.user', `Please enter the Database User Name`, dbConfig.user || 'root');
             await localConfig.promptValue('database.password', `Please enter the Password for Database User '${dbConfig.user}'`);
@@ -41,6 +41,7 @@ class DatabaseManager {
             db.end();
         } catch (e) {
             if(e.code === "ER_BAD_DB_ERROR") {
+                console.error(e.message);
                 const repairConfig = Object.assign({}, dbConfig);
                 delete repairConfig.database;
                 const repairDB = await this.createConnection(repairConfig);
@@ -51,8 +52,10 @@ class DatabaseManager {
                 const db = await this.createConnection(dbConfig);
                 db.end();
             } else {
-                if(interactive === false)
-                    return await this.configure(true, config);
+                if(forcePrompt === false) {
+                    console.error(e);
+                    return await this.configure(true, config, true);
+                }
                 throw e;
             }
         }
