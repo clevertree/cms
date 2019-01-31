@@ -70,6 +70,8 @@ class ConfigDatabase  {
             }
             target[lastPath] = results[i].value;
         }
+        if(typeof config[name] === "undefined")
+            return {};
         return config[name];
     }
 
@@ -139,7 +141,7 @@ class ConfigRow {
         return `
 CREATE TABLE \`config\` (
   \`name\` varchar(256) NOT NULL,
-  \`value\` TEXT NOT NULL,
+  \`value\` TEXT DEFAULT NULL,
   \`updated\` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY \`uk.config.name\` (\`name\`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

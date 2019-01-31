@@ -31,14 +31,7 @@ class MailServer {
 
         try {
             this.server = nodemailer.createTransport(smtpTransport(mailConfig));
-            await new Promise((resolve, reject) => {
-                this.server.verify((error, success) => {
-                    if (error || !success)
-                        reject(error);
-                    else
-                        resolve(true);
-                });
-            });
+            await this.server.verify();
             console.info(`Connection to Mail Server '${mailConfig.host}' Successful`);
             // await configDB.saveAll();
 

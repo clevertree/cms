@@ -26,26 +26,30 @@ class DatabaseManager {
 
     async configure(interactive=false, config=null) {
         const localConfig = new LocalConfig(interactive, config, !config);
-        const dbConfig = await localConfig.get('database');
+        const dbConfig = await localConfig.getOrCreate('database');
 
         let hostname        = (require('os').hostname()).toLowerCase();
 
-        if(!dbConfig.name || !dbConfig.user || !dbConfig.host) {
-            await localConfig.promptValue('database.name', `Please enter the Database Name`, dbConfig.name || 'cms_' + hostname);
+        if(!dbConfig.database || !dbConfig.user || !dbConfig.host) {
+            await localConfig.promptValue('database.host', `Please enter the Database Host`, dbConfig.host || hostname);
             await localConfig.promptValue('database.user', `Please enter the Database User Name`, dbConfig.user || 'root');
             await localConfig.promptValue('database.password', `Please enter the Password for Database User '${dbConfig.user}'`);
-            await localConfig.promptValue('database.host', `Please enter the Database Host`, dbConfig.host || hostname);
+            await localConfig.promptValue('database.database', `Please enter the Database Name`, dbConfig.database || 'cms_' + hostname);
         }
         try {
-            await this.createConnection(dbConfig);
+            const db = await this.createConnection(dbConfig);
+            db.end();
         } catch (e) {
             if(e.code === "ER_BAD_DB_ERROR") {
                 const repairConfig = Object.assign({}, dbConfig);
-                delete repairConfig.name;
+                delete repairConfig.database;
                 const repairDB = await this.createConnection(repairConfig);
-                await this.queryAsync(repairDB, `CREATE SCHEMA \`${dbConfig.name}\``);
-                await this.queryAsync(repairDB, `USE \`${dbConfig.name}\``);
-                console.info(`Created new schema: \`${dbConfig.name}\``)
+                await this.queryAsync(repairDB, `CREATE SCHEMA \`${dbConfig.database}\``);
+                await this.queryAsync(repairDB, `USE \`${dbConfig.database}\``);
+                console.info(`Created new schema: \`${dbConfig.database}\``);
+                repairDB.end();
+                const db = await this.createConnection(dbConfig);
+                db.end();
             } else {
                 throw e;
             }

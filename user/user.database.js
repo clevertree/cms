@@ -38,7 +38,7 @@ class UserDatabase  {
         if(adminUser) {
             console.info("Admin user found: " + adminUser.id);
         } else {
-            if(prompt) {
+            if(interactive) {
                 for (let i = 0; i < 4; i++) {
                     try {
                         const hostname = require('os').hostname().toLowerCase();

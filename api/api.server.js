@@ -18,7 +18,7 @@ class APIServer {
 
     async configure(interactive=false, config=null) {
         const localConfig = new LocalConfig(interactive, config, !config);
-        const serverConfig = await localConfig.get('server');
+        const serverConfig = await localConfig.getOrCreate('server');
         // let saveConfig = false;
         // if(!configCallback) {
         //     saveConfig = true;

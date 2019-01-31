@@ -1,0 +1,27 @@
+{
+    "mail": {
+        "auth": {
+            "user": "mail@clevetree.net",
+            "pass": "mailmail"
+        },
+        "host": "mail.ffga.me",
+        "port": 587
+    },
+    "database": {
+        "database": "ct_kittenton",
+        "user": "root",
+        "password": null,
+        "host": "kittenton",
+        "name": "cms_kittenton"
+    },
+    "user": {
+        "cookie": {},
+        "session": {
+            "secret": "81d937af-1dcf-43ed-86a4-2e1aae27d741",
+            "cookieName": "session"
+        }
+    },
+    "server": {
+        "port": 8080
+    }
+}
