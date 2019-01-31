@@ -51,6 +51,8 @@ class DatabaseManager {
                 const db = await this.createConnection(dbConfig);
                 db.end();
             } else {
+                if(interactive === false)
+                    return await this.configure(true, config);
                 throw e;
             }
         }
