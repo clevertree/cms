@@ -6,6 +6,7 @@ const { MailServer } = require('./mail/mail.server');
 
 (async () => {
     // Listen for HTTP(S)
+    await APIServer.configure(true);
     await APIServer.listen();
 
     // await DatabaseManager.configure(true);
