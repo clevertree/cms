@@ -3,7 +3,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const session = require('client-sessions');
 
-const { ConfigManager } = require('../config/config.manager');
+const { LocalConfig } = require('../config/local.config');
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeManager } = require('../theme/theme.manager');
 const { UserDatabase } = require('./user.database');
@@ -14,26 +14,23 @@ class UserAPI {
         this.router = null;
     }
 
-    async configure(interactive=false) {
-        // Configure
-        let config = await ConfigManager.getAll();
-        if(!config) config = {};
-        if(!config.user) config.user = {};
-        let configSession = Object.assign({}, config.user.session || {});
-        if(!configSession.secret) configSession.secret = require('uuid/v4')();
+    // Configure
+    async configure(interactive=false, config=null) {
+        const localConfig = new LocalConfig(interactive, config, !config);
+        const cookieConfig = await localConfig.getOrCreate('cookie');
 
-        let configCookie = Object.assign({}, config.user.cookie || {});
-        configSession.cookieName = 'session';
-        const router = express.Router();
-        router.use(session(configSession));
-
-        router.use(cookieParser(configCookie));
+        const sessionConfig = await localConfig.getOrCreate('session');
+        if(!sessionConfig.secret) sessionConfig.secret = require('uuid/v4')();
+        sessionConfig.cookieName = 'session';
 
         const bodyParser = require('body-parser');
         const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
 
+        const router = express.Router();
+        router.use(session(sessionConfig));
+        router.use(cookieParser(cookieConfig));
 
-        // TODO: create admin account on boot
+
         // TODO: handle session_save login
         // router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
         // API Routes

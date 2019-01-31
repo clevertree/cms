@@ -8,8 +8,10 @@ const { FileManager } = require('../file/file.manager');
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
 class LocalConfig {
-    constructor() {
-        this.config = null;
+    constructor(interactive=false, config=null, saveLocal=false) {
+        this.config = config || null;
+        this.interactive = interactive;
+        this.saveLocal = saveLocal;
     }
 
     async get(key) {
@@ -56,7 +58,32 @@ class LocalConfig {
         return true;
     }
 
-    async prompt(text, defaultValue=null) {
+    async promptValue(path, text, defaultValue=null) {
+        const config = await this.getAll();
+        if(!Array.isArray(path))
+            path = path.split('.');
+        const lastPath = path.pop();
+        let target = config;
+        for(let i=0; i<path.length; i++) {
+            if(typeof target[path[i]] === "undefined")
+                target[path[i]] = {};
+            if(typeof target[path[i]] !== "object")
+                throw new Error("Invalid path: " + path.join('.'))
+            target = target[path[i]];
+        }
+        if(typeof target[lastPath] !== "undefined")
+            defaultValue = target[lastPath];
+        const value = this.interactive
+            ? await this.prompt(text, defaultValue)
+            : defaultValue;
+        target[lastPath] = value;
+        if(this.saveLocal)
+            await this.saveAll();
+        return value;
+    }
+
+
+    prompt(text, defaultValue=null) {
         var standard_input = process.stdin;
         standard_input.setEncoding('utf-8');
         return new Promise( ( resolve, reject ) => {
@@ -96,4 +123,4 @@ class LocalConfig {
 //     debug: true,
 // };
 
-exports.LocalConfigManager = new LocalConfig();
+exports.LocalConfig = LocalConfig;

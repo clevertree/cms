@@ -16,17 +16,17 @@ class MailServer {
 
     async listen(prompt = false) {
         const configDB = await DatabaseManager.getConfigDB();
-        let mailConfig = await configDB.getConfigValues('mail%');
+        let mailConfig = await configDB.getConfigValues('mail');
         if(typeof mailConfig.auth === "undefined")
             mailConfig.auth = {};
-        if(prompt || !mailConfig.host || !mailConfig.port || !mailConfig.auth.user || !mailConfig.auth.pass) {
+        if(prompt || !mailConfig.host || !mailConfig.port || !mailConfig.auth.user) {
             const hostname = 'mail.' + require('os').hostname();
 
-            await configDB.promptSet('mail.host', `Please enter the Mail Server Host`, mailConfig.host || hostname);
-            await configDB.promptSet('mail.port', `Please enter the Mail Server Port`, mailConfig.port || 587);
-            await configDB.promptSet('mail.auth.user', `Please enter the Mail Server Username`, mailConfig.auth.user);
-            await configDB.promptSet('mail.auth.pass', `Please enter the Mail Server Password`, mailConfig.auth.pass);
-            mailConfig = await configDB.getConfigValues('mail%');
+            await configDB.promptValue('mail.host', `Please enter the Mail Server Host`, mailConfig.host || hostname);
+            await configDB.promptValue('mail.port', `Please enter the Mail Server Port`, mailConfig.port || 587);
+            await configDB.promptValue('mail.auth.user', `Please enter the Mail Server Username`, mailConfig.auth.user);
+            await configDB.promptValue('mail.auth.pass', `Please enter the Mail Server Password`, mailConfig.auth.pass);
+            mailConfig = await configDB.getConfigValues('mail');
         }
 
         try {

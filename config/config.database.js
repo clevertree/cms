@@ -57,16 +57,25 @@ class ConfigDatabase  {
         return results.length > 0 ? results[0].value : null;
     }
     async getConfigValues(name) {
-        const results = await this.selectConfigs('c.name LIKE ?', name);
+        const results = await this.selectConfigs('c.name LIKE ?', name+'%');
         const config = {};
-        for(let i=0; results.length; i++)
-            config[results[i].name] = results[i].value;
-        return config;
+        for(let i=0; i<results.length; i++) {
+            const path = results[i].name.split('.');
+            const lastPath = path.pop();
+            let target = config;
+            for(var j=0; j<path.length; j++) {
+                if(typeof target[path[j]] === "undefined")
+                    target[path[j]] = {};
+                target = target[path[j]];
+            }
+            target[lastPath] = results[i].value;
+        }
+        return config[name];
     }
 
     async updateConfigValue(name, value) {
-        let SQL = `INSERT config SET ? ON DUPLICATE KEY UPDATE value = ?, updated = UTC_TIMESTAMP()`;
-        const result = await this.queryAsync(SQL, [{name, value}, value]);
+        let SQL = `REPLACE INTO config SET ?;`;
+        const result = await this.queryAsync(SQL, {name, value});
         return result.affectedRows;
     }
 
@@ -82,11 +91,11 @@ class ConfigDatabase  {
         });
     }
 
-    async promptSet(name, text, defaultValue) {
+    async promptValue(name, text, defaultValue) {
         const oldValue = await this.fetchConfigValue(name);
         if(oldValue)
             defaultValue = oldValue;
-        const newValue = this.prompt(text, defaultValue);
+        const newValue = await this.prompt(text, defaultValue);
         await this.updateConfigValue(name, newValue);
         return newValue;
     }
@@ -131,8 +140,7 @@ class ConfigRow {
 CREATE TABLE \`config\` (
   \`name\` varchar(256) NOT NULL,
   \`value\` TEXT NOT NULL,
-  \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  \`updated\` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  \`updated\` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY \`uk.config.name\` (\`name\`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 `

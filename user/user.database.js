@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 
+const { LocalConfig } = require('../config/local.config');
+
 // const { ConfigManager } = require('../config/config.manager');
 
 class UserDatabase  {
@@ -25,7 +27,9 @@ class UserDatabase  {
 
     }
 
-    async configure(prompt=false) {
+    async configure(interactive=false, config=null) {
+        const localConfig = new LocalConfig(interactive, config, !config);
+
         // Check for table
         await this.configureTable('user',            UserRow.SQL_TABLE);
 
@@ -38,10 +42,10 @@ class UserDatabase  {
                 for (let i = 0; i < 4; i++) {
                     try {
                         const hostname = require('os').hostname().toLowerCase();
-                        let adminUsername = await ConfigManager.prompt(`Please enter an Administrator username`, 'admin');
-                        let adminEmail = await ConfigManager.prompt(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + hostname);
-                        let adminPassword = await ConfigManager.prompt(`Please enter a password for ${adminUsername}`, "");
-                        let adminPassword2 = await ConfigManager.prompt(`Please re-enter a password for ${adminUsername}`, "");
+                        let adminUsername = await localConfig.prompt(`Please enter an Administrator username`, 'admin');
+                        let adminEmail = await localConfig.prompt(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + hostname);
+                        let adminPassword = await localConfig.prompt(`Please enter a password for ${adminUsername}`, "");
+                        let adminPassword2 = await localConfig.prompt(`Please re-enter a password for ${adminUsername}`, "");
                         if(!adminPassword) {
                             adminPassword = (await bcrypt.genSalt(10)).replace(/\W/g, '').substr(0, 8);
                             adminPassword2 = adminPassword;

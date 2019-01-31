@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql');
 
-const { LocalConfigManager } = require('../config/localconfig.manager');
+const { LocalConfig } = require('../config/local.config');
 const { FileManager } = require('../file/file.manager');
 
 const { ArticleDatabase } = require('../article/article.database');
@@ -15,7 +15,7 @@ const BASE_DIR = path.resolve(path.dirname(__dirname));
 class DatabaseManager {
     constructor() {
         this.hosts = {};
-        // this.config = null;
+        this.config = null;
     }
 
     // TODO: database name instead of req
@@ -24,55 +24,34 @@ class DatabaseManager {
     async getConfigDB(req=null)     { return new ConfigDatabase(await this.get(req)); }
 
 
-    async configure(dbConfig=null, promptCallback=false) {
-        let saveConfig = false;
-        if(!dbConfig) {
-            dbConfig = await LocalConfigManager.get('database');
-            saveConfig = true;
+    async configure(interactive=false, config=null) {
+        const localConfig = new LocalConfig(interactive, config, !config);
+        const dbConfig = await localConfig.get('database');
+
+        let hostname        = (require('os').hostname()).toLowerCase();
+
+        if(!dbConfig.name || !dbConfig.user || !dbConfig.host) {
+            await localConfig.promptValue('database.name', `Please enter the Database Name`, dbConfig.name || 'cms_' + hostname);
+            await localConfig.promptValue('database.user', `Please enter the Database User Name`, dbConfig.user || 'root');
+            await localConfig.promptValue('database.password', `Please enter the Password for Database User '${dbConfig.user}'`);
+            await localConfig.promptValue('database.host', `Please enter the Database Host`, dbConfig.host || hostname);
         }
-        // if(!dbConfig.database && !prompt)
-        //     throw new Error("Prompt required to select database name")
-        for(let i=0; i<4; i++) {
-            try {
-
-                if(!dbConfig.name || !dbConfig.user || !dbConfig.host) {
-                    let hostname        = (require('os').hostname()).toLowerCase();
-                    dbConfig.name       = dbConfig.name || 'cms_' + hostname;
-                    dbConfig.user       = dbConfig.user || 'root';
-                    dbConfig.host       = dbConfig.host || hostname;
-
-                    if(promptCallback) {
-                        dbConfig.name = await promptCallback(`Please enter the Database Name`, dbConfig.name);
-                        dbConfig.user = await promptCallback(`Please enter the Database User Name`, dbConfig.user);
-                        dbConfig.password = await promptCallback(`Please enter the Password for Database User '${dbConfig.user}'`);
-                        dbConfig.host = await promptCallback(`Please enter the Database Host`, dbConfig.host);
-                    }
-                }
-
-                try {
-                    await this.createConnection(dbConfig);
-                } catch (e) {
-                    if(e.code === "ER_BAD_DB_ERROR") {
-                        const repairConfig = Object.assign({}, dbConfig);
-                        delete repairConfig.name;
-                        const repairDB = await this.createConnection(repairConfig);
-                        await this.queryAsync(repairDB, `CREATE SCHEMA \`${dbConfig.name}\``);
-                        await this.queryAsync(repairDB, `USE \`${dbConfig.name}\``);
-                        console.info(`Created new schema: \`${dbConfig.name}\``)
-                    } else {
-                        throw e;
-                    }
-                }
-
-                if(saveConfig)
-                    LocalConfigManager.saveAll();
-            } catch (e) {
-                console.error(e);
-                continue;
+        try {
+            await this.createConnection(dbConfig);
+        } catch (e) {
+            if(e.code === "ER_BAD_DB_ERROR") {
+                const repairConfig = Object.assign({}, dbConfig);
+                delete repairConfig.name;
+                const repairDB = await this.createConnection(repairConfig);
+                await this.queryAsync(repairDB, `CREATE SCHEMA \`${dbConfig.name}\``);
+                await this.queryAsync(repairDB, `USE \`${dbConfig.name}\``);
+                console.info(`Created new schema: \`${dbConfig.name}\``)
+            } else {
+                throw e;
             }
-            break;
         }
 
+        this.config = dbConfig;
 
         // Configure Databases
         const databases = [
@@ -81,7 +60,7 @@ class DatabaseManager {
             await this.getConfigDB(),
         ];
         for(var i=0; i<databases.length; i++)
-            await databases[i].configure(promptCallback);
+            await databases[i].configure(interactive, config);
 
         return dbConfig;
     }
@@ -98,8 +77,9 @@ class DatabaseManager {
             this.hosts[host].end();
         }
 
-        const dbConfig = await LocalConfigManager.getOrCreate('database');
-        const db = await this.createConnection(dbConfig);
+        if(!this.config)
+            await this.configure(false);
+        const db = await this.createConnection(this.config);
 
         this.hosts[host] = db;
         return db;

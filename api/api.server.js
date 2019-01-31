@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 
-const { ConfigDatabase } = require('../config/config.database');
+const { LocalConfig } = require('../config/local.config');
 
 const { DatabaseManager } = require('../database/database.manager');
 const { UserAPI } = require('../user/user.api');
@@ -11,25 +11,21 @@ const { FileAPI } = require('../file/file.api');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
-class APIManager {
+class APIServer {
     constructor() {
         this.router = null;
     }
 
-    async configure(configCallback=null) {
-        // TODO: use local config with save and prompt vs memory config (no save, no prompt)
-        if(!configCallback)
-            configCallback = this.configPromptAndSave;
-        if(typeof configCallback === "object")
-            configCallback = this.configObject(configCallback);
-
+    async configure(interactive=false, config=null) {
+        const localConfig = new LocalConfig(interactive, config, !config);
+        const serverConfig = await localConfig.get('server');
         // let saveConfig = false;
         // if(!configCallback) {
         //     saveConfig = true;
         // }
-        if(typeof configCallback.server === "undefined")      configCallback.server = {};
-        if(typeof configCallback.server.port === "undefined") configCallback.server.port = 8080;
-        if(typeof configCallback.database === "undefined")      configCallback.database = {};
+        // if(typeof config.server === "undefined")      config.server = {};
+        // if(typeof config.server.port === "undefined") config.server.port = 8080;
+        // if(typeof config.database === "undefined")      config.database = {};
         // Init Database
 
         // hostname = (hostname || require('os').hostname()).toLowerCase();
@@ -37,15 +33,10 @@ class APIManager {
         //     globalConfig.server.session = {};
         // }
 
-        if(promptCallback) {
-            configCallback.server.port = await promptCallback(`Please enter the Server Port`, configCallback.server.port);
-            // globalConfig.server = await configDB.getConfigValues('server%');
-        }
-        if(saveConfig)
-            LocalConfigManager.saveAll();
+        if(!serverConfig.port)  await localConfig.promptValue('server.port', `Please enter the Server Port`, 8080);
 
 
-        await DatabaseManager.configure();
+        await DatabaseManager.configure(interactive);
         await UserAPI.configure(interactive);
         await ArticleAPI.configure(interactive);
         await FileAPI.configure(interactive);
@@ -59,7 +50,7 @@ class APIManager {
         // CMS Asset files
         router.use(express.static(BASE_DIR));
         this.router = router;
-        return configCallback;
+        return serverConfig;
     }
 
     getMiddleware() {
@@ -72,44 +63,22 @@ class APIManager {
     }
 
     async listen(ports=null) {
+        const config = await this.configure(true);
         if(!ports)
-            ports = (await LocalConfigManager.get('server')).port;
-        const express = express();
-        express.use(this.getMiddleware());
+            ports = config.port;
+        const app = express();
+        app.use(this.getMiddleware());
 
         // HTTP
         ports = Array.isArray(ports) ? ports : [ports];
         for(let i=0; i<ports.length; i++) try {
-            express.listen(ports[i]);
+            app.listen(ports[i]);
             console.log(`Listening on ${ports[i]}`);
         } catch (e) {
             console.log(`Could not listen on ${ports[i]}: ${e.message}`);
         }
-        return express;
-    }
-
-    async configObject(config) {
-        return function(path, text, defaultValue) {
-
-        }
-    }
-
-    async configPromptAndSave(path, text, defaultValue) {
-        const globalConfig = await LocalConfigManager.getAll();
-
-    }
-
-    async prompt(text, defaultValue=null) {
-        var standard_input = process.stdin;
-        standard_input.setEncoding('utf-8');
-        return new Promise( ( resolve, reject ) => {
-            process.stdout.write(text + ` [${(defaultValue === null ? 'null' : defaultValue)}]: `);
-            standard_input.on('data', function (data) {
-                data = data.trim() || defaultValue;
-                resolve (data);
-            });
-        });
+        return app;
     }
 }
 
-exports.APIServer = new APIManager();
+exports.APIServer = new APIServer();
