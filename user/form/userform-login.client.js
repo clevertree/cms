@@ -12,11 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.state = {
                 processing: false,
                 response: null,
-                email: "",
-                password: "",
-                session_save: false,
             };
-            // this.state = {id:-1, flags:[]};
         }
 
         setState(newState) {
@@ -25,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         connectedCallback() {
-            this.addEventListener('change', this.onEvent);
+            // this.addEventListener('change', this.onEvent);
             this.addEventListener('submit', this.onEvent);
 
             this.render();
@@ -34,7 +30,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.requestFormData(userID);
         }
 
-        onSuccess(e, response) {}
+
+        onSuccess(e, response) {
+            setTimeout(() => window.location.href = response.redirect, 3000);
+        }
         onError(e, response) {}
 
         onEvent(e) {
@@ -43,14 +42,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.submit(e);
                     break;
 
-                case 'change':
-                    let value = e.target.value;
-                    if(e.target.getAttribute('type') === 'checkbox')
-                        value = e.target.checked;
-                    if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
-                        this.state[e.target.name] = value;
-                    // console.log(this.state);
-                    break;
+                // case 'change':
+                //     let value = e.target.value;
+                //     if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
+                //         this.state[e.target.name] = value;
+                //     // console.log(this.state);
+                //     break;
             }
         }
 
@@ -68,12 +65,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log(e, xhr.response);
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
                 response.status = xhr.status;
+                this.setState({response, processing: false});
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
                     this.onError(e, response);
                 }
-                this.setState({response, processing: false});
             };
             xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -83,12 +80,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
 
-        onSuccess(e, response) {
-            setTimeout(() => window.location.href = response.redirect, 3000);
-        }
-
         render() {
-            console.log("Render", this.state);
+            const form = this.querySelector('form');
+            const formData = {};
+            if(form)
+                new FormData(form).forEach((value, key) => formData[key] = value);
+
+            console.log("Render", this.state, formData);
             this.innerHTML =
                 `
                 <form action="/:user/:login" method="POST" class="userform userform-login themed">
@@ -100,28 +98,28 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <td colspan="2">
                                         ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
                                             ${this.state.response.message}
-                                        </div>` : "In order to start a new session, <br/>please enter your email and password and hit 'Log in' below"}
+                                        </div>` : "In order to start a new session please enter your username or email and password and hit 'Log in' below"}
                                     </td>
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="label">Email</td>
+                                    <td class="label">Username</td>
                                     <td>
-                                        <input type="email" name="email" value="${this.state.email}" required />
+                                        <input type="text" name="uuid" value="${formData.uuid||''}" required />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Password</td>
                                     <td>
-                                        <input type="password" name="password" value="${this.state.password}" required />
+                                        <input type="password" name="password" value="${formData.password||''}" required />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Stay Logged In</td>
                                     <td>
-                                        <input type="checkbox" name="session_save" ${this.state.session_save ? 'checked="checked"' : ''}/>
+                                        <input type="checkbox" name="session_save" ${formData.session_save ? 'checked="checked"' : ''} value="1"/>
                                         <div style="float: right">
                                             <a href=":user/forgotpassword">Forgot Password?</a>
                                         </div>

@@ -16,8 +16,8 @@ class APIServer {
         this.router = null;
     }
 
-    async configure(interactive=false, config=null) {
-        const localConfig = new LocalConfig(interactive, config, !config);
+    async configure(config=null) {
+        const localConfig = new LocalConfig(config, !config);
         const serverConfig = await localConfig.getOrCreate('server');
         // let saveConfig = false;
         // if(!configCallback) {
@@ -36,10 +36,10 @@ class APIServer {
         if(!serverConfig.port)  await localConfig.promptValue('server.port', `Please enter the Server Port`, 8080);
 
 
-        await DatabaseManager.configure(interactive);
-        await UserAPI.configure(interactive);
-        await ArticleAPI.configure(interactive);
-        await FileAPI.configure(interactive);
+        await DatabaseManager.configure(config);
+        await UserAPI.configure(config);
+        await ArticleAPI.configure(config);
+        await FileAPI.configure(config);
 
         const router = express.Router();
         // Routes
@@ -55,7 +55,7 @@ class APIServer {
 
     getMiddleware() {
         if(!this.router)
-            this.configure(false);
+            this.configure();
 
         return (req, res, next) => {
             return this.router(req, res, next);
@@ -63,7 +63,7 @@ class APIServer {
     }
 
     async listen(ports=null) {
-        const config = await this.configure(true);
+        const config = await this.configure();
         if(!ports)
             ports = config.port;
         const app = express();

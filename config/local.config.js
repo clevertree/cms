@@ -8,9 +8,13 @@ const { FileManager } = require('../file/file.manager');
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
 class LocalConfig {
-    constructor(interactive=false, config=null, saveLocal=false) {
-        this.config = config || null;
-        this.interactive = interactive;
+    constructor(config=null, saveLocal=false) {
+        this.config = null;
+        if(config) {
+            if(typeof config !== 'object')
+                throw new Error("Config must be an object");
+            this.config = config;
+        }
         this.saveLocal = saveLocal;
     }
 
@@ -53,7 +57,7 @@ class LocalConfig {
         }
         if(newConfigJSON === oldConfigJSON)
             return false;
-        console.info("Config file updated: " + configPath);
+        // console.info("Config file updated: " + configPath);
         await FileManager.writeFileAsync(configPath, newConfigJSON, 'utf8');
         return true;
     }
@@ -73,9 +77,7 @@ class LocalConfig {
         }
         if(typeof target[lastPath] !== "undefined")
             defaultValue = target[lastPath];
-        const value = this.interactive
-            ? await this.prompt(text, defaultValue)
-            : defaultValue;
+        const value = await this.prompt(text, defaultValue);
         target[lastPath] = value;
         if(this.saveLocal)
             await this.saveAll();

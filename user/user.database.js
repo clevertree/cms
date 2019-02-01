@@ -1,64 +1,50 @@
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 
+const { DatabaseManager } = require('../database/database.manager');
 const { LocalConfig } = require('../config/local.config');
 
 // const { ConfigManager } = require('../config/config.manager');
 
 class UserDatabase  {
-    constructor(db, debug=false) {
-        this.db = db;
+    constructor(dbName, debug=false) {
+        const tablePrefix = dbName ? `\`${dbName}\`.` : '';
+        this.table = {
+            user: tablePrefix + '`user`'
+        };
         this.debug = debug;
     }
 
-    async configureTable(tableName, tableSQL) {
-        // Check for table
-        try {
-            await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
-        } catch (e) {
-            if(e.code === 'ER_NO_SUCH_TABLE') {
-                await this.queryAsync(tableSQL);
-                await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
-                console.info(`Inserted table: ${tableName}`)
-            } else {
-                throw e;
-            }
-        }
-
-    }
-
-    async configure(interactive=false, config=null) {
-        const localConfig = new LocalConfig(interactive, config, !config);
+    async configure(config=null) {
+        const localConfig = new LocalConfig(config, !config);
 
         // Check for table
-        await this.configureTable('user',            UserRow.SQL_TABLE);
+        await DatabaseManager.configureTable(this.table.user,            UserRow.getTableSQL(this.table.user));
 
         // Insert admin user
         let adminUser = await this.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
         if(adminUser) {
             console.info("Admin user found: " + adminUser.id);
         } else {
-            if(interactive) {
-                for (let i = 0; i < 4; i++) {
-                    try {
-                        const hostname = require('os').hostname().toLowerCase();
-                        let adminUsername = await localConfig.prompt(`Please enter an Administrator username`, 'admin');
-                        let adminEmail = await localConfig.prompt(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + hostname);
-                        let adminPassword = await localConfig.prompt(`Please enter a password for ${adminUsername}`, "");
-                        let adminPassword2 = await localConfig.prompt(`Please re-enter a password for ${adminUsername}`, "");
-                        if(!adminPassword) {
-                            adminPassword = (await bcrypt.genSalt(10)).replace(/\W/g, '').substr(0, 8);
-                            adminPassword2 = adminPassword;
-                            console.info("Using generated password: " + adminPassword);
-                        }
-                        if (adminPassword !== adminPassword2)
-                            throw new Error("Password mismatch");
-                        adminUser = await this.createUser(adminUsername, adminEmail, adminPassword, 'admin');
-                        console.info("Admin user created: " + adminUser.id);
-                        break;
-                    } catch (e) {
-                        console.error(e);
+            for (let i = 0; i < 4; i++) {
+                try {
+                    const hostname = require('os').hostname().toLowerCase();
+                    let adminUsername = await localConfig.prompt(`Please enter an Administrator username`, 'admin');
+                    let adminEmail = await localConfig.prompt(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + hostname);
+                    let adminPassword = await localConfig.prompt(`Please enter a password for ${adminUsername}`, "");
+                    let adminPassword2 = await localConfig.prompt(`Please re-enter a password for ${adminUsername}`, "");
+                    if(!adminPassword) {
+                        adminPassword = (await bcrypt.genSalt(10)).replace(/\W/g, '').substr(0, 8);
+                        adminPassword2 = adminPassword;
+                        console.info("Using generated password: " + adminPassword);
                     }
+                    if (adminPassword !== adminPassword2)
+                        throw new Error("Password mismatch");
+                    adminUser = await this.createUser(adminUsername, adminEmail, adminPassword, 'admin');
+                    console.info("Admin user created: " + adminUser.id);
+                    break;
+                } catch (e) {
+                    console.error(e);
                 }
             }
         }
@@ -69,11 +55,11 @@ class UserDatabase  {
     async selectUsers(whereSQL, values, selectSQL='u.*,null as password') {
         let SQL = `
           SELECT ${selectSQL}
-          FROM user u
+          FROM ${this.table.user} u
           WHERE ${whereSQL}
           `;
 
-        const results = await this.queryAsync(SQL, values);
+        const results = await DatabaseManager.queryAsync(SQL, values);
         return results.map(result => new UserRow(result))
     }
     // async searchUsers(search, selectSQL='u.*,null as password') {
@@ -102,7 +88,7 @@ class UserDatabase  {
 
     async createUser(username, email, password, flags='') {
         if(Array.isArray(flags))
-            flags = flgas.join(',');
+            flags = flags.join(',');
         if(!username) throw new Error("Invalid username");
         if(!email) throw new Error("Invalid email");
         if(password) {
@@ -110,8 +96,8 @@ class UserDatabase  {
             password = await bcrypt.hash(password, salt);
         }
         let SQL = `
-          INSERT INTO user SET ?`;
-        await this.queryAsync(SQL, {
+          INSERT INTO ${this.table.user} SET ?`;
+        await DatabaseManager.queryAsync(SQL, {
             username,
             email,
             password,
@@ -129,36 +115,25 @@ class UserDatabase  {
         if(password !== null) set.password = password;
         if(profile !== null) set.profile = JSON.stringify(profile);
         if(flags !== null) set.flags = Array.isArray(flags) ? flags.join(',') : flags;
-        let SQL = `UPDATE user SET ? WHERE id = ?`;
+        let SQL = `UPDATE ${this.table.user} SET ? WHERE id = ?`;
 
-        return (await this.queryAsync(SQL, [set, userID]))
+        return (await DatabaseManager.queryAsync(SQL, [set, userID]))
             .affectedRows;
     }
 
-    queryAsync(sql, values, cb) {
-        if(cb)
-            return this.db.query(sql, values, cb);
-        return new Promise( ( resolve, reject ) => {
-            this.db.query(sql, values, ( err, rows ) => {
-                if(this.debug)
-                    err ? console.error (err.message, sql, values || "No Values") : console.log (sql, values || "No Values");
-                err ? reject (err) : resolve (rows);
-            });
-        });
-    }
 }
 
 class UserRow {
-    static get SQL_TABLE() {
+    static getTableSQL(tableName) {
         return `
-CREATE TABLE \`user\` (
+CREATE TABLE ${tableName} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`email\` varchar(256) NOT NULL,
   \`username\` varchar(256) NOT NULL,
   \`password\` varchar(256) DEFAULT NULL,
   \`profile\` JSON DEFAULT NULL,
   \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  \`flags\` SET("guest", "admin"),
+  \`flags\` SET("admin"),
   PRIMARY KEY (\`id\`),
   UNIQUE KEY \`uk.user.email\` (\`email\`),
   UNIQUE KEY \`uk.user.username\` (\`username\`)
@@ -184,7 +159,7 @@ CREATE TABLE \`user\` (
 
     hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
     isAdmin() { return this.hasFlag('admin'); }
-    isGuest() { return this.hasFlag('guest'); }
+    // isGuest() { return this.hasFlag('guest'); }
 }
 
 

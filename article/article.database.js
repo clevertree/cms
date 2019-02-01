@@ -1,60 +1,30 @@
-// const fs = require('fs');
-// const path = require('path');
-// const ejs = require('ejs');
-// const express = require('express');
-
+const { DatabaseManager } = require('../database/database.manager');
 
 // Init
 class ArticleDatabase {
-    constructor(db, debug=false) {
-        if(!db)
-            throw new Error("Invalid database");
-        this.db = db;
+    constructor(dbName, debug=false) {
+        const tablePrefix = dbName ? `\`${dbName}\`.` : '';
+        this.table = {
+            article:            tablePrefix + '`article`',
+            article_revision:   tablePrefix + '`article_revision`',
+        };
         this.debug = debug;
     }
 
-    async configureTable(tableName, tableSQL) {
-        // Check for table
-        try {
-            await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
-        } catch (e) {
-            if(e.code === 'ER_NO_SUCH_TABLE') {
-                await this.queryAsync(tableSQL);
-                await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
-                console.info(`Inserted table: ${tableName}`)
-            } else {
-                throw e;
-            }
-        }
-
-    }
-
-    async configure(interactive=false) {
+    async configure() {
         // Check for tables
-        await this.configureTable('article',            ArticleRow.SQL_TABLE);
-        await this.configureTable('article_revision',    ArticleRevisionRow.SQL_TABLE);
-// TODO: ask for server title
+        await DatabaseManager.configureTable(this.table.article,             ArticleRow.getTableSQL(this.table.article));
+        await DatabaseManager.configureTable(this.table.article_revision,    ArticleRevisionRow.getTableSQL(this.table.article_revision));
+
         // Insert home page
         let homeArticle = await this.fetchArticleByPath("/");
         if(homeArticle) {
             console.info("Home Article Found: " + homeArticle.id);
         } else {
-            if(interactive) {
-                for (let i = 0; i < 4; i++) {
-                    try {
-                        let homeArticleTitle = 'Home';
-                        let homeArticleContent = '<%- include("article/home.ejs")%>';
-                        if(interactive) {
-                            // homeArticleTitle = await ConfigManager.prompt(`Please enter a title for the Home Page`, "Home");
-                        }
-                        const homeArticleID = await this.insertArticle(homeArticleTitle, homeArticleContent, "/");
-                        console.info("Home Article Created: " + homeArticleID);
-                        break;
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-            }
+            let homeArticleTitle = 'Home';
+            let homeArticleContent = '<%- include("article/home.ejs")%>';
+            const homeArticleID = await this.insertArticle(homeArticleTitle, homeArticleContent, "/");
+            console.info("Home Article Created: " + homeArticleID);
         }
     }
 
@@ -63,10 +33,10 @@ class ArticleDatabase {
     async selectArticles(whereSQL, values, selectSQL='a.*, null as content') {
         let SQL = `
           SELECT ${selectSQL}
-          FROM article a
+          FROM ${this.table.article} a
           WHERE ${whereSQL}`;
 
-        const results = await this.queryAsync(SQL, values);
+        const results = await DatabaseManager.queryAsync(SQL, values);
         return results ? results.map(result => new ArticleRow(result)) : null;
     }
     async fetchArticle(whereSQL, values, selectSQL='a.*, null as content') {
@@ -94,10 +64,10 @@ class ArticleDatabase {
         if(theme) set.theme = theme;
         if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
-          INSERT INTO article
+          INSERT INTO ${this.table.article}
           SET ?
         `;
-        const results = await this.queryAsync(SQL, set);
+        const results = await DatabaseManager.queryAsync(SQL, set);
         return results.insertId;
     }
 
@@ -111,11 +81,11 @@ class ArticleDatabase {
         if(theme) set.theme = theme;
         if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
-          UPDATE article a
+          UPDATE ${this.table.article} a
           SET ?, updated = UTC_TIMESTAMP()
           WHERE a.id = ?
         `;
-        const results = await this.queryAsync(SQL, [set, id]);
+        const results = await DatabaseManager.queryAsync(SQL, [set, id]);
         return results.affectedRows;
     }
 
@@ -124,10 +94,10 @@ class ArticleDatabase {
     async queryMenuData(cascade=true) {
         let SQL = `
           SELECT a.id, a.parent_id, a.path, a.title
-          FROM article a
+          FROM ${this.table.article} a
           WHERE a.path IS NOT NULL
 `;
-        const menuEntries = await this.queryAsync(SQL);
+        const menuEntries = await DatabaseManager.queryAsync(SQL);
         if(!menuEntries || menuEntries.length === 0)
             throw new Error("No menu items found");
         if(!cascade)
@@ -156,11 +126,11 @@ class ArticleDatabase {
     async selectArticleRevision(whereSQL, values, selectSQL='ah.*') {
         let SQL = `
           SELECT ${selectSQL}
-          FROM article_revision ah
+          FROM ${this.table.article_revision} ah
           WHERE ${whereSQL}
           `;
 
-        const results = await this.queryAsync(SQL, values);
+        const results = await DatabaseManager.queryAsync(SQL, values);
         return results.map(result => new ArticleRevisionRow(result))
     }
 
@@ -191,32 +161,19 @@ class ArticleDatabase {
     // Inserting revision without updating article === draft
     async insertArticleRevision(article_id, title, content, user_id) {
         let SQL = `
-          INSERT INTO article_revision
+          INSERT INTO ${this.table.article_revision}
           SET ?
         `;
-        const results = await this.queryAsync(SQL, {article_id, user_id, title, content});
+        const results = await DatabaseManager.queryAsync(SQL, {article_id, user_id, title, content});
         return results.insertId;
     }
 
-
-
-    queryAsync(sql, values, cb) {
-        if(cb)
-            return this.db.query(sql, values, cb);
-        return new Promise( ( resolve, reject ) => {
-            this.db.query(sql, values, ( err, rows ) => {
-                if(this.debug)
-                    err ? console.error (err.message, sql, values || "No Values") : console.log (sql, values || "No Values");
-                err ? reject (err) : resolve (rows);
-            });
-        });
-    }
 }
 
 class ArticleRow {
-    static get SQL_TABLE() {
+    static getTableSQL(tableName) {
         return `
-CREATE TABLE IF NOT EXISTS \`article\` (
+CREATE TABLE ${tableName} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`user_id\` int(11) DEFAULT NULL,
   \`parent_id\` int(11) DEFAULT NULL,
@@ -253,9 +210,9 @@ CREATE TABLE IF NOT EXISTS \`article\` (
 }
 
 class ArticleRevisionRow {
-    static get SQL_TABLE() {
+    static getTableSQL(tableName) {
         return `
-CREATE TABLE \`article_revision\` (
+CREATE TABLE ${tableName} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`article_id\` int(11) NOT NULL,
   \`user_id\` int(11) NOT NULL,

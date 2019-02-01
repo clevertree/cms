@@ -1,31 +1,18 @@
-const bcrypt = require('bcryptjs');
-const uuidv4 = require('uuid/v4');
+const { DatabaseManager } = require('../database/database.manager');
 
 class ConfigDatabase  {
-    constructor(db, debug=false) {
-        this.db = db;
+    constructor(dbName, debug=false) {
+        const tablePrefix = dbName ? `\`${dbName}\`.` : '';
+        this.table = {
+            config: tablePrefix + '`config`'
+        };
         this.debug = debug;
     }
 
-    async configureTable(tableName, tableSQL) {
-        // Check for table
-        try {
-            await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
-        } catch (e) {
-            if(e.code === 'ER_NO_SUCH_TABLE') {
-                await this.queryAsync(tableSQL);
-                await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
-                console.info(`Inserted table: ${tableName}`)
-            } else {
-                throw e;
-            }
-        }
 
-    }
-
-    async configure(prompt=false) {
+    async configure() {
         // Check for table
-        await this.configureTable('config',            ConfigRow.SQL_TABLE);
+        await DatabaseManager.configureTable(this.table.config, ConfigRow.getTableSQL(this.table.config));
     }
 
     /** Config Table **/
@@ -37,7 +24,7 @@ class ConfigDatabase  {
           WHERE ${whereSQL}
           `;
 
-        const results = await this.queryAsync(SQL, values);
+        const results = await DatabaseManager.queryAsync(SQL, values);
         return results.map(result => new ConfigRow(result))
     }
     // async searchConfigs(search) {
@@ -77,21 +64,10 @@ class ConfigDatabase  {
 
     async updateConfigValue(name, value) {
         let SQL = `REPLACE INTO config SET ?;`;
-        const result = await this.queryAsync(SQL, {name, value});
+        const result = await DatabaseManager.queryAsync(SQL, {name, value});
         return result.affectedRows;
     }
 
-    queryAsync(sql, values, cb) {
-        if(cb)
-            return this.db.query(sql, values, cb);
-        return new Promise( ( resolve, reject ) => {
-            this.db.query(sql, values, ( err, rows ) => {
-                if(this.debug)
-                    err ? console.error (err.message, sql, values || "No Values") : console.log (sql, values || "No Values");
-                err ? reject (err) : resolve (rows);
-            });
-        });
-    }
 
     async promptValue(name, text, defaultValue) {
         const oldValue = await this.fetchConfigValue(name);
@@ -137,9 +113,9 @@ class ConfigDatabase  {
 }
 
 class ConfigRow {
-    static get SQL_TABLE() {
+    static getTableSQL(tableName) {
         return `
-CREATE TABLE \`config\` (
+CREATE TABLE ${tableName} (
   \`name\` varchar(256) NOT NULL,
   \`value\` TEXT DEFAULT NULL,
   \`updated\` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

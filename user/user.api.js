@@ -11,12 +11,13 @@ const { ForgotPasswordMail } = require("./mail/forgotpassword.class");
 
 class UserAPI {
     constructor() {
-        this.router = null;
+        this.routerAPI = null;
+        this.routerSession = null;
     }
 
     // Configure
-    async configure(interactive=false, config=null) {
-        const localConfig = new LocalConfig(interactive, config, !config);
+    async configure(config=null) {
+        const localConfig = new LocalConfig(config, !config);
         const cookieConfig = await localConfig.getOrCreate('cookie');
 
         const sessionConfig = await localConfig.getOrCreate('session');
@@ -24,36 +25,51 @@ class UserAPI {
         sessionConfig.cookieName = 'session';
 
         const bodyParser = require('body-parser');
-        const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
 
-        const router = express.Router();
-        router.use(session(sessionConfig));
-        router.use(cookieParser(cookieConfig));
+        const routerSession = express.Router();
+        routerSession.use(session(sessionConfig));
+        routerSession.use(cookieParser(cookieConfig));
+        this.routerSession = routerSession;
 
-
+        const routerAPI = express.Router();
         // TODO: handle session_save login
         // router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
         // API Routes
-        router.get('/[:]user/:userID(\\w+)/[:]json',                async (req, res, next) => await this.handleViewRequest(true, (req.params.userID), req, res, next));
-        router.get('/[:]user/:userID(\\w+)',                     async (req, res, next) => await this.handleViewRequest(false, (req.params.userID), req, res, next));
-        router.all('/[:]user/:userID(\\w+)/[:]profile',         PM, async (req, res) => await this.handleUpdateRequest('profile', (req.params.userID), req, res));
-        router.all('/[:]user/:userID(\\w+)/[:]flags',           PM, async (req, res) => await this.handleUpdateRequest('flags', (req.params.userID), req, res));
-        router.all('/[:]user/:userID(\\w+)/[:]password',  PM, async (req, res) => await this.handleUpdateRequest('password', (req.params.userID), req, res));
-        router.all('/[:]user/[:]login',                     PM, async (req, res) => await this.handleLoginRequest(req, res));
-        // router.all('/[:]user/session',                   PM, async (req, res) => await this.handleSessionLoginRequest(req, res));
-        router.all('/[:]user/[:]logout',                    PM, async (req, res) => await this.handleLogoutRequest(req, res));
-        router.all('/[:]user/[:]register',                  PM, async (req, res) => await this.handleRegisterRequest(req, res));
-        router.all('/[:]user/[:]forgotpassword',            PM, async (req, res) => await this.handleForgotPassword(req, res));
+        routerAPI.use(bodyParser.urlencoded({ extended: true }));
+        routerAPI.use(bodyParser.json());
+        routerAPI.use(routerSession);
 
-        this.router = router;
+        routerAPI.get('/[:]user/:userID(\\w+)/[:]json',         async (req, res, next) => await this.handleViewRequest(true, (req.params.userID), req, res, next));
+        routerAPI.get('/[:]user/:userID(\\w+)',                 async (req, res, next) => await this.handleViewRequest(false, (req.params.userID), req, res, next));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]profile',      async (req, res) => await this.handleUpdateRequest('profile', (req.params.userID), req, res));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]flags',        async (req, res) => await this.handleUpdateRequest('flags', (req.params.userID), req, res));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]password',     async (req, res) => await this.handleUpdateRequest('password', (req.params.userID), req, res));
+        routerAPI.all('/[:]user/[:]login',                      async (req, res) => await this.handleLoginRequest(req, res));
+        // router.all('/[:]user/session',                       async (req, res) => await this.handleSessionLoginRequest(req, res));
+        routerAPI.all('/[:]user/[:]logout',                     async (req, res) => await this.handleLogoutRequest(req, res));
+        routerAPI.all('/[:]user/[:]register',                   async (req, res) => await this.handleRegisterRequest(req, res));
+        routerAPI.all('/[:]user/[:]forgotpassword',             async (req, res) => await this.handleForgotPassword(req, res));
+
+        this.routerAPI = routerAPI;
+    }
+    
+    getSessionMiddleware() {
+        if(!this.routerSession)
+            this.configure();
+
+        return (req, res, next) => {
+            return this.routerSession(req, res, next);
+        }
     }
 
     getMiddleware() {
-        if(!this.router)
-            this.configure(false);
+        if(!this.routerAPI)
+            this.configure();
 
         return (req, res, next) => {
-            return this.router(req, res, next);
+            if(!req.url.startsWith('/:user'))
+                return next();
+            return this.routerAPI(req, res, next);
         }
     }
 
@@ -167,8 +183,8 @@ class UserAPI {
     }
 
 
-    async login(req, userID, password, saveSession=false) {
-        if(!userID)
+    async login(req, uuid, password, saveSession=false) {
+        if(!uuid)
             throw new Error("Username or Email is required");
         // if(!UserAPI.validateEmail(userID))
         //     throw new Error("Email format is invalid");
@@ -177,9 +193,9 @@ class UserAPI {
             throw new Error("Password is required");
 
         const userDB = await DatabaseManager.getUserDB(req);
-        const user = await userDB.fetchUserByID(userID, 'u.*');
+        const user = await userDB.fetchUserByID(uuid, 'u.*');
         if(!user)
-            throw new Error("User not found: " + userID);
+            throw new Error("User not found: " + uuid);
         const encryptedPassword = user.password;
         delete user.password;
 
@@ -192,22 +208,7 @@ class UserAPI {
         req.session.userID = user.id;
 
         if(saveSession) {
-            // TODO: set maxAge 2 weeks
-            // var ip = (req.headers['x-forwarded-for'] || '').split(',').pop() ||
-            //     req.connection.remoteAddress ||
-            //     req.socket.remoteAddress ||
-            //     req.connection.socket.remoteAddress
-            // const sessionData = {
-            //     ip
-            // };
-            // const result = await this.userDB.createUserSession(user.id, 'active', sessionData);
-            // req.session.user_session = {id: result.insertId};
-            // res.cookie('session_save', JSON.stringify({
-            //     uuid: result.uuid,
-            //     password: result.password,
-            // }), {
-            //     maxAge: 1000 * 60 * 60 * 24 * 7, // would expire after 7 days
-            // })
+            req.session.setDuration(1000 * 60 * 60 * 24 * 14);
         }
 
         this.addSessionMessage(req,"Login Successful: " + user.username);
@@ -313,7 +314,7 @@ class UserAPI {
             } else {
                 // Handle Form (POST) Request
                 // console.log("Log in Request", req.body);
-                const user = await this.login(req, req.body.email, req.body.password, req.body.session_save);
+                const user = await this.login(req, req.body.uuid, req.body.password, req.body.session_save);
 
                 return res.json({
                     redirect: `/:user/${user.id}`,

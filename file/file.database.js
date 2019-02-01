@@ -3,22 +3,31 @@
 // const ejs = require('ejs');
 // const express = require('express');
 
+const { DatabaseManager } = require('../database/database.manager');
+
 // Init
 class FileDatabase {
-    constructor(db) {
-        this.db = db;
-        this.debug = true;
+    constructor(dbName, debug=false) {
+        const tablePrefix = dbName ? `\`${dbName}\`.` : '';
+        this.table = {
+            file: tablePrefix + '`file`'
+        };
+        this.debug = debug;
     }
-    
+
+    async configure() {
+        // Check for tables
+        // await DatabaseManager.configureTable(this.table.file, ArticleRow.getTableSQL(this.table.article));
+    }
     /** Files **/
 
     async selectFiles(whereSQL, values, selectSQL='f.*, null as content') {
         let SQL = `
           SELECT ${selectSQL}
-          FROM file f
+          FROM ${this.table} f
           WHERE ${whereSQL}`;
 
-        const results = await this.queryAsync(SQL, values);
+        const results = await DatabaseManager.queryAsync(SQL, values);
         return results ? results.map(result => new FileEntry(result)) : null;
     }
 
@@ -37,10 +46,10 @@ class FileDatabase {
 
     async insertFile(content, path, size, hash=null, user_id=null) {
         let SQL = `
-          INSERT INTO file
+          INSERT INTO ${this.table}
           SET ?
         `;
-        const results = await this.queryAsync(SQL, {content, path, user_id, size, hash});
+        const results = await DatabaseManager.queryAsync(SQL, {content, path, user_id, size, hash});
         return results.insertId;
     }
 
@@ -51,25 +60,14 @@ class FileDatabase {
         if(content !== null) set.content = content;
         if(info !== null) set.info = JSON.stringify(info);
         let SQL = `
-          UPDATE file a
+          UPDATE ${this.table} a
           SET ?
           WHERE f.id = ?
         `;
-        const results = await this.queryAsync(SQL, [set, id]);
+        const results = await DatabaseManager.queryAsync(SQL, [set, id]);
         return results.affectedRows;
     }
 
-    queryAsync(sql, values, cb) {
-        if(cb)
-            return this.db.query(sql, values, cb);
-        return new Promise( ( resolve, reject ) => {
-            this.db.query(sql, values, ( err, rows ) => {
-                if(this.debug)
-                    err ? console.error (err.message, sql, values || "No Values") : console.log (sql, values || "No Values");
-                err ? reject (err) : resolve (rows);
-            });
-        });
-    }
 }
 
 class FileEntry {

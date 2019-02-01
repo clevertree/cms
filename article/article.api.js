@@ -13,14 +13,14 @@ class ArticleAPI {
 
     getMiddleware() {
         if(!this.router)
-            this.configure(false);
+            this.configure();
 
         return (req, res, next) => {
             return this.router(req, res, next);
         }
     }
 
-    async configure(interactive=false) {
+    async configure(config=null) {
         // Configure Routes
         const router = express.Router();
         const bodyParser = require('body-parser');

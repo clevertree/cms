@@ -10,7 +10,7 @@ class MailServer {
         this.server = null;
     }
 
-    async configure(interactive=false, forcePrompt=false)
+    async configure(forcePrompt=false)
     {
         const configDB = await DatabaseManager.getConfigDB();
         let mailConfig = await configDB.getConfigValues('mail');
@@ -35,7 +35,7 @@ class MailServer {
         } catch (e) {
             console.error(`Error connecting to ${mailConfig.host}: ${e}`);
             if(forcePrompt === false)
-                return await this.configure(interactive, true);
+                return await this.configure(true);
             throw e;
         }
         return mailConfig;
