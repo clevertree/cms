@@ -22,7 +22,14 @@ class ArticleDatabase {
             console.info("Home Article Found: " + homeArticle.id);
         } else {
             let homeArticleTitle = 'Home';
-            let homeArticleContent = '<%- include("article/home.ejs")%>';
+            let homeArticleContent = `
+            <section>
+                <h1 class="themed" id="activities">${require('os').hostname()}</h1>
+                <p>
+                    Welcome to ${require('os').hostname()}!
+                </p>
+            </section>
+`;
             const homeArticleID = await this.insertArticle(homeArticleTitle, homeArticleContent, "/");
             console.info("Home Article Created: " + homeArticleID);
         }

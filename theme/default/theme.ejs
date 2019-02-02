@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+<%
+let hostname = req ? req.headers.host.split(':')[0] : null;
+
+const slashCount = req.path.split('/').length-1;
+const baseHRef = slashCount > 1 ? "../".repeat(slashCount-1) : null;
+%><!DOCTYPE html>
 <html>
     <head>
-        <% if(baseHRef) {%>
         <base href="<%=baseHRef;%>">
-        <% } %>
         <title><%=hostname || "Website"%></title>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <meta name="keywords" CONTENT="<%=hostname || "Website"%>">

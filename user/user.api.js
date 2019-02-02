@@ -252,9 +252,12 @@ class UserAPI {
             } else {
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<%- include("user/element/user-profile.ejs")%>`, {
-                            id: userID
-                        })
+                        .render(req, `
+<section>
+    <script src="/user/element/user-profile.client.js"></script>
+    <user-profile id="${userID}"></user-profile>
+</section>
+`)
                 );
             }
 
@@ -266,7 +269,7 @@ class UserAPI {
                 res.status(400);
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
                 );
             }
         }
@@ -308,7 +311,9 @@ class UserAPI {
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<%- include("user/form/userform.ejs", {form: 'login'})%>`)
+                        .render(req, `
+<script src="/user/form/userform-login.client.js"></script>
+<userform-login></userform-login>`)
                 );
 
             } else {
@@ -334,7 +339,9 @@ class UserAPI {
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<%- include("user/form/userform.ejs", {form: 'logout'})%>`)
+                        .render(req, `
+<script src="/user/form/userform-logout.client.js"></script>
+<userform-logout></userform-logout>`)
                 );
 
             } else {
@@ -359,7 +366,9 @@ class UserAPI {
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<%- include("user/form/userform.ejs", {form: 'register'})%>`)
+                        .render(req, `
+<script src="/user/form/userform-register.client.js"></script>
+<userform-register></userform-register>`)
                 );
 
             } else {
@@ -390,7 +399,9 @@ class UserAPI {
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<%- include("user/form/userform.ejs", {form: 'forgotpassword'})%>`)
+                        .render(req, `
+<script src="/user/form/userform-forgotpassword.client.js"></script>
+<userform-forgotpassword></userform-forgotpassword>`)
                 );
 
             } else {
@@ -429,7 +440,9 @@ class UserAPI {
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<%- include("user/form/userform.ejs")%>`, {id: userID, form: type})
+                        .render(req, `
+<script src="/user/form/userform-${type}.client.js"></script>
+<userform-${type}></userform-${type}>`)
                 );
 
             } else {

@@ -29,7 +29,7 @@ class MailServer {
         try {
             const server = nodemailer.createTransport(smtpTransport(mailConfig));
             await server.verify();
-            console.info(`Connection to Mail Server '${mailConfig.host}' Successful`);
+            console.info(`Connection to Mail Server '${mailConfig.host}' verified`);
             // await configDB.saveAll();
 
         } catch (e) {
@@ -46,7 +46,7 @@ class MailServer {
         const mailConfig = await this.configure();
         this.server = nodemailer.createTransport(smtpTransport(mailConfig));
         await this.server.verify();
-        console.info(`Connection to Mail Server '${mailConfig.host}' Successful`);
+        console.log(`Connection to Mail Server '${mailConfig.host}' successful`);
     }
 }
 

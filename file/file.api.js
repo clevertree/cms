@@ -54,7 +54,7 @@ class FileAPI {
             res.json({message: error.message, error: error.stack});
             // res.send(
             //     await ThemeManager.get()
-            //         .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+            //         .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
             // );
         }
     }
@@ -128,7 +128,7 @@ class FileAPI {
             res.json({message: error.message, error: error.stack});
             // res.send(
             //     await ThemeManager.get()
-            //         .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+            //         .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
             // );
         }
     }
@@ -159,7 +159,7 @@ class FileAPI {
             res.json({message: error.message, error: error.stack});
             // res.send(
             //     await ThemeManager.get()
-            //         .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+            //         .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
             // );
         }
     }

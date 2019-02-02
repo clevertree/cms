@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <td>
                                         <input type="checkbox" name="session_save" ${formData.session_save ? 'checked="checked"' : ''} value="1"/>
                                         <div style="float: right">
-                                            <a href=":user/forgotpassword">Forgot Password?</a>
+                                            <a href=":user/:forgotpassword">Forgot Password?</a>
                                         </div>
                                     </td>
                                 </tr>

@@ -27,16 +27,17 @@ class DefaultTheme {
 
             if (!renderData)
                 renderData = {};
-            renderData.baseHRef = this.getBaseHRef(req);
+            // renderData.baseHRef = this.getBaseHRef(req);
             renderData.menu = await articleDB.queryMenuData(true);
 
             // const sessionUser = await userDB.fetchUserByID(req.session.userID);
-            renderData.sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+            // renderData.sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
             renderData.req = req;
             renderData.hostname = require('os').hostname();
-            renderData.content = content ? await ejs.render(content, renderData, this.renderOptions) : null;
+            renderData.content = content; // ? await ejs.render(content, renderData, this.renderOptions) : null;
 
             const templatePath = path.resolve(TEMPLATE_DIR + '/theme.ejs');
+            // res.render(templatePath)
             return await ejs.renderFile(templatePath, renderData, this.renderOptions);
         } catch (e) {
             console.error(e);
@@ -57,7 +58,7 @@ class DefaultTheme {
 
 module.exports = DefaultTheme;
 
-function sendErr(res, e) {
-    console.error(e);
-    res.send(e.message ? e.message + "<br/>\n" + JSON.stringify(e) : e);
-}
+// function sendErr(res, e) {
+//     console.error(e);
+//     res.send(e.message ? e.message + "<br/>\n" + JSON.stringify(e) : e);
+// }

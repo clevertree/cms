@@ -4,6 +4,7 @@ const { DatabaseManager } = require('../database/database.manager');
 const { ThemeManager } = require('../theme/theme.manager');
 const { ArticleDatabase } = require("./article.database");
 const { UserDatabase } = require("../user/user.database");
+const { UserAPI } = require('../user/user.api');
 
 class ArticleAPI {
     constructor() {
@@ -16,26 +17,29 @@ class ArticleAPI {
             this.configure();
 
         return (req, res, next) => {
+            // if(!req.url.startsWith('/:article'))
+            //     return next();
             return this.router(req, res, next);
         }
     }
 
-    async configure(config=null) {
+    async configure() {
         // Configure Routes
         const router = express.Router();
         const bodyParser = require('body-parser');
-        const postMiddleware = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
+        const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
+        const SM = UserAPI.getSessionMiddleware();
         // Handle Article requests
-        router.get(['/[\\w/_-]+', '/'], async (req, res, next) => await this.renderArticleByPath(req, res,next));
+        router.get(['/[\\w/_-]+', '/'],                         SM, async (req, res, next) => await this.renderArticleByPath(req, res,next));
 
-        router.get('/:?article/:id/json', async (req, res, next) => await this.renderArticleByID(true, req, res, next));
-        router.get(['/:?article/:id/view', '/:?article/:id'], async (req, res, next) => await this.renderArticleByID(false, req, res, next));
-        router.get('/:?article/sync', async (req, res) => await this.renderArticleBrowser(req, res));
+        router.get('/:?article/:id/json',                       SM, async (req, res, next) => await this.renderArticleByID(true, req, res, next));
+        router.get(['/:?article/:id/view', '/:?article/:id'],   SM, async (req, res, next) => await this.renderArticleByID(false, req, res, next));
+        router.get('/:?article/sync',                           SM, async (req, res) => await this.renderArticleBrowser(req, res));
         // TODO: sync
 
-        router.all('/:?article/:id/edit', postMiddleware, async (req, res) => await this.renderArticleEditorByID(req, res));
-        router.all('/:?article/add', postMiddleware, async (req, res) => await this.renderArticleAdd(req, res));
-        router.all(['/:?article', '/:?article/list'], postMiddleware, async (req, res) => await this.renderArticleBrowser(req, res));
+        router.all('/:?article/:id/edit',                       SM, PM, async (req, res) => await this.renderArticleEditorByID(req, res));
+        router.all('/:?article/add',                            SM, PM, async (req, res) => await this.renderArticleAdd(req, res));
+        router.all(['/:?article', '/:?article/list'],           SM, PM, async (req, res) => await this.renderArticleBrowser(req, res));
         this.router = router;
     }
 
@@ -67,7 +71,7 @@ class ArticleAPI {
             res.status(400);
             res.send(
                 await ThemeManager.get()
-                    .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+                    .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
             );
         }
     }
@@ -133,7 +137,7 @@ class ArticleAPI {
             } else {
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
                 );
             }
         }
@@ -159,7 +163,19 @@ class ArticleAPI {
                 // Render Editor
                 res.send(
                     await ThemeManager.get(article.theme)
-                        .render(req, `<%- include("article/section/editor.ejs", {article})%>`, {article})
+                        .render(req, `
+<section style="max-width: 1600px;">
+    <script src="/article/form/articleform-editor.client.js"></script>
+    <articleform-editor id="${article.id}"></articleform-editor>
+</section>
+<section class="articleform-preview-container">
+    <h1 style="text-align: center;">Preview</h1>
+    <hr/>
+    <div class="articleform-preview-content">
+        ${article.content}
+    </div>
+</section>
+`)
                 );
 
             } else {
@@ -216,7 +232,7 @@ class ArticleAPI {
             if(req.method === 'GET') {          // Handle GET
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
                 );
             } else {
                 res.json({message: error.stack});
@@ -239,7 +255,13 @@ class ArticleAPI {
                 // Render Editor
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<%- include("article/section/add.ejs")%>`)
+                        .render(req, `
+<section>
+    <script src="/article/form/articleform-add.client.js"></script>
+    <articleform-add></articleform-add>
+</section>
+
+`)
                 );
 
             } else {
@@ -266,7 +288,7 @@ class ArticleAPI {
             if(req.method === 'GET') {          // Handle GET
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
                 );
             } else {
                 res.json({message: error.stack});
@@ -281,7 +303,14 @@ class ArticleAPI {
             if (req.method === 'GET') {
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<%- include("article/section/browser.ejs")%>`)
+                        .render(req, `
+<section>
+    <script src="/article/form/articleform-browser.client.js"></script>
+    <articleform-browser></articleform-browser>
+    <script src="/article/form/articleform-add.client.js"></script>
+    <articleform-add></articleform-add>
+</section>
+`)
                 );
 
             } else {
@@ -304,7 +333,7 @@ class ArticleAPI {
             if(req.method === 'GET') {
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `<section class='error'><pre><%=message%></pre></section>`, {message: error.stack})
+                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
                 );
             } else {
                 res.json({message: error.stack});
