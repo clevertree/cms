@@ -1,15 +1,10 @@
-<%
-let hostname = req ? req.headers.host.split(':')[0] : null;
-
-const slashCount = req.path.split('/').length-1;
-const baseHRef = slashCount > 1 ? "../".repeat(slashCount-1) : null;
-%><!DOCTYPE html>
+<!DOCTYPE html>
 <html>
     <head>
         <base href="<%=baseHRef;%>">
-        <title><%=hostname || "Website"%></title>
+        <title><%=article.title || site.name%></title>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <meta name="keywords" CONTENT="<%=hostname || "Website"%>">
+        <meta name="keywords" CONTENT="<%=article.keywords || site.keywords || ""%>">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link href="theme/default/assets/default.theme.css" rel="stylesheet" />
@@ -20,32 +15,46 @@ const baseHRef = slashCount > 1 ? "../".repeat(slashCount-1) : null;
             <div class="logo-container">
                 <div class="logo"></div>
                 <a href="" class="logo-text">
-                    <%=hostname || "Website"%>
+                    <%=site.name%>
                 </a>
             </div>
             <nav>
-                <%- include('./partial/nav.ejs') %>
+                <ul class="nav-menu">
+                    <%_
+                    if(typeof menu !== "undefined") {
+                        for(let i=0; i<menu.length; i++) {
+                            const menuItem = menu[i];
+                            if(!menuItem)
+                                continue;
+                            const subMenuItems = menu[i].subMenu || [];
+                    _%>
+                    <li>
+                        <a href="<%=menuItem.path%>"><%=menuItem.title%></a>
+                        <%_ if (subMenuItems.length > 0) { _%>
+                        <ul class="nav-submenu">
+                            <%_
+                            for(let i=0; i<subMenuItems.length; i++) {
+                                const subMenuItem = subMenuItems[i];
+                                if(typeof subMenuItem === "string") {
+                                    _%><%-subMenuItem%><%_
+                                } else {
+                                    _%><li><a href="<%=subMenuItem.path%>"><%=subMenuItem.title%></a></li><%_
+                                }
+                            }
+                            _%>
+                        </ul>
+                        <%_ } _%>
+                    </li>
+                    <%_
+                        }
+                    }
+                    %>
+                </ul>
             </nav>
         </header>
 
         <article>
-            <%_ if(typeof req !== "undefined" && req.session) {
-                    if(req.session.messages && req.session.messages.length > 0) {
-                        const sessionMessage = req.session.messages.pop();
-            _%>
-            <section class="message">
-                <%-sessionMessage.message%>
-            </section>
-            <%_     } _%>
-
-            <%_     if(typeof article !== "undefined") { _%>
-            <section class="page-edit" style="text-align: center; font-size: smaller;">
-                <a href=":article/<%=article.id%>/edit">Edit this page</a>
-            </section>
-            <%_     } _%>
-            <%_ } _%>
-
-            <%-content%>
+            <%-article.content%>
         </article>
 
         <footer>
@@ -62,7 +71,7 @@ const baseHRef = slashCount > 1 ? "../".repeat(slashCount-1) : null;
                 <li>
                     <h2>Contact Us</h2>
                     <p>
-                        Email: <a href="mailto:admin@<%=hostname%>">admin@<%=hostname%></a>
+                        Email: <a href="mailto:<%=site.contact%>"><%=site.contact%></a>
                         <br/>
                         Copyright Clevertree LLC
                     </p>

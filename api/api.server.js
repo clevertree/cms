@@ -19,22 +19,8 @@ class APIServer {
     async configure(config=null) {
         const localConfig = new LocalConfig(config, !config);
         const serverConfig = await localConfig.getOrCreate('server');
-        // let saveConfig = false;
-        // if(!configCallback) {
-        //     saveConfig = true;
-        // }
-        // if(typeof config.server === "undefined")      config.server = {};
-        // if(typeof config.server.port === "undefined") config.server.port = 8080;
-        // if(typeof config.database === "undefined")      config.database = {};
-        // Init Database
-
-        // hostname = (hostname || require('os').hostname()).toLowerCase();
-        // if(typeof globalConfig.server.session === 'undefined') {
-        //     globalConfig.server.session = {};
-        // }
 
         if(!serverConfig.port)  await localConfig.promptValue('server.port', `Please enter the Server Port`, 8080);
-
 
         await DatabaseManager.configure(config);
         await UserAPI.configure(config);

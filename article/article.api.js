@@ -32,14 +32,14 @@ class ArticleAPI {
         // Handle Article requests
         router.get(['/[\\w/_-]+', '/'],                         SM, async (req, res, next) => await this.renderArticleByPath(req, res,next));
 
-        router.get('/:?article/:id/json',                       SM, async (req, res, next) => await this.renderArticleByID(true, req, res, next));
-        router.get(['/:?article/:id/view', '/:?article/:id'],   SM, async (req, res, next) => await this.renderArticleByID(false, req, res, next));
-        router.get('/:?article/sync',                           SM, async (req, res) => await this.renderArticleBrowser(req, res));
+        router.get('/[:]article/:id/[:]json',                       SM, async (req, res, next) => await this.renderArticleByID(true, req, res, next));
+        router.get(['/[:]article/:id/view', '/[:]article/:id'],   SM, async (req, res, next) => await this.renderArticleByID(false, req, res, next));
+        router.get('/[:]article/[:]sync',                           SM, async (req, res) => await this.renderArticleBrowser(req, res));
         // TODO: sync
 
-        router.all('/:?article/:id/edit',                       SM, PM, async (req, res) => await this.renderArticleEditorByID(req, res));
-        router.all('/:?article/add',                            SM, PM, async (req, res) => await this.renderArticleAdd(req, res));
-        router.all(['/:?article', '/:?article/list'],           SM, PM, async (req, res) => await this.renderArticleBrowser(req, res));
+        router.all('/[:]article/:id/[:]edit',                       SM, PM, async (req, res) => await this.renderArticleEditorByID(req, res));
+        router.all('/[:]article/[:]add',                            SM, PM, async (req, res) => await this.renderArticleAdd(req, res));
+        router.all(['/[:]article', '/[:]article/[:]list'],           SM, PM, async (req, res) => await this.renderArticleBrowser(req, res));
         this.router = router;
     }
 
@@ -49,6 +49,8 @@ class ArticleAPI {
             const article = await articleDB.fetchArticleByPath(req.url);
             if(!article)
                 return next();
+            let content = article.content;
+            let title = article.title;
 
             if(typeof req.query.r !== 'undefined') {
                 const articleRevisionID = parseInt(req.query.r);
@@ -58,13 +60,32 @@ class ArticleAPI {
 
                 if(articleRevision.article_id !== article.id)
                     throw new Error("Revision does not belong to article");
-                article.title = articleRevision.title;
-                article.content = articleRevision.content;
+
+                content = articleRevision.content;
+                title = articleRevision.title;
             }
+
+            if(req.session) {
+                if (req.session.messages && req.session.messages.length > 0) {
+                    const sessionMessage = req.session.messages.pop();
+                    content = `
+                        <section class="message">
+                            ${sessionMessage}
+                        </section>
+                        ${content}`;
+                }
+                if (req.session.userID) {
+                    content += `
+                        <section class="message">
+                            <a href=":article/${article.id}/:edit">Edit this page</a>
+                        </section>`;
+                }
+            }
+
 
             res.send(
                 await ThemeManager.get(article.theme)
-                    .render(req, article.content, {article})
+                    .render(req, article)
             );
         } catch (error) {
             console.log(error);
@@ -118,7 +139,7 @@ class ArticleAPI {
                 if(articleRevision)
                     response.revision = articleRevision;
                 if(req.query.getAll) {
-                    response.parentList = await articleDB.queryMenuData(false);
+                    response.parentList = await articleDB.selectArticles("a.path IS NOT NULL", null, "id, parent_id, path, title");
                 }
 
                 res.json(response);

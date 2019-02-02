@@ -125,7 +125,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
         if(this.state.revisionID)
             params += `&r=${this.state.revisionID}`;
         params += '&t=' + new Date().getTime();
-        xhr.open ("GET", `:article/${this.state.article.id}/json?${params}`, true);
+        xhr.open ("GET", `:article/${this.state.article.id}/:json?${params}`, true);
         // xhr.setRequestHeader("Accept", "application/json");
         xhr.send ();
         this.setState({processing: true});

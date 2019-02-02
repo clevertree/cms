@@ -98,29 +98,30 @@ class ArticleDatabase {
 
     /** Article Menu **/
 
-    async queryMenuData(cascade=true) {
+    async queryMenuData(req) {
         let SQL = `
           SELECT a.id, a.parent_id, a.path, a.title
           FROM ${this.table.article} a
           WHERE a.path IS NOT NULL
 `;
-        const menuEntries = await DatabaseManager.queryAsync(SQL);
+        let menuEntries = await DatabaseManager.queryAsync(SQL);
         if(!menuEntries || menuEntries.length === 0)
             throw new Error("No menu items found");
-        if(!cascade)
-            return menuEntries;
 
         const mainMenu = [];
+        // menuEntries = menuEntries.map(menuEntry => Object.assign({}, menuEntry));
+
         for(let i=0; i<menuEntries.length; i++) {
-            const menuEntry = new ArticleRow(menuEntries[i]);
+            let menuEntry = menuEntries[i];
             if(menuEntry.parent_id === null) { // parent_id === null indicates top level menu
-                const subMenu = [];
-                mainMenu.push([menuEntry, subMenu]);
-                for(let j=0; j<menuEntries.length; j++) {
-                    const menuEntry2 = new ArticleRow(menuEntries[j]);
-                    if(menuEntry.id === menuEntry2.parent_id) {
-                        subMenu.push([menuEntry2, []]);
-                    }
+                mainMenu.push(menuEntry);
+            }
+            for(let j=0; j<menuEntries.length; j++) {
+                let menuEntry2 = menuEntries[j];
+                if(menuEntry.id === menuEntry2.parent_id) {
+                    if(typeof menuEntry.subMenu === "undefined")
+                        menuEntry.subMenu = [];
+                    menuEntry.subMenu.push(menuEntry2);
                 }
             }
         }
@@ -200,17 +201,7 @@ CREATE TABLE ${tableName} (
     }
 
     constructor(row) {
-        this.id = row.id;
-        this.parent_id = row.parent_id;
-        this.user_id = row.user_id;
-        this.path = row.path;
-        this.title = row.title;
-        this.theme = row.theme || 'default';
-        this.status = row.status;
-        // this.flags = row.flags ? row.flags.split(',') : [];
-        this.content = row.content;
-        this.created = row.created;
-        this.updated = row.updated;
+        Object.assign(this, row);
     }
 
     // hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
@@ -237,13 +228,7 @@ CREATE TABLE ${tableName} (
     }
 
     constructor(row) {
-        this.id = row.id;
-        this.article_id = row.article_id;
-        this.user_id = row.user_id;
-        this.title = row.title;
-        if(row.content !== null)
-            this.content = row.content;
-        this.created = row.created;
+        Object.assign(this, row);
     }
 }
 

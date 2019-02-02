@@ -13,6 +13,16 @@ class ConfigDatabase  {
     async configure() {
         // Check for table
         await DatabaseManager.configureTable(this.table.config, ConfigRow.getTableSQL(this.table.config));
+        const configDB = await DatabaseManager.getConfigDB();
+        let siteConfig = await configDB.fetchConfigValues('site');
+
+        const hostname = require('os').hostname();
+        if(!siteConfig.hostname || !siteConfig.name) {
+            siteConfig.hostname = await configDB.promptValue('site.hostname', `Please enter the Website Hostname`, hostname);
+            siteConfig.name = await configDB.promptValue('site.name', `Please enter the Website Name`, siteConfig.hostname);
+            siteConfig.contact = await configDB.promptValue('site.contact', `Please enter the Website Contact Email`, 'admin@' + siteConfig.hostname);
+            siteConfig.keywords = await configDB.promptValue('site.keywords', `Please enter the Website Keywords`, siteConfig.keywords);
+        }
     }
 
     /** Config Table **/
@@ -43,7 +53,7 @@ class ConfigDatabase  {
         const results = await this.selectConfigs('c.name = ? LIMIT 1', name);
         return results.length > 0 ? results[0].value : null;
     }
-    async getConfigValues(name) {
+    async fetchConfigValues(name) {
         const results = await this.selectConfigs('c.name LIKE ?', name+'%');
         const config = {};
         for(let i=0; i<results.length; i++) {

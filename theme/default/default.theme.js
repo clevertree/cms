@@ -20,22 +20,72 @@ class DefaultTheme {
         };
     }
 
-    async render(req, content, renderData) {
+    async render(req, article) {
+        if(typeof article === "string")
+            article = {content: article};
+
+        const articleDB = await DatabaseManager.getArticleDB(req);
+        const configDB = await DatabaseManager.getConfigDB(req);
+
+        const renderData = {article};
+
+
+        // Menu data
+        renderData.menu = await articleDB.queryMenuData(req, true);
+
+        if(!req.session || !req.session.userID) { // If not logged in
+            renderData.menu.push({
+                path: '/:user/:login',
+                title: 'Log In',
+                subMenu: [{
+                    path: '/:user/:register',
+                    title: 'Register'
+                }, {
+                    path: '/:article',
+                    title: 'Browse Articles'
+                }]
+            })
+        } else { // If Logged In
+            const submenu = [];
+            renderData.menu.push({
+                path: `/:user/${req.session.userID}`,
+                title: 'Menu',
+                subMenu: submenu
+            });
+            if(article.id) {
+                submenu.push({
+                    path: `/:article/${article.id}/:edit`,
+                    title: 'Edit This Article',
+                });
+            }
+            submenu.push({
+                path: '/:article',
+                title: 'Browse Articles'
+            });
+            submenu.push("<hr/>", {
+                path: '/:user',
+                title: 'Browse Users'
+            }, "<hr/>", {
+                path: `/:user/${req.session.userID}`,
+                title: 'My Profile',
+            },{
+                path: `/:user/${req.session.userID}/:profile`,
+                title: 'Edit Profile',
+            },{
+                path: `/:user/:logout`,
+                title: 'Log Out',
+            });
+        }
+
+
+        // Server data
+        renderData.site = await configDB.fetchConfigValues('site');
+
+        // Relative path to root
+        const slashCount = req.path.split('/').length-1;
+        renderData.baseHRef = slashCount > 1 ? "../".repeat(slashCount-1) : null;
+
         try {
-            const articleDB = await DatabaseManager.getArticleDB(req);
-            const userDB = await DatabaseManager.getUserDB(req);
-
-            if (!renderData)
-                renderData = {};
-            // renderData.baseHRef = this.getBaseHRef(req);
-            renderData.menu = await articleDB.queryMenuData(true);
-
-            // const sessionUser = await userDB.fetchUserByID(req.session.userID);
-            // renderData.sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
-            renderData.req = req;
-            renderData.hostname = require('os').hostname();
-            renderData.content = content; // ? await ejs.render(content, renderData, this.renderOptions) : null;
-
             const templatePath = path.resolve(TEMPLATE_DIR + '/theme.ejs');
             // res.render(templatePath)
             return await ejs.renderFile(templatePath, renderData, this.renderOptions);
@@ -44,15 +94,6 @@ class DefaultTheme {
             return "Error Rendering Theme: " + e.stack;
         }
     }
-
-
-    getBaseHRef(req) {
-        const slashCount = req.path.split('/').length-1;
-        if(slashCount <= 1)
-            return null;
-        return "../".repeat(slashCount-1);
-    }
-
 
 }
 

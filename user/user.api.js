@@ -21,7 +21,10 @@ class UserAPI {
         const cookieConfig = await localConfig.getOrCreate('cookie');
 
         const sessionConfig = await localConfig.getOrCreate('session');
-        if(!sessionConfig.secret) sessionConfig.secret = require('uuid/v4')();
+        if(!sessionConfig.secret) {
+            sessionConfig.secret = require('uuid/v4')();
+            localConfig.saveAll();
+        }
         sessionConfig.cookieName = 'session';
 
         const bodyParser = require('body-parser');
@@ -74,10 +77,10 @@ class UserAPI {
     }
 
 
-    addSessionMessage(req, message, status) {
+    addSessionMessage(req, message) {
         if(typeof req.session.messages === 'undefined')
             req.session.messages = [];
-        req.session.messages.push({message, status})
+        req.session.messages.push(message)
     }
 
     popSessionMessage(req) {
@@ -211,7 +214,7 @@ class UserAPI {
             req.session.setDuration(1000 * 60 * 60 * 24 * 14);
         }
 
-        this.addSessionMessage(req,"Login Successful: " + user.username);
+        this.addSessionMessage(req,`<div class='success'>Login Successful: ${user.username}</div>`);
         return user;
     }
 
@@ -222,7 +225,7 @@ class UserAPI {
         }
         req.session.reset();
         res.clearCookie('session_save');
-        this.addSessionMessage(req,"User has been logged out");
+        this.addSessionMessage(req,`<div class='success'>User has been logged out</div>`);
         // TODO: destroy db session
     }
 
@@ -441,8 +444,8 @@ class UserAPI {
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
-<script src="/user/form/userform-${type}.client.js"></script>
-<userform-${type}></userform-${type}>`)
+<script src="/user/form/userform-update-${type}.client.js"></script>
+<userform-update-${type} id="${userID}"></userform-update-${type}>`)
                 );
 
             } else {
