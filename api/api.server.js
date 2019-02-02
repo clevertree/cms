@@ -8,6 +8,7 @@ const { DatabaseManager } = require('../database/database.manager');
 const { UserAPI } = require('../user/user.api');
 const { ArticleAPI } = require('../article/article.api');
 const { FileAPI } = require('../file/file.api');
+const { ConfigAPI } = require('../config/config.api');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
@@ -23,15 +24,19 @@ class APIServer {
         if(!serverConfig.port)  await localConfig.promptValue('server.port', `Please enter the Server Port`, 8080);
 
         await DatabaseManager.configure(config);
-        await UserAPI.configure(config);
-        await ArticleAPI.configure(config);
-        await FileAPI.configure(config);
 
-        const router = express.Router();
         // Routes
-        router.use(UserAPI.getMiddleware());
-        router.use(ArticleAPI.getMiddleware());
-        router.use(FileAPI.getMiddleware());
+        const router = express.Router();
+        [
+            UserAPI,
+            ArticleAPI,
+            FileAPI,
+            ConfigAPI,
+        ].forEach(async API => {
+            await API.configure(config);
+            router.use(API.getMiddleware());
+        });
+
 
         // CMS Asset files
         router.use(express.static(BASE_DIR));

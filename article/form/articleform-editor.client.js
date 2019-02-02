@@ -176,7 +176,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
         let message = null;
         switch(this.state.mode) {
             case 'edit':
-                action = `/:article/${this.state.article.id}/edit`;
+                action = `/:article/${this.state.article.id}/:edit`;
                 message = `Editing article ID ${this.state.article.id}`;
                 break;
             case 'add':

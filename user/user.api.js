@@ -52,6 +52,7 @@ class UserAPI {
         routerAPI.all('/[:]user/[:]logout',                     async (req, res) => await this.handleLogoutRequest(req, res));
         routerAPI.all('/[:]user/[:]register',                   async (req, res) => await this.handleRegisterRequest(req, res));
         routerAPI.all('/[:]user/[:]forgotpassword',             async (req, res) => await this.handleForgotPassword(req, res));
+        routerAPI.all('/[:]user(/[:]list)?',                    async (req, res) => await this.handleBrowserRequest(req, res));
 
         this.routerAPI = routerAPI;
     }
@@ -466,7 +467,11 @@ class UserAPI {
                         affectedRows = await this.updateFlags(req, userID, req.body);
                         break;
                     case 'password':
-                        affectedRows = await this.updatePassword(req, userID, sessionUser.isAdmin ? null : req.body.password_old, req.body.password_new, req.body.password_confirm);
+                        affectedRows = await this.updatePassword(req,
+                            userID,
+                            sessionUser.isAdmin ? null : req.body.password_old,
+                            req.body.password_new,
+                            req.body.password_confirm);
                         break;
                 }
                 const user = await userDB.fetchUserByID(userID);
@@ -481,6 +486,52 @@ class UserAPI {
             console.error(error);
             res.status(400).json({message: "Error: " + error.message, error: error.stack});
         }
+    }
+    
+    async handleBrowserRequest(req, res) {
+        try {
+
+            if (req.method === 'GET') {
+                res.send(
+                    await ThemeManager.get()
+                        .render(req, `
+<section>
+    <script src="/user/form/userform-browser.client.js"></script>
+    <userform-browser></userform-browser>
+    <script src="/user/form/userform-add.client.js"></script>
+    <userform-add></userform-add>
+</section>
+`)
+                );
+
+            } else {
+                const userDB = await DatabaseManager.getUserDB(req);
+                // Handle POST
+                let whereSQL = '1', values = null;
+                if(req.body.search) {
+                    whereSQL = 'u.username LIKE ? OR u.email LIKE ? OR u.id = ?';
+                    values = ['%'+req.body.search+'%', '%'+req.body.search+'%', parseInt(req.body.search)];
+                }
+                const users = await userDB.selectUsers(whereSQL, values, 'id, email, username, created, flags');
+
+                return res.json({
+                    message: `${users.length} User${users.length > 1 ? 's' : ''} queried successfully`,
+                    users
+                });
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(400);
+            if(req.method === 'GET') {
+                res.send(
+                    await ThemeManager.get()
+                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
+                );
+            } else {
+                res.json({message: error.stack});
+            }
+        }
+
     }
 
     static validateEmail(email) {

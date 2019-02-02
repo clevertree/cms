@@ -2,15 +2,15 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("article/form/articleform.css");
+    })("user/form/userform.css");
 });
 
 
-class HTMLArticleFormBrowserElement extends HTMLElement {
+class HTMLUserFormBrowserElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
-            articles: [],
+            users: [],
             status: null,
             message: null,
         };
@@ -59,14 +59,14 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
     //     xhr.onload = () => {
     //         this.setState({processing: false});
     //         // console.info(xhr.response);
-    //         if(!xhr.response || !xhr.response.article)
+    //         if(!xhr.response || !xhr.response.user)
     //             throw new Error("Invalid Response");
     //         this.setState(xhr.response);
     //         // this.state = xhr.response.user;
     //         // this.render();
     //     };
     //     xhr.responseType = 'json';
-    //     xhr.open ("GET", `:article/${this.state.article.id}/:json?getAll=true&getRevision=${new Date(this.state.revisionDate).getTime()}`, true);
+    //     xhr.open ("GET", `:user/${this.state.user.id}/:json?getAll=true&getRevision=${new Date(this.state.revisionDate).getTime()}`, true);
     //     // xhr.setRequestHeader("Accept", "application/json");
     //     xhr.send ();
     //     this.setState({processing: true});
@@ -117,34 +117,34 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
         let searchField = this.querySelector('input[name=search]');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
-            `<form action="/:article/:list" method="POST" class="articleform articleform-browser themed">
+            `<form action="/:user/:list" method="POST" class="userform userform-browser themed">
             <fieldset>
                 <table style="width: 100%;">
                     <thead>
                         <tr>
-                            <td colspan="4">
-                                <input type="text" name="search" placeholder="Search Articles" value="${formData.search||''}"/>
+                            <td colspan="5">
+                                <input type="text" name="search" placeholder="Search Users" value="${formData.search||''}"/>
                             </td>
                         </tr>
-                        <tr><td colspan="4"><hr/></td></tr>
+                        <tr><td colspan="5"><hr/></td></tr>
                         <tr>
                             <th>ID</th>
-                            <th>Path</th>
-                            <th>Title</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
+                            <th>User</th>
+                            <th>Profile</th>
+                            <th>Flags</th>
+                            <th>Password</th>
                         </tr>
                     </thead>
                     <tbody class="results">
                         <tr>
-                            <th colspan="4">No Results</th>
+                            <th colspan="5">No Results</th>
                         </tr>
                     </tbody>
                     <tfoot>
-                        <tr><td colspan="4"><hr/></td></tr>
+                        <tr><td colspan="5"><hr/></td></tr>
                         <tr>
-                            <td colspan="4" class="status">
-                                Article Browser
+                            <td colspan="5" class="status">
+                                User Browser
                             </td>
                         </tr>
                     </tfoot>
@@ -161,22 +161,35 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
     renderResults() {
         const resultsElement = this.querySelector('tbody.results');
         let classOdd = '';
-        resultsElement.innerHTML = this.state.articles.map(article => `
+        resultsElement.innerHTML = this.state.users.map(user => `
             <tr class="results ${classOdd=classOdd===''?'odd':''}">
-                <td><a href=":article/${article.id}">${article.id}</a></td>
-                <td style="text-align: left;"><a href="${article.path||`:article/${article.id}/:edit`}">${article.path||''}</a></td>
-                <td style="text-align: left;"><a href=":article/${article.id}">${article.title}</a></td>
-                
-                <td><a href=":article/${article.id}/:edit" class="action-edit">&#x270D;</a></td>
-                <td><a href=":article/${article.id}/:delete" class="action-edit">&#x26D4;</a></td>
-                
+                <td><a href=":user/${user.id}">${user.id}</a></td>
+                <td><a href=":user/${user.username}">${user.username}</a></td>
+                <td><a href=":user/${user.id}/:profile" class="action-edit">[&#x270D; edit]</a></td>
+                <td>${user.flags.join(', ')}<a href=":user/${user.id}/:flags" class="action-edit"> [&#x270D;]</a></td>
+                <td><a href=":user/${user.id}/:password" class="action-edit">[&#x270D; change]</a></td>
             </tr>
             `).join('');
 
         const statusElement = this.querySelector('td.status');
         statusElement.innerHTML = this.state.message
             ? this.state.message
-            : `Article Browser`;
+            : `User Browser`;
     }
 }
-customElements.define('articleform-browser', HTMLArticleFormBrowserElement);
+
+// HTMLUserFormBrowserElement.UserRow = class {
+//     constructor(row) {
+//         Object.assign(this, row);
+//         if(this.profile)
+//             this.profile = JSON.parse(this.profile);
+//         if(this.flags)
+//             this.flags = this.flags.split(',');
+//     }
+//
+//     hasFlag(flag) { return this.flags && this.flags.indexOf(flag) !== -1; }
+//     isAdmin() { return this.hasFlag('admin'); }
+//     // isGuest() { return this.hasFlag('guest'); }
+// };
+
+customElements.define('userform-browser', HTMLUserFormBrowserElement);

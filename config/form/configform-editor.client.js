@@ -2,15 +2,15 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("article/form/articleform.css");
+    })("config/form/configform.css");
 });
 
 
-class HTMLArticleFormBrowserElement extends HTMLElement {
+class HTMLConfigFormEditorElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
-            articles: [],
+            configs: [],
             status: null,
             message: null,
         };
@@ -59,14 +59,14 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
     //     xhr.onload = () => {
     //         this.setState({processing: false});
     //         // console.info(xhr.response);
-    //         if(!xhr.response || !xhr.response.article)
+    //         if(!xhr.response || !xhr.response.config)
     //             throw new Error("Invalid Response");
     //         this.setState(xhr.response);
     //         // this.state = xhr.response.user;
     //         // this.render();
     //     };
     //     xhr.responseType = 'json';
-    //     xhr.open ("GET", `:article/${this.state.article.id}/:json?getAll=true&getRevision=${new Date(this.state.revisionDate).getTime()}`, true);
+    //     xhr.open ("GET", `:config/${this.state.config.id}/:json?getAll=true&getRevision=${new Date(this.state.revisionDate).getTime()}`, true);
     //     // xhr.setRequestHeader("Accept", "application/json");
     //     xhr.send ();
     //     this.setState({processing: true});
@@ -117,21 +117,19 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
         let searchField = this.querySelector('input[name=search]');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
-            `<form action="/:article/:list" method="POST" class="articleform articleform-browser themed">
+            `<form action="/:config/:list" method="POST" class="configform configform-editor themed">
             <fieldset>
                 <table style="width: 100%;">
                     <thead>
                         <tr>
                             <td colspan="4">
-                                <input type="text" name="search" placeholder="Search Articles" value="${formData.search||''}"/>
+                                <input type="text" name="search" placeholder="Search Configs" value="${formData.search||''}"/>
                             </td>
                         </tr>
                         <tr><td colspan="4"><hr/></td></tr>
                         <tr>
-                            <th>ID</th>
-                            <th>Path</th>
-                            <th>Title</th>
-                            <th>Edit</th>
+                            <th>Name</th>
+                            <th>Value</th>
                             <th>Delete</th>
                         </tr>
                     </thead>
@@ -144,7 +142,7 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
                         <tr><td colspan="4"><hr/></td></tr>
                         <tr>
                             <td colspan="4" class="status">
-                                Article Browser
+                                Config Editor
                             </td>
                         </tr>
                     </tfoot>
@@ -161,22 +159,18 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
     renderResults() {
         const resultsElement = this.querySelector('tbody.results');
         let classOdd = '';
-        resultsElement.innerHTML = this.state.articles.map(article => `
+        resultsElement.innerHTML = this.state.configs.map(config => `
             <tr class="results ${classOdd=classOdd===''?'odd':''}">
-                <td><a href=":article/${article.id}">${article.id}</a></td>
-                <td style="text-align: left;"><a href="${article.path||`:article/${article.id}/:edit`}">${article.path||''}</a></td>
-                <td style="text-align: left;"><a href=":article/${article.id}">${article.title}</a></td>
-                
-                <td><a href=":article/${article.id}/:edit" class="action-edit">&#x270D;</a></td>
-                <td><a href=":article/${article.id}/:delete" class="action-edit">&#x26D4;</a></td>
-                
+                <td>${config.name}</td>
+                <td>${config.value}</td>
+                <td><a href=":config/${config.name}/:delete" class="action-edit">&#x26D4;</a></td>
             </tr>
             `).join('');
 
         const statusElement = this.querySelector('td.status');
         statusElement.innerHTML = this.state.message
             ? this.state.message
-            : `Article Browser`;
+            : `Config Editor`;
     }
 }
-customElements.define('articleform-browser', HTMLArticleFormBrowserElement);
+customElements.define('configform-editor', HTMLConfigFormEditorElement);

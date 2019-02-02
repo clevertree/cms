@@ -1,5 +1,6 @@
 form.userform {
     max-width: 520px;
+    text-align: center;
 }
 
 form.userform > fieldset {
@@ -8,6 +9,7 @@ form.userform > fieldset {
 
 form.userform > fieldset > table {
     width: 100%;
+    border-collapse: collapse;
 }
 form.userform > fieldset > table > caption {
     /* font-weight: bold; */
@@ -15,15 +17,13 @@ form.userform > fieldset > table > caption {
     text-align: left;
     /* padding-bottom: 1em; */
 }
-form.userform > fieldset > table > tbody > tr > td:first-child {
-    width: 25%;
-}
-form.userform > fieldset > table > tbody > tr > td.label {
-    /* text-align: right; */
-    /* font-weight: bold; */
-    /* padding-right: 4px; */
+
+/** Row **/
+form.userform > fieldset > table > tbody > tr:not(.odd) {
+    background-color: #0001;
 }
 
+/** Form Input **/
 
 form.userform input[type=text],
 form.userform input[type=email],
@@ -31,6 +31,13 @@ form.userform input[type=password],
 form.userform select,
 form.userform textarea {
      min-width: 90%;
+}
+
+/** Form Actions **/
+
+form.userform .action-edit {
+    font-size: x-small;
+    text-decoration: none;
 }
 
 /** Form Messages **/

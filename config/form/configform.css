@@ -1,26 +1,26 @@
-form.articleform {
+form.configform {
     /* max-width: 1200px; */
     /* text-align: center; */
 }
 
-form.articleform > fieldset {
+form.configform > fieldset {
     margin: 0px auto;
 }
 
-form.articleform > fieldset > table {
+form.configform > fieldset > table {
     width: 100%;
     border-collapse: collapse;
 }
-form.articleform > fieldset > table > caption {
+form.configform > fieldset > table > caption {
     /* font-weight: bold; */
     /*font-style: italic;*/
     text-align: left;
     /* padding-bottom: 1em; */
 }
-form.articleform > fieldset > table > tbody > tr > td:first-child {
+form.configform > fieldset > table > tbody > tr > td:first-child {
     width: 8%;
 }
-form.articleform > fieldset > table > tbody > tr > td.label {
+form.configform > fieldset > table > tbody > tr > td.label {
     text-align: right;
     padding: 8px 4px;
     font-weight: bold;
@@ -29,7 +29,7 @@ form.articleform > fieldset > table > tbody > tr > td.label {
     display: block;
     min-width: 90%;
 }
-form.articleform .editor-iframe.fullscreen {
+form.configform .editor-iframe.fullscreen {
     position: fixed;
     left: 0;
     top: 0;
@@ -37,45 +37,45 @@ form.articleform .editor-iframe.fullscreen {
 }
 
 /** Row **/
-form.articleform > fieldset > table > tbody > tr:not(.odd) {
+form.configform > fieldset > table > tbody > tr:not(.odd) {
     background-color: #0001;
 }
 
 /** Form Input **/
 
 
-form.articleform input[type=text],
-form.articleform input[type=email],
-form.articleform input[type=password],
-form.articleform select,
-form.articleform textarea {
+form.configform input[type=text],
+form.configform input[type=email],
+form.configform input[type=password],
+form.configform select,
+form.configform textarea {
     min-width: 90%;
 }
 
 /** Form Actions **/
 
-form.articleform .action-edit {
+form.configform .action-edit {
     font-size: x-small;
     text-decoration: none;
 }
 
 
-form.articleform textarea.editor-plain {
+form.configform textarea.editor-plain {
     min-height: 600px;
 }
 /** Form Messages **/
 
-form.articleform div.success,
-form.articleform div.error {
+form.configform div.success,
+form.configform div.error {
     padding: 0.5em;
     margin: 0.5em;
     border-radius: 4px;
 }
-form.articleform div.success {
+form.configform div.success {
     color: #f5fbf2;
     background: #118c09;
 }
-form.articleform div.error {
+form.configform div.error {
     color: #fee;
     background: #d25757;
 }

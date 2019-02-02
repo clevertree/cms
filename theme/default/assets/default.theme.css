@@ -229,32 +229,6 @@ body.theme-default {
 }
 
 
-/** Flex List **/
-
-.theme-default ul.flex-list {
-    list-style: none;
-    padding: 0 0;
-    margin: 0 0;
-    /* align-items: center; */
-    text-align: center;
-}
-
-@media only screen and (min-width: 600px) {
-    .theme-default ul.flex-list {
-        display: flex;
-        /* flex-wrap: wrap; */
-        /* justify-content: center; */
-    }
-}
-
-.theme-default ul.flex-list > li {
-    display: block;
-    flex-grow: 1;
-    flex-basis: 0;
-    max-width: 400px;
-    padding: 0.5em 1em;
-}
-
 .theme-default div.image-container > img,
 .theme-default div.image-container > a > img {
     max-width: 90%;
@@ -269,19 +243,6 @@ body.theme-default {
     align-items: center;
     padding: 10px 0px;
 }
-
-.theme-default ul.flex-list > li > h2 {
-    margin: 0 0;
-    font-family: "Advent Pro", Helvetica, serif;
-    font-size: 1.4em;
-}
-.theme-default ul.flex-list > li > p {
-    text-align: justify;
-    text-indent: 8px;
-    padding: 4px 8px;
-    line-height: 20px;
-}
-
 
 /** Section effects **/
 
@@ -409,10 +370,46 @@ body.theme-default {
 }
 
 .theme-default .themed td.label {
-    padding-right: 6px;
-    text-align: right;
-    font-weight: bold;
+    /* padding-right: 6px; */
+    /* text-align: right; */
+    /* font-weight: bold; */
     /* max-width: 36px; */
-    text-transform: capitalize;
-    white-space: nowrap;
+    /* text-transform: capitalize; */
+    /* white-space: nowrap; */
+}
+
+
+/** Flex List **/
+
+.theme-default .flex-list {
+    text-align: center;
+}
+
+@media only screen and (min-width: 600px) {
+    .theme-default .flex-list {
+        display: flex;
+        /* flex-wrap: wrap; */
+        /* justify-content: center; */
+    }
+
+    .theme-default .flex-list > * {
+        display: block;
+        flex-grow: 1;
+        flex-basis: 0;
+        max-width: 400px;
+        padding: 0.5em 1em;
+    }
+}
+
+
+.theme-default .flex-list > * > h2 {
+    margin: 0 0;
+    font-family: "Advent Pro", Helvetica, serif;
+    font-size: 1.4em;
+}
+.theme-default .flex-list > * > p {
+    text-align: justify;
+    text-indent: 8px;
+    padding: 4px 8px;
+    line-height: 20px;
 }

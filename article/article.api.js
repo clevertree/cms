@@ -43,45 +43,53 @@ class ArticleAPI {
         this.router = router;
     }
 
+    async checkForRevisionContent(req, article) {
+        const articleDB = await DatabaseManager.getArticleDB(req);
+        if(typeof req.query.r !== 'undefined') {
+            const articleRevisionID = parseInt(req.query.r);
+            const articleRevision = await articleDB.fetchArticleRevisionByID(articleRevisionID);
+            if(!articleRevision)
+                throw new Error("Article Revision ID not found: " + articleRevisionID);
+
+            if(articleRevision.article_id !== article.id)
+                throw new Error("Revision does not belong to article");
+
+            article.content = articleRevision.content;
+            article.title = articleRevision.title;
+            return articleRevision;
+        }
+        return null;
+    }
+
+    async appendSessionHTML(req, article) {
+        if(req.session) {
+            while (req.session.messages && req.session.messages.length > 0) {
+                const sessionMessage = req.session.messages.pop();
+                article.content = `
+                        <section class="message">
+                            ${sessionMessage}
+                        </section>
+                        ${content}`;
+            }
+            // if (req.session.userID) {
+            //     article.content += `
+            //             <section class="message">
+            //                 <a href=":article/${article.id}/:edit">Edit this page</a>
+            //             </section>`;
+            // }
+        }
+    }
+
+
     async renderArticleByPath(req, res, next) {
         try {
             const articleDB = await DatabaseManager.getArticleDB(req);
             const article = await articleDB.fetchArticleByPath(req.url);
             if(!article)
                 return next();
-            let content = article.content;
-            let title = article.title;
 
-            if(typeof req.query.r !== 'undefined') {
-                const articleRevisionID = parseInt(req.query.r);
-                const articleRevision = await articleDB.fetchArticleRevisionByID(articleRevisionID);
-                if(!articleRevision)
-                    throw new Error("Article Revision ID not found: " + articleRevisionID);
-
-                if(articleRevision.article_id !== article.id)
-                    throw new Error("Revision does not belong to article");
-
-                content = articleRevision.content;
-                title = articleRevision.title;
-            }
-
-            if(req.session) {
-                if (req.session.messages && req.session.messages.length > 0) {
-                    const sessionMessage = req.session.messages.pop();
-                    content = `
-                        <section class="message">
-                            ${sessionMessage}
-                        </section>
-                        ${content}`;
-                }
-                if (req.session.userID) {
-                    content += `
-                        <section class="message">
-                            <a href=":article/${article.id}/:edit">Edit this page</a>
-                        </section>`;
-                }
-            }
-
+            await this.checkForRevisionContent(req, article);
+            await this.appendSessionHTML(req, article);
 
             res.send(
                 await ThemeManager.get(article.theme)
@@ -104,18 +112,7 @@ class ArticleAPI {
             if(!article)
                 return next();
 
-            let articleRevision = null;
-            if(typeof req.query.r !== 'undefined') {
-                const articleRevisionID = parseInt(req.query.r);
-                articleRevision = await articleDB.fetchArticleRevisionByID(articleRevisionID);
-                if(!articleRevision)
-                    throw new Error("Article Revision ID not found: " + articleRevisionID);
-
-                if(articleRevision.article_id !== article.id)
-                    throw new Error("Revision does not belong to article");
-                article.title = articleRevision.title;
-                article.content = articleRevision.content;
-            }
+            let articleRevision = await this.checkForRevisionContent(req, article);
 
             if(asJSON) {
                 const response = {
@@ -133,7 +130,7 @@ class ArticleAPI {
                 if(req.query.getAll || req.query.getHistory) {
                     response.history = await articleDB.fetchArticleRevisionsByArticleID(article.id);
                     // response.revision = await articleDB.fetchArticleRevisionByID(article.id, req.query.getRevision || null);
-                    if(!articleRevision && response.history.length > 0)
+                    if(!articleRevision && response.history.length > 0) // Fetch latest revision? sloppy
                         articleRevision = await articleDB.fetchArticleRevisionByID(response.history[0].id); // response.history[0]; // (await articleDB.fetchArticleRevisionsByArticleID(article.id))[0];
                 }
                 if(articleRevision)
@@ -145,9 +142,10 @@ class ArticleAPI {
                 res.json(response);
 
             } else {
+                await this.appendSessionHTML(req, article);
                 res.send(
                     await ThemeManager.get(article.theme)
-                        .render(req, article.content, {article})
+                        .render(req, article)
                 );
             }
         } catch (error) {
@@ -297,7 +295,7 @@ class ArticleAPI {
                 );
                 const article = await articleDB.fetchArticleByID(insertID);
                 return res.json({
-                    redirect: '/:article/' + insertID + '/edit',
+                    redirect: '/:article/' + insertID + '/:edit',
                     message: "Article created successfully. Redirecting...",
                     insertID: insertID,
                     article
@@ -319,7 +317,6 @@ class ArticleAPI {
 
     async renderArticleBrowser(req, res) {
         try {
-            const articleDB = await DatabaseManager.getArticleDB(req);
 
             if (req.method === 'GET') {
                 res.send(
@@ -335,16 +332,17 @@ class ArticleAPI {
                 );
 
             } else {
+                const articleDB = await DatabaseManager.getArticleDB(req);
                 // Handle POST
                 let whereSQL = '1', values = null;
                 if(req.body.search) {
-                    whereSQL = 'a.title LIKE ? OR a.content LIKE ? OR a.path LIKE ?';
-                    values = ['%'+req.body.search+'%', '%'+req.body.search+'%', '%'+req.body.search+'%'];
+                    whereSQL = 'a.title LIKE ? OR a.content LIKE ? OR a.path LIKE ? OR a.id = ?';
+                    values = ['%'+req.body.search+'%', '%'+req.body.search+'%', '%'+req.body.search+'%', parseInt(req.body.search)];
                 }
                 const articles = await articleDB.selectArticles(whereSQL, values);
 
                 return res.json({
-                    message: "Article list queried successfully",
+                    message: `${articles.length} Article${articles.length > 1 ? 's' : ''} queried successfully`,
                     articles
                 });
             }

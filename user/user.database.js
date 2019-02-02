@@ -143,21 +143,14 @@ CREATE TABLE ${tableName} (
 
 
     constructor(row) {
-        this.id = row.id;
-        this.email = row.email;
-        if(row.password)
-            this.password = row.password;
-        this.created = row.created;
-        this.profile = {};
-        try {
-            this.profile = row.profile ? JSON.parse(row.profile) : {};
-        } catch (e) {
-            console.error(e);
-        }
-        this.flags = row.flags ? row.flags.split(',') : [];
+        Object.assign(this, row);
+        if(this.profile)
+            this.profile = JSON.parse(this.profile);
+        if(this.flags)
+            this.flags = this.flags.split(',');
     }
 
-    hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
+    hasFlag(flag) { return this.flags && this.flags.indexOf(flag) !== -1; }
     isAdmin() { return this.hasFlag('admin'); }
     // isGuest() { return this.hasFlag('guest'); }
 }

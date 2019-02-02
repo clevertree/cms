@@ -59,13 +59,6 @@ class DefaultTheme {
                 });
             }
             submenu.push({
-                path: '/:article',
-                title: 'Browse Articles'
-            });
-            submenu.push("<hr/>", {
-                path: '/:user',
-                title: 'Browse Users'
-            }, "<hr/>", {
                 path: `/:user/${req.session.userID}`,
                 title: 'My Profile',
             },{
@@ -74,6 +67,15 @@ class DefaultTheme {
             },{
                 path: `/:user/:logout`,
                 title: 'Log Out',
+            }, "<hr/>", {
+                path: '/:user',
+                title: 'Browse Users'
+            }, {
+                path: '/:article',
+                title: 'Browse Articles'
+            }, {
+                path: '/:config',
+                title: 'Configure Site'
             });
         }
 
