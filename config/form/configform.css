@@ -1,39 +1,24 @@
 form.configform {
     /* max-width: 1200px; */
-    /* text-align: center; */
+     /*text-align: center;*/
 }
 
 form.configform > fieldset {
-    margin: 0px auto;
+    /*margin: 0px auto;*/
 }
 
 form.configform > fieldset > table {
-    width: 100%;
+    min-width: 600px;
+    margin: auto;
     border-collapse: collapse;
 }
-form.configform > fieldset > table > caption {
-    /* font-weight: bold; */
-    /*font-style: italic;*/
+form.configform > fieldset > table > tbody > tr > td {
     text-align: left;
-    /* padding-bottom: 1em; */
+    padding: 5px;
 }
 form.configform > fieldset > table > tbody > tr > td:first-child {
-    width: 8%;
-}
-form.configform > fieldset > table > tbody > tr > td.label {
-    text-align: right;
-    padding: 8px 4px;
-    font-weight: bold;
-    /* padding-right: 4px; */
-    white-space: nowrap;
-    display: block;
-    min-width: 90%;
-}
-form.configform .editor-iframe.fullscreen {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100% !important;
+    text-align: left;
+    min-width: 80px;
 }
 
 /** Row **/
@@ -57,25 +42,4 @@ form.configform textarea {
 form.configform .action-edit {
     font-size: x-small;
     text-decoration: none;
-}
-
-
-form.configform textarea.editor-plain {
-    min-height: 600px;
-}
-/** Form Messages **/
-
-form.configform div.success,
-form.configform div.error {
-    padding: 0.5em;
-    margin: 0.5em;
-    border-radius: 4px;
-}
-form.configform div.success {
-    color: #f5fbf2;
-    background: #118c09;
-}
-form.configform div.error {
-    color: #fee;
-    background: #d25757;
 }

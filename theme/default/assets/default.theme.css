@@ -166,7 +166,7 @@ body.theme-default {
 
 .theme-default div.message,
 .theme-default section.message {
-    background-color: rgba(111, 171, 102, 0.93);
+    /* background-color: rgba(111, 171, 102, 0.93); */
 }
 
 /** Page Headings **/
@@ -347,6 +347,29 @@ body.theme-default {
     height: 16px;
     vertical-align: middle;
     margin: 0 0px 4px 0px;
+}
+
+
+/** Form Messages **/
+
+.theme-default div.message,
+.theme-default div.success,
+.theme-default div.error {
+    padding: 0.5em;
+    margin: 0.5em;
+    border-radius: 4px;
+}
+.theme-default div.message {
+    color: #000;
+    background: #0002;
+}
+.theme-default div.success {
+    color: #f5fbf2;
+    background: #118c09;
+}
+.theme-default div.error {
+    color: #fee;
+    background: #d25757;
 }
 
 /** Table **/

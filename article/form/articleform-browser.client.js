@@ -119,7 +119,7 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
         this.innerHTML =
             `<form action="/:article/:list" method="POST" class="articleform articleform-browser themed">
             <fieldset>
-                <table style="width: 100%;">
+                <table>
                     <thead>
                         <tr>
                             <td colspan="4">
@@ -144,7 +144,7 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
                         <tr><td colspan="4"><hr/></td></tr>
                         <tr>
                             <td colspan="4" class="status">
-                                Article Browser
+                                <div class="message">Article Browser</div> 
                             </td>
                         </tr>
                     </tfoot>

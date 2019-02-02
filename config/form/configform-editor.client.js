@@ -119,7 +119,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         this.innerHTML =
             `<form action="/:config/:list" method="POST" class="configform configform-editor themed">
             <fieldset>
-                <table style="width: 100%;">
+                <table>
                     <thead>
                         <tr>
                             <td colspan="4">
@@ -130,7 +130,6 @@ class HTMLConfigFormEditorElement extends HTMLElement {
                         <tr>
                             <th>Name</th>
                             <th>Value</th>
-                            <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody class="results">
@@ -139,10 +138,15 @@ class HTMLConfigFormEditorElement extends HTMLElement {
                         </tr>
                     </tbody>
                     <tfoot>
-                        <tr><td colspan="4"><hr/></td></tr>
+                        <tr><td colspan="2"><hr/></td></tr>
+                        <tr>
+                            <td colspan="2" style="text-align: right;">
+                                <button type="submit" disabled>Update Config</button>
+                            </td>
+                        </tr>
                         <tr>
                             <td colspan="4" class="status">
-                                Config Editor
+                                <div class="message">Config Editor</div> 
                             </td>
                         </tr>
                     </tfoot>
@@ -162,15 +166,21 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         resultsElement.innerHTML = this.state.configs.map(config => `
             <tr class="results ${classOdd=classOdd===''?'odd':''}">
                 <td>${config.name}</td>
-                <td>${config.value}</td>
-                <td><a href=":config/${config.name}/:delete" class="action-edit">&#x26D4;</a></td>
+                <td>${this.renderConfig(config)}</td>
             </tr>
             `).join('');
 
         const statusElement = this.querySelector('td.status');
         statusElement.innerHTML = this.state.message
-            ? this.state.message
-            : `Config Editor`;
+            ? `<div class="${this.state.status === 200 ? 'message' : 'error'}">${this.state.message}</div>`
+            : `<div class="message">Config Editor</div>`;
+    }
+
+    renderConfig(config) {
+        switch(config.type) {
+            default:
+                return `<input type='text' name='${config.name}' value='${config.value}' />`;
+        }
     }
 }
 customElements.define('configform-editor', HTMLConfigFormEditorElement);

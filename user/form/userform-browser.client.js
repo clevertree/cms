@@ -119,7 +119,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
         this.innerHTML =
             `<form action="/:user/:list" method="POST" class="userform userform-browser themed">
             <fieldset>
-                <table style="width: 100%;">
+                <table>
                     <thead>
                         <tr>
                             <td colspan="5">
@@ -144,7 +144,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
                         <tr><td colspan="5"><hr/></td></tr>
                         <tr>
                             <td colspan="5" class="status">
-                                User Browser
+                                <div class="message">User Browser</div> 
                             </td>
                         </tr>
                     </tfoot>
@@ -169,7 +169,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
                 <td>${user.flags.join(', ')}<a href=":user/${user.id}/:flags" class="action-edit"> [&#x270D;]</a></td>
                 <td><a href=":user/${user.id}/:password" class="action-edit">[&#x270D; change]</a></td>
             </tr>
-            `).join('');
+            `).join('');``
 
         const statusElement = this.querySelector('td.status');
         statusElement.innerHTML = this.state.message

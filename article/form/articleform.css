@@ -12,14 +12,9 @@ form.articleform > fieldset > table {
     border-collapse: collapse;
 }
 form.articleform > fieldset > table > caption {
-    /* font-weight: bold; */
-    /*font-style: italic;*/
-    text-align: left;
-    /* padding-bottom: 1em; */
+    text-align: right;
 }
-form.articleform > fieldset > table > tbody > tr > td:first-child {
-    width: 8%;
-}
+
 form.articleform > fieldset > table > tbody > tr > td.label {
     text-align: right;
     padding: 8px 4px;
@@ -62,20 +57,4 @@ form.articleform .action-edit {
 
 form.articleform textarea.editor-plain {
     min-height: 600px;
-}
-/** Form Messages **/
-
-form.articleform div.success,
-form.articleform div.error {
-    padding: 0.5em;
-    margin: 0.5em;
-    border-radius: 4px;
-}
-form.articleform div.success {
-    color: #f5fbf2;
-    background: #118c09;
-}
-form.articleform div.error {
-    color: #fee;
-    background: #d25757;
 }

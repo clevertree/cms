@@ -83,7 +83,7 @@ class HTMLArticleFormAddElement extends HTMLElement {
         this.innerHTML =
             `<form action="/:article/add" method="POST" class="articleform articleform-add themed">
             <fieldset>
-                <table style="width: 100%;">
+                <table>
                     <thead>
                         <tr>
                             <td colspan="2">

@@ -192,7 +192,7 @@ class HTMLArticleFormEditorElement extends HTMLElement {
             `<form action="${action}" method="POST" class="articleform articleform-editor themed">
             <input type="hidden" name="id" value="${this.state.article.id}" />
             <fieldset ${this.state.mode === 'edit' && !this.state.editable ? 'disabled="disabled"' : ''}>
-                <table style="width: 100%;">
+                <table>
                     <thead>
                         <tr>
                             <td colspan="2">
@@ -292,8 +292,8 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         </tr>
                     </tbody>
                     <tfoot>
+                        <tr><td colspan="2"><hr/></td></tr>
                         <tr>
-                            <tr><td colspan="2"><hr/></td></tr>
                             <td class="label"></td>
                             <td>
                                 <button type="submit">Publish</button>

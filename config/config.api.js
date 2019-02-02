@@ -54,7 +54,7 @@ class ConfigAPI {
                 // Handle POST
                 let whereSQL = '1', values = null;
                 if(req.body.search) {
-                    whereSQL = 'a.name LIKE ?';
+                    whereSQL = 'c.name LIKE ?';
                     values = ['%'+req.body.search+'%'];
                 }
                 const configs = await configDB.selectConfigs(whereSQL, values);
