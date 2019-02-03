@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer');
 const smtpTransport = require("nodemailer-smtp-transport");
 const path = require('path');
 
-const { FileManager } = require('../file/file.manager');
+const { FileManager } = require('../service/file/file.manager');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 

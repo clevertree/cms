@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 const smtpTransport = require("nodemailer-smtp-transport");
 
-const { DatabaseManager } = require('../database/database.manager');
+const { DatabaseManager } = require('../../database/database.manager');
 
 // const BASE_DIR = path.resolve(path.dirname(__dirname));
 

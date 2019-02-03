@@ -2,7 +2,7 @@
 const mysql = require('mysql');
 
 const { LocalConfig } = require('../config/local.config');
-const { FileManager } = require('../file/file.manager');
+const { FileManager } = require('../service/file/file.manager');
 
 // const { ArticleDatabase } = require('../article/article.database');
 // const { UserDatabase } = require('../user/user.database');

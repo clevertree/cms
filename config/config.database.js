@@ -11,18 +11,9 @@ class ConfigDatabase  {
 
 
     async configure() {
-        // Check for table
+        // Configure Table
         await DatabaseManager.configureTable(this.table.config, ConfigRow.getTableSQL(this.table.config));
-        const configDB = await DatabaseManager.getConfigDB();
-        let siteConfig = await configDB.fetchConfigValues('site');
 
-        const hostname = require('os').hostname();
-        if(!siteConfig.hostname || !siteConfig.name) {
-            siteConfig.hostname = await configDB.promptValue('site.hostname', `Please enter the Website Hostname`, hostname);
-            siteConfig.name = await configDB.promptValue('site.name', `Please enter the Website Name`, siteConfig.hostname);
-            siteConfig.contact = await configDB.promptValue('site.contact', `Please enter the Website Contact Email`, 'admin@' + siteConfig.hostname, 'email');
-            siteConfig.keywords = await configDB.promptValue('site.keywords', `Please enter the Website Keywords`, siteConfig.keywords);
-        }
     }
 
     /** Config Table **/

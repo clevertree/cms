@@ -3,7 +3,7 @@
 // const ejs = require('ejs');
 // const express = require('express');
 
-const { DatabaseManager } = require('../database/database.manager');
+const { DatabaseManager } = require('../../database/database.manager');
 
 // Init
 class FileDatabase {
@@ -24,7 +24,7 @@ class FileDatabase {
     async selectFiles(whereSQL, values, selectSQL='f.*, null as content') {
         let SQL = `
           SELECT ${selectSQL}
-          FROM ${this.table} f
+          FROM ${this.table.file} f
           WHERE ${whereSQL}`;
 
         const results = await DatabaseManager.queryAsync(SQL, values);
@@ -46,7 +46,7 @@ class FileDatabase {
 
     async insertFile(content, path, size, hash=null, user_id=null) {
         let SQL = `
-          INSERT INTO ${this.table}
+          INSERT INTO ${this.table.file}
           SET ?
         `;
         const results = await DatabaseManager.queryAsync(SQL, {content, path, user_id, size, hash});
@@ -60,7 +60,7 @@ class FileDatabase {
         if(content !== null) set.content = content;
         if(info !== null) set.info = JSON.stringify(info);
         let SQL = `
-          UPDATE ${this.table} a
+          UPDATE ${this.table.file} a
           SET ?
           WHERE f.id = ?
         `;

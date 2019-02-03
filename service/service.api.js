@@ -2,11 +2,11 @@ const express = require('express');
 
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeManager } = require('../theme/theme.manager');
-const { ConfigDatabase } = require("./config.database");
+const { ServiceDatabase } = require("./service.database");
 const { UserDatabase } = require("../user/user.database");
 const { UserAPI } = require('../user/user.api');
 
-class ConfigAPI {
+class ServiceAPI {
     constructor() {
         this.router = null;
     }
@@ -17,7 +17,7 @@ class ConfigAPI {
             this.configure();
 
         return (req, res, next) => {
-            if(!req.url.startsWith('/:config'))
+            if(!req.url.startsWith('/:service'))
                 return next();
             return this.router(req, res, next);
         }
@@ -31,33 +31,22 @@ class ConfigAPI {
         router.use(bodyParser.json());
         router.use(UserAPI.getSessionMiddleware());
 
-        // Handle Config requests
-        router.get('/[:]config/[:]json',                    async (req, res) => await this.renderConfigJSON(req, res));
-        router.all('/[:]config(/[:]edit)?',                 async (req, res) => await this.renderConfigEditor(req, res));
+        // Handle Service requests
+        router.get('/[:]service/[:]json',                    async (req, res) => await this.renderServiceJSON(req, res));
+        router.all('/[:]service(/[:]edit)?',                 async (req, res) => await this.renderServiceEditor(req, res));
         this.router = router;
     }
 
-    async renderConfigJSON(req, res) {
+    async renderServiceJSON(req, res) {
         try {
             const userDB = await DatabaseManager.getUserDB(req);
             const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
             if(!sessionUser || !sessionUser.isAdmin())
                 throw new Error("Not authorized");
 
-            const configDB = await DatabaseManager.getConfigDB(req);
-            // Handle POST
-            let whereSQL = '1', values = null;
-            if(req.body.search) {
-                whereSQL = 'c.name LIKE ?';
-                values = ['%'+req.body.search+'%'];
-            }
-            const configList = await configDB.selectConfigs(whereSQL, values);
-            const config = await configDB.parseConfigValues(configList);
-
             return res.json({
-                message: `${configList.length} Config${configList.length !== 1 ? 's' : ''} queried successfully`,
-                config,
-                configList,
+                // message: `${serviceList.length} Service${serviceList.length !== 1 ? 's' : ''} queried successfully`,
+                // serviceList,
             });
         } catch (error) {
             console.log(error);
@@ -69,7 +58,7 @@ class ConfigAPI {
         }
     }
 
-    async renderConfigEditor(req, res) {
+    async renderServiceEditor(req, res) {
         try {
 
             if (req.method === 'GET') {
@@ -77,8 +66,8 @@ class ConfigAPI {
                     await ThemeManager.get()
                         .render(req, `
 <section>
-    <script src="/config/form/configform-editor.client.js"></script>
-    <configform-editor></configform-editor>
+    <script src="/service/form/serviceform-editor.client.js"></script>
+    <serviceform-editor></serviceform-editor>
 </section>
 `)
                 );
@@ -86,31 +75,14 @@ class ConfigAPI {
             } else {
                 // Handle POST
                 const userDB = await DatabaseManager.getUserDB(req);
-                const configDB = await DatabaseManager.getConfigDB(req);
 
                 const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
                 if(!sessionUser || !sessionUser.isAdmin())
                     throw new Error("Not authorized");
 
-                let configChanges = req.body, configUpdateList=[];
-                for(let configName in configChanges) {
-                    if(configChanges.hasOwnProperty(configName)) {
-                        const configEntry = await configDB.fetchConfigValue(configName)
-                        if(!configEntry)
-                            throw new Error("Config entry not found: " + configName);
-                        if(configChanges[configName] !== configEntry)
-                            configUpdateList.push([configName, configChanges[configName]])
-                    }
-                }
-                for(let i=0; i<configUpdateList.length; i++) {
-                    await configDB.updateConfigValue(configUpdateList[i][0], configUpdateList[i][1])
-                }
-
-
-                const configList = await configDB.selectConfigs('1');
                 return res.json({
-                    message: `<div class='success'>${configUpdateList.length} Config${configUpdateList.length !== 1 ? 's' : ''} updated successfully</div>`,
-                    configList
+                    // message: `<div class='success'>${serviceUpdateList.length} Service${serviceUpdateList.length !== 1 ? 's' : ''} updated successfully</div>`,
+                    // serviceList
                 });
             }
         } catch (error) {
@@ -129,5 +101,5 @@ class ConfigAPI {
 }
 
 
-module.exports = {ConfigAPI: new ConfigAPI()};
+module.exports = {ServiceAPI: new ServiceAPI()};
 

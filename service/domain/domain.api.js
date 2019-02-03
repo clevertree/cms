@@ -1,12 +1,11 @@
 const express = require('express');
 
-const { DatabaseManager } = require('../database/database.manager');
-const { ThemeManager } = require('../theme/theme.manager');
-const { ConfigDatabase } = require("./config.database");
-const { UserDatabase } = require("../user/user.database");
-const { UserAPI } = require('../user/user.api');
+const { DatabaseManager } = require('../../database/database.manager');
+const { ThemeManager } = require('../../theme/theme.manager');
+const { DomainDatabase } = require("./domain.database");
+const { UserAPI } = require('../../user/user.api');
 
-class ConfigAPI {
+class DomainAPI {
     constructor() {
         this.router = null;
     }
@@ -17,7 +16,7 @@ class ConfigAPI {
             this.configure();
 
         return (req, res, next) => {
-            if(!req.url.startsWith('/:config'))
+            if(!req.url.startsWith('/:domain'))
                 return next();
             return this.router(req, res, next);
         }
@@ -31,33 +30,33 @@ class ConfigAPI {
         router.use(bodyParser.json());
         router.use(UserAPI.getSessionMiddleware());
 
-        // Handle Config requests
-        router.get('/[:]config/[:]json',                    async (req, res) => await this.renderConfigJSON(req, res));
-        router.all('/[:]config(/[:]edit)?',                 async (req, res) => await this.renderConfigEditor(req, res));
+        // Handle Domain requests
+        router.get('/[:]domain/[:]json',                    async (req, res) => await this.renderDomainJSON(req, res));
+        router.all('/[:]domain(/[:]edit)?',                 async (req, res) => await this.renderDomainEditor(req, res));
         this.router = router;
     }
 
-    async renderConfigJSON(req, res) {
+    async renderDomainJSON(req, res) {
         try {
             const userDB = await DatabaseManager.getUserDB(req);
             const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
             if(!sessionUser || !sessionUser.isAdmin())
                 throw new Error("Not authorized");
 
-            const configDB = await DatabaseManager.getConfigDB(req);
+            const domainDB = await DatabaseManager.getDomainDB(req);
             // Handle POST
             let whereSQL = '1', values = null;
             if(req.body.search) {
-                whereSQL = 'c.name LIKE ?';
+                whereSQL = 'd.name LIKE ?';
                 values = ['%'+req.body.search+'%'];
             }
-            const configList = await configDB.selectConfigs(whereSQL, values);
-            const config = await configDB.parseConfigValues(configList);
+            const domainList = await domainDB.selectDomains(whereSQL, values);
+            const domain = await domainDB.parseDomainValues(domainList);
 
             return res.json({
-                message: `${configList.length} Config${configList.length !== 1 ? 's' : ''} queried successfully`,
-                config,
-                configList,
+                message: `${domainList.length} Domain${domainList.length !== 1 ? 's' : ''} queried successfully`,
+                domain,
+                domainList,
             });
         } catch (error) {
             console.log(error);
@@ -69,7 +68,7 @@ class ConfigAPI {
         }
     }
 
-    async renderConfigEditor(req, res) {
+    async renderDomainEditor(req, res) {
         try {
 
             if (req.method === 'GET') {
@@ -77,8 +76,8 @@ class ConfigAPI {
                     await ThemeManager.get()
                         .render(req, `
 <section>
-    <script src="/config/form/configform-editor.client.js"></script>
-    <configform-editor></configform-editor>
+    <script src="/domain/form/domainform-editor.client.js"></script>
+    <domainform-editor></domainform-editor>
 </section>
 `)
                 );
@@ -86,31 +85,31 @@ class ConfigAPI {
             } else {
                 // Handle POST
                 const userDB = await DatabaseManager.getUserDB(req);
-                const configDB = await DatabaseManager.getConfigDB(req);
+                const domainDB = await DatabaseManager.getDomainDB(req);
 
                 const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
                 if(!sessionUser || !sessionUser.isAdmin())
                     throw new Error("Not authorized");
 
-                let configChanges = req.body, configUpdateList=[];
-                for(let configName in configChanges) {
-                    if(configChanges.hasOwnProperty(configName)) {
-                        const configEntry = await configDB.fetchConfigValue(configName)
-                        if(!configEntry)
-                            throw new Error("Config entry not found: " + configName);
-                        if(configChanges[configName] !== configEntry)
-                            configUpdateList.push([configName, configChanges[configName]])
+                let domainChanges = req.body, domainUpdateList=[];
+                for(let domainName in domainChanges) {
+                    if(domainChanges.hasOwnProperty(domainName)) {
+                        const domainEntry = await domainDB.fetchDomainValue(domainName)
+                        if(!domainEntry)
+                            throw new Error("Domain entry not found: " + domainName);
+                        if(domainChanges[domainName] !== domainEntry)
+                            domainUpdateList.push([domainName, domainChanges[domainName]])
                     }
                 }
-                for(let i=0; i<configUpdateList.length; i++) {
-                    await configDB.updateConfigValue(configUpdateList[i][0], configUpdateList[i][1])
+                for(let i=0; i<domainUpdateList.length; i++) {
+                    await domainDB.updateDomainValue(domainUpdateList[i][0], domainUpdateList[i][1])
                 }
 
 
-                const configList = await configDB.selectConfigs('1');
+                const domainList = await domainDB.selectDomains('1');
                 return res.json({
-                    message: `<div class='success'>${configUpdateList.length} Config${configUpdateList.length !== 1 ? 's' : ''} updated successfully</div>`,
-                    configList
+                    message: `<div class='success'>${domainUpdateList.length} Domain${domainUpdateList.length !== 1 ? 's' : ''} updated successfully</div>`,
+                    domainList
                 });
             }
         } catch (error) {
@@ -129,5 +128,5 @@ class ConfigAPI {
 }
 
 
-module.exports = {ConfigAPI: new ConfigAPI()};
+module.exports = {DomainAPI: new DomainAPI()};
 

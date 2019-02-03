@@ -125,7 +125,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
 
     render() {
         const form = this.querySelector('form');
-        console.log("RENDER", this.state);
+//         console.log("RENDER", this.state);
         let searchField = this.querySelector('input[name=search]');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
