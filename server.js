@@ -9,6 +9,9 @@ const { MailServer } = require('./mail/mail.server');
     // await APIServer.configure();
     await APIServer.listen();
 
+    // Listen for Mail ports
+    await MailServer.listen();
+
     // await DatabaseManager.configure(true);
     // const config = await APIServer.configure(true);
     //
@@ -18,6 +21,4 @@ const { MailServer } = require('./mail/mail.server');
     // server.listen(port);
     // console.log(`Listening on ${port}`);
 
-    // Listen for Mail ports
-    await MailServer.listen();
 })();

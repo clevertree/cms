@@ -10,36 +10,38 @@ class MailServer {
         this.server = null;
     }
 
-    async configure(forcePrompt=false)
+    async configure(forcePrompt=0)
     {
         const configDB = await DatabaseManager.getConfigDB();
         let mailConfig = await configDB.fetchConfigValues('mail');
         if(typeof mailConfig.auth === "undefined")
             mailConfig.auth = {};
-        let verifyConfig = false;
+        // let verifyConfig = false;
         if(forcePrompt || !mailConfig.host || !mailConfig.port || !mailConfig.auth.user) {
             const hostname = 'mail.' + require('os').hostname();
 
             await configDB.promptValue('mail.host', `Please enter the Mail Server Host`, mailConfig.host || hostname);
-            await configDB.promptValue('mail.port', `Please enter the Mail Server Port`, mailConfig.port || 587);
-            await configDB.promptValue('mail.auth.user', `Please enter the Mail Server Username`, mailConfig.auth.user);
-            await configDB.promptValue('mail.auth.pass', `Please enter the Mail Server Password`, mailConfig.auth.pass);
+            await configDB.promptValue('mail.port', `Please enter the Mail Server Port`, mailConfig.port || 587, 'number');
+            await configDB.promptValue('mail.auth.user', `Please enter the Mail Server Username`, mailConfig.auth.user, 'email');
+            await configDB.promptValue('mail.auth.pass', `Please enter the Mail Server Password`, mailConfig.auth.pass, 'password');
             mailConfig = await configDB.fetchConfigValues('mail');
-            verifyConfig = true;
+            // verifyConfig = true;
         }
 
         try {
-            if(verifyConfig) {
-                const server = nodemailer.createTransport(smtpTransport(mailConfig));
-                await server.verify();
-                console.info(`Connection to Mail Server '${mailConfig.host}' verified`);
-            }
+            // if(verifyConfig) {
+            const server = nodemailer.createTransport(smtpTransport(mailConfig));
+            await server.verify();
+            console.info(`Connection to Mail Server '${mailConfig.host}' verified`);
+            // }
             // await configDB.saveAll();
 
         } catch (e) {
             console.error(`Error connecting to ${mailConfig.host}: ${e}`);
-            if(forcePrompt === false)
-                return await this.configure(true);
+            if(forcePrompt < 3) {
+                console.error(e.message);
+                return await this.configure(forcePrompt + 1);
+            }
             throw e;
         }
         return mailConfig;
@@ -49,8 +51,8 @@ class MailServer {
     async listen() {
         const mailConfig = await this.configure();
         this.server = nodemailer.createTransport(smtpTransport(mailConfig));
-        await this.server.verify();
-        console.log(`Connection to Mail Server '${mailConfig.host}' successful`);
+        // await this.server.verify();
+        // console.log(`Connection to Mail Server '${mailConfig.host}' successful`);
     }
 }
 

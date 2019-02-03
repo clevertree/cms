@@ -10,25 +10,26 @@ class HTMLConfigFormEditorElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
-            configs: [],
+            configList: [],
             status: null,
             message: null,
         };
-        this.keyTimeout = null;
         // this.state = {id:-1, flags:[]};
     }
 
     setState(newState) {
         Object.assign(this.state, newState);
         // this.render();
-        this.renderResults();
+        this.render();
     }
 
     connectedCallback() {
+        this.addEventListener('change', this.onEvent);
         this.addEventListener('keyup', this.onEvent);
         this.addEventListener('submit', this.onEvent);
         this.render();
-        this.submit();
+        this.requestFormData();
+        // this.submit();
     }
 
     onSuccess(e, response) {
@@ -44,86 +45,97 @@ class HTMLConfigFormEditorElement extends HTMLElement {
                 break;
 
             case 'keyup':
-                switch(e.target.name) {
-                    case 'search':
-                        clearTimeout(this.keyTimeout);
-                        this.keyTimeout = setTimeout(e => this.submit(), 500);
-                        break;
-                }
+                // this.requestFormData(e);
+                if(e.target.name === 'search')
+                    this.renderResults();
+                this.checkSubmittable();
+                break;
+
+            case 'change':
+                this.checkSubmittable();
+                // this.state.configs[e.target.name] = e.target.value;
+                // this.setState({submittable: true});
                 break;
         }
     }
 
-    // requestFormData() {
-    //     const xhr = new XMLHttpRequest();
-    //     xhr.onload = () => {
-    //         this.setState({processing: false});
-    //         // console.info(xhr.response);
-    //         if(!xhr.response || !xhr.response.config)
-    //             throw new Error("Invalid Response");
-    //         this.setState(xhr.response);
-    //         // this.state = xhr.response.user;
-    //         // this.render();
-    //     };
-    //     xhr.responseType = 'json';
-    //     xhr.open ("GET", `:config/${this.state.config.id}/:json?getAll=true&getRevision=${new Date(this.state.revisionDate).getTime()}`, true);
-    //     // xhr.setRequestHeader("Accept", "application/json");
-    //     xhr.send ();
-    //     this.setState({processing: true});
-    // }
+    checkSubmittable() {
+        const form = this.querySelector('form');
+
+        let disabled = true;
+        const configChanges = {};
+        for(let i=0; i<this.state.configList.length; i++) {
+            const configItem = this.state.configList[i];
+            const formElm = form && form.elements[configItem.name] ? form.elements[configItem.name] : null;
+            if(formElm && (configItem.value||'') !== formElm.value) {
+                // console.log(configItem.name, configItem.value, formData[configItem.name]);
+                disabled = false;
+                configChanges[configItem.name] = formElm.value;
+            }
+        }
+        const btnSubmit = this.querySelector('button[type=submit]');
+        if(disabled)    btnSubmit.setAttribute('disabled', 'disabled');
+        else            btnSubmit.removeAttribute('disabled');
+        return configChanges;
+    }
+
+
+    requestFormData() {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = () => {
+            this.setState(Object.assign({
+                processing: false,
+                status: xhr.status,
+            }, xhr.response));
+        };
+        xhr.responseType = 'json';
+        xhr.open ("GET", `:config/:json?getAll=true`, true);
+        // xhr.setRequestHeader("Accept", "application/json");
+        xhr.send ();
+        this.setState({processing: true});
+    }
 
     submit(e) {
         if(e)
             e.preventDefault();
         const form = this.querySelector('form');
-        this.setState({processing: true});
-        const formData = this.getFormData();
+        const configChanges = this.checkSubmittable();
 
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
-            this.setState({processing: false});
-            // console.log(e, xhr.response);
-            const response = xhr.response && typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-            response.status = xhr.status;
+            const response = Object.assign({
+                processing: false,
+                status: xhr.status,
+            }, xhr.response);
+            this.setState(response);
+
             if(xhr.status === 200) {
                 this.onSuccess(e, response);
             } else {
                 this.onError(e, response);
             }
-            this.setState(response);
         };
         xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         // xhr.setRequestHeader("Accept", "application/json");
         xhr.responseType = 'json';
-        xhr.send(JSON.stringify(formData));
+        xhr.send(JSON.stringify(configChanges));
         this.setState({processing: true});
     }
 
-    getFormData() {
-        const form = this.querySelector('form');
-        const formData = {};
-        if(form) {
-            new FormData(form).forEach(function (value, key) {
-                formData[key] = value;
-            });
-        }
-        return formData;
-    }
-
     render() {
-        const formData = this.getFormData();
+        const form = this.querySelector('form');
         console.log("RENDER", this.state);
         let searchField = this.querySelector('input[name=search]');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
-            `<form action="/:config/:list" method="POST" class="configform configform-editor themed">
-            <fieldset>
+        `<form action="/:config/:edit" method="POST" class="configform configform-editor themed">
+            <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
                 <table>
                     <thead>
                         <tr>
                             <td colspan="4">
-                                <input type="text" name="search" placeholder="Search Configs" value="${formData.search||''}"/>
+                                <input type="text" name="search" placeholder="Search Configs" value="${form ? form.search.value||'' : ''}"/>
                             </td>
                         </tr>
                         <tr><td colspan="4"><hr/></td></tr>
@@ -158,15 +170,21 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         if(selectionStart)
             searchField.selectionStart = selectionStart;
         this.renderResults();
+        this.checkSubmittable();
     }
 
     renderResults() {
+        const form = this.querySelector('form');
+        // const formData = this.getFormData();
         const resultsElement = this.querySelector('tbody.results');
         let classOdd = '';
-        resultsElement.innerHTML = this.state.configs.map(config => `
+        const search = form ? form.search.value : null;
+        resultsElement.innerHTML = this.state.configList
+            .filter(config => !search || config.name.indexOf(search) !== -1)
+            .map(config => `
             <tr class="results ${classOdd=classOdd===''?'odd':''}">
                 <td>${config.name}</td>
-                <td>${this.renderConfig(config)}</td>
+                <td>${this.renderConfig(config, form && form.elements[config.name] ? form.elements[config.name].value : null)}</td>
             </tr>
             `).join('');
 
@@ -176,10 +194,19 @@ class HTMLConfigFormEditorElement extends HTMLElement {
             : `<div class="message">Config Editor</div>`;
     }
 
-    renderConfig(config) {
+    renderConfig(config, value=null) {
+        if(value === null)
+            value = config.value;
         switch(config.type) {
             default:
-                return `<input type='text' name='${config.name}' value='${config.value}' />`;
+                return `<input type='text' name='${config.name}' value='${value||''}' />`;
+            case 'text':
+            case 'email':
+            case 'checkbox':
+            case 'password':
+                return `<input type='${config.type}' name='${config.name}' value='${value||''}' />`;
+            case 'textarea':
+                return `<textarea name='${config.name}'>${value||''}</textarea>`;
         }
     }
 }

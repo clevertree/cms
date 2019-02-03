@@ -20,7 +20,7 @@ class ConfigDatabase  {
         if(!siteConfig.hostname || !siteConfig.name) {
             siteConfig.hostname = await configDB.promptValue('site.hostname', `Please enter the Website Hostname`, hostname);
             siteConfig.name = await configDB.promptValue('site.name', `Please enter the Website Name`, siteConfig.hostname);
-            siteConfig.contact = await configDB.promptValue('site.contact', `Please enter the Website Contact Email`, 'admin@' + siteConfig.hostname);
+            siteConfig.contact = await configDB.promptValue('site.contact', `Please enter the Website Contact Email`, 'admin@' + siteConfig.hostname, 'email');
             siteConfig.keywords = await configDB.promptValue('site.keywords', `Please enter the Website Keywords`, siteConfig.keywords);
         }
     }
@@ -54,10 +54,23 @@ class ConfigDatabase  {
         return results.length > 0 ? results[0].value : null;
     }
     async fetchConfigValues(name) {
-        const results = await this.selectConfigs('c.name LIKE ?', name+'%');
+        const configList = await this.selectConfigs('c.name LIKE ?', name+'%');
+        const config = await this.parseConfigValues(configList);
+        if(typeof config[name] === "undefined")
+            return {};
+        return config[name];
+    }
+
+    async updateConfigValue(name, value, type=null) {
+        let SQL = `REPLACE INTO config SET ?;`;
+        const result = await DatabaseManager.queryAsync(SQL, {name, value, type});
+        return result.affectedRows;
+    }
+
+    async parseConfigValues(configList) {
         const config = {};
-        for(let i=0; i<results.length; i++) {
-            const path = results[i].name.split('.');
+        for(let i=0; i<configList.length; i++) {
+            const path = configList[i].name.split('.');
             const lastPath = path.pop();
             let target = config;
             for(var j=0; j<path.length; j++) {
@@ -65,26 +78,18 @@ class ConfigDatabase  {
                     target[path[j]] = {};
                 target = target[path[j]];
             }
-            target[lastPath] = results[i].value;
+            target[lastPath] = configList[i].value;
         }
-        if(typeof config[name] === "undefined")
-            return {};
-        return config[name];
-    }
-
-    async updateConfigValue(name, value) {
-        let SQL = `REPLACE INTO config SET ?;`;
-        const result = await DatabaseManager.queryAsync(SQL, {name, value});
-        return result.affectedRows;
+        return config;
     }
 
 
-    async promptValue(name, text, defaultValue) {
+    async promptValue(name, text, defaultValue, type=null) {
         const oldValue = await this.fetchConfigValue(name);
         if(oldValue)
             defaultValue = oldValue;
         const newValue = await this.prompt(text, defaultValue);
-        await this.updateConfigValue(name, newValue);
+        await this.updateConfigValue(name, newValue, type);
         return newValue;
     }
 
@@ -128,6 +133,7 @@ class ConfigRow {
 CREATE TABLE ${tableName} (
   \`name\` varchar(256) NOT NULL,
   \`value\` TEXT DEFAULT NULL,
+  \`type\` varchar(64) DEFAULT NULL,
   \`updated\` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY \`uk.config.name\` (\`name\`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -135,8 +141,9 @@ CREATE TABLE ${tableName} (
     }
     
     constructor(row) {
-        this.name = row.name;
-        this.value = row.value;
+        Object.assign(this, row);
+        if(this.updated)
+            this.updated = new Date(this.updated);
     }
 }
 

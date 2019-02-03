@@ -452,9 +452,11 @@ class UserAPI {
             } else {
                 if(!req.session || !req.session.userID)
                     throw new Error("Must be logged in");
-                const sessionUser = await userDB.getSessionUser(req.session.userID);
-                if(!sessionUser.isAdmin())
+
+                const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+                if(!sessionUser || !sessionUser.isAdmin())
                     throw new Error("Not authorized");
+
 
                 // Handle Form (POST) Request
                 console.log(`Profile ${type} request`, req.body);
@@ -515,7 +517,7 @@ class UserAPI {
                 const users = await userDB.selectUsers(whereSQL, values, 'id, email, username, created, flags');
 
                 return res.json({
-                    message: `${users.length} User${users.length > 1 ? 's' : ''} queried successfully`,
+                    message: `${users.length} User${users.length !== 1 ? 's' : ''} queried successfully`,
                     users
                 });
             }

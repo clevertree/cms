@@ -31,11 +31,45 @@ class ConfigAPI {
         const SM = UserAPI.getSessionMiddleware();
 
         // Handle Config requests
-        router.all(['/[:]config', '/[:]config/[:]list'],           SM, PM, async (req, res) => await this.renderConfigBrowser(req, res));
+        router.get('/[:]config/[:]json',                    SM, PM, async (req, res) => await this.renderConfigJSON(req, res));
+        // router.all(['/[:]config', '/[:]config/[:]list'],    SM, PM, async (req, res) => await this.renderConfig(false, req, res));
+        router.all('/[:]config(/[:]edit)?',                 SM, PM, async (req, res) => await this.renderConfigEditor(req, res));
         this.router = router;
     }
 
-    async renderConfigBrowser(req, res) {
+    async renderConfigJSON(req, res) {
+        try {
+            const userDB = await DatabaseManager.getUserDB(req);
+            const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+            if(!sessionUser || !sessionUser.isAdmin())
+                throw new Error("Not authorized");
+
+            const configDB = await DatabaseManager.getConfigDB(req);
+            // Handle POST
+            let whereSQL = '1', values = null;
+            if(req.body.search) {
+                whereSQL = 'c.name LIKE ?';
+                values = ['%'+req.body.search+'%'];
+            }
+            const configList = await configDB.selectConfigs(whereSQL, values);
+            const config = await configDB.parseConfigValues(configList);
+
+            return res.json({
+                message: `${configList.length} Config${configList.length !== 1 ? 's' : ''} queried successfully`,
+                config,
+                configList,
+            });
+        } catch (error) {
+            console.log(error);
+            res.status(400);
+            return res.json({
+                message: `<div class='error'>${error.message || error}</div>`,
+                error: error.stack
+            });
+        }
+    }
+
+    async renderConfigEditor(req, res) {
         try {
 
             if (req.method === 'GET') {
@@ -50,18 +84,33 @@ class ConfigAPI {
                 );
 
             } else {
-                const configDB = await DatabaseManager.getConfigDB(req);
                 // Handle POST
-                let whereSQL = '1', values = null;
-                if(req.body.search) {
-                    whereSQL = 'c.name LIKE ?';
-                    values = ['%'+req.body.search+'%'];
-                }
-                const configs = await configDB.selectConfigs(whereSQL, values);
+                const userDB = await DatabaseManager.getUserDB(req);
+                const configDB = await DatabaseManager.getConfigDB(req);
 
+                const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+                if(!sessionUser || !sessionUser.isAdmin())
+                    throw new Error("Not authorized");
+
+                let configChanges = req.body, configUpdateList=[];
+                for(let configName in configChanges) {
+                    if(configChanges.hasOwnProperty(configName)) {
+                        const configEntry = await configDB.fetchConfigValue(configName)
+                        if(!configEntry)
+                            throw new Error("Config entry not found: " + configName);
+                        if(configChanges[configName] !== configEntry)
+                            configUpdateList.push([configName, configChanges[configName]])
+                    }
+                }
+                for(let i=0; i<configUpdateList.length; i++) {
+                    await configDB.updateConfigValue(configUpdateList[i][0], configUpdateList[i][1])
+                }
+
+
+                const configList = await configDB.selectConfigs('1');
                 return res.json({
-                    message: `${configs.length} Config${configs.length > 1 ? 's' : ''} queried successfully`,
-                    configs
+                    message: `<div class='success'>${configUpdateList.length} Config${configUpdateList.length !== 1 ? 's' : ''} updated successfully</div>`,
+                    configList
                 });
             }
         } catch (error) {
@@ -76,7 +125,6 @@ class ConfigAPI {
                 res.json({message: error.stack});
             }
         }
-
     }
 }
 

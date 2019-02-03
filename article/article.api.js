@@ -169,14 +169,15 @@ class ArticleAPI {
 
             if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
-            const sessionUser = await userDB.fetchUserByID(req.session.userID);
 
             const article = await articleDB.fetchArticleByID(req.params.id);
             if(!article)
                 return next();
 
-            if(!sessionUser.isAdmin() && sessionUser.id !== article.user_id)
+            const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+            if(!sessionUser || !sessionUser.isAdmin())
                 throw new Error("Not authorized");
+
 
             if(req.method === 'GET') {          // Handle GET
                 // Render Editor
@@ -265,10 +266,11 @@ class ArticleAPI {
             const userDB = await DatabaseManager.getUserDB(req);
             if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
-            const sessionUser = await userDB.fetchUserByID(req.session.userID);
 
-            if(!sessionUser.isAdmin())
+            const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+            if(!sessionUser || !sessionUser.isAdmin())
                 throw new Error("Not authorized");
+
 
             if(req.method === 'GET') {          // Handle GET
                 // Render Editor
@@ -342,7 +344,7 @@ class ArticleAPI {
                 const articles = await articleDB.selectArticles(whereSQL, values);
 
                 return res.json({
-                    message: `${articles.length} Article${articles.length > 1 ? 's' : ''} queried successfully`,
+                    message: `${articles.length} Article${articles.length !== 1 ? 's' : ''} queried successfully`,
                     articles
                 });
             }
