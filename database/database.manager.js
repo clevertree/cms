@@ -28,10 +28,10 @@ class DatabaseManager {
 
         if(forcePrompt || !dbConfig.database || !dbConfig.user || !dbConfig.host) {
             let hostname        = (require('os').hostname()).toLowerCase();
-            await localConfig.promptValue('database.host', `Please enter the Database Host`, dbConfig.host || hostname);
+            await localConfig.promptValue('database.host', `Please enter the Database Host`, dbConfig.host || 'localhost');
             await localConfig.promptValue('database.user', `Please enter the Database User Name`, dbConfig.user || 'root');
             await localConfig.promptValue('database.password', `Please enter the Password for Database User '${dbConfig.user}'`, 'password');
-            await localConfig.promptValue('database.database', `Please enter the Database Name`, dbConfig.database || 'cms_' + hostname);
+            await localConfig.promptValue('database.database', `Please enter the Database Name`, dbConfig.database || hostname.replace('.', '_') + '_cms');
         }
         try {
             const db = await this.createConnection(dbConfig);
