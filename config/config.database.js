@@ -122,7 +122,7 @@ class ConfigRow {
     static getTableSQL(tableName) {
         return `
 CREATE TABLE ${tableName} (
-  \`name\` varchar(256) NOT NULL,
+  \`name\` varchar(64) NOT NULL,
   \`value\` TEXT DEFAULT NULL,
   \`type\` varchar(64) DEFAULT NULL,
   \`updated\` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

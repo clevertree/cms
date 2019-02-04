@@ -75,7 +75,7 @@ class DomainRow {
     static getTableSQL(tableName) {
         return `
 CREATE TABLE ${tableName} (
-  \`name\` varchar(256) NOT NULL,
+  \`name\` varchar(64) NOT NULL,
   \`database\` varchar(256) NOT NULL,
   UNIQUE KEY \`uk.domain.name\` (\`domain\`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
