@@ -144,11 +144,16 @@ class DatabaseManager {
 
 function queryAsync(db, sql, values, debug) {
     return new Promise( ( resolve, reject ) => {
-        db.query(sql, values, ( err, rows ) => {
-            if(debug)
-                err ? console.error (err.message, sql, values || "No Values") : console.log (sql, values || "No Values");
-            err ? reject (err) : resolve (rows);
-        });
+        try {
+            db.query(sql, values, (err, rows) => {
+                if (debug)
+                    err ? console.error(err.message, sql, values || "No Values") : console.log(sql, values || "No Values");
+                err ? reject(err) : resolve(rows);
+            });
+        } catch (err) {
+            console.error(err);
+            reject(err);
+        }
     });
 }
 
