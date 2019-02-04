@@ -185,7 +185,7 @@ CREATE TABLE ${tableName} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`user_id\` int(11) DEFAULT NULL,
   \`parent_id\` int(11) DEFAULT NULL,
-  \`path\` varchar(256) DEFAULT NULL,
+  \`path\` varchar(64) DEFAULT NULL,
   \`title\` varchar(256) DEFAULT NULL,
   \`content\` text DEFAULT NULL,
   \`data\` TEXT DEFAULT NULL,
