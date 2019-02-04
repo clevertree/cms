@@ -188,7 +188,7 @@ CREATE TABLE ${tableName} (
   \`path\` varchar(256) DEFAULT NULL,
   \`title\` varchar(256) DEFAULT NULL,
   \`content\` text DEFAULT NULL,
-  \`data\` JSON DEFAULT NULL,
+  \`data\` TEXT DEFAULT NULL,
   \`status\` SET('published') DEFAULT '',
   \`created\` datetime DEFAULT current_timestamp(),
   \`updated\` datetime DEFAULT current_timestamp(),

@@ -131,7 +131,7 @@ CREATE TABLE ${tableName} (
   \`email\` varchar(256) NOT NULL,
   \`username\` varchar(256) NOT NULL,
   \`password\` varchar(256) DEFAULT NULL,
-  \`profile\` JSON DEFAULT NULL,
+  \`profile\` TEXT DEFAULT NULL,
   \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
   \`flags\` SET("admin"),
   PRIMARY KEY (\`id\`),
