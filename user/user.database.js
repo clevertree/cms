@@ -128,8 +128,8 @@ class UserRow {
         return `
 CREATE TABLE ${tableName} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
-  \`email\` varchar(256) NOT NULL,
-  \`username\` varchar(256) NOT NULL,
+  \`email\` varchar(64) NOT NULL,
+  \`username\` varchar(64) NOT NULL,
   \`password\` varchar(256) DEFAULT NULL,
   \`profile\` TEXT DEFAULT NULL,
   \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
