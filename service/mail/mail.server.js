@@ -23,7 +23,7 @@ class MailServer {
             await configDB.promptValue('mail.host', `Please enter the Mail Server Host`, mailConfig.host || hostname);
             await configDB.promptValue('mail.port', `Please enter the Mail Server Port`, mailConfig.port || 587, 'number');
             await configDB.promptValue('mail.auth.user', `Please enter the Mail Server Username`, mailConfig.auth.user, 'email');
-            await configDB.promptValue('mail.auth.pass', `Please enter the Mail Server Password`, mailConfig.auth.pass, 'password');
+            await configDB.promptValue('mail.auth.pass', `Please enter the Mail Server Password`, null, 'password');
             mailConfig = await configDB.fetchConfigValues('mail');
             // verifyConfig = true;
         }

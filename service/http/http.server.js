@@ -20,7 +20,7 @@ class HTTPServer {
 
     async configure(config=null) {
         if(this.config)
-            return this.config;
+            return this.config0;
         const localConfig = new LocalConfig(config, !config);
         const serverConfig = await localConfig.getOrCreate('server');
 
