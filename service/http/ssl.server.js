@@ -1,7 +1,9 @@
+const path = require('path');
 
 const { LocalConfig } = require('../../config/local.config');
 const { HTTPServer } = require('./http.server');
 
+const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
 
 class SSLServer {
     constructor() {
@@ -36,7 +38,21 @@ class SSLServer {
 
         this.server = require('greenlock-express').create(Object.assign({
             approveDomains: (opts, certs, cb) => this.approveDomains(opts, certs, cb),
-            app: HTTPServer.getMiddleware()
+            app: HTTPServer.getMiddleware(),
+            debug: true,
+            store: require('le-store-certbot').create({
+                    configDir: path.join(BASE_DIR, '.acme', 'etc')
+                    // , privkeyPath: ':configDir/live/:hostname/privkey.pem'          //
+                    // , fullchainPath: ':configDir/live/:hostname/fullchain.pem'      // Note: both that :configDir and :hostname
+                    // , certPath: ':configDir/live/:hostname/cert.pem'                //       will be templated as expected by
+                    // , chainPath: ':configDir/live/:hostname/chain.pem'              //       greenlock.js
+
+                    , logsDir: ':configDir/log'
+
+                    // , webrootPath: '~/acme/srv/www/:hostname/.well-known/acme-challenge'
+
+                // , webrootPath: '/tmp/acme-challenges'
+                    })
         }, sslConfig));
 
         this.config = sslConfig;

@@ -1,5 +1,8 @@
 .config.json
 
+#SSL
+.acme
+
 #JetBrains
 .idea
 

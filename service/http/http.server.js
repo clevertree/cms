@@ -69,6 +69,10 @@ class HTTPServer {
             this.configure();
 
         return (req, res, next) => {
+            if(!this.router) {
+                console.error("Router isn't configured");
+                return next();
+            }
             return this.router(req, res, next);
         }
     }
