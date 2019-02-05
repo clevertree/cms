@@ -21,6 +21,10 @@ class HTTPServer {
     async configure(config=null) {
         if(this.config)
             return this.config;
+
+        const router = express.Router();
+        this.router = router;
+
         const localConfig = new LocalConfig(config, !config);
         const serverConfig = await localConfig.getOrCreate('server');
 
@@ -45,7 +49,6 @@ class HTTPServer {
         }
 
         // Routes
-        const router = express.Router();
         [
             UserAPI,
             ArticleAPI,
@@ -59,7 +62,6 @@ class HTTPServer {
 
         // CMS Asset files
         router.use(express.static(BASE_DIR));
-        this.router = router;
         this.config = serverConfig;
         return serverConfig;
     }
@@ -68,13 +70,36 @@ class HTTPServer {
         if(!this.router)
             this.configure();
 
-        return (req, res, next) => {
-            if(!this.router) {
-                console.error("Router isn't configured");
-                return next();
-            }
+        var app = express();
+
+        app.use('/', (req, res) => {
+            const next = () => { // If no next()
+                console.error("Not Found: " + req.url);
+                res.status(404);
+                res.end("Not Found: " + req.url);
+            };
             return this.router(req, res, next);
-        }
+        })
+        return app;
+        // return (req, res, next) => {
+        //     try {
+        //         if (!this.router)
+        //             throw new Error("Router isn't configured");
+        //
+        //         var url = require('url');
+        //         const query = url.parse(req.url).query;
+        //         console.log(req, req.query, query);
+        //         if (!req.query)
+        //             req.query = query;
+        //
+        //         // next = next || function () { // If no next()
+        //         //     console.error("No Next!");
+        //         // };
+        //         return this.router(req, res, next);
+        //     } catch (err) {
+        //         return res.send(err);
+        //     }
+        // }
     }
 
     async listen(port=null) {

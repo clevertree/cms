@@ -1,3 +1,4 @@
+const express = require('express');
 const path = require('path');
 
 const { LocalConfig } = require('../../config/local.config');
@@ -34,7 +35,6 @@ class SSLServer {
         //         configDir: require('path').join(require('os').homedir(), 'acme', 'etc')
         //         , webrootPath: '/tmp/acme-challenges'
         //     });
-
 
         this.server = require('greenlock-express').create(Object.assign({
             approveDomains: (opts, certs, cb) => this.approveDomains(opts, certs, cb),
