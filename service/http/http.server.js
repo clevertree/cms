@@ -66,21 +66,19 @@ class HTTPServer {
         return serverConfig;
     }
 
+
     getMiddleware() {
         if(!this.router)
             this.configure();
-
-        var app = express();
-
-        app.use('/', (req, res) => {
-            const next = () => { // If no next()
+        return (req, res, next) => {
+            next = next || (() => { // If no next()
                 console.error("Not Found: " + req.url);
                 res.status(404);
                 res.end("Not Found: " + req.url);
-            };
+            });
             return this.router(req, res, next);
-        })
-        return app;
+        };
+
         // return (req, res, next) => {
         //     try {
         //         if (!this.router)

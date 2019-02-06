@@ -34,10 +34,10 @@ class DomainDatabase  {
         return domains[0];
     }
 
-    async createDomain(domainname, email, password, flags='') {
+    async createDomain(name, email, password, flags='') {
         if(Array.isArray(flags))
             flags = flags.join(',');
-        if(!domainname) throw new Error("Invalid domainname");
+        if(!name) throw new Error("Invalid name");
         if(!email) throw new Error("Invalid email");
         if(password) {
             const salt = await bcrypt.genSalt(10);
@@ -46,7 +46,7 @@ class DomainDatabase  {
         let SQL = `
           INSERT INTO ${this.table.domain} SET ?`;
         await DatabaseManager.queryAsync(SQL, {
-            domainname,
+            name,
             email,
             password,
             flags
