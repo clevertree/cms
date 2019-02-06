@@ -69,6 +69,9 @@ class DomainDatabase  {
             .affectedRows;
     }
 
+    async selectDatabaseByHost(req, defaultDatabase) {
+
+    }
 }
 
 class DomainRow {

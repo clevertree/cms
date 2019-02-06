@@ -36,6 +36,7 @@ class DomainAPI {
         this.router = router;
     }
 
+
     async renderDomainJSON(req, res) {
         try {
             const userDB = await DatabaseManager.getUserDB(req);
