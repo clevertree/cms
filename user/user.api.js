@@ -190,6 +190,73 @@ class UserAPI {
         return user;
     }
 
+    async queryDNSAdmin(hostname) {
+        const data = await new Promise( ( resolve, reject ) => {
+            var whois = require('whois')
+            whois.lookup('clevertree.net' || hostname, {
+                // "server":  "",   // this can be a string ("host:port") or an object with host and port as its keys; leaving it empty makes lookup rely on servers.json
+                "follow":  2,    // number of times to follow redirects
+                // "timeout": 2,    // socket timeout, excluding this doesn't override any default timeout value
+                // "verbose": true, // setting this to true returns an array of responses from all servers
+                // "bind": null,     // bind the socket to a local IP address
+                // "proxy": {       // (optional) SOCKS Proxy
+                //     "ipaddress": "",
+                //     "port": 0,
+                //     "type": 5    // or 4
+                // }
+            }, function(err, data) {
+                resolve (data);
+            });
+        });
+    }
+
+    async configureAdmin(database, hostname, interactive=false) {
+        const userDB = await DatabaseManager.getUserDB(database);
+
+
+        // Find admin user by DNS info
+        let dnsAdminEmail = await this.queryDNSAdmin(hostname);
+        if(dnsAdminEmail) {
+            adminUser = await userDB.createUser(dnsAdminEmail.split('@')[0], dnsAdminEmail, null, 'admin');
+            console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
+        }
+
+        // Insert admin user
+        let adminUser = await userDB.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
+        if (adminUser) {
+            console.info("Admin user found: " + adminUser.id);
+            return;
+        }
+        if(interactive && !adminUser) {
+            // Insert admin user
+            let adminUser = await this.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
+            if (adminUser) {
+                console.info("Admin user found: " + adminUser.id);
+            } else {
+                for (let i = 0; i < 4; i++) {
+                    try {
+                        // const hostname = require('os').hostname().toLowerCase();
+                        let adminUsername = await PromptManager.prompt(`Please enter an Administrator username`, 'admin');
+                        let adminEmail = await PromptManager.prompt(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + hostname);
+                        let adminPassword = await PromptManager.prompt(`Please enter a password for ${adminUsername}`, "");
+                        let adminPassword2 = await PromptManager.prompt(`Please re-enter a password for ${adminUsername}`, "");
+                        if (!adminPassword) {
+                            adminPassword = (await bcrypt.genSalt(10)).replace(/\W/g, '').substr(0, 8);
+                            adminPassword2 = adminPassword;
+                            console.info("Using generated password: " + adminPassword);
+                        }
+                        if (adminPassword !== adminPassword2)
+                            throw new Error("Password mismatch");
+                        adminUser = await userDB.createUser(adminUsername, adminEmail, adminPassword, 'admin');
+                        console.info(`Admin user created (${adminUser.id}: ` + adminUsername);
+                        break;
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            }
+        }
+    }
 
     async login(req, uuid, password, saveSession=false) {
         if(!uuid)

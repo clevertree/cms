@@ -2,7 +2,8 @@
 const mysql = require('mysql');
 
 const { LocalConfig } = require('../config/local.config');
-const { FileManager } = require('../service/file/file.manager');
+// const { FileManager } = require('../service/file/file.manager');
+// const { UserAPI } = require('../user/user.api');
 
 // const { ArticleDatabase } = require('../article/article.database');
 // const { UserDatabase } = require('../user/user.database');
@@ -95,10 +96,13 @@ class DatabaseManager {
             await this.getArticleDB(database),
             await this.getConfigDB(database),
         ];
-        if(this.config.multiDomain && database === this.config.database)
-            tables.push( await this.getDomainDB(database, interactive));
+        if(this.config.multiDomain && (database === this.config.database))
+            tables.push( await this.getDomainDB(database));
         for(let i=0; i<tables.length; i++)
             await tables[i].configure(interactive);
+
+        // Set up admin user
+        await require('../user/user.api').UserAPI.configureAdmin(database, hostname, interactive);
 
     }
 

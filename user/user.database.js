@@ -3,6 +3,8 @@ const uuidv4 = require('uuid/v4');
 
 const { DatabaseManager } = require('../database/database.manager');
 const { LocalConfig } = require('../config/local.config');
+const { PromptManager } = require('../config/prompt.manager');
+
 
 // const { ConfigManager } = require('../config/config.manager');
 
@@ -21,49 +23,6 @@ class UserDatabase  {
         // Check for table
         await DatabaseManager.configureTable(this.table.user,            UserRow.getTableSQL(this.table.user));
 
-
-        // TODO: move to database manager
-        if(interactive) {
-            // Insert admin user
-            let adminUser = await this.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
-            if (adminUser) {
-                console.info("Admin user found: " + adminUser.id);
-            } else {
-                for (let i = 0; i < 4; i++) {
-                    try {
-                        const hostname = require('os').hostname().toLowerCase();
-                        let adminUsername = await this.prompt(`Please enter an Administrator username`, 'admin');
-                        let adminEmail = await this.prompt(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + hostname);
-                        let adminPassword = await this.prompt(`Please enter a password for ${adminUsername}`, "");
-                        let adminPassword2 = await this.prompt(`Please re-enter a password for ${adminUsername}`, "");
-                        if (!adminPassword) {
-                            adminPassword = (await bcrypt.genSalt(10)).replace(/\W/g, '').substr(0, 8);
-                            adminPassword2 = adminPassword;
-                            console.info("Using generated password: " + adminPassword);
-                        }
-                        if (adminPassword !== adminPassword2)
-                            throw new Error("Password mismatch");
-                        adminUser = await this.createUser(adminUsername, adminEmail, adminPassword, 'admin');
-                        console.info("Admin user created: " + adminUser.id);
-                        break;
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-            }
-        }
-    }
-
-    async prompt(text, defaultValue=null) {
-        var standard_input = process.stdin;
-        standard_input.setEncoding('utf-8');
-        return new Promise( ( resolve, reject ) => {
-            process.stdout.write(text + ` [${(defaultValue === null ? 'null' : defaultValue)}]: `);
-            standard_input.on('data', function (data) {
-                data = data.trim() || defaultValue;
-                resolve (data);
-            });
-        });
     }
 
     /** User Table **/

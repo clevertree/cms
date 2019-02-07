@@ -4,6 +4,7 @@ const smtpTransport = require("nodemailer-smtp-transport");
 const path = require('path');
 
 const { FileManager } = require('../service/file/file.manager');
+const { PromptManager } = require('./prompt.manager');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
@@ -77,46 +78,13 @@ class LocalConfig {
         }
         if(typeof target[lastPath] !== "undefined")
             defaultValue = target[lastPath];
-        const value = await this.prompt(text, defaultValue);
+        const value = await PromptManager.prompt(text, defaultValue);
         target[lastPath] = value;
         if(this.saveLocal)
             await this.saveAll();
         return value;
     }
 
-
-    prompt(text, defaultValue=null) {
-        var standard_input = process.stdin;
-        standard_input.setEncoding('utf-8');
-        return new Promise( ( resolve, reject ) => {
-            process.stdout.write(text + ` [${(defaultValue === null ? 'null' : defaultValue)}]: `);
-            standard_input.on('data', function (data) {
-                data = data.trim() || defaultValue;
-                resolve (data);
-            });
-        });
-    }
-    // var readline = require('readline');
-    //
-    // var rl = readline.createInterface({
-    //     input: process.stdin,
-    //     output: process.stdout
-    // });
-    //
-    // rl.stdoutMuted = true;
-    //
-    // rl.query = "Password : ";
-    // rl.question(rl.query, function(password) {
-    //     console.log('\nPassword is ' + password);
-    //     rl.close();
-    // });
-    //
-    // rl._writeToOutput = function _writeToOutput(stringToWrite) {
-    //     if (rl.stdoutMuted)
-    //         rl.output.write("\x1B[2K\x1B[200D"+rl.query+"["+((rl.line.length%2==1)?"=-":"-=")+"]");
-    //     else
-    //         rl.output.write(stringToWrite);
-    // };
 
 
 }
