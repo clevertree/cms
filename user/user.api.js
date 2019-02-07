@@ -96,7 +96,8 @@ class UserAPI {
         if(!profile)
             throw new Error("Invalid Profile");
 
-        const userDB = await DatabaseManager.getUserDB(req);
+        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const userDB = await DatabaseManager.getUserDB(database);
         const user = await userDB.fetchUserByID(userID);
         if(!user)
             throw new Error("User not found: " + userID);
@@ -115,7 +116,8 @@ class UserAPI {
 
 
     async updateFlags(req, userID, flags) {
-        const userDB = await DatabaseManager.getUserDB(req);
+        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const userDB = await DatabaseManager.getUserDB(database);
         if(!userID)
             throw new Error("Invalid User ID");
         // const user = await this.userDB.fetchUserByID(userID);
@@ -142,7 +144,8 @@ class UserAPI {
     async updatePassword(req, userID, password_old, password_new, password_confirm) {
         if(!userID)
             throw new Error("Invalid User ID");
-        const userDB = await DatabaseManager.getUserDB(req);
+        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const userDB = await DatabaseManager.getUserDB(database);
         const user = await userDB.fetchUserByID(userID, 'u.*');
         if(!user)
             throw new Error("User not found: " + userID);
@@ -179,7 +182,8 @@ class UserAPI {
         if(password !== password_confirm && password_confirm !== null)
             throw new Error("Confirm & Password do not match");
 
-        const userDB = await DatabaseManager.getUserDB(req);
+        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const userDB = await DatabaseManager.getUserDB(database);
         const user = await userDB.createUser(username, email, password);
 
         await this.login(req, user.id, password);
@@ -196,7 +200,8 @@ class UserAPI {
         if(!password)
             throw new Error("Password is required");
 
-        const userDB = await DatabaseManager.getUserDB(req);
+        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const userDB = await DatabaseManager.getUserDB(database);
         const user = await userDB.fetchUserByID(uuid, 'u.*');
         if(!user)
             throw new Error("User not found: " + uuid);
@@ -220,7 +225,8 @@ class UserAPI {
     }
 
     async logout(req, res) {
-        const userDB = await DatabaseManager.getUserDB(req);
+        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const userDB = await DatabaseManager.getUserDB(database);
         if(req.session.user_session) {
             await userDB.deleteUserSessionByID(req.session.user_session);
         }
@@ -237,7 +243,8 @@ class UserAPI {
 
             // Render View
             if(asJSON) {
-                const userDB = await DatabaseManager.getUserDB(req);
+                const database = await DatabaseManager.selectDatabaseByRequest(req);
+                const userDB = await DatabaseManager.getUserDB(database);
                 const user = await userDB.fetchUserByID(userID);
                 if(!user)
                     throw new Error("User not found: " + userID);
@@ -411,7 +418,8 @@ class UserAPI {
             } else {
                 // Handle Form (POST) Request
                 // console.log("Log in Request", req.body);
-                const userDB = await DatabaseManager.getUserDB(req);
+                const database = await DatabaseManager.selectDatabaseByRequest(req);
+                const userDB = await DatabaseManager.getUserDB(database);
                 const user = await userDB.fetchUserByEmail(req.body.email);
                 if(!user)
                     throw new Error("User was not found: " + req.body.email);
@@ -436,7 +444,8 @@ class UserAPI {
 
     async handleUpdateRequest(type, userID, req, res) {
         try {
-            const userDB = await DatabaseManager.getUserDB(req);
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const userDB = await DatabaseManager.getUserDB(database);
             if(!userID)
                 throw new Error("Invalid user id");
             // const user = await this.userDB.fetchUserByID(userID);
@@ -507,7 +516,8 @@ class UserAPI {
                 );
 
             } else {
-                const userDB = await DatabaseManager.getUserDB(req);
+                const database = await DatabaseManager.selectDatabaseByRequest(req);
+                const userDB = await DatabaseManager.getUserDB(database);
                 // Handle POST
                 let whereSQL = '1', values = null;
                 if(req.body.search) {

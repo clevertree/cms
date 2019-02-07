@@ -14,26 +14,31 @@ class DatabaseManager {
     constructor() {
         this.config = null;
         this.db = null;
+        this.cacheHostname = {};
     }
 
-    // TODO: database name instead of req
-    async getArticleDB(req=null)    { return new (require('../article/article.database').ArticleDatabase)(await this.selectDatabaseByHost(req)); }
-    async getUserDB(req=null)       { return new (require('../user/user.database').UserDatabase)(await this.selectDatabaseByHost(req)); }
-    async getConfigDB(req=null)     { return new (require('../config/config.database').ConfigDatabase)(await this.selectDatabaseByHost(req)); }
-    async getDomainDB(req=null)     { return new (require('../service/domain/domain.database').DomainDatabase)(await this.selectDatabaseByHost(req)); }
+    async getArticleDB(database=null)    { return new (require('../article/article.database').ArticleDatabase)(database); }
+    async getUserDB(database=null)       { return new (require('../user/user.database').UserDatabase)(database); }
+    async getConfigDB(database=null)     { return new (require('../config/config.database').ConfigDatabase)(database); }
+    async getDomainDB(database=null)     { return new (require('../service/domain/domain.database').DomainDatabase)(database); }
 
 
     async configure(config=null, forcePrompt=0) {
         const localConfig = new LocalConfig(config, !config);
         const dbConfig = await localConfig.getOrCreate('database');
+        const serverConfig = await localConfig.getOrCreate('server');
+        let defaultHostname     = serverConfig.hostname || (require('os').hostname()).toLowerCase();
+        let defaultDatabaseName = defaultHostname.replace('.', '_') + '_cms';
 
-        if(forcePrompt || !dbConfig.database || !dbConfig.user || !dbConfig.host || !dbConfig.multiDomain) {
-            let hostname        = (require('os').hostname()).toLowerCase();
+        if(forcePrompt || !dbConfig.database || !dbConfig.user || !dbConfig.host || typeof dbConfig.multiDomain === 'undefined') {
             await localConfig.promptValue('database.host', `Please enter the Database Host`, dbConfig.host || 'localhost');
+            defaultDatabaseName = defaultHostname.replace('.', '_') + '_cms';
             await localConfig.promptValue('database.user', `Please enter the Database User Name`, dbConfig.user || 'root');
             await localConfig.promptValue('database.password', `Please enter the Password for Database User '${dbConfig.user}'`, null, 'password');
-            await localConfig.promptValue('database.database', `Please enter the Database Name`, dbConfig.database || hostname.replace('.', '_') + '_cms');
-            await localConfig.promptValue('database.multiDomain', `Enable Multi-domain hosting? [y or n]`, dbConfig.multiDomain || 'y');
+            await localConfig.promptValue('database.database', `Please enter the Database Name`, dbConfig.database || defaultDatabaseName);
+            await localConfig.promptValue('database.multiDomain', `Enable Multi-domain hosting? [y or n]`, dbConfig.multiDomain ? 'y' : 'n');
+            dbConfig.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain === 'y';
+            localConfig.saveAll();
         }
         try {
             const db = await this.createConnection(dbConfig);
@@ -63,17 +68,38 @@ class DatabaseManager {
         this.config = dbConfig;
 
         // Configure Databases
-        const tables = [
-            await this.getUserDB(), // TODO: users first
-            await this.getArticleDB(),
-            await this.getConfigDB(),
-        ];
-        if(this.config.multiDomain)
-            tables.push( await this.getDomainDB());
-        for(var i=0; i<tables.length; i++)
-            await tables[i].configure(config);
+        await this.configureDatabase(dbConfig.database, defaultHostname, true);
 
         return dbConfig;
+    }
+
+    async configureDatabase(database, hostname, interactive=false) {
+        const databaseExists = await this.queryAsync(`SHOW DATABASES LIKE '${database}'`);
+        if(databaseExists.length === 0) {
+            console.info("Database not found: ", database);
+            await this.queryAsync(`CREATE SCHEMA \`${database}\``);
+            await this.queryAsync(`USE \`${database}\``);
+            console.info(`Created new schema: \`${database}\``);
+        }
+
+        const domainDB = await this.getDomainDB(null);
+        domainDB.configure(interactive);
+        const domain = await domainDB.fetchDomainByHostname(hostname);
+        if(!domain) {
+            await domainDB.insertDomain(hostname, database);
+            console.info(`Created domain entry: ${hostname} => ${database}`);
+        }
+
+        const tables = [
+            await this.getUserDB(database),
+            await this.getArticleDB(database),
+            await this.getConfigDB(database),
+        ];
+        if(this.config.multiDomain && database === this.config.database)
+            tables.push( await this.getDomainDB(database, interactive));
+        for(let i=0; i<tables.length; i++)
+            await tables[i].configure(interactive);
+
     }
 
     async get(reconnect=false) {
@@ -94,9 +120,23 @@ class DatabaseManager {
         return this.db;
     }
 
-    async selectDatabaseByHost(req) {
-        if(this.config.multiDomain) {
-            return this.getDomainDB(req).selectDatabaseByHost(req, this.config.database);
+    async selectDatabaseByRequest(req) {
+        if(this.config.multiDomain && req) {
+            // const parse = require('url').parse(req.url);
+            const hostname = req.headers.host.split(':')[0];
+            if(typeof this.cacheHostname[hostname] !== "undefined")
+                return this.cacheHostname[hostname];
+            const domainDB = await this.getDomainDB(null);
+            const domain = await domainDB.fetchDomainByHostname(hostname);
+            let database;
+            if(domain) {
+                database = domain.database;
+            } else {
+                database = hostname.replace('.', '_') + '_cms';
+                await this.configureDatabase(database, hostname, false);
+            }
+            this.cacheHostname[hostname] = database;
+            return database;
         } else {
             return this.config.database;
         }

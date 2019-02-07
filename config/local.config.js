@@ -62,7 +62,7 @@ class LocalConfig {
         return true;
     }
 
-    async promptValue(path, text, defaultValue=null) {
+    async promptValue(path, text, defaultValue=null, validation=null) {
         const config = await this.getAll();
         if(!Array.isArray(path))
             path = path.split('.');

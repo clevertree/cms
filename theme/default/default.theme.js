@@ -24,8 +24,10 @@ class DefaultTheme {
         if(typeof article === "string")
             article = {content: article};
 
-        const articleDB = await DatabaseManager.getArticleDB(req);
-        const configDB = await DatabaseManager.getConfigDB(req);
+
+        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const articleDB = await DatabaseManager.getArticleDB(database);
+        const configDB = await DatabaseManager.getConfigDB(database);
 
         const renderData = {article};
 

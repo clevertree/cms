@@ -44,7 +44,8 @@ class ArticleAPI {
     }
 
     async checkForRevisionContent(req, article) {
-        const articleDB = await DatabaseManager.getArticleDB(req);
+        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const articleDB = await DatabaseManager.getArticleDB(database);
         if(typeof req.query.r !== 'undefined') {
             const articleRevisionID = parseInt(req.query.r);
             const articleRevision = await articleDB.fetchArticleRevisionByID(articleRevisionID);
@@ -83,7 +84,8 @@ class ArticleAPI {
 
     async renderArticleByPath(req, res, next) {
         try {
-            const articleDB = await DatabaseManager.getArticleDB(req);
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const articleDB = await DatabaseManager.getArticleDB(database);
             const article = await articleDB.fetchArticleByPath(req.url);
             if(!article)
                 return next();
@@ -107,7 +109,8 @@ class ArticleAPI {
 
     async renderArticleByID(asJSON, req, res, next) {
         try {
-            const articleDB = await DatabaseManager.getArticleDB(req);
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const articleDB = await DatabaseManager.getArticleDB(database);
             const article = await articleDB.fetchArticleByID(req.params.id);
             if(!article)
                 return next();
@@ -122,7 +125,8 @@ class ArticleAPI {
                     article
                 };
                 if(req.session && req.session.userID) {
-                    const userDB = await DatabaseManager.getUserDB(req);
+                    const database = await DatabaseManager.selectDatabaseByRequest(req);
+                    const userDB = await DatabaseManager.getUserDB(database);
                     const sessionUser = await userDB.fetchUserByID(req.session.userID);
                     if (sessionUser.isAdmin() || sessionUser.id === article.user_id)
                         response.editable = true;
@@ -164,8 +168,9 @@ class ArticleAPI {
 
     async renderArticleEditorByID(req, res, next) {
         try {
-            const articleDB = await DatabaseManager.getArticleDB(req);
-            const userDB = await DatabaseManager.getUserDB(req);
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const articleDB = await DatabaseManager.getArticleDB(database);
+            const userDB = await DatabaseManager.getUserDB(database);
 
             if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
@@ -262,8 +267,9 @@ class ArticleAPI {
 
     async renderArticleAdd(req, res) {
         try {
-            const articleDB = await DatabaseManager.getArticleDB(req);
-            const userDB = await DatabaseManager.getUserDB(req);
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const articleDB = await DatabaseManager.getArticleDB(database);
+            const userDB = await DatabaseManager.getUserDB(database);
             if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
 
@@ -334,7 +340,9 @@ class ArticleAPI {
                 );
 
             } else {
-                const articleDB = await DatabaseManager.getArticleDB(req);
+                const database = await DatabaseManager.selectDatabaseByRequest(req);
+                const articleDB = await DatabaseManager.getArticleDB(database);
+
                 // Handle POST
                 let whereSQL = '1', values = null;
                 if(req.body.search) {

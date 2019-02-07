@@ -10,7 +10,7 @@ class DomainDatabase  {
         };
     }
 
-    async configure(config=null) {
+    async configure(interactive=false) {
 
         // Check for table
         await DatabaseManager.configureTable(this.table.domain,            DomainRow.getTableSQL(this.table.domain));
@@ -19,58 +19,32 @@ class DomainDatabase  {
 
     /** Domain Table **/
 
-    async selectDomains(whereSQL, values, selectSQL='u.*,null as password') {
+    async selectDomains(whereSQL, values, selectSQL='d.*') {
         let SQL = `
           SELECT ${selectSQL}
-          FROM ${this.table.domain} u
+          FROM ${this.table.domain} d
           WHERE ${whereSQL}
           `;
 
         const results = await DatabaseManager.queryAsync(SQL, values);
         return results.map(result => new DomainRow(result))
     }
-    async fetchDomain(whereSQL, values, selectSQL='u.*,null as password') {
+    async fetchDomain(whereSQL, values, selectSQL='d.*') {
         const domains = await this.selectDomains(whereSQL, values, selectSQL);
-        return domains[0];
+        return domains[0] || null;
     }
 
-    async createDomain(name, email, password, flags='') {
-        if(Array.isArray(flags))
-            flags = flags.join(',');
-        if(!name) throw new Error("Invalid name");
-        if(!email) throw new Error("Invalid email");
-        if(password) {
-            const salt = await bcrypt.genSalt(10);
-            password = await bcrypt.hash(password, salt);
-        }
+    async fetchDomainByHostname(hostname, selectSQL='d.*') {
+        return await this.fetchDomain("d.hostname = ?", hostname, selectSQL);
+    }
+
+    async insertDomain(hostname, database) {
         let SQL = `
-          INSERT INTO ${this.table.domain} SET ?`;
-        await DatabaseManager.queryAsync(SQL, {
-            name,
-            email,
-            password,
-            flags
-        });
-
-        const domain = await this.fetchDomainByEmail(email);
-        console.info("Domain Created", domain);
-        return domain;
-    }
-
-    async updateDomain(domainID, email, password, profile, flags) {
-        let set = {};
-        if(email !== null) set.email = email;
-        if(password !== null) set.password = password;
-        if(profile !== null) set.profile = JSON.stringify(profile);
-        if(flags !== null) set.flags = Array.isArray(flags) ? flags.join(',') : flags;
-        let SQL = `UPDATE ${this.table.domain} SET ? WHERE id = ?`;
-
-        return (await DatabaseManager.queryAsync(SQL, [set, domainID]))
-            .affectedRows;
-    }
-
-    async selectDatabaseByHost(req, defaultDatabase) {
-
+          INSERT INTO ${this.table.domain}
+          SET ?
+        `;
+        const results = await DatabaseManager.queryAsync(SQL, {hostname, database});
+        return results.insertId;
     }
 }
 
@@ -78,9 +52,11 @@ class DomainRow {
     static getTableSQL(tableName) {
         return `
 CREATE TABLE ${tableName} (
-  \`name\` varchar(64) NOT NULL,
+  \`hostname\` varchar(64) NOT NULL,
   \`database\` varchar(256) NOT NULL,
-  UNIQUE KEY \`uk.domain.name\` (\`domain\`)
+  \`ssl\` TEXT DEFAULT NULL,
+  \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY \`uk.domain.name\` (\`hostname\`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 `
     }

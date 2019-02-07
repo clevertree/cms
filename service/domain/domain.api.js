@@ -39,12 +39,13 @@ class DomainAPI {
 
     async renderDomainJSON(req, res) {
         try {
-            const userDB = await DatabaseManager.getUserDB(req);
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const userDB = await DatabaseManager.getUserDB(database);
+            const domainDB = await DatabaseManager.getDomainDB(database);
             const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
             if(!sessionUser || !sessionUser.isAdmin())
                 throw new Error("Not authorized");
 
-            const domainDB = await DatabaseManager.getDomainDB(req);
             // Handle POST
             let whereSQL = '1', values = null;
             if(req.body.search) {
@@ -85,8 +86,9 @@ class DomainAPI {
 
             } else {
                 // Handle POST
-                const userDB = await DatabaseManager.getUserDB(req);
-                const domainDB = await DatabaseManager.getDomainDB(req);
+                const database = await DatabaseManager.selectDatabaseByRequest(req);
+                const userDB = await DatabaseManager.getUserDB(database);
+                const domainDB = await DatabaseManager.getDomainDB(database);
 
                 const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
                 if(!sessionUser || !sessionUser.isAdmin())

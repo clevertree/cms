@@ -39,12 +39,13 @@ class ConfigAPI {
 
     async renderConfigJSON(req, res) {
         try {
-            const userDB = await DatabaseManager.getUserDB(req);
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const userDB = await DatabaseManager.getUserDB(database);
+            const configDB = await DatabaseManager.getConfigDB(database);
             const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
             if(!sessionUser || !sessionUser.isAdmin())
                 throw new Error("Not authorized");
 
-            const configDB = await DatabaseManager.getConfigDB(req);
             // Handle POST
             let whereSQL = '1', values = null;
             if(req.body.search) {
@@ -85,8 +86,9 @@ class ConfigAPI {
 
             } else {
                 // Handle POST
-                const userDB = await DatabaseManager.getUserDB(req);
-                const configDB = await DatabaseManager.getConfigDB(req);
+                const database = await DatabaseManager.selectDatabaseByRequest(req);
+                const userDB = await DatabaseManager.getUserDB(database);
+                const configDB = await DatabaseManager.getConfigDB(database);
 
                 const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
                 if(!sessionUser || !sessionUser.isAdmin())

@@ -22,16 +22,15 @@ class HTTPServer {
         if(this.config)
             return this.config;
 
-        const router = express.Router();
-        this.router = router;
-
         const localConfig = new LocalConfig(config, !config);
         const serverConfig = await localConfig.getOrCreate('server');
 
         // Configure local
-        if(!serverConfig.hostname)  await localConfig.promptValue('server.hostname', `Please enter the Server Hostname`, require('os').hostname());
-        if(!serverConfig.ssl)       await localConfig.promptValue('server.ssl', `Enable SSL Server with GreenLock? [y or n]`, 'y');
-        if(!serverConfig.port)      await localConfig.promptValue('server.port', `Please enter the Server Port`, serverConfig.ssl === 'y' ? 443 : 8080);
+        if(!serverConfig.hostname)                  await localConfig.promptValue('server.hostname', `Please enter the Server Hostname`, require('os').hostname());
+        if(!serverConfig.port)                      await localConfig.promptValue('server.port', `Please enter the Server Port`, serverConfig.ssl === 'y' ? 443 : 8080);
+        if(typeof serverConfig.ssl === "undefined") await localConfig.promptValue('server.ssl', `Enable SSL Server with GreenLock? [y or n]`, 'y');
+        serverConfig.ssl = serverConfig.ssl && serverConfig.ssl === 'y';
+        localConfig.saveAll();
 
         await DatabaseManager.configure(config);
 
@@ -48,6 +47,9 @@ class HTTPServer {
             siteConfig.keywords = await configDB.promptValue('site.keywords', `Please enter the Website Keywords`, siteConfig.keywords);
         }
 
+
+        const router = express.Router();
+        this.router = router;
         // Routes
         [
             UserAPI,
@@ -102,7 +104,7 @@ class HTTPServer {
 
     async listen(port=null) {
         const config = await this.configure();
-        if(config.ssl === 'y') {
+        if(config.ssl === true) {
             const { SSLServer } = require('./ssl.server');
             await SSLServer.listen(port);
             return;

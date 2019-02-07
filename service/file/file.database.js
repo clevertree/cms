@@ -15,7 +15,7 @@ class FileDatabase {
         this.debug = debug;
     }
 
-    async configure() {
+    async configure(interactive=false) {
         // Check for tables
         // await DatabaseManager.configureTable(this.table.file, ArticleRow.getTableSQL(this.table.article));
     }

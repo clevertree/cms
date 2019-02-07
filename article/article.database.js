@@ -11,7 +11,7 @@ class ArticleDatabase {
         this.debug = debug;
     }
 
-    async configure() {
+    async configure(interactive=false) {
         // Check for tables
         await DatabaseManager.configureTable(this.table.article,             ArticleRow.getTableSQL(this.table.article));
         await DatabaseManager.configureTable(this.table.article_revision,    ArticleRevisionRow.getTableSQL(this.table.article_revision));
@@ -51,7 +51,9 @@ class ArticleDatabase {
         return articles[0] || null;
     }
 
-    async fetchArticleByPath(renderPath) { return await this.fetchArticle('a.path = ? LIMIT 1', renderPath, 'a.*'); }
+    async fetchArticleByPath(renderPath) {
+        renderPath = renderPath.split('?')[0];
+        return await this.fetchArticle('a.path = ? LIMIT 1', renderPath, 'a.*'); }
     async fetchArticleByID(articleID) { return await this.fetchArticle('a.id = ? LIMIT 1', articleID, 'a.*'); }
 
     // async fetchArticlesByFlag(flags, selectSQL = 'id, parent_id, path, title, flags') {
@@ -196,7 +198,7 @@ CREATE TABLE ${tableName} (
   UNIQUE KEY \`uk:article.path\` (\`path\`),
   KEY \`fk:article.user_id\` (\`user_id\`),
   CONSTRAINT \`fk:article.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=404 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8;
 `
     }
 
