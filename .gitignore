@@ -4,7 +4,7 @@
 .acme
 
 #JetBrains
-.idea
+#.idea
 
 # Logs
 logs

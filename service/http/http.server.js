@@ -29,8 +29,8 @@ class HTTPServer {
         if(!serverConfig.hostname)                  await localConfig.promptValue('server.hostname', `Please enter the Server Hostname`, require('os').hostname());
         if(!serverConfig.port)                      await localConfig.promptValue('server.port', `Please enter the Server Port`, serverConfig.ssl === 'y' ? 443 : 8080);
         if(typeof serverConfig.ssl === "undefined") await localConfig.promptValue('server.ssl', `Enable SSL Server with GreenLock? [y or n]`, 'y');
-        serverConfig.ssl = serverConfig.ssl && serverConfig.ssl === 'y';
-        localConfig.saveAll();
+        // serverConfig.ssl = serverConfig.ssl && serverConfig.ssl === 'y';
+        // localConfig.saveAll();
 
         await DatabaseManager.configure(config);
 
@@ -104,7 +104,7 @@ class HTTPServer {
 
     async listen(port=null) {
         const config = await this.configure();
-        if(config.ssl === true) {
+        if(config.ssl === 'y') {
             const { SSLServer } = require('./ssl.server');
             await SSLServer.listen(port);
             return;

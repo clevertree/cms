@@ -37,11 +37,12 @@ class DatabaseManager {
             await localConfig.promptValue('database.user', `Please enter the Database User Name`, dbConfig.user || 'root');
             await localConfig.promptValue('database.password', `Please enter the Password for Database User '${dbConfig.user}'`, null, 'password');
             await localConfig.promptValue('database.database', `Please enter the Database Name`, dbConfig.database || defaultDatabaseName);
-            await localConfig.promptValue('database.multiDomain', `Enable Multi-domain hosting? [y or n]`, dbConfig.multiDomain ? 'y' : 'n');
-            dbConfig.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain === 'y';
-            localConfig.saveAll();
+            await localConfig.promptValue('database.multiDomain', `Enable Multi-domain hosting? [y or n]`, dbConfig.multiDomain || 'n');
+            // dbConfig.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain === 'y';
+            // localConfig.saveAll();
         }
         try {
+            // dbConfig.insecureAuth = true;
             const db = await this.createConnection(dbConfig);
             db.end();
         } catch (e) {
@@ -67,6 +68,7 @@ class DatabaseManager {
         }
 
         this.config = dbConfig;
+        dbConfig.debug = true;
 
         // Configure Databases
         await this.configureDatabase(dbConfig.database, defaultHostname, true);
@@ -83,6 +85,17 @@ class DatabaseManager {
             console.info(`Created new schema: \`${database}\``);
         }
 
+        const tables = [
+            await this.getUserDB(database),
+            await this.getArticleDB(database),
+            await this.getConfigDB(database),
+        ];
+        if(database === this.config.database)
+            tables.push( await this.getDomainDB(database));
+        for(let i=0; i<tables.length; i++)
+            await tables[i].configure(interactive);
+
+        // Configure Domain
         const domainDB = await this.getDomainDB(null);
         domainDB.configure(interactive);
         const domain = await domainDB.fetchDomainByHostname(hostname);
@@ -90,16 +103,6 @@ class DatabaseManager {
             await domainDB.insertDomain(hostname, database);
             console.info(`Created domain entry: ${hostname} => ${database}`);
         }
-
-        const tables = [
-            await this.getUserDB(database),
-            await this.getArticleDB(database),
-            await this.getConfigDB(database),
-        ];
-        if(this.config.multiDomain && (database === this.config.database))
-            tables.push( await this.getDomainDB(database));
-        for(let i=0; i<tables.length; i++)
-            await tables[i].configure(interactive);
 
         // Set up admin user
         await require('../user/user.api').UserAPI.configureAdmin(database, hostname, interactive);
@@ -125,7 +128,7 @@ class DatabaseManager {
     }
 
     async selectDatabaseByRequest(req) {
-        if(this.config.multiDomain && req) {
+        if(this.config.multiDomain === 'y' && req) {
             // const parse = require('url').parse(req.url);
             const hostname = req.headers.host.split(':')[0];
             if(typeof this.cacheHostname[hostname] !== "undefined")

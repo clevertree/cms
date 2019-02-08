@@ -23,7 +23,7 @@ class UserAPI {
         const sessionConfig = await localConfig.getOrCreate('session');
         if(!sessionConfig.secret) {
             sessionConfig.secret = require('uuid/v4')();
-            localConfig.saveAll();
+            await localConfig.saveAll();
         }
         sessionConfig.cookieName = 'session';
 
@@ -193,7 +193,7 @@ class UserAPI {
     async queryDNSAdmin(hostname) {
         const data = await new Promise( ( resolve, reject ) => {
             var whois = require('whois')
-            whois.lookup('clevertree.net' || hostname, {
+            whois.lookup('snesology.org' || hostname, {
                 // "server":  "",   // this can be a string ("host:port") or an object with host and port as its keys; leaving it empty makes lookup rely on servers.json
                 "follow":  2,    // number of times to follow redirects
                 // "timeout": 2,    // socket timeout, excluding this doesn't override any default timeout value
@@ -208,31 +208,43 @@ class UserAPI {
                 resolve (data);
             });
         });
+        // Admin Email: ari.asulin@gmail.com
+        let reg = /admin.*\s+([-.\w]+@(?:[\w-]+\.)+[\w-]{2,20})/i;
+        let matches = reg.exec(data);
+        if(matches)
+            return matches[1];
+
+        throw new Error ("TODO: " + data);
     }
 
     async configureAdmin(database, hostname, interactive=false) {
         const userDB = await DatabaseManager.getUserDB(database);
 
 
-        // Find admin user by DNS info
-        let dnsAdminEmail = await this.queryDNSAdmin(hostname);
-        if(dnsAdminEmail) {
-            adminUser = await userDB.createUser(dnsAdminEmail.split('@')[0], dnsAdminEmail, null, 'admin');
-            console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
-        }
-
-        // Insert admin user
+        // Find admin user
         let adminUser = await userDB.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
         if (adminUser) {
             console.info("Admin user found: " + adminUser.id);
-            return;
+            return adminUser;
         }
-        if(interactive && !adminUser) {
+
+        // Find admin user by DNS info
+        if(!adminUser) {
+            let dnsAdminEmail = await this.queryDNSAdmin(hostname);
+            if (dnsAdminEmail) {
+                // dnsAdminEmail.split('@')[0]
+                adminUser = await userDB.createUser('admin', dnsAdminEmail, null, 'admin');
+                console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
+            }
+        }
+
+        if(!adminUser && interactive) {
             // Insert admin user
-            let adminUser = await this.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
+            let adminUser = await userDB.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
             if (adminUser) {
                 console.info("Admin user found: " + adminUser.id);
             } else {
+                let lastErr = null;
                 for (let i = 0; i < 4; i++) {
                     try {
                         // const hostname = require('os').hostname().toLowerCase();
@@ -251,11 +263,24 @@ class UserAPI {
                         console.info(`Admin user created (${adminUser.id}: ` + adminUsername);
                         break;
                     } catch (e) {
+                        lastErr = e;
                         console.error(e);
                     }
                 }
+                throw lastErr;
             }
         }
+
+        // Configure site
+        const configDB = await DatabaseManager.getConfigDB(database);
+        let siteConfig = await configDB.fetchConfigValues('site');
+
+        if(!siteConfig.contact)
+            await configDB.updateConfigValue('site.contact', adminUser.email);
+
+        // TODO: send email;
+        return adminUser;
+
     }
 
     async login(req, uuid, password, saveSession=false) {
