@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('change', this.onEvent);
             this.addEventListener('submit', this.onEvent);
 
+            this.state.userID = this.getAttribute('userID');
             this.render();
         }
 
@@ -50,10 +51,9 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const form = e.target; // querySelector('form.user-login-form');
             this.setState({processing: true});
-            const request = {};
-            new FormData(form).forEach(function (value, key) {
-                request[key] = value;
-            });
+            const request = this.getFormData(form);
+            const method = form.getAttribute('method');
+            const action = form.getAttribute('action');
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
@@ -67,9 +67,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 this.setState({response, processing: false});
             };
-            xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
+            xhr.open(method, action, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            // xhr.setRequestHeader("Accept", "application/json");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
         }
@@ -93,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="label">Email</td>
+                                    <td class="label">Email or UserID</td>
                                     <td>
                                         <input type="text" name="userID" value="${this.state.userID}" placeholder="Username or Email" required />
                                     </td>
@@ -102,12 +101,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
-                                    <td class="label"></td>
                                     <td>
+                                        <button onclick="location.href=':user/:login'" type="button">Go Back</button>
+                                    </td>
+                                    <td style="text-align: right;">
                                         <button type="submit">Submit</button>
-                                        <div style="float: right">
-                                            <a href=":user/:login">Go Back</a>
-                                        </div>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -115,6 +113,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     </fieldset>
                 </form>
 `;
+        }
+
+        getFormData(form) {
+            const formData = {};
+            new FormData(form).forEach((value, key) => formData[key] = value);
+            return formData;
         }
     }
     customElements.define('userform-forgotpassword', HTMLUserForgotPasswordFormElement);

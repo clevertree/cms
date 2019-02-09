@@ -53,7 +53,7 @@ class UserDatabase  {
         if(!isNaN(parseInt(userID)) && isFinite(userID)) {
             return await this.fetchUser('? IN (u.id)', userID, selectSQL);
         } else {
-            return await this.fetchUser('? IN (u.email, u.username)', userID, selectSQL);
+            return await this.fetchUser('? IN (u.email, u.username)', [userID, userID], selectSQL);
         }
     }
     async fetchUserByEmail(email, selectSQL='u.*,null as password') {
@@ -87,7 +87,10 @@ class UserDatabase  {
     async updateUser(userID, email, password, profile, flags) {
         let set = {};
         if(email !== null) set.email = email;
-        if(password !== null) set.password = password;
+        if(password) {
+            const salt = await bcrypt.genSalt(10);
+            set.password = await bcrypt.hash(password, salt);
+        }
         if(profile !== null) set.profile = JSON.stringify(profile);
         if(flags !== null) set.flags = Array.isArray(flags) ? flags.join(',') : flags;
         let SQL = `UPDATE ${this.table.user} SET ? WHERE id = ?`;

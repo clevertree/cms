@@ -22,7 +22,7 @@ form.configform > fieldset > table > tbody > tr > td:first-child {
 }
 
 /** Row **/
-form.configform > fieldset > table > tbody > tr:not(.odd) {
+form.configform > fieldset > table > tbody > tr.odd {
     background-color: #0001;
 }
 

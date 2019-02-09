@@ -11,82 +11,69 @@ document.addEventListener('DOMContentLoaded', function() {
             super();
             this.state = {
                 processing: false,
-                response: null,
+                userID: "",
+                password: "",
+                session_save: "",
+                message: "In order to start a new session please enter your username or email and password and hit 'Log in' below",
+                status: 0
             };
         }
 
         setState(newState) {
-            Object.assign(this.state, newState);
+            for(let i=0; i<arguments.length; i++)
+               Object.assign(this.state, arguments[i]);
             this.render();
         }
 
         connectedCallback() {
-            // this.addEventListener('change', this.onEvent);
-            this.addEventListener('submit', this.onEvent);
+            this.addEventListener('change', this.onChange);
+            this.addEventListener('submit', this.onSubmit);
 
+            this.state.userID = this.getAttribute('userID');
             this.render();
-            const userID = this.getAttribute('user-id');
-            if(userID)
-                this.requestFormData(userID);
         }
 
 
         onSuccess(e, response) {
+            console.log(e, response);
             setTimeout(() => window.location.href = response.redirect, 3000);
         }
-        onError(e, response) {}
-
-        onEvent(e) {
-            switch (e.type) {
-                case 'submit':
-                    this.submit(e);
-                    break;
-
-                // case 'change':
-                //     let value = e.target.value;
-                //     if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
-                //         this.state[e.target.name] = value;
-                //     // console.log(this.state);
-                //     break;
-            }
+        onError(e, response) {
+            console.error(e, response);
         }
 
-        submit(e) {
+        onChange(e) {
+            if(typeof this.state[e.target.name] !== 'undefined')
+                this.state[e.target.name] = e.target.value;
+        }
+
+        onSubmit(e) {
             e.preventDefault();
-            const form = e.target; // querySelector('form.user-login-form');
+            const form = e.target;
             this.setState({processing: true});
-            const request = {};
-            new FormData(form).forEach(function (value, key) {
-                request[key] = value;
-            });
+            const request = this.getFormData(form);
+            const method = form.getAttribute('method');
+            const action = form.getAttribute('action');
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
-                console.log(e, xhr.response);
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                response.status = xhr.status;
-                this.setState({response, processing: false});
+                this.setState({processing: false, status: xhr.status}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
                     this.onError(e, response);
                 }
             };
-            xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
+            xhr.open(method, action, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            // xhr.setRequestHeader("Accept", "application/json");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
         }
 
-
         render() {
-            const form = this.querySelector('form');
-            const formData = {};
-            if(form)
-                new FormData(form).forEach((value, key) => formData[key] = value);
-
-            console.log("Render", this.state, formData);
+            const messageClass = this.state.status === 200 ? 'success' : (this.state.status === 0 ? '' : 'error');
+            console.log("STATE", this.state);
             this.innerHTML =
                 `
                 <form action="/:user/:login" method="POST" class="userform userform-login themed">
@@ -96,9 +83,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             <thead>
                                 <tr>
                                     <td colspan="2">
-                                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
-                                            ${this.state.response.message}
-                                        </div>` : "In order to start a new session please enter your username or email and password and hit 'Log in' below"}
+                                        <div class="${messageClass} status-${this.status}">
+                                            ${this.state.message}
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
@@ -107,21 +94,21 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr>
                                     <td class="label">Username</td>
                                     <td>
-                                        <input type="text" name="uuid" value="${formData.uuid||''}" required />
+                                        <input type="text" name="userID" value="${this.state.userID}" required />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Password</td>
                                     <td>
-                                        <input type="password" name="password" value="${formData.password||''}" required />
+                                        <input type="password" name="password" value="" required />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Stay Logged In</td>
                                     <td>
-                                        <input type="checkbox" name="session_save" ${formData.session_save ? 'checked="checked"' : ''} value="1"/>
+                                        <input type="checkbox" name="session_save" ${this.state.session_save ? 'checked="checked"' : ''} value="1"/>
                                         <div style="float: right">
-                                            <a href=":user/:forgotpassword">Forgot Password?</a>
+                                            <a href=":user/:forgotpassword${this.state.userID ? '?userID=' + this.state.userID : ''}">Forgot Password?</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -129,16 +116,23 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
-                                    <td class="label"></td>
                                     <td>
-                                        <button type="submit">Log in</button>
                                     </td>
-                                </tr>
+                                    <td style="text-align: right;">
+                                        <button type="submit">Log In</button>
+                                    </td>
+                                 </tr>
                             </tfoot>
                         </table>
                     </fieldset>
                 </form>
 `;
+        }
+
+        getFormData(form) {
+            const formData = {};
+            new FormData(form).forEach((value, key) => formData[key] = value);
+            return formData;
         }
     }
     customElements.define('userform-login', HTMLUserLoginFormElement);

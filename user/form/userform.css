@@ -2,10 +2,6 @@ form.userform {
     max-width: 520px;
 }
 
-form.userform-register {
-    text-align: center;
-}
-
 form.userform > fieldset {
     margin: 0px auto;
 }
@@ -20,12 +16,6 @@ form.userform > fieldset > table > caption {
     text-align: left;
     /* padding-bottom: 1em; */
 }
-
-/** Row **/
-form.userform > fieldset > table > tbody > tr:not(.odd) {
-    background-color: #0001;
-}
-
 /** Form Input **/
 
 form.userform input[type=text],
@@ -43,3 +33,28 @@ form.userform .action-edit {
     text-decoration: none;
 }
 
+/** Row **/
+form.userform tr.odd {
+    background-color: #0001;
+}
+
+/** Labels **/
+
+form.userform td.label {
+    text-align: right;
+    padding: 8px 8px 8px 0px;
+    font-weight: bold;
+    white-space: nowrap;
+    display: block;
+    min-width: 90%;
+}
+form.userform td.label:after {
+    content: ':'
+}
+
+
+/** Custom Forms **/
+
+form.userform-register {
+    text-align: center;
+}

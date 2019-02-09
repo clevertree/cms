@@ -15,7 +15,7 @@ form.articleform > fieldset > table > caption {
     text-align: right;
 }
 
-form.articleform > fieldset > table > tbody > tr > td.label {
+form.articleform td.label {
     text-align: right;
     padding: 8px 4px;
     font-weight: bold;
@@ -32,7 +32,7 @@ form.articleform .editor-iframe.fullscreen {
 }
 
 /** Row **/
-form.articleform > fieldset > table > tbody > tr:not(.odd) {
+form.articleform tr.odd {
     background-color: #0001;
 }
 

@@ -16,7 +16,9 @@ class UserAPI {
     constructor() {
         this.routerAPI = null;
         this.routerSession = null;
-        this.resetPasswordRequests = {};
+        this.resetPasswordRequests = {
+            'aa196dc0-f51f-4a79-a858-53c3b3b03097': 101
+        };
     }
 
     // Configure
@@ -263,8 +265,8 @@ class UserAPI {
 
     }
 
-    async login(req, uuid, password, saveSession=false) {
-        if(!uuid)
+    async login(req, userID, password, saveSession=false) {
+        if(!userID)
             throw new Error("Username or Email is required");
         // if(!UserAPI.validateEmail(userID))
         //     throw new Error("Email format is invalid");
@@ -274,9 +276,9 @@ class UserAPI {
 
         const database = await DatabaseManager.selectDatabaseByRequest(req);
         const userDB = await DatabaseManager.getUserDB(database);
-        const user = await userDB.fetchUserByID(uuid, 'u.*');
+        const user = await userDB.fetchUserByID(userID, 'u.*');
         if(!user)
-            throw new Error("User not found: " + uuid);
+            throw new Error("User not found: " + userID);
         const encryptedPassword = user.password;
         delete user.password;
 
@@ -390,19 +392,20 @@ class UserAPI {
 
     async handleLoginRequest(req, res) {
         try {
+            const userID = req.query.userID ? req.query.userID.replace(/\W/g, '') : null;
             if(req.method === 'GET') {
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
 <script src="/user/form/userform-login.client.js"></script>
-<userform-login></userform-login>`)
+<userform-login userID="${userID||''}"></userform-login>`)
                 );
 
             } else {
                 // Handle Form (POST) Request
                 // console.log("Log in Request", req.body);
-                const user = await this.login(req, req.body.uuid, req.body.password, req.body.session_save);
+                const user = await this.login(req, req.body.userID, req.body.password, req.body.session_save);
 
                 return res.json({
                     redirect: `/:user/${user.id}`,
@@ -479,22 +482,25 @@ class UserAPI {
     async handleForgotPassword(req, res) {
         try {
             if(req.method === 'GET') {
+                const userID = req.query.userID ? req.query.userID.replace(/\W/g, '') : null;
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
 <script src="/user/form/userform-forgotpassword.client.js"></script>
-<userform-forgotpassword></userform-forgotpassword>`)
+<userform-forgotpassword userID="${userID||''}"></userform-forgotpassword>`)
                 );
 
             } else {
                 // Handle Form (POST) Request
                 // console.log("Log in Request", req.body);
+                if(!req.body.userID)
+                    throw new Error("userID is required");
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
                 const userDB = await DatabaseManager.getUserDB(database);
                 const user = await userDB.fetchUserByID(req.body.userID);
                 if(!user)
-                    throw new Error("User was not found: " + req.body.userID);
+                    throw new Error("User was not found: " + userID);
 
                 const uuid = uuidv4();
                 const recoveryUrl = req.protocol + '://' + req.get('host') + `/:user/${user.id}/:resetpassword/${uuid}`;
@@ -508,7 +514,7 @@ class UserAPI {
                 await mail.send();
 
                 return res.json({
-                    redirect: `/:user/:login?userID=${user.username}`,
+                    redirect: `/:user/:login`,
                     message: `Recovery email sent successfully to ${user.email}. <br/>Redirecting...`,
                     user
                 });
@@ -524,11 +530,20 @@ class UserAPI {
 
     async handleResetPassword(userID, uuid, req, res) {
         try {
+
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const userDB = await DatabaseManager.getUserDB(database);
+            const user = await userDB.fetchUserByID(userID);
+            if(!user)
+                throw new Error("User was not found: " + userID);
+
+
             if(!uuid)
                 throw new Error("uuid required");
             if(!this.resetPasswordRequests[uuid])
                 throw new Error("Invalid Validation UUID: " + uuid);
-            const userID = this.resetPasswordRequests[uuid];
+            if(this.resetPasswordRequests[uuid] !== user.id)
+                throw new Error("Validation UUID Mismatch: " + uuid);
 
             if(req.method === 'GET') {
                 // Render Editor Form
@@ -536,20 +551,15 @@ class UserAPI {
                     await ThemeManager.get()
                         .render(req, `
 <script src="/user/form/userform-resetpassword.client.js"></script>
-<userform-resetpassword uuid="${uuid}" userID="${userID}"></userform-resetpassword>`)
+<userform-resetpassword uuid="${uuid}" userID="${userID}" username="${user.username}"></userform-resetpassword>`)
                 );
 
             } else {
                 // Handle Form (POST) Request
-                // console.log("Log in Request", req.body);
-                // const database = await DatabaseManager.selectDatabaseByRequest(req);
-                // const userDB = await DatabaseManager.getUserDB(database);
-                // const user = await userDB.fetchUserByID(userID);
-                // if(!user)
-                //     throw new Error("User was not found: " + userID);
+                // console.log("Reset Request", req.body);
 
                 const affectedRows = await this.updatePassword(req,
-                    userID,
+                    user.id,
                     null,
                     req.body.password_new,
                     req.body.password_confirm);
@@ -557,9 +567,9 @@ class UserAPI {
                 if(!affectedRows)
                     throw new Error("Password not updated");
                 return res.json({
-                    redirect: `/:user/:login`,
+                    redirect: `/:user/:login?userID=${user.username}`,
                     message: `Recovery email sent successfully to ${user.email}. <br/>Redirecting...`,
-                    // user
+                    user
                 });
 
             }

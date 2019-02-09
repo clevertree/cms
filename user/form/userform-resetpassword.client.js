@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
             super();
             this.state = {
                 userID: "",
-                uuid: "",
                 password: "",
                 message: "Please enter a new password and hit submit below",
                 status: 0
@@ -20,7 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         setState(newState) {
-            Object.assign(this.state, newState);
+            for(let i=0; i<arguments.length; i++)
+                Object.assign(this.state, arguments[i]);
             this.render();
         }
 
@@ -30,18 +30,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
             this.state.userID = this.getAttribute('userID');
             if(!this.state.userID)
-                this.setState({message: "userID is required", status: 400})
+                this.setState({message: "Error: userID is required", status: 400});
             this.state.uuid = this.getAttribute('uuid');
             if(!this.state.uuid)
-                this.setState({message: "UUID is required", status: 400})
+                this.setState({message: "Error: UUID is required", status: 400});
+            this.state.username = this.getAttribute('username');
 
             this.render();
         }
 
         onSuccess(e, response) {
+            console.log(e, response);
             setTimeout(() => window.location.href = response.redirect, 3000);
         }
-        onError(e, response) {}
+        onError(e, response) {
+            console.error(e, response);
+        }
 
         onEvent(e) {
             switch (e.type) {
@@ -69,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.onload = (e) => {
                 console.log(e, xhr.response);
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                this.setState(Object.assign({processing: false, status: xhr.status}, response));
+                this.setState({processing: false, status: xhr.status}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
@@ -102,9 +106,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             </thead>
                             <tbody class="themed">
                                 <tr>
-                                    <td class="label">User ID</td>
+                                    <td class="label">Username</td>
                                     <td>
-                                        ${this.state.userID}
+                                        <input type="text" name="username" value="${this.state.username}" disabled />
                                     </td>
                                 </tr>
                                 <tr>
@@ -123,12 +127,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
-                                    <td class="label"></td>
                                     <td>
+                                        <button onclick="location.href=':user/:login'" type="button">Go Back</button>
+                                    </td>
+                                    <td style="text-align: right;">
                                         <button type="submit">Submit</button>
-                                        <div style="float: right">
-                                            <a href=":user/:login">Go Back</a>
-                                        </div>
                                     </td>
                                 </tr>
                             </tfoot>

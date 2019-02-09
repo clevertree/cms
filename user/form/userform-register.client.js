@@ -27,8 +27,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         connectedCallback() {
-            this.addEventListener('change', this.onEvent);
-            this.addEventListener('submit', this.onEvent);
+            this.addEventListener('change', this.onChange);
+            this.addEventListener('submit', this.onSubmit);
 
             this.render();
             const userID = this.getAttribute('user-id');
@@ -41,25 +41,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         onError(e, response) {}
 
-        onEvent(e) {
+        onChange(e) {
             const form = e.target.form || e.target;
-            switch (event.type) {
-                case 'submit':
-                    this.submit(e);
-                    break;
-
-                case 'change':
-                    // if(typeof this.state[e.target.name] !== "undefined")
-                    //     this.state[e.target.name] = e.target.value;
-                    if(!form.username.value && form.email.value) {
-                        form.username.value = form.email.value.split('@')[0];
-                    }
-                    // console.log(this.state);
-                break;
+            if(!form.username.value && form.email.value) {
+                form.username.value = form.email.value.split('@')[0];
             }
         }
 
-        submit(e) {
+        onSubmit(e) {
             e.preventDefault();
             const form = e.target; // querySelector('form.user-login-form');
             this.setState({processing: true});
@@ -87,13 +76,6 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.send(JSON.stringify(request));
         }
 
-        getFormData() {
-            const formData = {};
-            new FormData(this.querySelector('form')).forEach(function (value, key) {
-                formData[key] = value;
-            });
-            return formData;
-        }
 
         render() {
             const formData = this.getFormData();
@@ -154,6 +136,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     </fieldset>
                 </form>
 `;
+        }
+
+        getFormData(form) {
+            const formData = {};
+            new FormData(form).forEach((value, key) => formData[key] = value);
+            return formData;
         }
     }
     customElements.define('userform-register', HTMLUserRegisterFormElement);
