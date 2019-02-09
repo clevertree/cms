@@ -8,6 +8,7 @@ const { DatabaseManager } = require('../../database/database.manager');
 class MailServer {
     constructor() {
         this.server = null;
+        this.config = null;
     }
 
     async configure(forcePrompt=0)
@@ -44,9 +45,18 @@ class MailServer {
             }
             throw e;
         }
+        this.config = mailConfig;
         return mailConfig;
     }
 
+    async sendMail(data) {
+        if(!this.config)
+            await this.configure();
+        if(!data.from)
+            data.from = this.config.auth.user;
+        const server = nodemailer.createTransport(smtpTransport(this.config));
+        return await server.sendMail(data)
+    }
 
     async listen() {
         const mailConfig = await this.configure();

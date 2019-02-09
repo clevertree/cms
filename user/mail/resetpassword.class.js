@@ -1,4 +1,6 @@
-class ForgotPasswordMail {
+const { MailServer } = require('../../service/mail/mail.server');
+
+class ResetPasswordEmail {
     // sender info
     // from: 'Sender Name <sender@example.com>',
 
@@ -15,21 +17,10 @@ class ForgotPasswordMail {
     // html:'<p><b>Hello</b> to myself <img src="cid:note@node"/></p>'+
     //     '<p>Here\'s a nyan cat for you as an embedded attachment:<br/></p>'
 
-    constructor(app, user, recoveryURL) {
-        this.app = app;
+    constructor(recoveryURL, to, from, subject="Reset Password") {
         // this.user = user;
-        this.data = {
-            from:app.config.mail.auth.user,
-            to:user.email,
-            subject: "Forgot Password",
-        };
-        let fullname = user.profile.name;
-        if(fullname) {
-            this.data.to = `"${fullname}" <${this.data.to}>`;
-        } else {
-            fullname = this.data.to;
-        }
-        this.data.text = `Dear ${fullname},
+        this.data = {from, to, subject};
+        this.data.text = `User ${to},
 
 You have requested a new password. You may change your password at the following address:
 
@@ -39,13 +30,11 @@ Thanks for browsing the site!`;
     }
 
     async send() {
-        // console.log('Sending Mail');
-        await this.app.mail.sendMail(this.data);
-
-        // console.log('Message sent successfully!');
-
+        console.log('Sending Reset Password Email');
+        await MailServer.sendMail(this.data);
+        console.log('Message sent successfully!');
     }
 }
 
-module.exports = {ForgotPasswordMail};
+module.exports = {ResetPasswordEmail};
 

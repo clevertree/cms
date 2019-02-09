@@ -131,7 +131,7 @@ class DatabaseManager {
     async selectDatabaseByRequest(req) {
         if(this.config.multiDomain === 'y' && req) {
             // const parse = require('url').parse(req.url);
-            const hostname = req.headers.host.split(':')[0];
+            const hostname = req.get('host').split(':')[0];
             if(typeof this.cacheHostname[hostname] !== "undefined")
                 return this.cacheHostname[hostname];
             const domainDB = await this.getDomainDB(null);

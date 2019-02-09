@@ -6,18 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserRegisterFormElement extends HTMLElement {
+    class HTMLUserResetPasswordFormElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
-                response: null,
-                processing: false
-            }
-            // this.state = {
-            //     username: "",
-            //     email: "",
-            //     password: "",
-            // };
+                userID: "",
+                uuid: "",
+                password: "",
+                message: "Please enter a new password and hit submit below",
+                status: 0
+            };
             // this.state = {id:-1, flags:[]};
         }
 
@@ -27,13 +25,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         connectedCallback() {
-            this.addEventListener('change', this.onEvent);
+            // this.addEventListener('change', this.onEvent);
             this.addEventListener('submit', this.onEvent);
 
+            this.state.userID = this.getAttribute('userID');
+            if(!this.state.userID)
+                this.setState({message: "userID is required", status: 400})
+            this.state.uuid = this.getAttribute('uuid');
+            if(!this.state.uuid)
+                this.setState({message: "UUID is required", status: 400})
+
             this.render();
-            const userID = this.getAttribute('user-id');
-            if(userID)
-                this.requestFormData(userID);
         }
 
         onSuccess(e, response) {
@@ -42,20 +44,15 @@ document.addEventListener('DOMContentLoaded', function() {
         onError(e, response) {}
 
         onEvent(e) {
-            const form = e.target.form || e.target;
-            switch (event.type) {
+            switch (e.type) {
                 case 'submit':
                     this.submit(e);
                     break;
 
-                case 'change':
-                    // if(typeof this.state[e.target.name] !== "undefined")
-                    //     this.state[e.target.name] = e.target.value;
-                    if(!form.username.value && form.email.value) {
-                        form.username.value = form.email.value.split('@')[0];
-                    }
-                    // console.log(this.state);
-                break;
+                // case 'change':
+                //     if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
+                //         this.state[e.target.name] = e.target.value;
+                //     break;
             }
         }
 
@@ -72,72 +69,54 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.onload = (e) => {
                 console.log(e, xhr.response);
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                response.status = xhr.status;
+                this.setState(Object.assign({processing: false, status: xhr.status}, response));
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
                     this.onError(e, response);
                 }
-                this.setState({response, processing: false});
             };
             xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            // xhr.setRequestHeader("Accept", "application/json");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
         }
 
-        getFormData() {
-            const formData = {};
-            new FormData(this.querySelector('form')).forEach(function (value, key) {
-                formData[key] = value;
-            });
-            return formData;
-        }
-
         render() {
-            const formData = this.getFormData();
-            // console.log(formData);
-            const hostname = document.location.host.split(':')[0];
+            const messageClass = this.state.status === 200 ? 'success' : (this.state.status === 0 ? '' : 'error');
             this.innerHTML =
                 `
-                <form action="/:user/:register" method="POST" class="userform userform-register themed">
+                <form action="/:user/${this.state.userID}/:resetpassword/${this.state.uuid}" method="POST" class="userform userform-resetpassword themed">
                     <fieldset>
-                        <legend>Register a new account</legend>
+                        <legend>Reset Password</legend>
                         <table>
                             <thead>
                                 <tr>
                                     <td colspan="2">
-                                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
-                                            ${this.state.response.message}
-                                        </div>` : "To register a new account, <br/>please enter your email and password"}
+                                        <div class="${messageClass} status-${this.status}">
+                                            ${this.state.message}
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
                             </thead>
-                            <tbody>
+                            <tbody class="themed">
                                 <tr>
-                                    <td class="label">Email</td>
+                                    <td class="label">User ID</td>
                                     <td>
-                                        <input type="email" name="email" value="${formData.email||''}" required />
+                                        ${this.state.userID}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="label">Username</td>
+                                    <td class="label">New Password</td>
                                     <td>
-                                        <input type="username" name="username" value="${formData.username||''}" required /> @${hostname}
+                                        <input type="password" name="password_new" autocomplete="off" required />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="label">Password</td>
+                                    <td class="label">Confirm Password</td>
                                     <td>
-                                        <input type="password" name="password" value="${formData.password||''}" autocomplete="off" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Confirm</td>
-                                    <td>
-                                        <input type="password" name="password_confirm" value="${formData.password_confirm||''}" autocomplete="off" required/>
+                                        <input type="password" name="password_confirm" autocomplete="off" required />
                                     </td>
                                 </tr>
                             </tbody>
@@ -146,7 +125,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr>
                                     <td class="label"></td>
                                     <td>
-                                        <button type="submit">Register</button>
+                                        <button type="submit">Submit</button>
+                                        <div style="float: right">
+                                            <a href=":user/:login">Go Back</a>
+                                        </div>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -156,6 +138,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('userform-register', HTMLUserRegisterFormElement);
+    customElements.define('userform-resetpassword', HTMLUserResetPasswordFormElement);
 
 }

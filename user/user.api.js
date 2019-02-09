@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const session = require('client-sessions');
+const uuidv4 = require('uuid/v4');
 
 const { LocalConfig } = require('../config/local.config');
 const { PromptManager } = require('../config/prompt.manager');
@@ -9,12 +10,13 @@ const { DatabaseManager } = require('../database/database.manager');
 const { DNSManager } = require('../service/domain/dns.manager');
 const { ThemeManager } = require('../theme/theme.manager');
 const { UserDatabase } = require('./user.database');
-const { ForgotPasswordMail } = require("./mail/forgotpassword.class");
+const { ResetPasswordEmail } = require("./mail/resetpassword.class");
 
 class UserAPI {
     constructor() {
         this.routerAPI = null;
         this.routerSession = null;
+        this.resetPasswordRequests = {};
     }
 
     // Configure
@@ -44,21 +46,22 @@ class UserAPI {
         routerAPI.use(bodyParser.json());
         routerAPI.use(routerSession);
 
-        routerAPI.get('/[:]user/:userID(\\w+)/[:]json',         async (req, res, next) => await this.handleViewRequest(true, (req.params.userID), req, res, next));
-        routerAPI.get('/[:]user/:userID(\\w+)',                 async (req, res, next) => await this.handleViewRequest(false, (req.params.userID), req, res, next));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]profile',      async (req, res) => await this.handleUpdateRequest('profile', (req.params.userID), req, res));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]flags',        async (req, res) => await this.handleUpdateRequest('flags', (req.params.userID), req, res));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]password',     async (req, res) => await this.handleUpdateRequest('password', (req.params.userID), req, res));
-        routerAPI.all('/[:]user/[:]login',                      async (req, res) => await this.handleLoginRequest(req, res));
-        // router.all('/[:]user/session',                       async (req, res) => await this.handleSessionLoginRequest(req, res));
-        routerAPI.all('/[:]user/[:]logout',                     async (req, res) => await this.handleLogoutRequest(req, res));
-        routerAPI.all('/[:]user/[:]register',                   async (req, res) => await this.handleRegisterRequest(req, res));
-        routerAPI.all('/[:]user/[:]forgotpassword',             async (req, res) => await this.handleForgotPassword(req, res));
-        routerAPI.all('/[:]user(/[:]list)?',                    async (req, res) => await this.handleBrowserRequest(req, res));
+        routerAPI.get('/[:]user/:userID(\\w+)/[:]json',                 async (req, res, next) => await this.handleViewRequest(true, req.params.userID, req, res, next));
+        routerAPI.get('/[:]user/:userID(\\w+)',                         async (req, res, next) => await this.handleViewRequest(false, req.params.userID, req, res, next));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]profile',              async (req, res) => await this.handleUpdateRequest('profile', req.params.userID, req, res));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]flags',                async (req, res) => await this.handleUpdateRequest('flags', req.params.userID, req, res));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]password',             async (req, res) => await this.handleUpdateRequest('password', req.params.userID, req, res));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]resetpassword/:uuid',  async (req, res) => await this.handleResetPassword(req.params.userID, req.params.uuid, req, res));
+        routerAPI.all('/[:]user/[:]login',                              async (req, res) => await this.handleLoginRequest(req, res));
+        // router.all('/[:]user/session',                               async (req, res) => await this.handleSessionLoginRequest(req, res));
+        routerAPI.all('/[:]user/[:]logout',                             async (req, res) => await this.handleLogoutRequest(req, res));
+        routerAPI.all('/[:]user/[:]register',                           async (req, res) => await this.handleRegisterRequest(req, res));
+        routerAPI.all('/[:]user/[:]forgotpassword',                     async (req, res) => await this.handleForgotPassword(req, res));
+        routerAPI.all('/[:]user(/[:]list)?',                            async (req, res) => await this.handleBrowserRequest(req, res));
 
         this.routerAPI = routerAPI;
     }
-    
+
     getSessionMiddleware() {
         if(!this.routerSession)
             this.configure();
@@ -489,21 +492,76 @@ class UserAPI {
                 // console.log("Log in Request", req.body);
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
                 const userDB = await DatabaseManager.getUserDB(database);
-                const user = await userDB.fetchUserByEmail(req.body.email);
+                const user = await userDB.fetchUserByID(req.body.userID);
                 if(!user)
-                    throw new Error("User was not found: " + req.body.email);
-                const result = await userDB.createUserSession(user.id, 'reset');
-                // TODO: store password reset in memory, not database!
+                    throw new Error("User was not found: " + req.body.userID);
 
-                const recoveryURL = this.app.config.server.baseHRef + `/:user/session?uuid=${result.uuid}&password=${result.password}`;
-                const mail = new ForgotPasswordMail(this.app, user, recoveryURL);
+                const uuid = uuidv4();
+                const recoveryUrl = req.protocol + '://' + req.get('host') + `/:user/${user.id}/:resetpassword/${uuid}`;
+
+                this.resetPasswordRequests[uuid] = user.id;
+                setTimeout(() => delete this.resetPasswordRequests[uuid], 1000 * 60 * 60); // Delete after 1 hour
+
+                let to = `${user.profile && user.profile.name ? user.profile.name : user.username} <${user.email}>`;
+
+                const mail = new ResetPasswordEmail(recoveryUrl, to);
                 await mail.send();
 
                 return res.json({
-                    redirect: `/:user/:login`,
+                    redirect: `/:user/:login?userID=${user.username}`,
                     message: `Recovery email sent successfully to ${user.email}. <br/>Redirecting...`,
                     user
                 });
+
+
+
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(400).json({message: "Error: " + error.message, error: error.stack});
+        }
+    }
+
+    async handleResetPassword(userID, uuid, req, res) {
+        try {
+            if(!uuid)
+                throw new Error("uuid required");
+            if(!this.resetPasswordRequests[uuid])
+                throw new Error("Invalid Validation UUID: " + uuid);
+            const userID = this.resetPasswordRequests[uuid];
+
+            if(req.method === 'GET') {
+                // Render Editor Form
+                res.send(
+                    await ThemeManager.get()
+                        .render(req, `
+<script src="/user/form/userform-resetpassword.client.js"></script>
+<userform-resetpassword uuid="${uuid}" userID="${userID}"></userform-resetpassword>`)
+                );
+
+            } else {
+                // Handle Form (POST) Request
+                // console.log("Log in Request", req.body);
+                // const database = await DatabaseManager.selectDatabaseByRequest(req);
+                // const userDB = await DatabaseManager.getUserDB(database);
+                // const user = await userDB.fetchUserByID(userID);
+                // if(!user)
+                //     throw new Error("User was not found: " + userID);
+
+                const affectedRows = await this.updatePassword(req,
+                    userID,
+                    null,
+                    req.body.password_new,
+                    req.body.password_confirm);
+
+                if(!affectedRows)
+                    throw new Error("Password not updated");
+                return res.json({
+                    redirect: `/:user/:login`,
+                    message: `Recovery email sent successfully to ${user.email}. <br/>Redirecting...`,
+                    // user
+                });
+
             }
         } catch (error) {
             console.error(error);
@@ -567,7 +625,7 @@ class UserAPI {
             res.status(400).json({message: "Error: " + error.message, error: error.stack});
         }
     }
-    
+
     async handleBrowserRequest(req, res) {
         try {
 

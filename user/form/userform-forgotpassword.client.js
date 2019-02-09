@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
-                email: "",
+                userID: "",
                 password: "",
             };
             // this.state = {id:-1, flags:[]};
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
         render() {
             this.innerHTML =
                 `
-                <form action="/:user/:forgotpassword" method="POST" class="userform userform-forgotpassword themed" style1="display: none;">
+                <form action="/:user/:forgotpassword" method="POST" class="userform userform-forgotpassword themed">
                     <fieldset>
                         <legend>Forgot Password</legend>
                         <table>
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr>
                                     <td class="label">Email</td>
                                     <td>
-                                        <input type="email" name="email" value="${this.state.email}" required />
+                                        <input type="text" name="userID" value="${this.state.userID}" placeholder="Username or Email" required />
                                     </td>
                                 </tr>
                             </tbody>
