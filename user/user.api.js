@@ -4,7 +4,9 @@ const cookieParser = require('cookie-parser');
 const session = require('client-sessions');
 
 const { LocalConfig } = require('../config/local.config');
+const { PromptManager } = require('../config/prompt.manager');
 const { DatabaseManager } = require('../database/database.manager');
+const { DNSManager } = require('../service/domain/dns.manager');
 const { ThemeManager } = require('../theme/theme.manager');
 const { UserDatabase } = require('./user.database');
 const { ForgotPasswordMail } = require("./mail/forgotpassword.class");
@@ -190,33 +192,6 @@ class UserAPI {
         return user;
     }
 
-    async queryDNSAdmin(hostname) {
-        const data = await new Promise( ( resolve, reject ) => {
-            var whois = require('whois')
-            whois.lookup('snesology.org' || hostname, {
-                // "server":  "",   // this can be a string ("host:port") or an object with host and port as its keys; leaving it empty makes lookup rely on servers.json
-                "follow":  2,    // number of times to follow redirects
-                // "timeout": 2,    // socket timeout, excluding this doesn't override any default timeout value
-                // "verbose": true, // setting this to true returns an array of responses from all servers
-                // "bind": null,     // bind the socket to a local IP address
-                // "proxy": {       // (optional) SOCKS Proxy
-                //     "ipaddress": "",
-                //     "port": 0,
-                //     "type": 5    // or 4
-                // }
-            }, function(err, data) {
-                resolve (data);
-            });
-        });
-        // Admin Email: ari.asulin@gmail.com
-        let reg = /admin.*\s+([-.\w]+@(?:[\w-]+\.)+[\w-]{2,20})/i;
-        let matches = reg.exec(data);
-        if(matches)
-            return matches[1];
-
-        throw new Error ("TODO: " + data);
-    }
-
     async configureAdmin(database, hostname, interactive=false) {
         const userDB = await DatabaseManager.getUserDB(database);
 
@@ -230,11 +205,13 @@ class UserAPI {
 
         // Find admin user by DNS info
         if(!adminUser) {
-            let dnsAdminEmail = await this.queryDNSAdmin(hostname);
+            console.info("Querying WHOIS for admin email: " + hostname);
+            let dnsAdminEmail = await DNSManager.queryDNSAdmin(hostname);
             if (dnsAdminEmail) {
                 // dnsAdminEmail.split('@')[0]
                 adminUser = await userDB.createUser('admin', dnsAdminEmail, null, 'admin');
                 console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
+                // TODO: send email;
             }
         }
 
@@ -244,7 +221,6 @@ class UserAPI {
             if (adminUser) {
                 console.info("Admin user found: " + adminUser.id);
             } else {
-                let lastErr = null;
                 for (let i = 0; i < 4; i++) {
                     try {
                         // const hostname = require('os').hostname().toLowerCase();
@@ -257,28 +233,29 @@ class UserAPI {
                             adminPassword2 = adminPassword;
                             console.info("Using generated password: " + adminPassword);
                         }
-                        if (adminPassword !== adminPassword2)
-                            throw new Error("Password mismatch");
+                        if (adminPassword !== adminPassword2) {
+                            console.error("Password mismatch");
+                            continue;
+                        }
                         adminUser = await userDB.createUser(adminUsername, adminEmail, adminPassword, 'admin');
                         console.info(`Admin user created (${adminUser.id}: ` + adminUsername);
                         break;
                     } catch (e) {
-                        lastErr = e;
                         console.error(e);
                     }
                 }
-                throw lastErr;
             }
         }
 
-        // Configure site
-        const configDB = await DatabaseManager.getConfigDB(database);
-        let siteConfig = await configDB.fetchConfigValues('site');
+        if(adminUser) {
+            // Configure site
+            const configDB = await DatabaseManager.getConfigDB(database);
+            let siteConfig = await configDB.fetchConfigValues('site');
 
-        if(!siteConfig.contact)
-            await configDB.updateConfigValue('site.contact', adminUser.email);
+            if (!siteConfig.contact)
+                await configDB.updateConfigValue('site.contact', adminUser.email);
+        }
 
-        // TODO: send email;
         return adminUser;
 
     }

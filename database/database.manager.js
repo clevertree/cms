@@ -68,7 +68,7 @@ class DatabaseManager {
         }
 
         this.config = dbConfig;
-        dbConfig.debug = true;
+        // dbConfig.debug = true;
 
         // Configure Databases
         await this.configureDatabase(dbConfig.database, defaultHostname, true);
@@ -124,6 +124,7 @@ class DatabaseManager {
         if(!this.config)
             await this.configure();
         this.db = await this.createConnection(this.config);
+        console.info(`DB Connection to '${this.config.host}' Successful`);
         return this.db;
     }
 
@@ -165,7 +166,6 @@ class DatabaseManager {
                     console.error(`DB Connection to '${config.host}' Failed`, err.message);
                     reject(err);
                 } else {
-                    console.info(`DB Connecting to '${config.host}' Successful`);
                     resolve(db);
                 }
             });

@@ -105,6 +105,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <td class="label"></td>
                                     <td>
                                         <button type="submit">Submit</button>
+                                        <div style="float: right">
+                                            <a href=":user/:login">Go Back</a>
+                                        </div>
                                     </td>
                                 </tr>
                             </tfoot>
