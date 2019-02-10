@@ -79,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
-            const messageClass = this.state.status === 200 ? 'success' : (this.state.status === 0 ? '' : 'error');
             // console.log("STATE", this.state);
             this.innerHTML =
                 `
@@ -90,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <thead>
                                 <tr>
                                     <td colspan="2">
-                                        <div class="${messageClass} status-${this.status}">
+                                        <div class="${this.state.status === 200 ? 'success' : (this.state.status === 0 ? '' : 'error')} status-${this.status}">
                                             ${this.state.message}
                                         </div>
                                     </td>
@@ -124,6 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td>
+                                        <a href=":user/:register${this.state.userID ? '?userID=' + this.state.userID : ''}">Register</a>
                                     </td>
                                     <td style="text-align: right;">
                                         <button type="submit">Log In</button>

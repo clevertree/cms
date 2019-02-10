@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
+                message: "In order to update this profile, please modify this form and hit 'Update Profile' below",
+                status: 0,
+                processing: false,
                 user: {id: -1, profile: {}},
             };
             // this.state = {id:-1, flags:[]};
@@ -22,90 +25,89 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         connectedCallback() {
-            this.addEventListener('change', this.onEvent);
-            this.addEventListener('submit', this.onEvent);
+            this.addEventListener('change', e => this.onChange(e));
+            this.addEventListener('submit', e => this.onSubmit(e));
 
             this.render();
-            const userID = this.getAttribute('id');
+            const userID = this.getAttribute('userID');
             if(userID)
                 this.requestFormData(userID);
         }
 
-        onSuccess(e, response) {
-            // setTimeout(() => window.location.href = response.redirect, 3000);
-        }
-        onError(e, response) {}
-
-        onEvent(e) {
-            switch (e.type) {
-                case 'submit':
-                    this.submit(e);
-                    break;
-
-                case 'change':
-                    let value = e.target.value;
-                    if(e.target.getAttribute('type') === 'checkbox')
-                        value = e.target.checked;
-                    if(e.target.name && typeof this.state.user.profile[e.target.name] !== 'undefined')
-                        this.state.user.profile[e.target.name] = value;
-                    // console.log(this.state);
-                    break;
-            }
-        }
 
         requestFormData(userID) {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
-                // console.info(xhr.response);
                 if(!xhr.response || !xhr.response.user)
                     throw new Error("Invalid Response");
-                this.setState(xhr.response);
-                // this.state = xhr.response.user;
-                // this.render();
+                this.setState({processing: false}, xhr.response);
             };
             xhr.responseType = 'json';
             xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
             // xhr.setRequestHeader("Accept", "application/json");
             xhr.send ();
+            this.setState({processing: true});
         }
 
-        submit(e) {
+
+        onSuccess(e, response) {
+            console.log(e, response);
+            this.setState({processing: false});
+            setTimeout(() => window.location.href = response.redirect, 3000);
+        }
+        onError(e, response) {
+            console.error(e, response);
+        }
+        onChange(e) {
+            const form = e.target.form || e.target;
+            if(!form.username.value && form.email.value) {
+                form.username.value = form.email.value.split('@')[0];
+            }
+            form.username.value = (form.username.value || '').replace(/[^\w.]/g, '');
+        }
+
+        onSubmit(e) {
             e.preventDefault();
-            const form = e.target; // querySelector('form.user-login-form');
-            this.setState({processing: true});
-            const request = {};
-            new FormData(form).forEach(function (value, key) {
-                request[key] = value;
-            });
+            const form = e.target;
+            const request = this.getFormData(form);
+            const method = form.getAttribute('method');
+            const action = form.getAttribute('action');
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
-                console.log(e, xhr.response);
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                response.status = xhr.status;
+                this.setState({status: xhr.status}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
                     this.onError(e, response);
                 }
-                this.setState({response, user:response.user, processing: false});
             };
-            xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
+            xhr.open(method, action, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            // xhr.setRequestHeader("Accept", "application/json");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
+            this.setState({processing: true});
+        }
+
+        getFormData(form) {
+            const formData = {};
+            new FormData(form).forEach((value, key) => formData[key] = value);
+            return formData;
         }
 
         renderProfileField(field) {
-            const value = this.state.user.profile[field.name];
+            const userProfile = this.state.user.profile || {};
+            const value = userProfile[field.name];
+            let attributeHTML = field.attributes || '';
+            attributeHTML += field.class ? ` class="${field.class}"` : '';
             switch(field.type) {
                 case 'textarea':
-                    return `<textarea name="${field.name}" class="${field.class}" ${field.attributes}>${value||''}</textarea>`;
+                    return `<textarea name="${field.name}" ${attributeHTML}>${value||''}</textarea>`;
                 case 'select':
-                    return `<select name="${field.name}" class="${field.class}" ${field.attributes}></select>`;
+                    return `<select name="${field.name}" ${attributeHTML}></select>`;
                 default:
-                    return `<input name="${field.name}" type="${field.type||'text'}" class="${field.class}" value="${value||''}" ${field.attributes}/>`;
+                    return `<input name="${field.name}" type="${field.type||'text'}" value="${value||''}" ${attributeHTML}/>`;
             }
         }
 
@@ -129,15 +131,15 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/${this.state.user.id}/:profile" method="POST" class="userform userform-update-profile themed">
-                    <fieldset ${!this.state.editable ? 'disabled="disabled"' : ''}>
+                    <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
                         <legend>Update Profile</legend>
                         <table>
                             <thead>
                                 <tr>
                                     <td colspan="2">
-                                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
-                                            ${this.state.response.message}
-                                        </div>` : "In order to update this profile, <br/>please modify this form and hit 'Update' below"}
+                                        <div class="${this.state.status === 200 ? 'success' : (this.state.status === 0 ? '' : 'error')} status-${this.status}">
+                                            ${this.state.message}
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
@@ -151,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </tr>
                             ${profileFields.map(profileField => `
                                 <tr>
-                                    <td class="label">${profileField.name}:</td>
+                                    <td class="label">${profileField.title || profileField.name}</td>
                                     <td>
                                         ${this.renderProfileField(profileField)}
                                     </td>
@@ -161,9 +163,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
-                                    <td class="label"></td>
                                     <td>
-                                        <button type="submit">Update</button>
+                                        <a href=":user/${this.state.user.id}/">Back to Profile</a>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <button type="submit">Update Profile</button>
                                     </td>
                                 </tr>
                             </tfoot>

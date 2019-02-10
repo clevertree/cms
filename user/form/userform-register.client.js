@@ -10,15 +10,11 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
+                message: "To register a new account, please enter your email and password",
+                status: 0,
                 response: null,
                 processing: false
             }
-            // this.state = {
-            //     username: "",
-            //     email: "",
-            //     password: "",
-            // };
-            // this.state = {id:-1, flags:[]};
         }
 
         setState(newState) {
@@ -28,11 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         connectedCallback() {
-            this.addEventListener('change', this.onChange);
-            this.addEventListener('submit', this.onSubmit);
+            this.addEventListener('change', e => this.onChange(e));
+            this.addEventListener('submit', e => this.onSubmit(e));
 
             this.render();
-            const userID = this.getAttribute('user-id');
+            const userID = this.getAttribute('userID');
             if(userID)
                 this.requestFormData(userID);
         }
@@ -50,36 +46,38 @@ document.addEventListener('DOMContentLoaded', function() {
             if(!form.username.value && form.email.value) {
                 form.username.value = form.email.value.split('@')[0];
             }
+            form.username.value = (form.username.value || '').replace(/[^\w.]/g, '');
         }
 
         onSubmit(e) {
             e.preventDefault();
-            const form = e.target; // querySelector('form.user-login-form');
-            this.setState({processing: true});
-            const request = {};
-            new FormData(form).forEach(function (value, key) {
-                request[key] = value;
-            });
+            const form = e.target;
+            const request = this.getFormData(form);
+            const method = form.getAttribute('method');
+            const action = form.getAttribute('action');
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
-                console.log(e, xhr.response);
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                response.status = xhr.status;
+                this.setState({status: xhr.status}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
                     this.onError(e, response);
                 }
-                this.setState({response, processing: false});
             };
-            xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
+            xhr.open(method, action, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            // xhr.setRequestHeader("Accept", "application/json");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
+            this.setState({processing: true});
         }
 
+        getFormData(form) {
+            const formData = {};
+            new FormData(form).forEach((value, key) => formData[key] = value);
+            return formData;
+        }
 
         render() {
             const formData = this.getFormData();
@@ -88,15 +86,15 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/:register" method="POST" class="userform userform-register themed">
-                    <fieldset>
+                    <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
                         <legend>Register a new account</legend>
                         <table>
                             <thead>
                                 <tr>
                                     <td colspan="2">
-                                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
-                                            ${this.state.response.message}
-                                        </div>` : "To register a new account, <br/>please enter your email and password"}
+                                        <div class="${this.state.status === 200 ? 'success' : (this.state.status === 0 ? '' : 'error')} status-${this.status}">
+                                            ${this.state.message}
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
@@ -110,8 +108,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </tr>
                                 <tr>
                                     <td class="label">Username</td>
-                                    <td>
-                                        <input type="username" name="username" value="${formData.username||''}" required /> @${hostname}
+                                    <td style="position: relative;">
+                                        <input type="text" name="username" value="${formData.username||''}" required /> 
+                                        <div style="position: absolute; right: 30px; top: 7px; color: grey;">@${hostname}</div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -130,8 +129,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
-                                    <td class="label"></td>
                                     <td>
+                                        <a href=":user/:login${this.state.userID ? '?userID=' + this.state.userID : ''}">Back to Login</a>
+                                    </td>
+                                    <td style="text-align: right;">
                                         <button type="submit">Register</button>
                                     </td>
                                 </tr>
@@ -140,12 +141,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     </fieldset>
                 </form>
 `;
-        }
-
-        getFormData(form) {
-            const formData = {};
-            new FormData(form).forEach((value, key) => formData[key] = value);
-            return formData;
         }
     }
     customElements.define('userform-register', HTMLUserRegisterFormElement);

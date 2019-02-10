@@ -111,10 +111,10 @@ class DatabaseManager {
         const configDB = await this.getConfigDB(database);
         let userProfile = await configDB.fetchConfigValue('user.profile');
         if (!userProfile)
-            await configDB.updateConfigValue('user.profile', JSON.stringify({
-                name: {title: "Full Name"},
-                description: {type: "text", title: "Description"}
-            }));
+            await configDB.updateConfigValue('user.profile', JSON.stringify([
+                {name: 'name', title: "Full Name"},
+                {name: 'description', type: "textarea", title: "Description"},
+            ]));
 
 
     }

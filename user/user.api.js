@@ -330,8 +330,10 @@ class UserAPI {
                         response.sessionUser = await userDB.fetchUserByID(req.session.userID);
                     }
                 }
-                // if(req.query.getAll || req.query.getProfileConfig)
-                //     response.profileConfig = this.app.config.user.profile;
+                if(req.query.getAll || req.query.getProfileConfig) {
+                    const configDB = await DatabaseManager.getConfigDB(database);
+                    response.profileConfig = JSON.parse(await configDB.fetchConfigValue('user.profile'));
+                }
                 res.json(response);
 
             } else {
@@ -592,7 +594,7 @@ class UserAPI {
                     await ThemeManager.get()
                         .render(req, `
 <script src="/user/form/userform-update-${type}.client.js"></script>
-<userform-update-${type} id="${userID}"></userform-update-${type}>`)
+<userform-update-${type} userID="${userID}"></userform-update-${type}>`)
                 );
 
             } else {
