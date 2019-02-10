@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/${this.state.user.id}/:password" method="POST" class="userform userform-update-password themed">
-                    <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
+                    <fieldset ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>
                         <legend>Change Password</legend>
                         <table>
                             <thead>

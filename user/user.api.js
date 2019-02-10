@@ -50,6 +50,7 @@ class UserAPI {
 
         routerAPI.get('/[:]user/:userID(\\w+)/[:]json',                 async (req, res, next) => await this.handleViewRequest(true, req.params.userID, req, res, next));
         routerAPI.get('/[:]user/:userID(\\w+)',                         async (req, res, next) => await this.handleViewRequest(false, req.params.userID, req, res, next));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]edit',                 async (req, res) => await this.handleUpdateRequest('edit', req.params.userID, req, res));
         routerAPI.all('/[:]user/:userID(\\w+)/[:]profile',              async (req, res) => await this.handleUpdateRequest('profile', req.params.userID, req, res));
         routerAPI.all('/[:]user/:userID(\\w+)/[:]flags',                async (req, res) => await this.handleUpdateRequest('flags', req.params.userID, req, res));
         routerAPI.all('/[:]user/:userID(\\w+)/[:]password',             async (req, res) => await this.handleUpdateRequest('password', req.params.userID, req, res));
@@ -109,14 +110,20 @@ class UserAPI {
         if(!user)
             throw new Error("User not found: " + userID);
 
-        for(var i=0; i<this.app.config.user.profile.length; i++) {
-            const profileField = this.app.config.user.profile[i];
+        const configDB = await DatabaseManager.getConfigDB(database);
+        const profileConfig = JSON.parse(await configDB.fetchConfigValue('user.profile'));
+
+        const newProfile = user.profile || {};
+        for(var i=0; i<profileConfig.length; i++) {
+            const profileField = profileConfig[i];
+            if(typeof profile[profileField.name] === "undefined")
+                continue;
             let value = profile[profileField.name];
             value = encodeHTML(value);
-            user.profile[profileField.name] = value;
+            newProfile[profileField.name] = value;
         }
 
-        return await userDB.updateUser(userID, null, null, user.profile, null);
+        return await userDB.updateUser(userID, null, null, newProfile, null);
         // console.info("SET PROFILE", user, profile);
         // return user;
     }
@@ -176,6 +183,9 @@ class UserAPI {
     }
 
     async register(req, username, email, password, password_confirm) {
+        username = UserAPI.sanitizeInput(username, 'username');
+        email = UserAPI.sanitizeInput(email, 'email');
+
         if(!username)
             throw new Error("username is required");
         if(!email)
@@ -590,19 +600,36 @@ class UserAPI {
             // const user = await this.userDB.fetchUserByID(userID);
             if(req.method === 'GET') {
                 // Render Editor Form
-                res.send(
-                    await ThemeManager.get()
-                        .render(req, `
+                if(type === 'edit') {
+                    res.send(
+                        await ThemeManager.get()
+                            .render(req, `
+<script src="/user/form/userform-update-profile.client.js"></script>
+<userform-update-profile userID="${userID}"></userform-update-profile>
+<script src="/user/form/userform-update-password.client.js"></script>
+<userform-update-password userID="${userID}"></userform-update-password>
+<script src="/user/form/userform-update-flags.client.js"></script>
+<userform-update-flags userID="${userID}"></userform-update-flags>`)
+                    );
+                } else {
+                    res.send(
+                        await ThemeManager.get()
+                            .render(req, `
 <script src="/user/form/userform-update-${type}.client.js"></script>
 <userform-update-${type} userID="${userID}"></userform-update-${type}>`)
-                );
+                    );
+                }
 
             } else {
+                let user = await userDB.fetchUserByID(userID);
+
                 if(!req.session || !req.session.userID)
                     throw new Error("Must be logged in");
 
                 const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
-                if(!sessionUser || !sessionUser.isAdmin())
+                if(!sessionUser)
+                    throw new Error("Session User Not Found: " + req.session.userID);
+                if(!sessionUser.isAdmin() && sessionUser.id !== user.id)
                     throw new Error("Not authorized");
 
 
@@ -623,13 +650,16 @@ class UserAPI {
                             req.body.password_new,
                             req.body.password_confirm);
                         break;
+                    default:
+                        throw new Error("Invalid Profile Request: " + type);
                 }
-                const user = await userDB.fetchUserByID(userID);
+                user = await userDB.fetchUserByID(userID);
 
                 return res.json({
                     // redirect: `/:user/${user.id}`,
                     message: `User updated successfully (${type}): ${user.email}`,
-                    user, affectedRows
+                    user,
+                    affectedRows
                 });
             }
         } catch (error) {
@@ -685,10 +715,23 @@ class UserAPI {
 
     }
 
+    static sanitizeInput(input, type='username') {
+        switch(type) {
+            case 'username':
+            default:
+                input = (input || '').replace(/[^\w]/g, '');
+                break;
+            case 'email':
+                input = (input || '').replace(/[^\w@.]/g, '');
+                break;
+        }
+        return input
+    }
+
     static validateEmail(email) {
-        return email.indexOf('@') !== -1;
-        // var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        // return re.test(String(email).toLowerCase());
+        // return email.indexOf('@') !== -1;
+        var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(email).toLowerCase());
     }
 }
 

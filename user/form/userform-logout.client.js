@@ -33,11 +33,15 @@ document.addEventListener('DOMContentLoaded', function() {
             this.state.userID = this.getAttribute('userID');
         }
 
+
         onSuccess(e, response) {
             console.log(e, response);
-            this.setState({processing: false});
-            setTimeout(() => window.location.href = response.redirect, 3000);
+            if(response.redirect) {
+                this.setState({processing: true});
+                setTimeout(() => window.location.href = response.redirect, 3000);
+            }
         }
+
         onError(e, response) {
             console.error(e, response);
         }
@@ -57,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                this.setState({status: xhr.status}, response);
+                this.setState({processing: false, status: xhr.status}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {

@@ -10,6 +10,10 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
+                message: "In order to update this flag, please modify this form and hit 'Update' below",
+                status: 0,
+                processing: false,
+                editable: true,
                 user: {id: -1, flags:[]}
             };
             // this.state = {id:-1, flags:[]};
@@ -22,64 +26,56 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         connectedCallback() {
-            this.addEventListener('change', this.onEvent);
-            this.addEventListener('submit', this.onEvent);
+            this.addEventListener('change', e => this.onChange(e));
+            this.addEventListener('submit', e => this.onSubmit(e));
 
             this.render();
-            const userID = this.getAttribute('id');
+            const userID = this.getAttribute('userID');
             if(userID)
                 this.requestFormData(userID);
         }
 
+
         onSuccess(e, response) {
-            // setTimeout(() => window.location.href = response.redirect, 3000);
-        }
-        onError(e, response) {}
-
-        onEvent(e) {
-            switch (e.type) {
-                case 'submit':
-                    this.submit(e);
-                    break;
-
-                case 'change':
-                    let value = e.target.value;
-                    if(e.target.getAttribute('type') === 'checkbox')
-                        value = e.target.checked;
-                    if(e.target.name && typeof this.state.user.profile[e.target.name] !== 'undefined')
-                        this.state.user.flags[e.target.name] = value;
-                    if(e.target.getAttribute('type') === 'checkbox') {
-                        if(e.target.checked) {
-                            this.state.user.flags =
-                                this.state.user.flags.concat(e.target.name)
-                                    .filter((v, i, a) => a.indexOf(v) === i);
-                        } else {
-                            this.state.user.flags =
-                                this.state.user.flags.filter((v) => v !== e.target.name);
-                        }
-                    }
-                    console.log(this.state);
-                    break;
+            console.log(e, response);
+            if(response.redirect) {
+                this.setState({processing: true});
+                setTimeout(() => window.location.href = response.redirect, 3000);
             }
+        }
+
+        onError(e, response) {
+            console.error(e, response);
+        }
+
+        onChange(e) {
+            let value = e.target.value;
+            if(e.target.getAttribute('type') === 'checkbox')
+                value = e.target.checked;
+            if(e.target.name && typeof this.state.user.profile[e.target.name] !== 'undefined')
+                this.state.user.flags[e.target.name] = value;
+            if(e.target.getAttribute('type') === 'checkbox') {
+                if(e.target.checked) {
+                    this.state.user.flags =
+                        this.state.user.flags.concat(e.target.name)
+                            .filter((v, i, a) => a.indexOf(v) === i);
+                } else {
+                    this.state.user.flags =
+                        this.state.user.flags.filter((v) => v !== e.target.name);
+                }
+            }
+            console.log(this.state);
         }
 
         requestFormData(userID) {
             const xhr = new XMLHttpRequest();
-            xhr.onload = (e) => {
-                // console.info(xhr.response);
-                if(xhr.status === 200) {
-                    if(!xhr.response || !xhr.response.user)
-                        throw new Error("Invalid Response");
-                    this.setState(xhr.response);
-                } else {
-                    const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                    this.onError(e, response);
-                }
+            xhr.onload = () => {
+                this.setState({processing: false}, xhr.response);
             };
             xhr.responseType = 'json';
-            xhr.open ("GET", `:user/${userID}/:json`, true);
-            // xhr.setRequestHeader("Accept", "application/json");
+            xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
             xhr.send ();
+            this.setState({processing: true});
         }
 
         submit(e) {
@@ -115,15 +111,15 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/${this.state.user.id}/:flags" method="POST" class="userform userform-flags themed">
-                    <fieldset ${this.state.editable !== 'admin' ? 'disabled="disabled"' : ''}>
+                    <fieldset ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>
                         <legend>Update User Flags</legend>
                         <table>
                             <thead>
                                 <tr>
                                     <td colspan="2">
-                                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
-                                            ${this.state.response.message}
-                                        </div>` : "In order to update this flag, <br/>please modify this form and hit 'Update' below"}
+                                        <div class="${this.state.status === 200 ? 'success' : (this.state.status === 0 ? '' : 'error')} status-${this.status}">
+                                            ${this.state.message}
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>

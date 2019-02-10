@@ -33,12 +33,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         onSuccess(e, response) {
-            console.log(response);
+            console.log(e, response);
             this.setState({processing: true});
             setTimeout(() => window.location.href = response.redirect, 3000);
         }
+
         onError(e, response) {
-            console.error(response);
+            console.error(e, response);
+            this.setState({processing: false});
         }
 
         onChange(e) {

@@ -35,12 +35,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         onSuccess(e, response) {
             console.log(e, response);
-            this.setState({processing: false});
-            setTimeout(() => window.location.href = response.redirect, 3000);
+            if(response.redirect) {
+                this.setState({processing: true});
+                setTimeout(() => window.location.href = response.redirect, 3000);
+            }
         }
+
         onError(e, response) {
             console.error(e, response);
         }
+
         onChange(e) {
             const form = e.target.form || e.target;
             if(!form.username.value && form.email.value) {
@@ -59,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                this.setState({status: xhr.status}, response);
+                this.setState({processing: false, status: xhr.status}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {

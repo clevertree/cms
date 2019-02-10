@@ -64,7 +64,7 @@ class DefaultTheme {
                 path: `/:user/${req.session.userID}`,
                 title: 'My Profile',
             },{
-                path: `/:user/${req.session.userID}/:profile`,
+                path: `/:user/${req.session.userID}/:edit`,
                 title: 'Edit Profile',
             },{
                 path: `/:user/:logout`,

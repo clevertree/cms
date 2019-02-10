@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 message: "In order to update this profile, please modify this form and hit 'Update Profile' below",
                 status: 0,
                 processing: false,
+                editable: true,
                 user: {id: -1, profile: {}},
             };
             // this.state = {id:-1, flags:[]};
@@ -35,35 +36,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
 
+        onSuccess(e, response) {
+            console.log(e, response);
+            if(response.redirect) {
+                this.setState({processing: true});
+                setTimeout(() => window.location.href = response.redirect, 3000);
+            }
+        }
+
+        onError(e, response) {
+            console.error(e, response);
+        }
+
+        onChange(e) {
+            if(!this.state.user.profile)
+                this.state.user.profile = {};
+            if(e.target.name) // typeof this.state.user.profile[e.target.name] !== 'undefined')
+                this.state.user.profile[e.target.name] = e.target.value;
+        }
+
         requestFormData(userID) {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
-                if(!xhr.response || !xhr.response.user)
-                    throw new Error("Invalid Response");
                 this.setState({processing: false}, xhr.response);
             };
             xhr.responseType = 'json';
             xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
-            // xhr.setRequestHeader("Accept", "application/json");
             xhr.send ();
             this.setState({processing: true});
-        }
-
-
-        onSuccess(e, response) {
-            console.log(e, response);
-            this.setState({processing: false});
-            setTimeout(() => window.location.href = response.redirect, 3000);
-        }
-        onError(e, response) {
-            console.error(e, response);
-        }
-        onChange(e) {
-            const form = e.target.form || e.target;
-            if(!form.username.value && form.email.value) {
-                form.username.value = form.email.value.split('@')[0];
-            }
-            form.username.value = (form.username.value || '').replace(/[^\w.]/g, '');
         }
 
         onSubmit(e) {
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                this.setState({status: xhr.status}, response);
+                this.setState({processing: false, status: xhr.status}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
@@ -112,26 +112,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
-            let profileFields = [];
-            if(this.state.profileConfig) {
-                profileFields = this.state.profileConfig.slice(0);
-                if(this.state.user.profile) {
-                    Object.keys(this.state.user.profile).forEach(key => {
-                        for (var i = 0; i < profileFields.length; i++) {
-                            if (profileFields[i].name === key)
-                                return;
-                        }
-                        profileFields.push({
-                            name: key
-                        })
-                    });
-                }
-            }
+            // let profileFields = [];
+            // if(this.state.profileConfig) {
+                // profileFields = this.state.profileConfig.slice(0);
+            //     if(this.state.user.profile) {
+            //         Object.keys(this.state.user.profile).forEach(key => {
+            //             for (var i = 0; i < profileFields.length; i++) {
+            //                 if (profileFields[i].name === key)
+            //                     return;
+            //             }
+            //             profileFields.push({
+            //                 name: key
+            //             })
+            //         });
+            //     }
+
             console.log("RENDER", this.state);
             this.innerHTML =
                 `
                 <form action="/:user/${this.state.user.id}/:profile" method="POST" class="userform userform-update-profile themed">
-                    <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
+                    <fieldset ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>
                         <legend>Update Profile</legend>
                         <table>
                             <thead>
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <input type="email" name="email" value="${this.state.user.email}" disabled/>
                                     </td>
                                 </tr>
-                            ${profileFields.map(profileField => `
+                            ${(this.state.profileConfig || []).map(profileField => `
                                 <tr>
                                     <td class="label">${profileField.title || profileField.name}</td>
                                     <td>
