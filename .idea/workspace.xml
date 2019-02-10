@@ -2,15 +2,23 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/article/form/articleform.css" beforeDir="false" afterPath="$PROJECT_DIR$/article/form/articleform.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/form/configform.css" beforeDir="false" afterPath="$PROJECT_DIR$/config/form/configform.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/article/article.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/article/article.api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/article/form/articleform-add.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/article/form/articleform-add.client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/article/form/articleform-browser.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/article/form/articleform-browser.client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/article/form/articleform-editor.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/article/form/articleform-editor.client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/form/configform-editor.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/form/configform-editor.client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/database.manager.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/database.manager.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/element/user-profile.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/element/user-profile.client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/form/userform-browser.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-browser.client.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/form/userform-forgotpassword.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-forgotpassword.client.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/form/userform-login.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-login.client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/form/userform-logout.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-logout.client.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/form/userform-register.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-register.client.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/form/userform-resetpassword.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-resetpassword.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/form/userform.css" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/user.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/user.database.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.database.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/form/userform-update-flags.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-update-flags.client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/form/userform-update-password.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-update-password.client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/form/userform-update-profile.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-update-profile.client.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -21,19 +29,10 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/user/form/userform.css">
+        <entry file="file://$PROJECT_DIR$/user/form/userform-logout.client.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1122">
-              <caret line="51" column="16" selection-start-line="51" selection-start-column="16" selection-end-line="51" selection-end-column="16" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/user/form/userform-forgotpassword.client.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="533">
-              <caret line="62" column="40" lean-forward="true" selection-start-line="62" selection-start-column="40" selection-end-line="62" selection-end-column="40" />
+            <state relative-caret-position="364">
+              <caret line="80" selection-start-line="80" selection-end-line="81" />
               <folding>
                 <element signature="n#style#0;n#td#1;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
               </folding>
@@ -42,101 +41,39 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/user/form/userform-resetpassword.client.js">
+        <entry file="file://$PROJECT_DIR$/config/form/configform-editor.client.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1567">
-              <caret line="135" column="9" lean-forward="true" selection-start-line="129" selection-start-column="9" selection-end-line="135" selection-end-column="9" />
-              <folding>
-                <element signature="n#style#0;n#td#1;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
-              </folding>
+            <state relative-caret-position="484">
+              <caret line="22" column="22" lean-forward="true" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/user/form/userform-browser.client.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="488">
+              <caret line="113" column="14" lean-forward="true" selection-start-line="113" selection-start-column="14" selection-end-line="113" selection-end-column="14" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/user/user.api.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="890">
-              <caret line="419" column="4" selection-start-line="419" selection-start-column="4" selection-end-line="419" selection-end-column="4" />
+            <state relative-caret-position="1134">
+              <caret line="697" column="1" lean-forward="true" selection-start-line="697" selection-start-column="1" selection-end-line="697" selection-end-column="1" />
               <folding>
-                <element signature="e#1080#1189#0" />
-                <element signature="e#1540#1574#0" />
-                <element signature="e#3838#3904#0" />
-                <element signature="e#4028#4167#0" />
                 <element signature="n#!!block;n#addSessionMessage#0;n#UserAPI#0" />
                 <element signature="n#!!block;n#popSessionMessage#0;n#UserAPI#0" />
                 <element signature="n#!!block;n#updateProfile#0;n#UserAPI#0" />
-                <element signature="e#5084#5305#0" />
-                <element signature="e#5395#5441#0" />
                 <element signature="n#!!block;n#updateFlags#0;n#UserAPI#0" />
-                <element signature="e#5737#5793#0" />
-                <element signature="e#5914#5962#0" />
-                <element signature="e#5993#6005#0" />
-                <element signature="e#6041#6353#0" />
-                <element signature="e#6145#6343#0" />
-                <element signature="e#6199#6329#0" />
-                <element signature="n#!!block;n#configureAdmin#0;n#UserAPI#0" />
-                <element signature="e#8598#8702#0" />
-                <element signature="e#8766#9248#0" />
-                <element signature="e#8946#9238#0" />
-                <element signature="e#9288#11112#0" />
-                <element signature="e#9443#9525#0" />
-                <element signature="e#9531#11102#0" />
-                <element signature="e#9577#11088#0" />
-                <element signature="e#9603#10994#0" />
-                <element signature="e#10263#10542#0" />
-                <element signature="e#10605#10734#0" />
-                <element signature="e#11005#11070#0" />
-                <element signature="e#11136#11443#0" />
-                <element signature="e#11625#11662#0" />
-                <element signature="e#12450#12524#0" />
                 <element signature="n#!!block;n#logout#0;n#UserAPI#0" />
-                <element signature="e#12864#12949#0" />
                 <element signature="n#!!block;n#handleViewRequest#0;n#UserAPI#0" />
-                <element signature="e#13222#14526#0" />
-                <element signature="e#13351#14227#0" />
-                <element signature="e#13782#14028#0" />
-                <element signature="e#13892#14010#0" />
-                <element signature="e#14045#14098#0" />
-                <element signature="e#14233#14515#0" />
-                <element signature="n#section#0;n#!!top" />
-                <element signature="e#14541#14964#0" />
-                <element signature="e#14600#14711#0" />
-                <element signature="e#14717#14954#0" />
-                <element signature="e#14976#15022#0" />
-                <element signature="e#16664#16693#0" />
                 <element signature="n#!!block;n#handleLogoutRequest#0;n#UserAPI#0" />
-                <element signature="e#17327#18011#0" />
-                <element signature="e#17366#17648#0" />
-                <element signature="e#17654#18001#0" />
-                <element signature="e#17838#17985#0" />
-                <element signature="e#18026#18163#0" />
                 <element signature="n#!!block;n#handleRegisterRequest#0;n#UserAPI#0" />
-                <element signature="e#18227#19067#0" />
-                <element signature="e#18266#18554#0" />
-                <element signature="e#18560#19057#0" />
-                <element signature="e#18840#19041#0" />
-                <element signature="e#19082#19369#0" />
-                <element signature="e#19151#19357#0" />
-                <element signature="e#22956#23093#0" />
                 <element signature="n#!!block;n#handleUpdateRequest#0;n#UserAPI#0" />
-                <element signature="e#23169#25377#0" />
-                <element signature="e#23504#23825#0" />
-                <element signature="e#23831#25367#0" />
-                <element signature="e#24358#25057#0" />
-                <element signature="e#24393#24527#0" />
-                <element signature="e#24548#24678#0" />
-                <element signature="e#24699#25039#0" />
-                <element signature="e#25156#25351#0" />
-                <element signature="e#25392#25529#0" />
-                <element signature="e#25633#26006#0" />
-                <element signature="n#section#0;n#!!top" />
-                <element signature="e#26647#26798#0" />
-                <element signature="e#26839#27224#0" />
-                <element signature="e#26939#27143#0" />
-                <element signature="e#27149#27214#0" />
                 <element signature="n#!!block;n#validateEmail#0;n#UserAPI#0" />
-                <element signature="e#27317#27483#0" />
                 <element signature="n#!!block;n#encodeHTML#0" />
               </folding>
             </state>
@@ -144,15 +81,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="mock://internal/process/next_tick.js">
-          <provider selected="true" editor-type-id="vmFileEditor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/user/user.database.js">
+        <entry file="file://$PROJECT_DIR$/article/form/articleform-browser.client.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="551">
-              <caret line="51" column="23" selection-start-line="51" selection-start-column="10" selection-end-line="51" selection-end-column="23" />
+            <state relative-caret-position="497">
+              <caret line="23" column="4" selection-start-line="23" selection-start-column="4" selection-end-line="23" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -160,8 +92,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/user/form/userform-login.client.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="572">
-              <caret line="29" column="38" lean-forward="true" selection-start-line="29" selection-start-column="38" selection-end-line="29" selection-end-column="38" />
+            <state relative-caret-position="1222">
+              <caret line="72" selection-start-line="72" selection-end-line="72" />
               <folding>
                 <element signature="n#style#0;n#div#0;n#td#1;n#tr#2;n#tbody#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#td#1;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
@@ -171,19 +103,37 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/user/form/userform-register.client.js">
+        <entry file="file://$PROJECT_DIR$/user/form/userform-update-flags.client.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="731">
-              <caret line="42" lean-forward="true" selection-start-line="42" selection-end-line="48" selection-end-column="9" />
+            <state relative-caret-position="462">
+              <caret line="22" selection-start-line="22" selection-end-line="22" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/article/form/articleform.css">
+        <entry file="file://$PROJECT_DIR$/user/form/userform-update-profile.client.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="748">
-              <caret line="34" column="17" selection-start-line="34" selection-start-column="17" selection-end-line="34" selection-end-column="17" />
+            <state relative-caret-position="462">
+              <caret line="22" selection-start-line="22" selection-end-line="22" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/user/form/userform-register.client.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="594">
+              <caret line="28" selection-start-line="28" selection-end-line="28" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/user/form/userform-forgotpassword.client.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="210">
+              <caret line="81" selection-start-line="81" selection-end-line="81" />
             </state>
           </provider>
         </entry>
@@ -192,16 +142,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>uuid</find>
-      <find>DNSManager</find>
-      <find>reset</find>
-      <find>password_new</find>
-      <find>updatePass</find>
-      <find>forgotpassword</find>
-      <find>email</find>
-      <find>req.get('host')</find>
-      <find>sendMail</find>
-      <find>/reset</find>
       <find>forgot</find>
       <find>(req.params.userID)</find>
       <find>handleResetPassword</find>
@@ -222,12 +162,23 @@
       <find>userID =</find>
       <find>Invalid Val</find>
       <find>resetPasswordRequests</find>
+      <find>configureAd</find>
+      <find>configureAdmin</find>
+      <find>site.</find>
+      <find>fetchDomainByHostname</find>
+      <find>In orde</find>
+      <find>setState</find>
+      <find>setState(newState</find>
+      <find>setState(newSt</find>
+      <find>&lt;fieldset</find>
+      <find>form//us</find>
     </findStrings>
     <replaceStrings>
       <replace>password</replace>
       <replace>reset</replace>
       <replace />
       <replace>req.params.userID</replace>
+      <replace>form/us</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -239,19 +190,28 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/service/http/http.server.js" />
         <option value="$PROJECT_DIR$/service/domain/dns.manager.js" />
-        <option value="$PROJECT_DIR$/database/database.manager.js" />
         <option value="$PROJECT_DIR$/user/mail/forgotpassword.class.js" />
         <option value="$PROJECT_DIR$/service/mail/mail.server.js" />
         <option value="$PROJECT_DIR$/user/mail/resetpassword.class.js" />
         <option value="$PROJECT_DIR$/config/form/configform.css" />
         <option value="$PROJECT_DIR$/article/form/articleform.css" />
         <option value="$PROJECT_DIR$/user/form/userform.css" />
-        <option value="$PROJECT_DIR$/user/form/userform-resetpassword.client.js" />
-        <option value="$PROJECT_DIR$/user/form/userform-register.client.js" />
         <option value="$PROJECT_DIR$/user/user.database.js" />
-        <option value="$PROJECT_DIR$/user/form/userform-forgotpassword.client.js" />
-        <option value="$PROJECT_DIR$/user/form/userform-login.client.js" />
         <option value="$PROJECT_DIR$/user/user.api.js" />
+        <option value="$PROJECT_DIR$/user/form/userform-resetpassword.client.js" />
+        <option value="$PROJECT_DIR$/article/article.api.js" />
+        <option value="$PROJECT_DIR$/config/config.database.js" />
+        <option value="$PROJECT_DIR$/database/database.manager.js" />
+        <option value="$PROJECT_DIR$/user/form/userform-update-password.client.js" />
+        <option value="$PROJECT_DIR$/user/form/userform-update-flags.client.js" />
+        <option value="$PROJECT_DIR$/user/form/userform-update-profile.client.js" />
+        <option value="$PROJECT_DIR$/user/form/userform-register.client.js" />
+        <option value="$PROJECT_DIR$/article/form/articleform-browser.client.js" />
+        <option value="$PROJECT_DIR$/config/form/configform-editor.client.js" />
+        <option value="$PROJECT_DIR$/user/form/userform-browser.client.js" />
+        <option value="$PROJECT_DIR$/user/form/userform-login.client.js" />
+        <option value="$PROJECT_DIR$/user/form/userform-logout.client.js" />
+        <option value="$PROJECT_DIR$/user/form/userform-forgotpassword.client.js" />
       </list>
     </option>
   </component>
@@ -276,35 +236,17 @@
             <path>
               <item name="cms" type="b2602c69:ProjectViewProjectNode" />
               <item name="cms" type="462c0819:PsiDirectoryNode" />
+              <item name="config" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cms" type="462c0819:PsiDirectoryNode" />
               <item name="database" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="cms" type="b2602c69:ProjectViewProjectNode" />
               <item name="cms" type="462c0819:PsiDirectoryNode" />
-              <item name="service" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
-              <item name="cms" type="462c0819:PsiDirectoryNode" />
-              <item name="service" type="462c0819:PsiDirectoryNode" />
-              <item name="domain" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
-              <item name="cms" type="462c0819:PsiDirectoryNode" />
-              <item name="service" type="462c0819:PsiDirectoryNode" />
-              <item name="http" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
-              <item name="cms" type="462c0819:PsiDirectoryNode" />
               <item name="user" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
-              <item name="cms" type="462c0819:PsiDirectoryNode" />
-              <item name="user" type="462c0819:PsiDirectoryNode" />
-              <item name="form" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="cms" type="b2602c69:ProjectViewProjectNode" />
@@ -364,12 +306,12 @@
       <workItem from="1549583372694" duration="1055000" />
       <workItem from="1549593546226" duration="298000" />
       <workItem from="1549593946713" duration="2002000" />
-      <workItem from="1549650448910" duration="15662000" />
+      <workItem from="1549650448910" duration="21726000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="20052000" />
+    <option name="totallyTimeSpent" value="26116000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="27" width="3773" height="2133" extended-state="6" />
@@ -380,7 +322,7 @@
       <window_info id="npm" order="2" side_tool="true" />
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32979798" />
+      <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" weight="0.32979798" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Cvs" order="3" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="4" weight="0.4" />
@@ -394,7 +336,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Database" order="3" />
-      <window_info active="true" anchor="right" id="Debug" order="4" visible="true" weight="0.3294782" />
+      <window_info anchor="right" id="Debug" order="4" visible="true" weight="0.3294782" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -405,7 +347,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/database/database.manager.js</url>
-          <line>208</line>
+          <line>218</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -422,12 +364,6 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/user/user.api.js</url>
-          <line>286</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="38" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/user/user.api.js</url>
           <line>502</line>
           <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="40" />
@@ -437,6 +373,12 @@
           <line>543</line>
           <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="41" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/database/database.manager.js</url>
+          <line>154</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="45" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -477,20 +419,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/service/domain/domain.database.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1034">
-          <caret line="47" column="5" lean-forward="true" selection-start-line="47" selection-start-column="5" selection-end-line="47" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/database/database.manager.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="643">
-          <caret line="136" column="40" selection-start-line="136" selection-start-column="40" selection-end-line="136" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="308">
@@ -526,20 +454,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/form/userform-update-password.client.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="709">
-          <caret line="125" column="36" lean-forward="true" selection-start-line="125" selection-start-column="36" selection-end-line="155" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/form/userform-update-flags.client.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="26" column="26" lean-forward="true" selection-start-line="26" selection-start-column="26" selection-end-line="29" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/config/form/configform.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="968">
@@ -568,44 +482,117 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/form/userform-register.client.js">
+    <entry file="file://$PROJECT_DIR$/user/form/userform-resetpassword.client.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="731">
-          <caret line="42" lean-forward="true" selection-start-line="42" selection-end-line="48" selection-end-column="9" />
+        <state relative-caret-position="1078">
+          <caret line="49" column="11" selection-start-line="49" selection-start-column="11" selection-end-line="49" selection-end-column="11" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/form/userform-resetpassword.client.js">
+    <entry file="file://$PROJECT_DIR$/article/article.api.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1567">
-          <caret line="135" column="9" lean-forward="true" selection-start-line="129" selection-start-column="9" selection-end-line="135" selection-end-column="9" />
-          <folding>
-            <element signature="n#style#0;n#td#1;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
-          </folding>
+        <state relative-caret-position="639">
+          <caret line="72" column="26" selection-start-line="72" selection-start-column="26" selection-end-line="72" selection-end-column="26" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/user/user.database.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/config.database.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="551">
-          <caret line="51" column="23" selection-start-line="51" selection-start-column="10" selection-end-line="51" selection-end-column="23" />
+        <state relative-caret-position="639">
+          <caret line="46" column="10" selection-start-line="46" selection-start-column="10" selection-end-line="46" selection-end-column="10" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/form/userform-forgotpassword.client.js">
+    <entry file="file://$PROJECT_DIR$/service/domain/domain.database.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="533">
-          <caret line="62" column="40" lean-forward="true" selection-start-line="62" selection-start-column="40" selection-end-line="62" selection-end-column="40" />
+        <state relative-caret-position="792">
+          <caret line="36" column="31" selection-start-line="36" selection-start-column="10" selection-end-line="36" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/database/database.manager.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1717">
+          <caret line="155" column="17" selection-start-line="155" selection-start-column="17" selection-end-line="155" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/form/userform-update-password.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="440">
+          <caret line="20" column="25" selection-start-line="20" selection-start-column="8" selection-end-line="20" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/form/userform-update-flags.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="462">
+          <caret line="22" selection-start-line="22" selection-end-line="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/form/userform-update-profile.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="462">
+          <caret line="22" selection-start-line="22" selection-end-line="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/form/userform-register.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="594">
+          <caret line="28" selection-start-line="28" selection-end-line="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/article/form/articleform-browser.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="497">
+          <caret line="23" column="4" selection-start-line="23" selection-start-column="4" selection-end-line="23" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/form/configform-editor.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="484">
+          <caret line="22" column="22" lean-forward="true" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/form/userform-browser.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="488">
+          <caret line="113" column="14" lean-forward="true" selection-start-line="113" selection-start-column="14" selection-end-line="113" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/user.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1134">
+          <caret line="697" column="1" lean-forward="true" selection-start-line="697" selection-start-column="1" selection-end-line="697" selection-end-column="1" />
           <folding>
-            <element signature="n#style#0;n#td#1;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#!!block;n#addSessionMessage#0;n#UserAPI#0" />
+            <element signature="n#!!block;n#popSessionMessage#0;n#UserAPI#0" />
+            <element signature="n#!!block;n#updateProfile#0;n#UserAPI#0" />
+            <element signature="n#!!block;n#updateFlags#0;n#UserAPI#0" />
+            <element signature="n#!!block;n#logout#0;n#UserAPI#0" />
+            <element signature="n#!!block;n#handleViewRequest#0;n#UserAPI#0" />
+            <element signature="n#!!block;n#handleLogoutRequest#0;n#UserAPI#0" />
+            <element signature="n#!!block;n#handleRegisterRequest#0;n#UserAPI#0" />
+            <element signature="n#!!block;n#handleUpdateRequest#0;n#UserAPI#0" />
+            <element signature="n#!!block;n#validateEmail#0;n#UserAPI#0" />
+            <element signature="n#!!block;n#encodeHTML#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/user/form/userform-login.client.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="572">
-          <caret line="29" column="38" lean-forward="true" selection-start-line="29" selection-start-column="38" selection-end-line="29" selection-end-column="38" />
+        <state relative-caret-position="1222">
+          <caret line="72" selection-start-line="72" selection-end-line="72" />
           <folding>
             <element signature="n#style#0;n#div#0;n#td#1;n#tr#2;n#tbody#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#td#1;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
@@ -613,91 +600,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/user.api.js">
+    <entry file="file://$PROJECT_DIR$/user/form/userform-logout.client.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="890">
-          <caret line="419" column="4" selection-start-line="419" selection-start-column="4" selection-end-line="419" selection-end-column="4" />
+        <state relative-caret-position="364">
+          <caret line="80" selection-start-line="80" selection-end-line="81" />
           <folding>
-            <element signature="e#1080#1189#0" />
-            <element signature="e#1540#1574#0" />
-            <element signature="e#3838#3904#0" />
-            <element signature="e#4028#4167#0" />
-            <element signature="n#!!block;n#addSessionMessage#0;n#UserAPI#0" />
-            <element signature="n#!!block;n#popSessionMessage#0;n#UserAPI#0" />
-            <element signature="n#!!block;n#updateProfile#0;n#UserAPI#0" />
-            <element signature="e#5084#5305#0" />
-            <element signature="e#5395#5441#0" />
-            <element signature="n#!!block;n#updateFlags#0;n#UserAPI#0" />
-            <element signature="e#5737#5793#0" />
-            <element signature="e#5914#5962#0" />
-            <element signature="e#5993#6005#0" />
-            <element signature="e#6041#6353#0" />
-            <element signature="e#6145#6343#0" />
-            <element signature="e#6199#6329#0" />
-            <element signature="n#!!block;n#configureAdmin#0;n#UserAPI#0" />
-            <element signature="e#8598#8702#0" />
-            <element signature="e#8766#9248#0" />
-            <element signature="e#8946#9238#0" />
-            <element signature="e#9288#11112#0" />
-            <element signature="e#9443#9525#0" />
-            <element signature="e#9531#11102#0" />
-            <element signature="e#9577#11088#0" />
-            <element signature="e#9603#10994#0" />
-            <element signature="e#10263#10542#0" />
-            <element signature="e#10605#10734#0" />
-            <element signature="e#11005#11070#0" />
-            <element signature="e#11136#11443#0" />
-            <element signature="e#11625#11662#0" />
-            <element signature="e#12450#12524#0" />
-            <element signature="n#!!block;n#logout#0;n#UserAPI#0" />
-            <element signature="e#12864#12949#0" />
-            <element signature="n#!!block;n#handleViewRequest#0;n#UserAPI#0" />
-            <element signature="e#13222#14526#0" />
-            <element signature="e#13351#14227#0" />
-            <element signature="e#13782#14028#0" />
-            <element signature="e#13892#14010#0" />
-            <element signature="e#14045#14098#0" />
-            <element signature="e#14233#14515#0" />
-            <element signature="n#section#0;n#!!top" />
-            <element signature="e#14541#14964#0" />
-            <element signature="e#14600#14711#0" />
-            <element signature="e#14717#14954#0" />
-            <element signature="e#14976#15022#0" />
-            <element signature="e#16664#16693#0" />
-            <element signature="n#!!block;n#handleLogoutRequest#0;n#UserAPI#0" />
-            <element signature="e#17327#18011#0" />
-            <element signature="e#17366#17648#0" />
-            <element signature="e#17654#18001#0" />
-            <element signature="e#17838#17985#0" />
-            <element signature="e#18026#18163#0" />
-            <element signature="n#!!block;n#handleRegisterRequest#0;n#UserAPI#0" />
-            <element signature="e#18227#19067#0" />
-            <element signature="e#18266#18554#0" />
-            <element signature="e#18560#19057#0" />
-            <element signature="e#18840#19041#0" />
-            <element signature="e#19082#19369#0" />
-            <element signature="e#19151#19357#0" />
-            <element signature="e#22956#23093#0" />
-            <element signature="n#!!block;n#handleUpdateRequest#0;n#UserAPI#0" />
-            <element signature="e#23169#25377#0" />
-            <element signature="e#23504#23825#0" />
-            <element signature="e#23831#25367#0" />
-            <element signature="e#24358#25057#0" />
-            <element signature="e#24393#24527#0" />
-            <element signature="e#24548#24678#0" />
-            <element signature="e#24699#25039#0" />
-            <element signature="e#25156#25351#0" />
-            <element signature="e#25392#25529#0" />
-            <element signature="e#25633#26006#0" />
-            <element signature="n#section#0;n#!!top" />
-            <element signature="e#26647#26798#0" />
-            <element signature="e#26839#27224#0" />
-            <element signature="e#26939#27143#0" />
-            <element signature="e#27149#27214#0" />
-            <element signature="n#!!block;n#validateEmail#0;n#UserAPI#0" />
-            <element signature="e#27317#27483#0" />
-            <element signature="n#!!block;n#encodeHTML#0" />
+            <element signature="n#style#0;n#td#1;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/form/userform-forgotpassword.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="81" selection-start-line="81" selection-end-line="81" />
         </state>
       </provider>
     </entry>

@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("user/form//userform.css");
+    })("user/form/userform.css");
 });
 
 {
@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
+                message: "In order to recover your password, please enter your email and hit submit below",
+                status: 0,
                 userID: "",
                 password: "",
             };
@@ -17,75 +19,78 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         setState(newState) {
-            Object.assign(this.state, newState);
+            for(let i=0; i<arguments.length; i++)
+                Object.assign(this.state, arguments[i]);
             this.render();
         }
 
         connectedCallback() {
-            this.addEventListener('change', this.onEvent);
-            this.addEventListener('submit', this.onEvent);
+            this.addEventListener('change', e => this.onChange(e));
+            this.addEventListener('submit', e => this.onSubmit(e));
 
             this.state.userID = this.getAttribute('userID');
             this.render();
         }
 
         onSuccess(e, response) {
+            console.log(response);
+            this.setState({processing: true});
             setTimeout(() => window.location.href = response.redirect, 3000);
         }
-        onError(e, response) {}
-
-        onEvent(e) {
-            switch (e.type) {
-                case 'submit':
-                    this.submit(e);
-                    break;
-
-                case 'change':
-                    if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
-                        this.state[e.target.name] = e.target.value;
-                    break;
-            }
+        onError(e, response) {
+            console.error(response);
         }
 
-        submit(e) {
+        onChange(e) {
+            if(typeof this.state[e.target.name] !== 'undefined')
+                this.state[e.target.name] = e.target.value;
+        }
+
+        onSubmit(e) {
             e.preventDefault();
             const form = e.target; // querySelector('form.user-login-form');
-            this.setState({processing: true});
             const request = this.getFormData(form);
             const method = form.getAttribute('method');
             const action = form.getAttribute('action');
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
-                console.log(e, xhr.response);
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                response.status = xhr.status;
+                this.setState({status: xhr.status}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
                     this.onError(e, response);
                 }
-                this.setState({response, processing: false});
             };
             xhr.open(method, action, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
+            this.setState({processing: true});
+        }
+
+        getFormData(form) {
+            const formData = {};
+            new FormData(form).forEach((value, key) => formData[key] = value);
+            return formData;
         }
 
         render() {
+            const messageClass = this.state.status === 200 ? 'success' : (this.state.status === 0 ? '' : 'error');
+            // console.log("STATE", this.state);
             this.innerHTML =
                 `
                 <form action="/:user/:forgotpassword" method="POST" class="userform userform-forgotpassword themed">
-                    <fieldset>
+                    <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
                         <legend>Forgot Password</legend>
                         <table>
                             <thead>
                                 <tr>
                                     <td colspan="2">
-                                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
-                                            ${this.state.response.message}
-                                        </div>` : "In order to recover your password, <br/>please enter your email and hit submit below"}
+                                        <div class="${messageClass} status-${this.status}">
+                                            ${this.state.message}
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
@@ -113,12 +118,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     </fieldset>
                 </form>
 `;
-        }
-
-        getFormData(form) {
-            const formData = {};
-            new FormData(form).forEach((value, key) => formData[key] = value);
-            return formData;
         }
     }
     customElements.define('userform-forgotpassword', HTMLUserForgotPasswordFormElement);

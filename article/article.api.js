@@ -67,10 +67,10 @@ class ArticleAPI {
             while (req.session.messages && req.session.messages.length > 0) {
                 const sessionMessage = req.session.messages.pop();
                 article.content = `
-                        <section class="message">
-                            ${sessionMessage}
-                        </section>
-                        ${content}`;
+                    <section class="message">
+                        ${sessionMessage}
+                    </section>
+                    ${article.content}`;
             }
             // if (req.session.userID) {
             //     article.content += `

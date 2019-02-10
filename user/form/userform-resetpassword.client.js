@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("user/form//userform.css");
+    })("user/form/userform.css");
 });
 
 {
@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         connectedCallback() {
-            // this.addEventListener('change', this.onEvent);
-            this.addEventListener('submit', this.onEvent);
+            this.addEventListener('change', e => this.onChange(e));
+            this.addEventListener('submit', e => this.onSubmit(e));
 
             this.state.userID = this.getAttribute('userID');
             if(!this.state.userID)
@@ -47,20 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error(e, response);
         }
 
-        onEvent(e) {
-            switch (e.type) {
-                case 'submit':
-                    this.submit(e);
-                    break;
-
-                // case 'change':
-                //     if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
-                //         this.state[e.target.name] = e.target.value;
-                //     break;
-            }
-        }
-
-        submit(e) {
+        onSubmit(e) {
             e.preventDefault();
             const form = e.target; // querySelector('form.user-login-form');
             this.setState({processing: true});

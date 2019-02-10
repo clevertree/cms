@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("user/form//userform.css");
+    })("user/form/userform.css");
 });
 
 {
@@ -16,7 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         setState(newState) {
-            Object.assign(this.state, newState);
+            for(let i=0; i<arguments.length; i++)
+                Object.assign(this.state, arguments[i]);
             this.render();
         }
 

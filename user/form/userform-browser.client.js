@@ -19,8 +19,8 @@ class HTMLUserFormBrowserElement extends HTMLElement {
     }
 
     setState(newState) {
-        Object.assign(this.state, newState);
-        // this.render();
+        for(let i=0; i<arguments.length; i++)
+            Object.assign(this.state, arguments[i]);
         this.renderResults();
     }
 
@@ -118,7 +118,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
             `<form action="/:user/:list" method="POST" class="userform userform-browser themed">
-            <fieldset>
+             <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
                 <table>
                     <thead>
                         <tr>

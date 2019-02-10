@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("user/form//userform.css");
+    })("user/form/userform.css");
 });
 
 {
@@ -10,12 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
+                message: "In order to start a new session please enter your username or email and password and hit 'Log in' below",
+                status: 0,
                 processing: false,
                 userID: "",
                 password: "",
-                session_save: "",
-                message: "In order to start a new session please enter your username or email and password and hit 'Log in' below",
-                status: 0
+                session_save: ""
             };
         }
 
@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         connectedCallback() {
-            this.addEventListener('change', this.onChange);
-            this.addEventListener('submit', this.onSubmit);
+            this.addEventListener('change', e => this.onChange(e));
+            this.addEventListener('submit', e => this.onSubmit(e));
 
             this.state.userID = this.getAttribute('userID');
             this.render();
@@ -35,7 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
         onSuccess(e, response) {
-            console.log(e, response);
+            this.setState({processing: true});
+            // console.log(e, response);
             setTimeout(() => window.location.href = response.redirect, 3000);
         }
         onError(e, response) {
@@ -50,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
         onSubmit(e) {
             e.preventDefault();
             const form = e.target;
-            this.setState({processing: true});
             const request = this.getFormData(form);
             const method = form.getAttribute('method');
             const action = form.getAttribute('action');
@@ -69,11 +69,18 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
+            this.setState({processing: true});
+        }
+
+        getFormData(form) {
+            const formData = {};
+            new FormData(form).forEach((value, key) => formData[key] = value);
+            return formData;
         }
 
         render() {
             const messageClass = this.state.status === 200 ? 'success' : (this.state.status === 0 ? '' : 'error');
-            console.log("STATE", this.state);
+            // console.log("STATE", this.state);
             this.innerHTML =
                 `
                 <form action="/:user/:login" method="POST" class="userform userform-login themed">
@@ -121,18 +128,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <td style="text-align: right;">
                                         <button type="submit">Log In</button>
                                     </td>
-                                 </tr>
+                                </tr>
                             </tfoot>
                         </table>
                     </fieldset>
                 </form>
 `;
-        }
-
-        getFormData(form) {
-            const formData = {};
-            new FormData(form).forEach((value, key) => formData[key] = value);
-            return formData;
         }
     }
     customElements.define('userform-login', HTMLUserLoginFormElement);

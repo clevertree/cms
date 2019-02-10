@@ -19,8 +19,8 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
     }
 
     setState(newState) {
-        Object.assign(this.state, newState);
-        // this.render();
+        for(let i=0; i<arguments.length; i++)
+            Object.assign(this.state, arguments[i]);
         this.renderResults();
     }
 

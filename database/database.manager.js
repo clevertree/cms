@@ -107,6 +107,16 @@ class DatabaseManager {
         // Set up admin user
         await require('../user/user.api').UserAPI.configureAdmin(database, hostname, interactive);
 
+        // Set up default config
+        const configDB = await this.getConfigDB(database);
+        let userProfile = await configDB.fetchConfigValue('user.profile');
+        if (!userProfile)
+            await configDB.updateConfigValue('user.profile', JSON.stringify({
+                name: {title: "Full Name"},
+                description: {type: "text", title: "Description"}
+            }));
+
+
     }
 
     async get(reconnect=false) {
@@ -141,8 +151,8 @@ class DatabaseManager {
                 database = domain.database;
             } else {
                 database = hostname.replace('.', '_') + '_cms';
-                await this.configureDatabase(database, hostname, false);
             }
+            await this.configureDatabase(database, hostname, false);
             this.cacheHostname[hostname] = database;
             return database;
         } else {

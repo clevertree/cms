@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("user/form//userform.css");
+    })("user/form/userform.css");
 });
 
 {
@@ -10,99 +10,104 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
+                message: "In order to end your session, please hit 'Log out' below",
+                status: 0,
                 email: "",
-                password: "",
+                password: ""
             };
             // this.state = {id:-1, flags:[]};
         }
 
         setState(newState) {
-            Object.assign(this.state, newState);
+            for(let i=0; i<arguments.length; i++)
+               Object.assign(this.state, arguments[i]);
             this.render();
         }
 
+
         connectedCallback() {
-            this.addEventListener('change', this.onEvent);
-            this.addEventListener('submit', this.onEvent);
+            this.addEventListener('change', e => this.onChange(e));
+            this.addEventListener('submit', e => this.onSubmit(e));
 
             this.render();
-            const userID = this.getAttribute('user-id');
-            if(userID)
-                this.requestFormData(userID);
+            this.state.userID = this.getAttribute('userID');
         }
 
         onSuccess(e, response) {
+            console.log(e, response);
+            this.setState({processing: false});
             setTimeout(() => window.location.href = response.redirect, 3000);
         }
-        onError(e, response) {}
-
-        onEvent(e) {
-            switch (event.type) {
-                case 'submit':
-                    this.submit(e);
-                    break;
-
-                case 'change':
-                    break;
-            }
+        onError(e, response) {
+            console.error(e, response);
         }
 
-        submit(e) {
+        onChange(e) {
+            if(typeof this.state[e.target.name] !== 'undefined')
+                this.state[e.target.name] = e.target.value;
+        }
+
+        onSubmit(e) {
             e.preventDefault();
-            const form = e.target; // querySelector('form.user-login-form');
-            this.setState({processing: true});
-            const request = {};
-            new FormData(form).forEach(function (value, key) {
-                request[key] = value;
-            });
+            const form = e.target;
+            const request = this.getFormData(form);
+            const method = form.getAttribute('method');
+            const action = form.getAttribute('action');
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
-                console.log(e, xhr.response);
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                response.status = xhr.status;
+                this.setState({status: xhr.status}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
                     this.onError(e, response);
                 }
-                this.setState({response, processing: false});
             };
-            xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
+            xhr.open(method, action, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            // xhr.setRequestHeader("Accept", "application/json");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
+            this.setState({processing: true});
+        }
+
+        getFormData(form) {
+            const formData = {};
+            new FormData(form).forEach((value, key) => formData[key] = value);
+            return formData;
         }
 
         render() {
+            const messageClass = this.state.status === 200 ? 'success' : (this.state.status === 0 ? '' : 'error');
+            // console.log("STATE", this.state);
             this.innerHTML =
                 `
-        <form action="/:user/:logout" method="POST" class="userform userform-logout themed">
-            <fieldset>
-                <legend>Log Out</legend>
-                    <table>
-                        <thead>
-                            <tr>
-                                <td colspan="2">
-                                    ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
-                                        ${this.state.response.message}
-                                    </div>` : "In order to end your session, <br/>please hit 'Log out' below"}
-                                </td>
-                            </tr>
-                        </thead>
-                        <tfoot>
-                            <tr><td colspan="2"><hr/></td></tr>
-                            <tr>
-                                <td class="label"></td>
-                                <td>
-                                    <button type="submit">Log out</button>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-            </fieldset>
-        </form>
+                <form action="/:user/:logout" method="POST" class="userform userform-logout themed">
+                    <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
+                        <legend>Log Out</legend>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="${messageClass} status-${this.status}">
+                                                ${this.state.message}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr><td colspan="2"><hr/></td></tr>
+                                    <tr>
+                                        <td>
+                                        </td>
+                                        <td style="text-align: right;">
+                                            <button type="submit">Log Out</button>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                    </fieldset>
+                </form>
 `;
         }
     }

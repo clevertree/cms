@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("user/form//userform.css");
+    })("user/form/userform.css");
 });
 
 {
@@ -19,13 +19,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         setState(newState) {
-            Object.assign(this.state, newState);
+            for(let i=0; i<arguments.length; i++)
+                Object.assign(this.state, arguments[i]);
             this.render();
         }
 
         connectedCallback() {
-            this.addEventListener('change', this.onEvent);
-            this.addEventListener('submit', this.onEvent);
+            this.addEventListener('change', this.onChange);
+            this.addEventListener('submit', this.onSubmit);
 
             this.render();
             const userID = this.getAttribute('id');
@@ -33,31 +34,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.requestFormData(userID);
         }
 
+
         onSuccess(e, response) {
-            // setTimeout(() => window.location.href = response.redirect, 3000);
-            this.setState({
-                password_old: null,
-                password_new: null,
-                password_confirm: null,
-            })
+            console.log(e, response);
+            this.setState({processing: false});
+            setTimeout(() => window.location.href = response.redirect, 3000);
         }
-        onError(e, response) {}
+        onError(e, response) {
+            console.error(e, response);
+        }
 
-        onEvent(e) {
-            switch (e.type) {
-                case 'submit':
-                    this.submit(e);
-                    break;
-
-                case 'change':
-                    let value = e.target.value;
-                    if(e.target.getAttribute('type') === 'checkbox')
-                        value = e.target.checked;
-                    if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
-                        this.state[e.target.name] = value;
-                    // console.log(this.state);
-                    break;
-            }
+        onChange(e) {
+            let value = e.target.value;
+            if(e.target.getAttribute('type') === 'checkbox')
+                value = e.target.checked;
+            if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
+                this.state[e.target.name] = value;
+            // console.log(this.state);
         }
 
         requestFormData(userID) {
@@ -79,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.send ();
         }
 
-        submit(e) {
+        onSubmit(e) {
             e.preventDefault();
             const form = e.target; // querySelector('form.user-login-form');
             this.setState({processing: true});

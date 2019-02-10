@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("user/form//userform.css");
+    })("user/form/userform.css");
 });
 
 {
@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         setState(newState) {
-            Object.assign(this.state, newState);
+            for(let i=0; i<arguments.length; i++)
+                Object.assign(this.state, arguments[i]);
             this.render();
         }
 
@@ -37,10 +38,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         onSuccess(e, response) {
+            console.log(e, response);
+            this.setState({processing: false});
             setTimeout(() => window.location.href = response.redirect, 3000);
         }
-        onError(e, response) {}
-
+        onError(e, response) {
+            console.error(e, response);
+        }
         onChange(e) {
             const form = e.target.form || e.target;
             if(!form.username.value && form.email.value) {
