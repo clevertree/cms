@@ -2,7 +2,6 @@
 const mysql = require('mysql');
 
 const { LocalConfig } = require('../config/local.config');
-const { TaskManager } = require('../service/task/task.manager');
 // const { FileManager } = require('../service/file/file.manager');
 // const { UserAPI } = require('../user/user.api');
 
@@ -118,7 +117,8 @@ class DatabaseManager {
             ]));
 
 
-        // Init Tasks
+        // Init Task Manager
+        const { TaskManager } = require('../service/task/task.manager');
         await TaskManager.configure(database);
 
     }

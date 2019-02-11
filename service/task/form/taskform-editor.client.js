@@ -2,15 +2,15 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("config/form/taskform.css");
+    })("service/task/form/taskform.css");
 });
 
 
-class HTMLConfigFormEditorElement extends HTMLElement {
+class HTMLTaskFormEditorElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
-            configList: [],
+            taskList: [],
             status: null,
             message: null,
         };
@@ -26,10 +26,9 @@ class HTMLConfigFormEditorElement extends HTMLElement {
     connectedCallback() {
         this.addEventListener('change', e => this.onChange(e));
         this.addEventListener('submit', e => this.onSubmit(e));
-        this.addEventListener('keyup', e => this.onKeyUp(e));
 
-        this.state.userID = this.getAttribute('userID');
         this.render();
+        this.requestFormData();
     }
 
 
@@ -46,93 +45,58 @@ class HTMLConfigFormEditorElement extends HTMLElement {
     }
 
     onChange(e) {
-        this.checkSubmittable(e);
-    }
-
-    onKeyUp(e) {
-        // this.requestFormData(e);
-        if(e.target.name === 'search')
-            this.renderResults();
-        this.checkSubmittable(e);
-    }
-
-    checkSubmittable(e) {
-        const form = this.querySelector('form');
-
-        let disabled = true;
-        const configChanges = {};
-        for(let i=0; i<this.state.configList.length; i++) {
-            const configItem = this.state.configList[i];
-            const formElm = form && form.elements[configItem.name] ? form.elements[configItem.name] : null;
-            if(formElm && (configItem.value||'') !== formElm.value) {
-                // console.log(configItem.name, configItem.value, formData[configItem.name]);
-                disabled = false;
-                configChanges[configItem.name] = formElm.value;
-            }
-        }
-        const btnSubmit = this.querySelector('button[type=submit]');
-        if(disabled)    btnSubmit.setAttribute('disabled', 'disabled');
-        else            btnSubmit.removeAttribute('disabled');
-        return configChanges;
     }
 
 
     requestFormData() {
         const xhr = new XMLHttpRequest();
         xhr.onload = () => {
-            this.setState(Object.assign({
-                processing: false,
-                status: xhr.status,
-            }, xhr.response));
+            this.setState({processing: false}, xhr.response);
         };
         xhr.responseType = 'json';
-        xhr.open ("GET", `:config/:json?getAll=true`, true);
+        xhr.open ("GET", `:task/:json?getAll=true`, true);
         // xhr.setRequestHeader("Accept", "application/json");
         xhr.send ();
         this.setState({processing: true});
     }
 
-    submit(e) {
-        if(e)
-            e.preventDefault();
-        const form = this.querySelector('form');
-        const configChanges = this.checkSubmittable();
+    onSubmit(e) {
+        e.preventDefault();
+        const form = e.target;
+        const request = this.getFormData(form);
+        const method = form.getAttribute('method');
+        const action = form.getAttribute('action');
 
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
-            const response = Object.assign({
-                processing: false,
-                status: xhr.status,
-            }, xhr.response);
-            this.setState(response);
-
+            const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+            this.setState({processing: false, status: xhr.status}, response);
             if(xhr.status === 200) {
                 this.onSuccess(e, response);
             } else {
                 this.onError(e, response);
             }
         };
-        xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
+        xhr.open(method, action, true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        // xhr.setRequestHeader("Accept", "application/json");
         xhr.responseType = 'json';
-        xhr.send(JSON.stringify(configChanges));
+        xhr.send(JSON.stringify(request));
         this.setState({processing: true});
     }
 
     render() {
         const form = this.querySelector('form');
-//         console.log("RENDER", this.state);
+        console.log("STATE", this.state);
         let searchField = this.querySelector('input[name=search]');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
-        `<form action="/:config/:edit" method="POST" class="configform configform-editor themed">
+        `<form action="/:task/:edit" method="POST" class="taskform taskform-editor themed">
             <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
                 <table>
                     <thead>
                         <tr>
                             <td colspan="4">
-                                <input type="text" name="search" placeholder="Search Configs" value="${form ? form.search.value||'' : ''}"/>
+                                <input type="text" name="search" placeholder="Search Tasks" value="${form ? form.search.value||'' : ''}"/>
                             </td>
                         </tr>
                         <tr><td colspan="4"><hr/></td></tr>
@@ -150,12 +114,12 @@ class HTMLConfigFormEditorElement extends HTMLElement {
                         <tr><td colspan="2"><hr/></td></tr>
                         <tr>
                             <td colspan="2" style="text-align: right;">
-                                <button type="submit" disabled>Update Config</button>
+                                <button type="submit" disabled>Update Task</button>
                             </td>
                         </tr>
                         <tr>
                             <td colspan="4" class="status">
-                                <div class="message">Config Editor</div> 
+                                <div class="message">Task Editor</div> 
                             </td>
                         </tr>
                     </tfoot>
@@ -167,7 +131,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         if(selectionStart)
             searchField.selectionStart = selectionStart;
         this.renderResults();
-        this.checkSubmittable();
+        // this.checkSubmittable();
     }
 
     renderResults() {
@@ -176,35 +140,34 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         const resultsElement = this.querySelector('tbody.results');
         let classOdd = '';
         const search = form ? form.search.value : null;
-        resultsElement.innerHTML = this.state.configList
-            .filter(config => !search || config.name.indexOf(search) !== -1)
-            .map(config => `
+        resultsElement.innerHTML = this.state.taskList
+            .filter(task => !search || task.name.indexOf(search) !== -1)
+            .map(task => `
             <tr class="results ${classOdd=classOdd===''?'odd':''}">
-                <td>${config.name}</td>
-                <td>${this.renderConfig(config, form && form.elements[config.name] ? form.elements[config.name].value : null)}</td>
+                <td>${task.name}</td>
+                <td>${this.renderTask(task, form && form.elements[task.name] ? form.elements[task.name].value : null)}</td>
             </tr>
             `).join('');
 
         const statusElement = this.querySelector('td.status');
-        statusElement.innerHTML = this.state.message
-            ? `<div class="${this.state.status === 200 ? 'message' : 'error'}">${this.state.message}</div>`
-            : `<div class="message">Config Editor</div>`;
+        statusElement.innerHTML =
+            `<div class="${this.state.status === 200 ? 'success' : (!this.state.status? 'message' : 'error')} status-${this.state.status}">${this.state.message}</div>`;
     }
 
-    renderConfig(config, value=null) {
+    renderTask(task, value=null) {
         if(value === null)
-            value = config.value;
-        switch(config.type) {
+            value = task.value;
+        switch(task.type) {
             default:
-                return `<input type='text' name='${config.name}' value='${value||''}' />`;
+                return `<input type='text' name='${task.name}' value='${value||''}' />`;
             case 'text':
             case 'email':
             case 'checkbox':
             case 'password':
-                return `<input type='${config.type}' name='${config.name}' value='${value||''}' />`;
+                return `<input type='${task.type}' name='${task.name}' value='${value||''}' />`;
             case 'textarea':
-                return `<textarea name='${config.name}'>${value||''}</textarea>`;
+                return `<textarea name='${task.name}'>${value||''}</textarea>`;
         }
     }
 }
-customElements.define('configform-editor', HTMLConfigFormEditorElement);
+customElements.define('taskform-editor', HTMLTaskFormEditorElement);

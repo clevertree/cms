@@ -2,7 +2,7 @@
 const path = require('path');
 const ejs = require('ejs');
 // const { ArticleDatabase } = require('../../article/article.database');
-// const { UserDatabase } = require('../../user/user.database');
+const { UserAPI } = require('../../user/user.api');
 const { DatabaseManager } = require('../../database/database.manager');
 
 const TEMPLATE_DIR = path.resolve(__dirname);
@@ -28,6 +28,9 @@ class DefaultTheme {
         const database = await DatabaseManager.selectDatabaseByRequest(req);
         const articleDB = await DatabaseManager.getArticleDB(database);
         const configDB = await DatabaseManager.getConfigDB(database);
+
+
+        await UserAPI.appendSessionHTML(req, article);
 
         const renderData = {article};
 

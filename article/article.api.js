@@ -1,10 +1,9 @@
 const express = require('express');
 
-const { TaskManager } = require('../service/task/task.manager');
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeManager } = require('../theme/theme.manager');
-const { ArticleDatabase } = require("./article.database");
-const { UserDatabase } = require("../user/user.database");
+// const { ArticleDatabase } = require("./article.database");
+// const { UserDatabase } = require("../user/user.database");
 const { UserAPI } = require('../user/user.api');
 
 class ArticleAPI {
@@ -63,43 +62,6 @@ class ArticleAPI {
         return null;
     }
 
-    async appendSessionHTML(req, article) {
-        if(req.session) {
-            while (req.session.messages && req.session.messages.length > 0) {
-                const sessionMessage = req.session.messages.pop();
-
-                article.content = `
-                    <section class="message">
-                        ${sessionMessage}
-                    </section>
-                    ${article.content}`;
-            }
-            // if (req.session.userID) {
-            //     article.content += `
-            //             <section class="message">
-            //                 <a href=":article/${article.id}/:edit">Edit this page</a>
-            //             </section>`;
-            // }
-            if (req.session.userID) {
-                const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = await DatabaseManager.getUserDB(database);
-                const sessionUser = await userDB.fetchUserByID(req.session.userID);
-
-                const activeTasks = await TaskManager.getActiveTasks(database, sessionUser);
-                if(activeTasks.length > 0) {
-                    article.content = `
-                    <section class="message">
-                        <div class='info'>
-                            <a href=":task">You have ${activeTasks.length} pending tasks</a>
-                        </div>
-                    </section>
-                    ${article.content}`;
-                }
-            }
-        }
-
-    }
-
 
     async renderArticleByPath(req, res, next) {
         try {
@@ -110,7 +72,6 @@ class ArticleAPI {
                 return next();
 
             await this.checkForRevisionContent(req, article);
-            await this.appendSessionHTML(req, article);
 
             res.send(
                 await ThemeManager.get(article.theme)
@@ -165,7 +126,6 @@ class ArticleAPI {
                 res.json(response);
 
             } else {
-                await this.appendSessionHTML(req, article);
                 res.send(
                     await ThemeManager.get(article.theme)
                         .render(req, article)

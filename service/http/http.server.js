@@ -10,6 +10,7 @@ const { UserAPI } = require('../../user/user.api');
 const { ArticleAPI } = require('../../article/article.api');
 const { FileAPI } = require('../file/file.api');
 const { ConfigAPI } = require('../../config/config.api');
+const { TaskAPI } = require('../task/task.api');
 
 const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
 
@@ -58,6 +59,7 @@ class HTTPServer {
             ArticleAPI,
             FileAPI,
             ConfigAPI,
+            TaskAPI
         ].forEach(async API => {
             await API.configure(config);
             router.use(API.getMiddleware());

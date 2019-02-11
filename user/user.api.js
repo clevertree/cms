@@ -9,7 +9,8 @@ const { PromptManager } = require('../config/prompt.manager');
 const { DatabaseManager } = require('../database/database.manager');
 const { DNSManager } = require('../service/domain/dns.manager');
 const { ThemeManager } = require('../theme/theme.manager');
-const { UserDatabase } = require('./user.database');
+// const { UserDatabase } = require('./user.database');
+const { TaskManager } = require('../service/task/task.manager');
 const { ResetPasswordEmail } = require("./mail/resetpassword.class");
 
 class UserAPI {
@@ -294,7 +295,7 @@ class UserAPI {
 
         const matches = await bcrypt.compare(password, encryptedPassword);
         if(matches !== true)
-            throw new Error("Invalid Password");
+            throw new Error("Incorrect Password");
 
         // sets a cookie with the user's info
         req.session.reset();
@@ -405,7 +406,7 @@ class UserAPI {
 
     async handleLoginRequest(req, res) {
         try {
-            const userID = req.query.userID ? req.query.userID.replace(/\W/g, '') : null;
+            const userID = UserAPI.sanitizeInput(req.query.userID || null);
             if(req.method === 'GET') {
                 // Render Editor Form
                 res.send(
@@ -495,7 +496,7 @@ class UserAPI {
     async handleForgotPassword(req, res) {
         try {
             if(req.method === 'GET') {
-                const userID = req.query.userID ? req.query.userID.replace(/\W/g, '') : null;
+                const userID = UserAPI.sanitizeInput(req.query.userID || null);
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
@@ -717,14 +718,47 @@ class UserAPI {
 
     }
 
+
+    async appendSessionHTML(req, article) {
+        if(req.session) {
+            if (req.session.userID) {
+                const database = await DatabaseManager.selectDatabaseByRequest(req);
+                const userDB = await DatabaseManager.getUserDB(database);
+                const sessionUser = await userDB.fetchSessionUser(req);
+
+                const activeTasks = await TaskManager.getActiveTasks(database, sessionUser);
+                if(activeTasks.length > 0) {
+                    article.content = `
+                    <section class="message">
+                        <div class='message'>
+                            <a href=":task">You have ${activeTasks.length} pending task${activeTasks.length > 1 ? 's' : ''}</a>
+                        </div>
+                    </section>
+                    ${article.content}`;
+                }
+            }
+
+
+            while (req.session.messages && req.session.messages.length > 0) {
+                const sessionMessage = req.session.messages.pop();
+
+                article.content = `
+                    <section class="message">
+                        ${sessionMessage}
+                    </section>
+                    ${article.content}`;
+            }
+        }
+    }
+
     static sanitizeInput(input, type='username') {
         switch(type) {
             case 'username':
-            default:
-                input = (input || '').replace(/[^\w]/g, '');
+                input = (input || '').replace(/[^\w._]/g, '');
                 break;
+            default:
             case 'email':
-                input = (input || '').replace(/[^\w@.]/g, '');
+                input = (input || '').replace(/[^\w@._]/g, '');
                 break;
         }
         return input

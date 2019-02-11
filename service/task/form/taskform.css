@@ -1,0 +1,45 @@
+form.taskform {
+    /* max-width: 1200px; */
+     /*text-align: center;*/
+}
+
+form.taskform > fieldset {
+    /*margin: 0px auto;*/
+}
+
+form.taskform > fieldset > table {
+    min-width: 600px;
+    margin: auto;
+    border-collapse: collapse;
+}
+form.taskform > fieldset > table > tbody > tr > td {
+    text-align: left;
+    padding: 5px;
+}
+form.taskform > fieldset > table > tbody > tr > td:first-child {
+    text-align: left;
+    min-width: 80px;
+}
+
+/** Row **/
+form.taskform > fieldset > table > tbody > tr.odd {
+    background-color: #0001;
+}
+
+/** Form Input **/
+
+
+form.taskform input[type=text],
+form.taskform input[type=email],
+form.taskform input[type=password],
+form.taskform select,
+form.taskform textarea {
+    min-width: 90%;
+}
+
+/** Form Actions **/
+
+form.taskform .action-edit {
+    font-size: x-small;
+    text-decoration: none;
+}
