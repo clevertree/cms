@@ -36,13 +36,9 @@ document.addEventListener('DOMContentLoaded', function() {
         requestFormData(userID) {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
-                // console.info(xhr.response);
-                // if(!xhr.response || !xhr.response.user)
-                //     throw new Error("Invalid Response");
-                this.setState(xhr.response);
-                this.setState({processing: false});
-                // this.state = xhr.response.user;
-                // this.render();
+                this.setState({processing: false}, xhr.response);
+                this.setState({editable: this.state.sessionUser && this.state.user &&
+                        (this.state.sessionUser.flags.indexOf('admin') !== -1 || this.state.sessionUser.id === this.state.user.id)});
             };
             xhr.responseType = 'json';
             xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
@@ -71,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </tr>
                         <tr>
                             <td class="label">Flags</td>
-                            <td>${this.state.user.flags.join(', ')}</td>
+                            <td>${(this.state.user.flags || ['none']).join(', ')}</td>
                         </tr>
                         ${this.state.user.profile && Object.keys(this.state.user.profile).map(key => `
                         <tr>

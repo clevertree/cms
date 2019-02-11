@@ -1,5 +1,6 @@
 const express = require('express');
 
+const { TaskManager } = require('../service/task/task.manager');
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeManager } = require('../theme/theme.manager');
 const { ArticleDatabase } = require("./article.database");
@@ -66,6 +67,7 @@ class ArticleAPI {
         if(req.session) {
             while (req.session.messages && req.session.messages.length > 0) {
                 const sessionMessage = req.session.messages.pop();
+
                 article.content = `
                     <section class="message">
                         ${sessionMessage}
@@ -78,7 +80,24 @@ class ArticleAPI {
             //                 <a href=":article/${article.id}/:edit">Edit this page</a>
             //             </section>`;
             // }
+            if (req.session.userID) {
+                const database = await DatabaseManager.selectDatabaseByRequest(req);
+                const userDB = await DatabaseManager.getUserDB(database);
+                const sessionUser = await userDB.fetchUserByID(req.session.userID);
+
+                const activeTasks = await TaskManager.getActiveTasks(database, sessionUser);
+                if(activeTasks.length > 0) {
+                    article.content = `
+                    <section class="message">
+                        <div class='info'>
+                            <a href=":task">You have ${activeTasks.length} pending tasks</a>
+                        </div>
+                    </section>
+                    ${article.content}`;
+                }
+            }
         }
+
     }
 
 

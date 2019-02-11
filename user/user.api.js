@@ -301,10 +301,11 @@ class UserAPI {
         req.session.userID = user.id;
 
         if(saveSession) {
-            req.session.setDuration(1000 * 60 * 60 * 24 * 14);
+            req.session.setDuration(1000 * 60 * 60 * 24 * 14) // 2 weeks;
         }
 
         this.addSessionMessage(req,`<div class='success'>Login Successful: ${user.username}</div>`);
+
         return user;
     }
 
@@ -578,6 +579,7 @@ class UserAPI {
 
                 if(!affectedRows)
                     throw new Error("Password not updated");
+                delete this.resetPasswordRequests[uuid];
                 return res.json({
                     redirect: `/:user/:login?userID=${user.username}`,
                     message: `Recovery email sent successfully to ${user.email}. <br/>Redirecting...`,

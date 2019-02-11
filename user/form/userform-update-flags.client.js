@@ -64,13 +64,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         this.state.user.flags.filter((v) => v !== e.target.name);
                 }
             }
-            console.log(this.state);
         }
 
         requestFormData(userID) {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
-                this.setState({processing: false}, xhr.response);
+                this.setState({processing: false, editable: false}, xhr.response);
+                if(this.state.sessionUser && this.state.user) {
+                    if(this.state.sessionUser.flags.indexOf('admin') !== -1)
+                        this.setState({editable: 'admin'});
+                }
             };
             xhr.responseType = 'json';
             xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
@@ -107,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
-            console.log("RENDER", this.state);
+            // console.log("STATE", this.state);
             this.innerHTML =
                 `
                 <form action="/:user/${this.state.user.id}/:flags" method="POST" class="userform userform-flags themed">
@@ -146,9 +149,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
-                                    <td class="label"></td>
                                     <td>
-                                        <button type="submit">Update</button>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <button type="submit">Update Flags</button>
                                     </td>
                                 </tr>
                             </tfoot>

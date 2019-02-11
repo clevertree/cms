@@ -47,7 +47,7 @@ class UserDatabase  {
 
     async fetchUser(whereSQL, values, selectSQL='u.*,null as password') {
         const users = await this.selectUsers(whereSQL, values, selectSQL);
-        return users[0];
+        return users[0] || null;
     }
     async fetchUserByID(userID, selectSQL='u.*,null as password') {
         if(!isNaN(parseInt(userID)) && isFinite(userID)) {

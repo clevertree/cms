@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
+                message: "In order to change password, please modify this form and hit 'Update' below",
+                status: 0,
                 user: {id: -1},
                 password_old: null,
                 password_new: null,
@@ -25,11 +27,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         connectedCallback() {
-            this.addEventListener('change', this.onChange);
-            this.addEventListener('submit', this.onSubmit);
+            this.addEventListener('change', e => this.onChange(e));
+            this.addEventListener('submit', e => this.onSubmit(e));
 
             this.render();
-            const userID = this.getAttribute('id');
+            const userID = this.getAttribute('userID');
             if(userID)
                 this.requestFormData(userID);
         }
@@ -37,9 +39,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         onSuccess(e, response) {
             console.log(e, response);
-            this.setState({processing: false});
-            setTimeout(() => window.location.href = response.redirect, 3000);
+            if(response.redirect) {
+                this.setState({processing: true});
+                setTimeout(() => window.location.href = response.redirect, 3000);
+            }
         }
+
         onError(e, response) {
             console.error(e, response);
         }
@@ -55,21 +60,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         requestFormData(userID) {
             const xhr = new XMLHttpRequest();
-            xhr.onload = (e) => {
-                // console.info(xhr.response);
-                if(xhr.status === 200) {
-                    if(!xhr.response || !xhr.response.user)
-                        throw new Error("Invalid Response");
-                    this.setState(xhr.response);
-                } else {
-                    const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                    this.onError(e, response);
+            xhr.onload = () => {
+                this.setState({processing: false, editable: false}, xhr.response);
+                if(this.state.sessionUser && this.state.user) {
+                    if(this.state.sessionUser.flags.indexOf('admin') !== -1)
+                        this.setState({editable: 'admin'});
+                    else if (this.state.sessionUser.id === this.state.user.id)
+                        this.setState({editable: 'user'});
                 }
             };
             xhr.responseType = 'json';
-            xhr.open ("GET", `:user/${userID}/:json`, true);
-            // xhr.setRequestHeader("Accept", "application/json");
+            xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
             xhr.send ();
+            this.setState({processing: true});
         }
 
         onSubmit(e) {
@@ -110,9 +113,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             <thead>
                                 <tr>
                                     <td colspan="2">
-                                        ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
-                                            ${this.state.response.message}
-                                        </div>` : "In order to change password, <br/>please modify this form and hit 'Update' below"}
+                                        <div class="${this.state.status === 200 ? 'success' : (this.state.status === 0 ? '' : 'error')} status-${this.status}">
+                                            ${this.state.message}
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
@@ -150,8 +153,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
-                                    <td class="label"></td>
                                     <td>
+                                    </td>
+                                    <td style="text-align: right;">
                                         <button type="submit">Update Password</button>
                                     </td>
                                 </tr>
@@ -160,7 +164,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     </fieldset>
                 </form>
 `;
-            console.log("RENDER", this.state);
         }
     }
     customElements.define('userform-update-password', HTMLUserChangePasswordFormElement);

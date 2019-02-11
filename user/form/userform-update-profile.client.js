@@ -58,7 +58,13 @@ document.addEventListener('DOMContentLoaded', function() {
         requestFormData(userID) {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
-                this.setState({processing: false}, xhr.response);
+                this.setState({processing: false, editable: false}, xhr.response);
+                if(this.state.sessionUser && this.state.user) {
+                    if(this.state.sessionUser.flags.indexOf('admin') !== -1)
+                        this.setState({editable: 'admin'});
+                    else if (this.state.sessionUser.id === this.state.user.id)
+                        this.setState({editable: 'user'});
+                }
             };
             xhr.responseType = 'json';
             xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
@@ -112,22 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
-            // let profileFields = [];
-            // if(this.state.profileConfig) {
-                // profileFields = this.state.profileConfig.slice(0);
-            //     if(this.state.user.profile) {
-            //         Object.keys(this.state.user.profile).forEach(key => {
-            //             for (var i = 0; i < profileFields.length; i++) {
-            //                 if (profileFields[i].name === key)
-            //                     return;
-            //             }
-            //             profileFields.push({
-            //                 name: key
-            //             })
-            //         });
-            //     }
-
-            console.log("RENDER", this.state);
+            // console.log("STATE", this.state);
             this.innerHTML =
                 `
                 <form action="/:user/${this.state.user.id}/:profile" method="POST" class="userform userform-update-profile themed">
@@ -162,14 +153,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             </tbody>
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
-                                <tr>
                                     <td>
-                                        <a href=":user/${this.state.user.id}/">Back to Profile</a>
                                     </td>
                                     <td style="text-align: right;">
                                         <button type="submit">Update Profile</button>
                                     </td>
-                                </tr>
                             </tfoot>
                         </table>
                     </fieldset>

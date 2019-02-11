@@ -4,6 +4,7 @@ const express = require('express');
 
 const { LocalConfig } = require('../../config/local.config');
 
+// const { TaskManager } = require('../task/task.manager');
 const { DatabaseManager } = require('../../database/database.manager');
 const { UserAPI } = require('../../user/user.api');
 const { ArticleAPI } = require('../../article/article.api');
@@ -29,6 +30,7 @@ class HTTPServer {
         if(!serverConfig.hostname)                  await localConfig.promptValue('server.hostname', `Please enter the Server Hostname`, require('os').hostname());
         if(!serverConfig.port)                      await localConfig.promptValue('server.port', `Please enter the Server Port`, serverConfig.ssl === 'y' ? 443 : 8080);
         if(typeof serverConfig.ssl === "undefined") await localConfig.promptValue('server.ssl', `Enable SSL Server with GreenLock? [y or n]`, 'y');
+        this.config = serverConfig;
         // serverConfig.ssl = serverConfig.ssl && serverConfig.ssl === 'y';
         // localConfig.saveAll();
 
@@ -64,8 +66,12 @@ class HTTPServer {
 
         // CMS Asset files
         router.use(express.static(BASE_DIR));
-        this.config = serverConfig;
+
+
+
+
         return serverConfig;
+
     }
 
 
