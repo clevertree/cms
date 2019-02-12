@@ -4,6 +4,7 @@ const ejs = require('ejs');
 // const { ArticleDatabase } = require('../../article/article.database');
 const { UserAPI } = require('../../user/user.api');
 const { DatabaseManager } = require('../../database/database.manager');
+const { TaskManager } = require('../../service/task/task.manager');
 
 const TEMPLATE_DIR = path.resolve(__dirname);
 const BASE_DIR = path.resolve((path.dirname(path.dirname(__dirname))));
@@ -29,8 +30,12 @@ class DefaultTheme {
         const articleDB = await DatabaseManager.getArticleDB(database);
         const configDB = await DatabaseManager.getConfigDB(database);
 
+        const activeTaskIDs = await TaskManager.getActiveTaskIDs(req);
 
-        await UserAPI.appendSessionHTML(req, article);
+        let prependHTML = await UserAPI.getSessionHTML(req);
+        // prependHTML += await TaskManager.getSessionHTML(req);
+        if(prependHTML)
+            article.content = prependHTML + article.content;
 
         const renderData = {article};
 
@@ -64,6 +69,18 @@ class DefaultTheme {
                 });
             }
             submenu.push({
+                path: '/:article',
+                title: 'Browse Articles'
+            }, "<hr/>", {
+                path: '/:task',
+                title: `${activeTaskIDs.length} Pending Task${activeTaskIDs.length > 1 ? 's' : ''}`
+            },{
+                path: '/:config',
+                title: 'Configure Site'
+            }, "<hr/>", {
+                path: '/:user',
+                title: 'Browse Users'
+            }, {
                 path: `/:user/${req.session.userID}`,
                 title: 'My Profile',
             },{
@@ -72,15 +89,6 @@ class DefaultTheme {
             },{
                 path: `/:user/:logout`,
                 title: 'Log Out',
-            }, "<hr/>", {
-                path: '/:user',
-                title: 'Browse Users'
-            }, {
-                path: '/:article',
-                title: 'Browse Articles'
-            }, {
-                path: '/:config',
-                title: 'Configure Site'
             });
         }
 

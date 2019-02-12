@@ -31,12 +31,12 @@ class TaskAPI {
         router.use(UserAPI.getSessionMiddleware());
 
         // Handle Task requests
-        router.get('/[:]task/[:]json',                  async (req, res) => await this.renderTaskJSON(req, res));
-        router.all('/[:]task(/[:]manage)?',             async (req, res) => await this.renderTaskManager(req, res));
+        router.get('/[:]task/:taskID/[:]json',        async (req, res) => await this.renderTaskJSON(req.params.taskID || null, req, res));
+        router.all('/[:]task(/:taskID)?',             async (req, res) => await this.renderTaskManager(req.params.taskID || null, req, res));
         this.router = router;
     }
 
-    async renderTaskJSON(req, res) {
+    async renderTaskJSON(taskID, req, res) {
         try {
             if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
@@ -45,12 +45,19 @@ class TaskAPI {
             const userDB = await DatabaseManager.getUserDB(database);
             const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
 
-            const activeTasks = await TaskManager.getActiveTasks(database, sessionUser);
+            const taskList = await TaskManager.getTasks();
+            const task = TaskManager.getTask(taskID);
+            const htmlForm = await task.renderFormHTML(req, taskID, database, sessionUser);
+            const taskData = {
+                // taskID: taskID,
+                isActive: await task.isActive(database, sessionUser),
+                htmlForm: htmlForm.trim()
+            };
 
             return res.json({
-                message: `${activeTasks.length} Task${activeTasks.length !== 1 ? 's' : ''} available`,
+                message: `${taskList.length} Task${taskList.length !== 1 ? 's' : ''} available`,
                 sessionUser,
-                activeTasks
+                taskData
             });
         } catch (error) {
             console.log(error);
@@ -62,30 +69,52 @@ class TaskAPI {
         }
     }
 
-    async renderTaskManager(req, res) {
+    async renderTaskManager(taskID, req, res) {
         try {
 
             if (req.method === 'GET') {
+
+                let activeResponseHTML = '', inactiveResponseHTML = '';
+                if (!taskID) {
+                    const database = await DatabaseManager.selectDatabaseByRequest(req);
+                    const userDB = await DatabaseManager.getUserDB(database);
+                    const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+
+                    const taskList = await TaskManager.getTasks();
+                    for (let currentTaskID = 0; currentTaskID < taskList.length; currentTaskID++) {
+                        if (await taskList[currentTaskID].isActive(database, sessionUser))
+                            activeResponseHTML += `\n\t<taskform-manager taskID="${currentTaskID}" active="true"></taskform-manager>`;
+                        else
+                            inactiveResponseHTML += `\n\t<taskform-manager taskID="${currentTaskID}"></taskform-manager>`;
+                    }
+                } else {
+                    activeResponseHTML += `\n\t<taskform-manager taskID="${taskID}" active="true"></taskform-manager>`;
+                }
+
+                const responseHTML = `
+<section>
+    <script src="/service/task/form/taskform-manager.client.js"></script>
+    ${activeResponseHTML}
+    ${inactiveResponseHTML}
+</section>`;
+
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `
-<section>
-    <script src="/service/task/form/taskform-editor.client.js"></script>
-    <taskform-editor></taskform-editor>
-</section>
-`)
+                        .render(req, responseHTML)
                 );
 
             } else {
                 // Handle POST
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
                 const userDB = await DatabaseManager.getUserDB(database);
-
                 const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
-                if(!sessionUser || !sessionUser.isAdmin())
-                    throw new Error("Not authorized");
 
-                const activeTasks = await TaskManager.getActiveTasks(database, sessionUser);
+                if(typeof req.body.taskID === "undefined")
+                    throw new Error("Missing required field: taskID");
+                const taskID = parseInt(req.body.taskID);
+
+                const task = await TaskManager.getTask(taskID);
+                const responseHTML = await task.handleFormSubmit(req, database, sessionUser)
 
                 return res.json({
                     message: `<div class='success'>${activeTasks.length} Task${activeTasks.length !== 1 ? 's' : ''} updated successfully</div>`,

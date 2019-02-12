@@ -2,27 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/service/task/form/taskform-editor.client.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/service/task/form/taskform.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/service/task/task.api.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/service/task/form/taskform-manager.client.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/article/article.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/article/article.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/form/configform-editor.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/form/configform-editor.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/database.manager.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/database.manager.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/http/http.server.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/http/http.server.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/article/form/articleform-add.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/article/form/articleform-add.client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/task/form/taskform-editor.client.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/task/form/taskform.css" beforeDir="false" afterPath="$PROJECT_DIR$/service/task/form/taskform.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/task/task.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/task/task.api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/task/task.manager.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/task/task.manager.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/theme/default/default.theme.js" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/default.theme.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/form/userform-forgotpassword.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-forgotpassword.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/form/userform-login.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-login.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/form/userform-logout.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-logout.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/form/userform-register.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-register.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/form/userform-resetpassword.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-resetpassword.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/form/userform-update-flags.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-update-flags.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/form/userform-update-password.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-update-password.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/form/userform-update-profile.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/form/userform-update-profile.client.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/task/admin-configure.task.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/task/admin-configure.task.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/user.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/user.database.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.database.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,20 +21,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/user/task/admin-configure.task.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="792">
-              <caret line="36" selection-start-line="36" selection-end-line="36" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/service/task/task.api.js">
+        <entry file="file://$PROJECT_DIR$/service/task/form/taskform-manager.client.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="448">
-              <caret line="38" column="36" lean-forward="true" selection-start-line="38" selection-start-column="36" selection-end-line="38" selection-end-column="36" />
+            <state relative-caret-position="1696">
+              <caret line="97" column="25" selection-start-line="97" selection-start-column="18" selection-end-line="97" selection-end-column="25" />
             </state>
           </provider>
         </entry>
@@ -53,8 +33,26 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/service/task/task.manager.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="88">
-              <caret line="4" column="17" selection-start-line="4" selection-start-column="6" selection-end-line="4" selection-end-column="17" />
+            <state relative-caret-position="616">
+              <caret line="28" column="20" selection-start-line="28" selection-start-column="10" selection-end-line="28" selection-end-column="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/user/task/admin-configure.task.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="772">
+              <caret line="47" column="40" selection-start-line="47" selection-start-column="40" selection-end-line="47" selection-end-column="40" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/service/task/task.api.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="751">
+              <caret line="54" column="14" selection-start-line="54" selection-start-column="14" selection-end-line="54" selection-end-column="14" />
             </state>
           </provider>
         </entry>
@@ -70,36 +68,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>session.userID</find>
-      <find>TaskMa</find>
-      <find>sessionUser =</find>
-      <find>.pop</find>
-      <find>Session user is</find>
-      <find>Invalid Pass</find>
-      <find>userID</find>
-      <find>userform-login</find>
-      <find>appendSessionHTML</find>
-      <find>.success</find>
-      <find>class='info'</find>
-      <find>Admin User No</find>
-      <find>Taskure</find>
-      <find>getActive</find>
-      <find>userID =</find>
-      <find>configform</find>
-      <find>Config</find>
-      <find>closure</find>
-      <find>TaskManager</find>
-      <find>Must be log</find>
-      <find>Must be logged in</find>
-      <find>{ Task</find>
-      <find>state.status === 200</find>
-      <find>status: null</find>
-      <find>(this.state.status === 0 ?</find>
-      <find>!this.state.status? ''</find>
-      <find>!this.state.status? 'message'</find>
-      <find>!this.state.status ? ''</find>
       <find>status-${this.status}</find>
       <find>You have</find>
+      <find>pending</find>
+      <find>appendSessionHTML</find>
+      <find>{ Task</find>
+      <find>getActiveTasks</find>
+      <find>req.session.messages</find>
+      <find>.message</find>
+      <find>${this.state.message}</find>
+      <find>getTask</find>
+      <find>map(async</find>
+      <find>map(</find>
+      <find>this.status</find>
+      <find>getFormData</find>
+      <find>.status</find>
+      <find>ave&quot;value=</find>
+      <find>&lt;input</find>
+      <find>require('hostname'</find>
+      <find>'os'</find>
+      <find>req.ge</find>
+      <find>renderFormHTML</find>
+      <find>('host')</find>
+      <find>.label</find>
+      <find>userform</find>
+      <find>:task/</find>
+      <find>Editor</find>
+      <find>taskform-edit</find>
+      <find>.params.</find>
+      <find>taskData</find>
+      <find>taskList[currentTaskID</find>
     </findStrings>
     <replaceStrings>
       <replace>password</replace>
@@ -108,12 +106,14 @@
       <replace>form/us</replace>
       <replace>req.params.userID</replace>
       <replace>Closure</replace>
-      <replace>taskform</replace>
       <replace>Task</replace>
       <replace>(!this.state.status ?</replace>
       <replace>!this.state.status? 'message'</replace>
       <replace>!this.state.status ? 'message'</replace>
       <replace>status-${this.state.status}</replace>
+      <replace>this.state</replace>
+      <replace>taskform</replace>
+      <replace>Manager</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -144,18 +144,20 @@
         <option value="$PROJECT_DIR$/user/form/userform-update-profile.client.js" />
         <option value="$PROJECT_DIR$/database/database.manager.js" />
         <option value="$PROJECT_DIR$/user/user.database.js" />
-        <option value="$PROJECT_DIR$/theme/default/default.theme.js" />
         <option value="$PROJECT_DIR$/article/article.api.js" />
         <option value="$PROJECT_DIR$/theme/default/assets/default.theme.css" />
-        <option value="$PROJECT_DIR$/service/task/task.manager.js" />
-        <option value="$PROJECT_DIR$/service/task/form/taskform.css" />
         <option value="$PROJECT_DIR$/config/form/configform-editor.client.js" />
         <option value="$PROJECT_DIR$/service/http/http.server.js" />
-        <option value="$PROJECT_DIR$/service/task/task.api.js" />
         <option value="$PROJECT_DIR$/user/form/userform-update-password.client.js" />
-        <option value="$PROJECT_DIR$/service/task/form/taskform-editor.client.js" />
         <option value="$PROJECT_DIR$/user/user.api.js" />
+        <option value="$PROJECT_DIR$/theme/default/default.theme.js" />
+        <option value="$PROJECT_DIR$/article/form/articleform-add.client.js" />
+        <option value="$PROJECT_DIR$/service/task/form/taskform.css" />
+        <option value="$PROJECT_DIR$/service/task/form/taskform-editor.client.js" />
         <option value="$PROJECT_DIR$/user/task/admin-configure.task.js" />
+        <option value="$PROJECT_DIR$/service/task/task.manager.js" />
+        <option value="$PROJECT_DIR$/service/task/task.api.js" />
+        <option value="$PROJECT_DIR$/service/task/form/taskform-manager.client.js" />
       </list>
     </option>
   </component>
@@ -221,6 +223,13 @@
               <item name="cms" type="462c0819:PsiDirectoryNode" />
               <item name="service" type="462c0819:PsiDirectoryNode" />
               <item name="task" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cms" type="462c0819:PsiDirectoryNode" />
+              <item name="service" type="462c0819:PsiDirectoryNode" />
+              <item name="task" type="462c0819:PsiDirectoryNode" />
+              <item name="form" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="cms" type="b2602c69:ProjectViewProjectNode" />
@@ -318,18 +327,18 @@
       <workItem from="1549593546226" duration="298000" />
       <workItem from="1549593946713" duration="2002000" />
       <workItem from="1549650448910" duration="27969000" />
-      <workItem from="1549818097410" duration="12731000" />
+      <workItem from="1549818097410" duration="23013000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="45090000" />
+    <option name="totallyTimeSpent" value="55372000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="27" width="3773" height="2133" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.096045196" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.096045196" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="npm" order="2" side_tool="true" />
       <window_info id="Favorites" order="3" side_tool="true" />
@@ -347,7 +356,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Database" order="3" />
-      <window_info anchor="right" id="Debug" order="4" visible="true" weight="0.3292978" />
+      <window_info active="true" anchor="right" id="Debug" order="4" visible="true" weight="0.3292978" />
       <window_info anchor="right" id="Find" order="5" weight="0.32956687" />
     </layout>
   </component>
@@ -386,6 +395,18 @@
           <url>file://$PROJECT_DIR$/user/user.api.js</url>
           <line>633</line>
           <option name="timeStamp" value="47" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/service/task/task.api.js</url>
+          <line>115</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="75" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/service/task/task.api.js</url>
+          <line>111</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="76" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -496,13 +517,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/form/userform.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1298">
-          <caret line="59" column="1" lean-forward="true" selection-start-line="59" selection-start-column="1" selection-end-line="59" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/user/section/profile.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="132">
@@ -514,16 +528,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="649">
           <caret line="41" column="8" selection-start-line="41" selection-start-column="8" selection-end-line="41" selection-end-column="8" />
-          <folding>
-            <element signature="n#style#0;n#td#1;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/form/userform-logout.client.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="638">
-          <caret line="35" lean-forward="true" selection-start-line="35" selection-end-line="46" selection-end-column="9" />
           <folding>
             <element signature="n#style#0;n#td#1;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
           </folding>
@@ -554,20 +558,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/user.database.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="660">
-          <caret line="65" column="65" lean-forward="true" selection-start-line="65" selection-start-column="65" selection-end-line="65" selection-end-column="65" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/theme/default/default.theme.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="704">
-          <caret line="32" column="32" lean-forward="true" selection-start-line="32" selection-start-column="32" selection-end-line="32" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/theme/theme.manager.js">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -583,27 +573,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/service/task/form/userform.css">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/service/task/form/taskform.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="902">
-          <caret line="41" column="15" selection-start-line="41" selection-start-column="15" selection-end-line="41" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config/form/configform-editor.client.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="17" column="5" lean-forward="true" selection-start-line="17" selection-start-column="5" selection-end-line="56" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/form/userform-login.client.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1034">
-          <caret line="53" column="21" lean-forward="true" selection-start-line="53" selection-start-column="21" selection-end-line="53" selection-end-column="21" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/user/form/userform-update-flags.client.js">
       <provider selected="true" editor-type-id="text-editor">
@@ -650,24 +619,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/form/userform-update-password.client.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1430">
-          <caret line="13" column="20" lean-forward="true" selection-start-line="13" selection-start-column="20" selection-end-line="13" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/service/task/form/taskform-editor.client.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="726">
-          <caret line="33" lean-forward="true" selection-start-line="33" selection-end-line="33" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/user/user.api.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="822">
-          <caret line="733" column="122" selection-start-line="733" selection-start-column="122" selection-end-line="733" selection-end-column="122" />
+        <state relative-caret-position="264">
+          <caret line="12" selection-start-line="12" selection-end-line="13" />
           <folding>
             <element signature="n#!!block;n#updateFlags#0;n#UserAPI#0" />
             <element signature="n#!!block;n#logout#0;n#UserAPI#0" />
@@ -677,24 +632,94 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/user/user.database.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="692">
+          <caret line="70" column="8" lean-forward="true" selection-start-line="67" selection-start-column="12" selection-end-line="70" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/default/default.theme.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1122">
+          <caret line="69" column="13" lean-forward="true" selection-start-line="69" selection-start-column="13" selection-end-line="69" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/form/userform-logout.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="242">
+          <caret line="11" column="26" lean-forward="true" selection-start-line="11" selection-start-column="26" selection-end-line="13" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/form/configform-editor.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1372">
+          <caret line="189" column="79" lean-forward="true" selection-start-line="189" selection-start-column="79" selection-end-line="189" selection-end-column="100" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/form/userform-login.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="616">
+          <caret line="76" lean-forward="true" selection-start-line="76" selection-end-line="81" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/article/form/articleform-add.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1894">
+          <caret line="89" column="28" lean-forward="true" selection-start-line="89" selection-start-column="28" selection-end-line="89" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/form/userform-update-password.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="756">
+          <caret line="122" column="50" lean-forward="true" selection-start-line="122" selection-start-column="50" selection-end-line="128" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/form/userform.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="924">
+          <caret line="42" column="16" selection-end-line="60" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/service/task/form/taskform.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="12" column="44" lean-forward="true" selection-start-line="12" selection-start-column="44" selection-end-line="12" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/user/task/admin-configure.task.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="792">
-          <caret line="36" selection-start-line="36" selection-end-line="36" />
+        <state relative-caret-position="772">
+          <caret line="47" column="40" selection-start-line="47" selection-start-column="40" selection-end-line="47" selection-end-column="40" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/service/task/task.manager.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="88">
-          <caret line="4" column="17" selection-start-line="4" selection-start-column="6" selection-end-line="4" selection-end-column="17" />
+        <state relative-caret-position="616">
+          <caret line="28" column="20" selection-start-line="28" selection-start-column="10" selection-end-line="28" selection-end-column="20" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/service/task/task.api.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="448">
-          <caret line="38" column="36" lean-forward="true" selection-start-line="38" selection-start-column="36" selection-end-line="38" selection-end-column="36" />
+        <state relative-caret-position="751">
+          <caret line="54" column="14" selection-start-line="54" selection-start-column="14" selection-end-line="54" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/service/task/form/taskform-manager.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1696">
+          <caret line="97" column="25" selection-start-line="97" selection-start-column="18" selection-end-line="97" selection-end-column="25" />
         </state>
       </provider>
     </entry>

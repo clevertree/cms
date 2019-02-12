@@ -719,36 +719,19 @@ class UserAPI {
     }
 
 
-    async appendSessionHTML(req, article) {
+    async getSessionHTML(req, article) {
+        let sessionHTML = '';
         if(req.session) {
-            if (req.session.userID) {
-                const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = await DatabaseManager.getUserDB(database);
-                const sessionUser = await userDB.fetchSessionUser(req);
-
-                const activeTasks = await TaskManager.getActiveTasks(database, sessionUser);
-                if(activeTasks.length > 0) {
-                    article.content = `
-                    <section class="message">
-                        <div class='message'>
-                            <a href=":task">You have ${activeTasks.length} pending task${activeTasks.length > 1 ? 's' : ''}</a>
-                        </div>
-                    </section>
-                    ${article.content}`;
-                }
-            }
-
-
             while (req.session.messages && req.session.messages.length > 0) {
                 const sessionMessage = req.session.messages.pop();
-
-                article.content = `
+                sessionHTML = `
                     <section class="message">
                         ${sessionMessage}
                     </section>
-                    ${article.content}`;
+                    ${sessionHTML}`;
             }
         }
+        return sessionHTML;
     }
 
     static sanitizeInput(input, type='username') {

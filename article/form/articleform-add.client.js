@@ -88,11 +88,9 @@ class HTMLArticleFormAddElement extends HTMLElement {
                 <table>
                     <thead>
                         <tr>
-                            <td colspan="2">
-                                ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
-                                    ${this.state.response.message}
-                                </div>` : `Add a new article`}
-                            </td>
+                            <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                ${this.state.message}
+                            </div>
                         </tr>
                         <tr><td colspan="2"><hr/></td></tr>
                     </thead>
