@@ -34,8 +34,8 @@ class DatabaseManager {
         if(forcePrompt || !dbConfig.database || !dbConfig.user || !dbConfig.host || typeof dbConfig.multiDomain === 'undefined') {
             await localConfig.promptValue('database.host', `Please enter the Database Host`, dbConfig.host || 'localhost');
             defaultDatabaseName = defaultHostname.replace('.', '_') + '_cms';
-            await localConfig.promptValue('database.user', `Please enter the Database User Name`, dbConfig.user || 'root');
-            await localConfig.promptValue('database.password', `Please enter the Password for Database User '${dbConfig.user}'`, null, 'password');
+            await localConfig.promptValue('database.user', `Please enter the Database User Name`, dbConfig.user || 'cms_user');
+            await localConfig.promptValue('database.password', `Please enter the Password for Database User '${dbConfig.user}'`, dbConfig.password || 'cms_pass', 'password');
             await localConfig.promptValue('database.database', `Please enter the Database Name`, dbConfig.database || defaultDatabaseName);
             await localConfig.promptValue('database.multiDomain', `Enable Multi-domain hosting? [y or n]`, dbConfig.multiDomain || 'n');
             // dbConfig.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain === 'y';

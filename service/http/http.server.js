@@ -45,6 +45,7 @@ class HTTPServer {
         if(hostname) await configDB.updateConfigValue('site.hostname', hostname);
         else hostname = await configDB.promptValue('site.hostname', `Please enter the Site Public Hostname`, hostname);
         if(!siteConfig.name) {
+            // TODO: server should already be running. ask on the site!
             siteConfig.name = await configDB.promptValue('site.name', `Please enter the Website Name`, hostname);
             siteConfig.contact = await configDB.promptValue('site.contact', `Please enter the Website Contact Email`, 'admin@' + hostname, 'email');
             siteConfig.keywords = await configDB.promptValue('site.keywords', `Please enter the Website Keywords`, siteConfig.keywords);
