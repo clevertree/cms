@@ -78,7 +78,7 @@ class ArticleAPI {
                     .render(req, article)
             );
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             res.send(
                 await ThemeManager.get()
@@ -132,7 +132,7 @@ class ArticleAPI {
                 );
             }
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             if(asJSON) {
                 res.json({message: error.stack});
@@ -231,7 +231,7 @@ class ArticleAPI {
                 }
             }
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             if(req.method === 'GET') {          // Handle GET
                 res.send(
@@ -289,7 +289,7 @@ class ArticleAPI {
                 });
             }
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             if(req.method === 'GET') {          // Handle GET
                 res.send(
@@ -336,7 +336,7 @@ class ArticleAPI {
                 });
             }
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             if(req.method === 'GET') {
                 res.send(

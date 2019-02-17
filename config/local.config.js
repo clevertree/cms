@@ -9,14 +9,19 @@ const { PromptManager } = require('./prompt.manager');
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
 class LocalConfig {
-    constructor(config=null, saveLocal=false) {
+    constructor() {
         this.config = null;
-        if(config) {
-            if(typeof config !== 'object')
-                throw new Error("Config must be an object");
-            this.config = config;
-        }
-        this.saveLocal = saveLocal;
+        // if(config) {
+        //     if(typeof config !== 'object')
+        //         throw new Error("Config must be an object");
+        //     this.config = config;
+        // }
+        // this.saveLocal = saveLocal;
+    }
+
+    async has(key) {
+        const config = await this.getAll();
+        return (typeof config[key] === 'undefined')
     }
 
     async get(key) {
@@ -80,8 +85,8 @@ class LocalConfig {
             defaultValue = target[lastPath];
         const value = await PromptManager.prompt(text, defaultValue);
         target[lastPath] = value;
-        if(this.saveLocal)
-            await this.saveAll();
+        // if(this.saveLocal)
+        //     await this.saveAll();
         return value;
     }
 

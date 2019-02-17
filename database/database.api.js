@@ -1,6 +1,8 @@
 const express = require('express');
 
 const { DatabaseManager } = require('./database.manager');
+const { UserAPI } = require('../user/user.api');
+const { ThemeManager } = require('../theme/theme.manager');
 
 class DatabaseAPI {
     constructor() {
@@ -14,9 +16,11 @@ class DatabaseAPI {
             this.configure();
 
         return (req, res, next) => {
-            if(!req.url.startsWith('/:database'))
+            if(req.url.startsWith('/:database'))
                 return this.router(req, res, next);
-            if(!DatabaseManager.isConnected)
+            if(DatabaseManager.isConnected)
+                return next();
+            if(req.url === '/')
                 return this.routerMissingDB(req, res, next);
             return next();
         }
@@ -32,18 +36,23 @@ class DatabaseAPI {
 
         // Handle Database requests
         router.get('/[:]database/[:]json',                    async (req, res) => await this.renderDatabaseJSON(req, res));
-        router.all('/[:]database(/[:]edit)?',                 async (req, res) => await this.renderDatabaseEditor(req, res));
+        router.all('/[:]database(/[:]edit)?',                 async (req, res) => await this.renderDatabaseManager(req, res));
+        router.all('/[:]database/[:]connect',                 async (req, res) => await this.renderDatabaseConnectForm(req, res));
         this.router = router;
 
         router = express.Router();
         router.use(bodyParser.urlencoded({ extended: true }));
         router.use(bodyParser.json());
-        router.use(async (req, res) => await this.renderMissingDatabaseManager(req, res));
+        router.use(async (req, res) => await this.renderDatabaseConnectForm(req, res));
 
         this.routerMissingDB = router;
 
-
-        await DatabaseManager.configure();
+        await DatabaseManager.autoConfigure();
+        // try {
+        //     await DatabaseManager.configure();
+        // } catch (e) {
+        //     console.error("Database is not yet configured: ", e);
+        // }
     }
 
     async renderDatabaseJSON(req, res) {
@@ -70,7 +79,7 @@ class DatabaseAPI {
                 databaseList,
             });
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             return res.json({
                 message: `<div class='error'>${error.message || error}</div>`,
@@ -79,7 +88,7 @@ class DatabaseAPI {
         }
     }
 
-    async renderDatabaseEditor(req, res) {
+    async renderDatabaseManager(req, res) {
         try {
 
             if (req.method === 'GET') {
@@ -87,8 +96,8 @@ class DatabaseAPI {
                     await ThemeManager.get()
                         .render(req, `
 <section>
-    <script src="/database/form/databaseform-editor.client.js"></script>
-    <databaseform-editor></databaseform-editor>
+    <script src="/database/form/databaseform-manage.client.js"></script>
+    <databaseform-manage></databaseform-manage>
 </section>
 `)
                 );
@@ -125,7 +134,7 @@ class DatabaseAPI {
                 });
             }
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             if(req.method === 'GET') {
                 res.send(
@@ -138,62 +147,38 @@ class DatabaseAPI {
         }
     }
 
-    async renderMissingDatabaseManager(req, res) {
+    async renderDatabaseConnectForm(req, res) {
         try {
 
             if (req.method === 'GET') {
                 res.send(
                     await ThemeManager.get()
-                        .render(req, `
+                        .render(req, {
+                            title: `Connect to Database`,
+                            content: `
 <section>
-    <script src="/database/form/databaseform-editor.client.js"></script>
-    <databaseform-editor></databaseform-editor>
+    <script src="/database/form/databaseform-connect.client.js"></script>
+    <databaseform-connect></databaseform-connect>
 </section>
-`)
+`
+                        })
                 );
 
             } else {
                 // Handle POST
-                const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = await DatabaseManager.getUserDB(database);
-                const databaseDB = await DatabaseManager.getDatabaseDB(database);
+                if(DatabaseManager.isAvailable)
+                    throw new Error("Database is already connected");
+                await DatabaseManager.configure(req.body);
 
-                const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
-                if(!sessionUser || !sessionUser.isAdmin())
-                    throw new Error("Not authorized");
-
-                let databaseChanges = req.body, databaseUpdateList=[];
-                for(let databaseName in databaseChanges) {
-                    if(databaseChanges.hasOwnProperty(databaseName)) {
-                        const databaseEntry = await databaseDB.fetchDatabaseValue(databaseName)
-                        if(!databaseEntry)
-                            throw new Error("Database entry not found: " + databaseName);
-                        if(databaseChanges[databaseName] !== databaseEntry)
-                            databaseUpdateList.push([databaseName, databaseChanges[databaseName]])
-                    }
-                }
-                for(let i=0; i<databaseUpdateList.length; i++) {
-                    await databaseDB.updateDatabaseValue(databaseUpdateList[i][0], databaseUpdateList[i][1])
-                }
-
-
-                const databaseList = await databaseDB.selectDatabases('1');
                 return res.json({
-                    message: `<div class='success'>${databaseUpdateList.length} Database${databaseUpdateList.length !== 1 ? 's' : ''} updated successfully</div>`,
-                    databaseList
+                    redirect: '/:database',
+                    message: `<div class='success'>Database Configured Successfully!</div>`,
                 });
             }
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
-            if(req.method === 'GET') {
-                res.send(
-                    await ThemeManager.get()
-                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-                );
-            } else {
-                res.json({message: error.stack});
-            }
+            res.json({message: error.message, error: error.stack});
         }
     }
 }

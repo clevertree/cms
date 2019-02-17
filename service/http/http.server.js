@@ -57,17 +57,18 @@ class HTTPServer {
         const router = express.Router();
         this.router = router;
         // Routes
-        [
+        const routes = [
             DatabaseAPI,
             UserAPI,
             ArticleAPI,
             FileAPI,
             ConfigAPI,
             TaskAPI
-        ].forEach(async API => {
-            await API.configure(config);
-            router.use(API.getMiddleware());
-        });
+        ];
+        for(let i=0; i<routes.length; i++) {
+            await routes[i].configure();
+            router.use(routes[i].getMiddleware());
+        }
 
 
         // CMS Asset files
@@ -114,7 +115,7 @@ class HTTPServer {
         // }
     }
 
-    async listen(httpPort=80, sslPort=443) {
+    async listen(httpPort=8080, sslPort=8443) {
         // if(config.ssl === 'y') {
         //     const { SSLServer } = require('./ssl.server');
         //     await SSLServer.listen(httpPort);

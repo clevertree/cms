@@ -2,17 +2,20 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("user/form/userform.css");
+    })("database/form/databaseform.css");
 });
 
 {
-    class HTMLUserRegisterFormElement extends HTMLElement {
+    class HTMLDatabaseManageFormElement extends HTMLElement {
         constructor() {
             super();
             this.state = {
-                message: "To register a new account, please enter your email and password",
+                title: "Manage Website Database",
+                message: "In order to manage this Website to a Database, please enter the database credentials below and hit 'Manage'",
+                method: 'POST',
+                action: '/:database/:manage/',
+                classes: 'databaseform databaseform-manage themed',
                 status: 0,
-                response: null,
                 processing: false
             }
         }
@@ -28,9 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('submit', e => this.onSubmit(e));
 
             this.render();
-            // const userID = this.getAttribute('userID');
-            // if(userID)
-            //     this.requestFormData(userID);
+            this.requestFormData();
         }
 
         onSuccess(e, response) {
@@ -46,19 +47,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         onChange(e) {
-            const form = e.target.form || e.target;
-            if(!form.username.value && form.email.value) {
-                form.username.value = form.email.value.split('@')[0];
-            }
-            form.username.value = (form.username.value || '').replace(/[^\w.]/g, '');
+            // const form = e.target.form || e.target;
+            // if(!form.username.value && form.email.value) {
+            //     form.username.value = form.email.value.split('@')[0];
+            // }
+            // form.username.value = (form.username.value || '').replace(/[^\w.]/g, '');
+        }
+
+        requestFormData(userID) {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = () => {
+                this.setState({processing: false}, xhr.response);
+                this.setState({editable: this.state.sessionUser && this.state.user &&
+                        (this.state.sessionUser.flags.indexOf('admin') !== -1 || this.state.sessionUser.id === this.state.user.id)});
+            };
+            xhr.responseType = 'json';
+            xhr.open ("GET", `:database/:json?getAll=true`, true);
+            // xhr.setRequestHeader("Accept", "application/json");
+            xhr.send ();
+            this.setState({processing: true, userID: userID});
         }
 
         onSubmit(e) {
             e.preventDefault();
             const form = e.target;
             const request = this.getFormData(form);
-            const method = form.getAttribute('method');
-            const action = form.getAttribute('action');
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
@@ -70,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.onError(e, response);
                 }
             };
-            xhr.open(method, action, true);
+            xhr.open(this.state.method, this.state.action, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
@@ -87,12 +100,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = this.getFormData();
             // console.log(formData);
             const hostname = document.location.host.split(':')[0];
+            const defaultDatabaseName = hostname.replace('.', '_') + '_cms';
             this.innerHTML =
                 `
-                <form action="/:user/:register" method="POST" class="userform userform-register themed">
+                <form action="${this.state.action}" method="${this.state.method}" class="${this.state.classes}">
                     <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
-                        <legend>Register a new account</legend>
-                        <table>
+                        <legend>${this.state.title}</legend>
+                        <table style="width: 100%">
                             <thead>
                                 <tr>
                                     <td colspan="2">
@@ -105,28 +119,27 @@ document.addEventListener('DOMContentLoaded', function() {
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="label">Email</td>
+                                    <td class="label">Host</td>
                                     <td>
-                                        <input type="email" name="email" value="${formData.email||''}" required />
+                                        <input type="text" name="host" value="${formData.host||'localhost'}" autocomplete="off" required />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Username</td>
-                                    <td style="position: relative;">
-                                        <input type="text" name="username" value="${formData.username||''}" required /> 
-                                        <div style="position: absolute; right: 30px; top: 7px; color: grey;">@${hostname}</div>
+                                    <td>
+                                        <input type="text" name="user" value="${formData.user||'cms_user'}" autocomplete="off" required /> 
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Password</td>
                                     <td>
-                                        <input type="password" name="password" value="${formData.password||''}" autocomplete="off" required />
+                                        <input type="password" name="password" value="${formData.password||'cms_pass'}" autocomplete="off" required />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="label">Confirm</td>
+                                    <td class="label">Database Name</td>
                                     <td>
-                                        <input type="password" name="password_confirm" value="${formData.password_confirm||''}" autocomplete="off" required/>
+                                        <input type="database" name="database" value="${formData.database||defaultDatabaseName}" autocomplete="off" />
                                     </td>
                                 </tr>
                             </tbody>
@@ -134,10 +147,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td>
-                                        <a href=":user/:login${this.state.userID ? '?userID=' + this.state.userID : ''}">Back to Login</a>
+                                        <a href=":database">Database Status</a>
                                     </td>
                                     <td style="text-align: right;">
-                                        <button type="submit">Register</button>
+                                        <button type="submit">Manage</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -147,6 +160,5 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('userform-register', HTMLUserRegisterFormElement);
-
+    customElements.define('databaseform-manage', HTMLDatabaseManageFormElement);
 }

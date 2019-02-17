@@ -208,7 +208,7 @@ class UserAPI {
         return user;
     }
 
-    async configureAdmin(database, hostname, interactive=false) {
+    async configureAdmin(database, hostname) {
         const userDB = await DatabaseManager.getUserDB(database);
 
 
@@ -220,7 +220,7 @@ class UserAPI {
         }
 
         // Find admin user by DNS info
-        if(!adminUser) {
+        if(!adminUser && false) {
             console.info("Querying WHOIS for admin email: " + hostname);
             let dnsAdminEmail = await DNSManager.queryDNSAdmin(hostname);
             if (dnsAdminEmail) {
@@ -231,37 +231,37 @@ class UserAPI {
             }
         }
 
-        if(!adminUser && interactive) {
-            // Insert admin user
-            let adminUser = await userDB.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
-            if (adminUser) {
-                console.info("Admin user found: " + adminUser.id);
-            } else {
-                for (let i = 0; i < 4; i++) {
-                    try {
-                        // const hostname = require('os').hostname().toLowerCase();
-                        let adminUsername = await PromptManager.prompt(`Please enter an Administrator username`, 'admin');
-                        let adminEmail = await PromptManager.prompt(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + hostname);
-                        let adminPassword = await PromptManager.prompt(`Please enter a password for ${adminUsername}`, "");
-                        let adminPassword2 = await PromptManager.prompt(`Please re-enter a password for ${adminUsername}`, "");
-                        if (!adminPassword) {
-                            adminPassword = (await bcrypt.genSalt(10)).replace(/\W/g, '').substr(0, 8);
-                            adminPassword2 = adminPassword;
-                            console.info("Using generated password: " + adminPassword);
-                        }
-                        if (adminPassword !== adminPassword2) {
-                            console.error("Password mismatch");
-                            continue;
-                        }
-                        adminUser = await userDB.createUser(adminUsername, adminEmail, adminPassword, 'admin');
-                        console.info(`Admin user created (${adminUser.id}: ` + adminUsername);
-                        break;
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-            }
-        }
+        // if(!adminUser && interactive) {
+        //     // Insert admin user
+        //     let adminUser = await userDB.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
+        //     if (adminUser) {
+        //         console.info("Admin user found: " + adminUser.id);
+        //     } else {
+        //         for (let i = 0; i < 4; i++) {
+        //             try {
+        //                 // const hostname = require('os').hostname().toLowerCase();
+        //                 let adminUsername = await PromptManager.prompt(`Please enter an Administrator username`, 'admin');
+        //                 let adminEmail = await PromptManager.prompt(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + hostname);
+        //                 let adminPassword = await PromptManager.prompt(`Please enter a password for ${adminUsername}`, "");
+        //                 let adminPassword2 = await PromptManager.prompt(`Please re-enter a password for ${adminUsername}`, "");
+        //                 if (!adminPassword) {
+        //                     adminPassword = (await bcrypt.genSalt(10)).replace(/\W/g, '').substr(0, 8);
+        //                     adminPassword2 = adminPassword;
+        //                     console.info("Using generated password: " + adminPassword);
+        //                 }
+        //                 if (adminPassword !== adminPassword2) {
+        //                     console.error("Password mismatch");
+        //                     continue;
+        //                 }
+        //                 adminUser = await userDB.createUser(adminUsername, adminEmail, adminPassword, 'admin');
+        //                 console.info(`Admin user created (${adminUser.id}: ` + adminUsername);
+        //                 break;
+        //             } catch (e) {
+        //                 console.error(e);
+        //             }
+        //         }
+        //     }
+        // }
 
         if(adminUser) {
             // Configure site
@@ -704,7 +704,7 @@ class UserAPI {
                 });
             }
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             if(req.method === 'GET') {
                 res.send(

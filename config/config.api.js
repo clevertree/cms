@@ -61,7 +61,7 @@ class ConfigAPI {
                 configList,
             });
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             return res.json({
                 message: `<div class='error'>${error.message || error}</div>`,
@@ -116,7 +116,7 @@ class ConfigAPI {
                 });
             }
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             if(req.method === 'GET') {
                 res.send(

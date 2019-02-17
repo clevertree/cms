@@ -21,7 +21,7 @@ class ConfigDatabase  {
     async selectConfigs(whereSQL, values) {
         let SQL = `
           SELECT c.*
-          FROM config c
+          FROM ${this.table.config} c
           WHERE ${whereSQL}
           `;
 
@@ -53,7 +53,7 @@ class ConfigDatabase  {
     }
 
     async updateConfigValue(name, value, type=null) {
-        let SQL = `REPLACE INTO config SET ?;`;
+        let SQL = `REPLACE INTO ${this.table.config} SET ?;`;
         const result = await DatabaseManager.queryAsync(SQL, {name, value, type});
         return result.affectedRows;
     }

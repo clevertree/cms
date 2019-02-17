@@ -4,13 +4,14 @@ const { DatabaseManager } = require('../../database/database.manager');
 
 class DomainDatabase  {
     constructor(dbName, debug=false) {
-        const tablePrefix = dbName ? `\`${dbName}\`.` : '';
+        if(!dbName)
+            throw new Error("Database name is required");
         this.table = {
-            domain: tablePrefix + '`domain`'
+            domain: `\`${dbName}\`\.domain`
         };
     }
 
-    async configure(interactive=false) {
+    async configure() {
 
         // Check for table
         await DatabaseManager.configureTable(this.table.domain,            DomainRow.getTableSQL(this.table.domain));

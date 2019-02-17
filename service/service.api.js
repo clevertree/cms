@@ -50,7 +50,7 @@ class ServiceAPI {
                 // serviceList,
             });
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             return res.json({
                 message: `<div class='error'>${error.message || error}</div>`,
@@ -88,7 +88,7 @@ class ServiceAPI {
                 });
             }
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             if(req.method === 'GET') {
                 res.send(

@@ -49,7 +49,7 @@ class FileAPI {
             // console.log(err, fields, files);
             // res.json({msg: 'File ', error: err, images: ['/images/asdasdasd.png'], path});
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             res.json({message: error.message, error: error.stack});
             // res.send(
@@ -123,7 +123,7 @@ class FileAPI {
             //         .render(req, file.content, {file})
             // );
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             res.json({message: error.message, error: error.stack});
             // res.send(
@@ -154,7 +154,7 @@ class FileAPI {
             //         .render(req, file.content, {file})
             // );
         } catch (error) {
-            console.log(error);
+            console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             res.json({message: error.message, error: error.stack});
             // res.send(

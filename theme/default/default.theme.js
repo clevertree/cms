@@ -6,12 +6,15 @@ const { UserAPI } = require('../../user/user.api');
 const { DatabaseManager } = require('../../database/database.manager');
 const { TaskManager } = require('../../service/task/task.manager');
 
-const TEMPLATE_DIR = path.resolve(__dirname);
+const TEMPLATE_DIR = path.resolve(__dirname + '/template');
 const BASE_DIR = path.resolve((path.dirname(path.dirname(__dirname))));
 
 class DefaultTheme {
     constructor() {
-        this.menuData = null;
+        this.siteConfig = {
+            name: require('os').hostname,
+            baseURL: '/'
+        };
         this.renderOptions = {
             views: [
                 path.resolve(TEMPLATE_DIR),
@@ -26,9 +29,7 @@ class DefaultTheme {
             article = {content: article};
 
 
-        const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const articleDB = await DatabaseManager.getArticleDB(database);
-        const configDB = await DatabaseManager.getConfigDB(database);
+        // const configDB = await DatabaseManager.getConfigDB(database);
 
         const activeTaskIDs = await TaskManager.getActiveTaskIDs(req);
 
@@ -37,11 +38,22 @@ class DefaultTheme {
         if(prependHTML)
             article.content = prependHTML + article.content;
 
-        const renderData = {article};
+        // Relative path to root
+        // const slashCount = req.path.split('/').length-1;
+        // renderData.baseHRef = slashCount > 1 ? "../".repeat(slashCount-1) : null;
+        const renderData = {
+            article,
+            site: this.siteConfig
+        };
 
 
         // Menu data
-        renderData.menu = await articleDB.queryMenuData(req, true);
+        renderData.menu = [];
+        if(DatabaseManager.isAvailable) {
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const articleDB = await DatabaseManager.getArticleDB(database);
+            renderData.menu = await articleDB.queryMenuData(req, true);
+        }
 
         if(!req.session || !req.session.userID) { // If not logged in
             renderData.menu.push({
@@ -94,11 +106,8 @@ class DefaultTheme {
 
 
         // Server data
-        renderData.site = await configDB.fetchConfigValues('site');
+        // renderData.site = await configDB.fetchConfigValues('site');
 
-        // Relative path to root
-        const slashCount = req.path.split('/').length-1;
-        renderData.baseHRef = slashCount > 1 ? "../".repeat(slashCount-1) : null;
 
         try {
             const templatePath = path.resolve(TEMPLATE_DIR + '/theme.ejs');
