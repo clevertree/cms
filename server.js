@@ -2,23 +2,17 @@
 const { HTTPServer } = require('./service/http/http.server');
 
 (async () => {
+    if(process && process.argv && process.argv.indexOf('--interactive') !== -1) {
+        try {
+            console.log("Starting interactive configuration");
+            await HTTPServer.configureInteractive();
+        } catch (e) {
+
+        }
+    }
+
+
     // Listen for HTTP(S)
-    // await HTTPServer.configure();
-    // await SSLServer.listen();
-
-    // await DatabaseManager.configure({
-    //     "host": "localhost",
-    //     "user": "cms",
-    //     "password": "cms",
-    // });
-
     await HTTPServer.listen();
-
-    // const express = require('express');
-    // const server = express({});
-    // server.use(HTTPServer.getMiddleware());
-    // const port = 8080;
-    // server.listen(port);
-    // console.log(`Listening on ${port}`);
 
 })();

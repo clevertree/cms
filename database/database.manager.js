@@ -29,16 +29,7 @@ class DatabaseManager {
     async getConfigDB(database=null)     { return new (require('../config/config.database').ConfigDatabase)(database); }
     async getDomainDB(database=null)     { return new (require('../service/domain/domain.database').DomainDatabase)(database); }
 
-    async autoConfigure() {
-        const localConfig = new LocalConfig();
-        if(await localConfig.has('database')) {
-            const databaseConfig = await localConfig.getOrCreate('database');
-            await this.configure(databaseConfig);
-        }
-
-    }
-
-    async configure(config=null) {
+    async configureInteractive(promptCallback) {
 
         // const serverConfig = await localConfig.getOrCreate('server');
         // let defaultDatabaseName = defaultHostname.replace('.', '_') + '_cms';
@@ -52,6 +43,14 @@ class DatabaseManager {
         //     // dbConfig.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain === 'y';
         //     // localConfig.saveAll();
         // }
+    }
+
+    async configure(config=null) {
+        const localConfig = new LocalConfig();
+        if(config === null) {
+            config = await localConfig.getOrCreate('database');
+        }
+
         if(this.db) {
             console.warn("Closing existing DB Connection");
             this.db.end();
@@ -79,7 +78,6 @@ class DatabaseManager {
         if(typeof config.multiDomain !== "undefined")
             this.multiDomain = config.multiDomain && config.multiDomain !== 'n';
 
-        const localConfig = new LocalConfig();
         const databaseConfig = await localConfig.getOrCreate('database');
         Object.assign(config, databaseConfig);
         await localConfig.saveAll();
@@ -175,7 +173,7 @@ class DatabaseManager {
             });
             db.connect({}, (err) => {
                 if (err) {
-                    console.error(`DB Connection to '${config.host}' Failed`, err.message);
+                    console.error(`DB Connection to '${config.host}' failed`, err.message);
                     reject(err);
                 } else {
                     resolve(db);

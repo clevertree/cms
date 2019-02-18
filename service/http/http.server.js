@@ -3,9 +3,10 @@ const path = require('path');
 const express = require('express');
 
 const { LocalConfig } = require('../../config/local.config');
+const { PromptManager } = require('../../config/prompt.manager');
 
 // const { TaskManager } = require('../task/task.manager');
-// const { DatabaseManager } = require('../../database/database.manager');
+const { DatabaseManager } = require('../../database/database.manager');
 const { DatabaseAPI } = require('../../database/database.api');
 const { UserAPI } = require('../../user/user.api');
 const { ArticleAPI } = require('../../article/article.api');
@@ -22,7 +23,10 @@ class HTTPServer {
         this.app = null;
     }
 
-    async configure() {
+    async configureInteractive(promptManager=null) {
+        if(!promptManager)
+            promptManager = PromptManager;
+
         // if(this.config)
         //     return this.config;
 
@@ -47,11 +51,19 @@ class HTTPServer {
         // if(hostname) await configDB.updateConfigValue('site.hostname', hostname);
         // else hostname = await configDB.promptValue('site.hostname', `Please enter the Site Public Hostname`, hostname);
         // if(!siteConfig.name) {
-            // TODO: server should already be running. ask on the site!
-            // siteConfig.name = await configDB.promptValue('site.name', `Please enter the Website Name`, hostname);
-            // siteConfig.contact = await configDB.promptValue('site.contact', `Please enter the Website Contact Email`, 'admin@' + hostname, 'email');
-            // siteConfig.keywords = await configDB.promptValue('site.keywords', `Please enter the Website Keywords`, siteConfig.keywords);
+        // TODO: server should already be running. ask on the site!
+        // siteConfig.name = await configDB.promptValue('site.name', `Please enter the Website Name`, hostname);
+        // siteConfig.contact = await configDB.promptValue('site.contact', `Please enter the Website Contact Email`, 'admin@' + hostname, 'email');
+        // siteConfig.keywords = await configDB.promptValue('site.keywords', `Please enter the Website Keywords`, siteConfig.keywords);
         // }
+
+        await DatabaseManager.configureInteractive(promptManager);
+    }
+
+    async configure() {
+
+
+        await DatabaseManager.configure();
 
 
         const router = express.Router();
@@ -116,21 +128,34 @@ class HTTPServer {
     }
 
     async listen(httpPort=8080, sslPort=8443) {
-        // if(config.ssl === 'y') {
-        //     const { SSLServer } = require('./ssl.server');
-        //     await SSLServer.listen(httpPort);
-        //     return;
-        // }
-        if(this.app)
-            throw new Error("App already listening");
+        try {
+            await this.configure();
+            // try {
+            //     await DatabaseManager.configure();
+            // } catch (e) {
+            //     console.error("Database is not yet configured: ", e);
+            // }
 
-        this.app = express();
-        this.app.use(this.getMiddleware());
 
-        // HTTP
-        this.app.listen(httpPort);
-        console.log(`Listening on ${httpPort}`);
-        return this.app;
+            // if(config.ssl === 'y') {
+            //     const { SSLServer } = require('./ssl.server');
+            //     await SSLServer.listen(httpPort);
+            //     return;
+            // }
+            if (this.app)
+                throw new Error("App already listening");
+
+            this.app = express();
+            this.app.use(this.getMiddleware());
+
+            // HTTP
+            this.app.listen(httpPort);
+            console.log(`Listening on ${httpPort}`);
+            return this.app;
+        } catch (e) {
+            console.error(e);
+            process.exit(1);
+        }
     }
 }
 

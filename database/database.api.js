@@ -47,12 +47,6 @@ class DatabaseAPI {
 
         this.routerMissingDB = router;
 
-        await DatabaseManager.autoConfigure();
-        // try {
-        //     await DatabaseManager.configure();
-        // } catch (e) {
-        //     console.error("Database is not yet configured: ", e);
-        // }
     }
 
     async renderDatabaseJSON(req, res) {
