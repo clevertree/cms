@@ -18,8 +18,6 @@ const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
 
 class HTTPServer {
     constructor() {
-        this.router = null;
-        // this.config = null;
         this.app = null;
     }
 
@@ -63,28 +61,8 @@ class HTTPServer {
     async configure() {
 
 
-        await DatabaseManager.configure();
+        // await DatabaseManager.configure();
 
-
-        const router = express.Router();
-        this.router = router;
-        // Routes
-        const routes = [
-            DatabaseAPI,
-            UserAPI,
-            ArticleAPI,
-            FileAPI,
-            ConfigAPI,
-            TaskAPI
-        ];
-        for(let i=0; i<routes.length; i++) {
-            await routes[i].configure();
-            router.use(routes[i].getMiddleware());
-        }
-
-
-        // CMS Asset files
-        router.use(express.static(BASE_DIR));
 
 
 
@@ -95,15 +73,26 @@ class HTTPServer {
 
 
     getMiddleware() {
-        if(!this.router)
-            this.configure();
+        const router = express.Router();
+        // Routes
+        router.use(DatabaseAPI.getMiddleware());
+        router.use(UserAPI.getMiddleware());
+        router.use(ArticleAPI.getMiddleware());
+        router.use(FileAPI.getMiddleware());
+        router.use(ConfigAPI.getMiddleware());
+        router.use(TaskAPI.getMiddleware());
+
+
+        // CMS Asset files
+        router.use(express.static(BASE_DIR));
+
         return (req, res, next) => {
             next = next || (() => { // If no next()
                 console.error("Not Found: " + req.url);
                 res.status(404);
                 res.end("Not Found: " + req.url);
             });
-            return this.router(req, res, next);
+            return router(req, res, next);
         };
 
         // return (req, res, next) => {

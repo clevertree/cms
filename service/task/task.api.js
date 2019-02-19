@@ -7,22 +7,10 @@ const { TaskManager } = require('./task.manager');
 
 class TaskAPI {
     constructor() {
-        this.router = null;
     }
 
 
     getMiddleware() {
-        if(!this.router)
-            this.configure();
-
-        return (req, res, next) => {
-            if(!req.url.startsWith('/:task'))
-                return next();
-            return this.router(req, res, next);
-        }
-    }
-
-    async configure() {
         // Configure Routes
         const router = express.Router();
         const bodyParser = require('body-parser');
@@ -33,8 +21,14 @@ class TaskAPI {
         // Handle Task requests
         router.get('/[:]task/:taskID/[:]json',        async (req, res) => await this.renderTaskJSON(req.params.taskID || null, req, res));
         router.all('/[:]task(/:taskID)?',             async (req, res) => await this.renderTaskManager(req.params.taskID || null, req, res));
-        this.router = router;
+
+        return (req, res, next) => {
+            if(!req.url.startsWith('/:task'))
+                return next();
+            return router(req, res, next);
+        }
     }
+
 
     async renderTaskJSON(taskID, req, res) {
         try {

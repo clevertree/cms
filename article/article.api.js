@@ -8,23 +8,10 @@ const { UserAPI } = require('../user/user.api');
 
 class ArticleAPI {
     constructor() {
-        this.router = null;
     }
 
 
     getMiddleware() {
-        if(!this.router)
-            this.configure();
-
-        return (req, res, next) => {
-            // if(!req.url.startsWith('/:article'))
-            //     return next();
-            return this.router(req, res, next);
-        }
-    }
-
-    async configure() {
-        // Configure Routes
         const router = express.Router();
         const bodyParser = require('body-parser');
         const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
@@ -40,8 +27,14 @@ class ArticleAPI {
         router.all('/[:]article/:id/[:]edit',                       SM, PM, async (req, res) => await this.renderArticleEditorByID(req, res));
         router.all('/[:]article/[:]add',                            SM, PM, async (req, res) => await this.renderArticleAdd(req, res));
         router.all(['/[:]article', '/[:]article/[:]list'],           SM, PM, async (req, res) => await this.renderArticleBrowser(req, res));
-        this.router = router;
+
+        return (req, res, next) => {
+            // if(!req.url.startsWith('/:article'))
+            //     return next();
+            return router(req, res, next);
+        }
     }
+
 
     async checkForRevisionContent(req, article) {
         const database = await DatabaseManager.selectDatabaseByRequest(req);

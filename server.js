@@ -7,7 +7,8 @@ const { HTTPServer } = require('./service/http/http.server');
             console.log("Starting interactive configuration");
             await HTTPServer.configureInteractive();
         } catch (e) {
-
+            console.error(e);
+            process.exit(1);
         }
     }
 

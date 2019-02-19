@@ -6,27 +6,10 @@ const { ThemeManager } = require('../theme/theme.manager');
 
 class DatabaseAPI {
     constructor() {
-        this.router = null;
-        this.routerMissingDB = null;
     }
 
 
     getMiddleware() {
-        if(!this.router)
-            this.configure();
-
-        return (req, res, next) => {
-            if(req.url.startsWith('/:database'))
-                return this.router(req, res, next);
-            if(DatabaseManager.isConnected)
-                return next();
-            if(req.url === '/')
-                return this.routerMissingDB(req, res, next);
-            return next();
-        }
-    }
-
-    async configure() {
         // Configure Routes
         let router = express.Router();
         const bodyParser = require('body-parser');
@@ -38,15 +21,22 @@ class DatabaseAPI {
         router.get('/[:]database/[:]json',                    async (req, res) => await this.renderDatabaseJSON(req, res));
         router.all('/[:]database(/[:]edit)?',                 async (req, res) => await this.renderDatabaseManager(req, res));
         router.all('/[:]database/[:]connect',                 async (req, res) => await this.renderDatabaseConnectForm(req, res));
-        this.router = router;
 
-        router = express.Router();
-        router.use(bodyParser.urlencoded({ extended: true }));
-        router.use(bodyParser.json());
-        router.use(async (req, res) => await this.renderDatabaseConnectForm(req, res));
+        const routerMissingDB = express.Router();
+        routerMissingDB.use(bodyParser.urlencoded({ extended: true }));
+        routerMissingDB.use(bodyParser.json());
+        routerMissingDB.use(async (req, res) => await this.renderDatabaseConnectForm(req, res));
 
-        this.routerMissingDB = router;
 
+        return (req, res, next) => {
+            if(req.url.startsWith('/:database'))
+                return router(req, res, next);
+            if(DatabaseManager.isConnected)
+                return next();
+            if(req.url === '/')
+                return routerMissingDB(req, res, next);
+            return next();
+        }
     }
 
     async renderDatabaseJSON(req, res) {

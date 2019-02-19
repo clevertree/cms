@@ -15,31 +15,45 @@ const { ResetPasswordEmail } = require("./mail/resetpassword.class");
 
 class UserAPI {
     constructor() {
-        this.routerAPI = null;
-        this.routerSession = null;
         this.resetPasswordRequests = {
             'aa196dc0-f51f-4a79-a858-53c3b3b03097': 101
         };
     }
 
-    // Configure
-    async configure(config=null) {
-        const localConfig = new LocalConfig(config, !config);
-        const cookieConfig = await localConfig.getOrCreate('cookie');
+    getSessionMiddleware() {
+        // const localConfig = new LocalConfig(config, !config);
+        const cookieConfig = {}; // await localConfig.getOrCreate('cookie');
 
-        const sessionConfig = await localConfig.getOrCreate('session');
-        if(!sessionConfig.secret) {
-            sessionConfig.secret = require('uuid/v4')();
-            await localConfig.saveAll();
-        }
+        const sessionConfig = {}; //await localConfig.getOrCreate('session');
+        // if(!sessionConfig.secret) {
+        //     sessionConfig.secret = require('uuid/v4')();
+        //     await localConfig.saveAll();
+        // }
         sessionConfig.cookieName = 'session';
 
-        const bodyParser = require('body-parser');
+        // const bodyParser = require('body-parser');
 
         const routerSession = express.Router();
         routerSession.use(session(sessionConfig));
         routerSession.use(cookieParser(cookieConfig));
-        this.routerSession = routerSession;
+
+        return (req, res, next) => {
+            return routerSession(req, res, next);
+        }
+    }
+
+    getMiddleware() {
+        // const localConfig = new LocalConfig(config, !config);
+        // const cookieConfig = await localConfig.getOrCreate('cookie');
+
+        const sessionConfig = {}; //await localConfig.getOrCreate('session');
+        // if(!sessionConfig.secret) {
+        //     sessionConfig.secret = require('uuid/v4')();
+        //     await localConfig.saveAll();
+        // }
+        sessionConfig.cookieName = 'session';
+
+        const bodyParser = require('body-parser');
 
         const routerAPI = express.Router();
         // TODO: handle session_save login
@@ -63,26 +77,10 @@ class UserAPI {
         routerAPI.all('/[:]user/[:]forgotpassword',                     async (req, res) => await this.handleForgotPassword(req, res));
         routerAPI.all('/[:]user(/[:]list)?',                            async (req, res) => await this.handleBrowserRequest(req, res));
 
-        this.routerAPI = routerAPI;
-    }
-
-    getSessionMiddleware() {
-        if(!this.routerSession)
-            this.configure();
-
-        return (req, res, next) => {
-            return this.routerSession(req, res, next);
-        }
-    }
-
-    getMiddleware() {
-        if(!this.routerAPI)
-            this.configure();
-
         return (req, res, next) => {
             if(!req.url.startsWith('/:user'))
                 return next();
-            return this.routerAPI(req, res, next);
+            return routerAPI(req, res, next);
         }
     }
 

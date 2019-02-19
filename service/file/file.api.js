@@ -10,25 +10,19 @@ const { FileDatabase } = require("./file.database");
 
 class FileAPI {
     constructor() {
-        this.router = null;
     }
 
     get fileDB () { return new FileDatabase(this.app.db); }
 
-    async configure() {
+
+    getMiddleware() {
         const router = express.Router();
         router.post('/:?file/[:]upload', formidableMiddleware(), async (req, res) => await this.handleFileUpload(req, res));
         router.all('/:?file/[:]browse', formidableMiddleware(), async (req, res) => await this.handleFileBrowseRequest(req, res));
         router.get(/^\/?:file(.*)/, async (req, res, next) => await this.renderFileByPath(req, res, next));
-        this.router = router;
-    }
-
-    getMiddleware() {
-        if(!this.router)
-            this.configure();
 
         return (req, res, next) => {
-            return this.router(req, res, next);
+            return router(req, res, next);
         }
     }
 

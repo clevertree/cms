@@ -8,22 +8,10 @@ const { UserAPI } = require('../user/user.api');
 
 class ConfigAPI {
     constructor() {
-        this.router = null;
     }
 
 
     getMiddleware() {
-        if(!this.router)
-            this.configure();
-
-        return (req, res, next) => {
-            if(!req.url.startsWith('/:config'))
-                return next();
-            return this.router(req, res, next);
-        }
-    }
-
-    async configure() {
         // Configure Routes
         const router = express.Router();
         const bodyParser = require('body-parser');
@@ -34,7 +22,12 @@ class ConfigAPI {
         // Handle Config requests
         router.get('/[:]config/[:]json',                    async (req, res) => await this.renderConfigJSON(req, res));
         router.all('/[:]config(/[:]edit)?',                 async (req, res) => await this.renderConfigEditor(req, res));
-        this.router = router;
+
+        return (req, res, next) => {
+            if(!req.url.startsWith('/:config'))
+                return next();
+            return router(req, res, next);
+        }
     }
 
     async renderConfigJSON(req, res) {
