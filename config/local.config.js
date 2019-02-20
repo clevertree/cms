@@ -4,10 +4,11 @@ const smtpTransport = require("nodemailer-smtp-transport");
 const path = require('path');
 
 const { FileManager } = require('../service/file/file.manager');
-const { PromptManager } = require('./prompt.manager');
+const { ConfigManager } = require('./config.manager');
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
+// Missing database config always prompts. --configure forces all config options
 class LocalConfig {
     constructor() {
         this.config = null;
@@ -83,7 +84,7 @@ class LocalConfig {
         }
         if(typeof target[lastPath] !== "undefined")
             defaultValue = target[lastPath];
-        const value = await PromptManager.prompt(text, defaultValue);
+        const value = await ConfigManager.prompt(text, defaultValue, validation);
         target[lastPath] = value;
         // if(this.saveLocal)
         //     await this.saveAll();

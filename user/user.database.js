@@ -2,8 +2,8 @@ const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 
 const { DatabaseManager } = require('../database/database.manager');
-const { LocalConfig } = require('../config/local.config');
-const { PromptManager } = require('../config/prompt.manager');
+// const { LocalConfig } = require('../config/local.config');
+const { ConfigManager } = require('../config/config.manager');
 
 
 // const { ConfigManager } = require('../config/config.manager');
@@ -20,8 +20,70 @@ class UserDatabase  {
     async configure(interactive=false) {
         // const localConfig = new LocalConfig(config, !config);
 
-        // Check for table
-        await DatabaseManager.configureTable(this.table.user,            UserRow.getTableSQL(this.table.user));
+        // Configure tables
+        await UserRow.configure(this.table.user);
+
+        // Set up admin user
+
+        // Find admin user
+        let adminUser = await this.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
+        if (adminUser) {
+            console.info("Admin user found: " + adminUser.id);
+            return adminUser;
+        }
+
+        // Find admin user by DNS info
+        if(!adminUser && false) {
+            console.info("Querying WHOIS for admin email: " + hostname);
+            let dnsAdminEmail = await DNSManager.queryDNSAdmin(hostname);
+            if (dnsAdminEmail) {
+                // dnsAdminEmail.split('@')[0]
+                adminUser = await this.createUser('admin', dnsAdminEmail, null, 'admin');
+                console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
+                // TODO: send email;
+            }
+        }
+
+        if(!adminUser && interactive) {
+            // Insert admin user
+            let adminUser = await this.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
+            if (adminUser) {
+                console.info("Admin user found: " + adminUser.id);
+            } else {
+                for (let i = 0; i < 4; i++) {
+                    try {
+                        // const hostname = require('os').hostname().toLowerCase();
+                        let adminUsername = await ConfigManager.prompt(`Please enter an Administrator username`, 'admin');
+                        let adminEmail = await ConfigManager.prompt(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + hostname);
+                        let adminPassword = await ConfigManager.prompt(`Please enter a password for ${adminUsername}`, "");
+                        let adminPassword2 = await ConfigManager.prompt(`Please re-enter a password for ${adminUsername}`, "");
+                        if (!adminPassword) {
+                            adminPassword = (await bcrypt.genSalt(10)).replace(/\W/g, '').substr(0, 8);
+                            adminPassword2 = adminPassword;
+                            console.info("Using generated password: " + adminPassword);
+                        }
+                        if (adminPassword !== adminPassword2) {
+                            console.error("Password mismatch");
+                            continue;
+                        }
+                        adminUser = await this.createUser(adminUsername, adminEmail, adminPassword, 'admin');
+                        console.info(`Admin user created (${adminUser.id}: ` + adminUsername);
+                        break;
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            }
+        }
+
+        if(adminUser) {
+            // Configure site
+            const configDB = new ConfigDatabase(database);
+            let siteConfig = await configDB.fetchConfigValues('site');
+
+            if (!siteConfig.contact)
+                await configDB.updateConfigValue('site.contact', adminUser.email);
+        }
 
     }
 
@@ -138,6 +200,10 @@ CREATE TABLE ${tableName} (
             this.profile = JSON.parse(this.profile);
         if(this.flags)
             this.flags = this.flags.split(',');
+    }
+
+    async configure(tableName) {
+        await DatabaseManager.configureTable(tableName,             UserRow.getTableSQL(tableName));
     }
 
     hasFlag(flag) { return this.flags && this.flags.indexOf(flag) !== -1; }

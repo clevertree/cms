@@ -1,17 +1,26 @@
+const { DatabaseManager } = require('../database/database.manager');
+const { ServiceManager } = require('../service/service.manager');
 
-class PromptManager {
+class ConfigManager {
     constructor() {
     }
 
+    async configure(interactive=false) {
+        await DatabaseManager.configure(interactive);
+        await ServiceManager.configure(interactive);
+    }
 
-
-    prompt(text, defaultValue=null) {
+    prompt(text, defaultValue=null, validation=null) {
         var standard_input = process.stdin;
         standard_input.setEncoding('utf-8');
         return new Promise( ( resolve, reject ) => {
             process.stdout.write(text + ` [${(defaultValue === null ? 'null' : defaultValue)}]: `);
             standard_input.on('data', function (data) {
-                data = data.trim() || defaultValue;
+                switch(validation) {
+                    default:
+                        data = data.trim() || defaultValue;
+                        break;
+                }
                 resolve (data);
             });
         });
@@ -45,4 +54,4 @@ class PromptManager {
 //     debug: true,
 // };
 
-exports.PromptManager = new PromptManager();
+exports.ConfigManager = new ConfigManager();

@@ -20,7 +20,7 @@ class AdminConfigureTask {
             return false;
         }
 
-        const userDB = await DatabaseManager.getUserDB(database);
+        const userDB = new UserDatabase(database);
         let adminUser = await userDB.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
         if(adminUser) {
             console.log(`Admin User Found [DB: ${database}]: `, adminUser);

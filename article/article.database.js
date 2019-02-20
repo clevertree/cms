@@ -11,10 +11,10 @@ class ArticleDatabase {
         this.debug = debug;
     }
 
-    async configure(interactive=false) {
-        // Check for tables
-        await DatabaseManager.configureTable(this.table.article,             ArticleRow.getTableSQL(this.table.article));
-        await DatabaseManager.configureTable(this.table.article_revision,    ArticleRevisionRow.getTableSQL(this.table.article_revision));
+    async configure() {
+        // Configure tables
+        await ArticleRow.configure(this.table.article);
+        await ArticleRevisionRow.configure(this.table.article_revision);
 
         // Insert home page
         let homeArticle = await this.fetchArticleByPath("/");
@@ -206,6 +206,9 @@ CREATE TABLE ${tableName} (
         Object.assign(this, row);
     }
 
+    async configure(tableName) {
+        await DatabaseManager.configureTable(tableName,             ArticleRow.getTableSQL(tableName));
+    }
     // hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
 }
 
@@ -231,6 +234,10 @@ CREATE TABLE ${tableName} (
 
     constructor(row) {
         Object.assign(this, row);
+    }
+
+    async configure(tableName) {
+        await DatabaseManager.configureTable(tableName,             ArticleRevisionRow.getTableSQL(tableName));
     }
 }
 

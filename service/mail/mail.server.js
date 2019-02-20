@@ -13,7 +13,7 @@ class MailServer {
 
     async configure(forcePrompt=0)
     {
-        const configDB = await DatabaseManager.getConfigDB();
+        const configDB = new ConfigDatabase();
         let mailConfig = await configDB.fetchConfigValues('mail');
         if(typeof mailConfig.auth === "undefined")
             mailConfig.auth = {};

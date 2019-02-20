@@ -1,11 +1,11 @@
 
-const { HTTPServer } = require('./service/http/http.server');
+const { ConfigManager } = require('./config/config.manager');
 
 (async () => {
-    if(process && process.argv && process.argv.indexOf('--interactive') !== -1) {
+    if(process && process.argv && process.argv.indexOf('--configure') !== -1) {
         try {
-            console.log("Starting interactive configuration");
-            await HTTPServer.configureInteractive();
+            console.log("Starting configuration");
+            await ConfigManager.configure(true);
         } catch (e) {
             console.error(e);
             process.exit(1);
@@ -13,7 +13,7 @@ const { HTTPServer } = require('./service/http/http.server');
     }
 
 
-    // Listen for HTTP(S)
+    //     Listen for HTTP(S)
     await HTTPServer.listen();
 
 })();

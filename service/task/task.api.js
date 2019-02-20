@@ -36,7 +36,7 @@ class TaskAPI {
                 throw new Error("Must be logged in");
 
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = await DatabaseManager.getUserDB(database);
+            const userDB = new UserDatabase(database);
             const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
 
             const taskList = await TaskManager.getTasks();
@@ -71,7 +71,7 @@ class TaskAPI {
                 let activeResponseHTML = '', inactiveResponseHTML = '';
                 if (!taskID) {
                     const database = await DatabaseManager.selectDatabaseByRequest(req);
-                    const userDB = await DatabaseManager.getUserDB(database);
+                    const userDB = new UserDatabase(database);
                     const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
 
                     const taskList = await TaskManager.getTasks();
@@ -100,7 +100,7 @@ class TaskAPI {
             } else {
                 // Handle POST
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = await DatabaseManager.getUserDB(database);
+                const userDB = new UserDatabase(database);
                 const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
 
                 if(typeof req.body.taskID === "undefined")

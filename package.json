@@ -8,7 +8,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "configure": "node server.js --interactive"
+    "configure": "node server.js --configure"
   },
   "repository": {
     "type": "git",

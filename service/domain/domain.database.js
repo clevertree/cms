@@ -12,9 +12,8 @@ class DomainDatabase  {
     }
 
     async configure() {
-
-        // Check for table
-        await DatabaseManager.configureTable(this.table.domain,            DomainRow.getTableSQL(this.table.domain));
+        // Configure tables
+        await DomainRow.configure(this.table.domain);
 
     }
 
@@ -65,6 +64,11 @@ CREATE TABLE ${tableName} (
 
     constructor(row) {
         Object.assign(this, row);
+    }
+
+
+    async configure(tableName) {
+        await DatabaseManager.configureTable(tableName,             DomainRow.getTableSQL(tableName));
     }
 }
 

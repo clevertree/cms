@@ -29,7 +29,7 @@ class DefaultTheme {
             article = {content: article};
 
 
-        // const configDB = await DatabaseManager.getConfigDB(database);
+        // const configDB = new ConfigDatabase(database);
 
         const activeTaskIDs = await TaskManager.getActiveTaskIDs(req);
 
@@ -51,7 +51,7 @@ class DefaultTheme {
         renderData.menu = [];
         if(DatabaseManager.isAvailable) {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const articleDB = await DatabaseManager.getArticleDB(database);
+            const articleDB = new ArticleDatabase(database);
             renderData.menu = await articleDB.queryMenuData(req, true);
         }
 

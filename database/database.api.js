@@ -42,8 +42,8 @@ class DatabaseAPI {
     async renderDatabaseJSON(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = await DatabaseManager.getUserDB(database);
-            const databaseDB = await DatabaseManager.getDatabaseDB(database);
+            const userDB = new UserDatabase(database);
+            const databaseDB = DatabaseManager.getDatabaseDB(database);
             const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
             if(!sessionUser || !sessionUser.isAdmin())
                 throw new Error("Not authorized");
@@ -89,8 +89,8 @@ class DatabaseAPI {
             } else {
                 // Handle POST
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = await DatabaseManager.getUserDB(database);
-                const databaseDB = await DatabaseManager.getDatabaseDB(database);
+                const userDB = new UserDatabase(database);
+                const databaseDB = DatabaseManager.getDatabaseDB(database);
 
                 const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
                 if(!sessionUser || !sessionUser.isAdmin())

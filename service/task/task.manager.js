@@ -39,7 +39,7 @@ class TaskManager {
         if(typeof req.session.activeTaskIDs === 'undefined') {
             const activeTaskIDs = [];
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = await DatabaseManager.getUserDB(database);
+            const userDB = new UserDatabase(database);
             const sessionUser = await userDB.fetchSessionUser(req);
             for (let i = 0; i < this.tasks.length; i++) {
                 const task = this.tasks[i];

@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 
-const { LocalConfig } = require('../../config/local.config');
-const { PromptManager } = require('../../config/prompt.manager');
+// const { LocalConfig } = require('../../config/local.config');
+const { ConfigManager } = require('../../config/config.manager');
 
 // const { TaskManager } = require('../task/task.manager');
 const { DatabaseManager } = require('../../database/database.manager');
@@ -21,9 +21,7 @@ class HTTPServer {
         this.app = null;
     }
 
-    async configureInteractive(promptManager=null) {
-        if(!promptManager)
-            promptManager = PromptManager;
+    async configure(interactive=false) {
 
         // if(this.config)
         //     return this.config;
@@ -42,7 +40,7 @@ class HTTPServer {
         // await DatabaseManager.configure();
 
         // Configure site
-        // const configDB = await DatabaseManager.getConfigDB();
+        // const configDB = new ConfigDatabase();
         // let siteConfig = await configDB.fetchConfigValues('site');
 
         // let hostname = serverConfig.hostname;
@@ -55,20 +53,7 @@ class HTTPServer {
         // siteConfig.keywords = await configDB.promptValue('site.keywords', `Please enter the Website Keywords`, siteConfig.keywords);
         // }
 
-        await DatabaseManager.configureInteractive(promptManager);
-    }
-
-    async configure() {
-
-
-        // await DatabaseManager.configure();
-
-
-
-
-
-        // return serverConfig;
-
+        // await DatabaseManager.configure(ConfigManager);
     }
 
 
@@ -118,7 +103,14 @@ class HTTPServer {
 
     async listen(httpPort=8080, sslPort=8443) {
         try {
-            await this.configure();
+            await ConfigManager.configure(false);
+        } catch (e) {
+            console.error("Automatic configuration failed. Please use: \n$ npm start --configure\n", e);
+            process.exit(1);
+        }
+
+        try {
+            // await this.configure();
             // try {
             //     await DatabaseManager.configure();
             // } catch (e) {

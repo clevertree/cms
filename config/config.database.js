@@ -11,8 +11,16 @@ class ConfigDatabase  {
 
 
     async configure() {
-        // Configure Table
-        await DatabaseManager.configureTable(this.table.config, ConfigRow.getTableSQL(this.table.config));
+        // Configure tables
+        await ConfigRow.configure(this.table.config);
+
+        // Set up default config
+        let userProfile = await this.fetchConfigValue('user.profile');
+        if (!userProfile)
+            await this.updateConfigValue('user.profile', JSON.stringify([
+                {name: 'name', title: "Full Name"},
+                {name: 'description', type: "textarea", title: "Description"},
+            ]));
 
     }
 
@@ -135,6 +143,10 @@ CREATE TABLE ${tableName} (
         Object.assign(this, row);
         if(this.updated)
             this.updated = new Date(this.updated);
+    }
+
+    async configure(tableName) {
+        await DatabaseManager.configureTable(tableName,             ConfigRow.getTableSQL(tableName));
     }
 }
 

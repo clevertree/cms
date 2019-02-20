@@ -4,12 +4,15 @@ const cookieParser = require('cookie-parser');
 const session = require('client-sessions');
 const uuidv4 = require('uuid/v4');
 
-const { LocalConfig } = require('../config/local.config');
-const { PromptManager } = require('../config/prompt.manager');
+// const { LocalConfig } = require('../config/local.config');
+// const { ConfigManager } = require('../config/config.manager');
 const { DatabaseManager } = require('../database/database.manager');
+// const { ArticleDatabase } = require("../article/article.database");
+const { UserDatabase } = require('./user.database');
+const { ConfigDatabase } = require("../../config.database");
+
 const { DNSManager } = require('../service/domain/dns.manager');
 const { ThemeManager } = require('../theme/theme.manager');
-// const { UserDatabase } = require('./user.database');
 const { TaskManager } = require('../service/task/task.manager');
 const { ResetPasswordEmail } = require("./mail/resetpassword.class");
 
@@ -61,7 +64,7 @@ class UserAPI {
         // API Routes
         routerAPI.use(bodyParser.urlencoded({ extended: true }));
         routerAPI.use(bodyParser.json());
-        routerAPI.use(routerSession);
+        routerAPI.use(this.getSessionMiddleware());
 
         routerAPI.get('/[:]user/:userID(\\w+)/[:]json',                 async (req, res, next) => await this.handleViewRequest(true, req.params.userID, req, res, next));
         routerAPI.get('/[:]user/:userID(\\w+)',                         async (req, res, next) => await this.handleViewRequest(false, req.params.userID, req, res, next));
@@ -104,12 +107,12 @@ class UserAPI {
             throw new Error("Invalid Profile");
 
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = await DatabaseManager.getUserDB(database);
+        const userDB = new UserDatabase(database);
         const user = await userDB.fetchUserByID(userID);
         if(!user)
             throw new Error("User not found: " + userID);
 
-        const configDB = await DatabaseManager.getConfigDB(database);
+        const configDB = new ConfigDatabase(database);
         const profileConfig = JSON.parse(await configDB.fetchConfigValue('user.profile'));
 
         const newProfile = user.profile || {};
@@ -130,7 +133,7 @@ class UserAPI {
 
     async updateFlags(req, userID, flags) {
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = await DatabaseManager.getUserDB(database);
+        const userDB = new UserDatabase(database);
         if(!userID)
             throw new Error("Invalid User ID");
         // const user = await this.userDB.fetchUserByID(userID);
@@ -158,7 +161,7 @@ class UserAPI {
         if(!userID)
             throw new Error("Invalid User ID");
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = await DatabaseManager.getUserDB(database);
+        const userDB = new UserDatabase(database);
         const user = await userDB.fetchUserByID(userID, 'u.*');
         if(!user)
             throw new Error("User not found: " + userID);
@@ -199,7 +202,7 @@ class UserAPI {
             throw new Error("Confirm & Password do not match");
 
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = await DatabaseManager.getUserDB(database);
+        const userDB = new UserDatabase(database);
         const user = await userDB.createUser(username, email, password);
 
         await this.login(req, user.id, password);
@@ -207,68 +210,7 @@ class UserAPI {
     }
 
     async configureAdmin(database, hostname) {
-        const userDB = await DatabaseManager.getUserDB(database);
-
-
-        // Find admin user
-        let adminUser = await userDB.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
-        if (adminUser) {
-            console.info("Admin user found: " + adminUser.id);
-            return adminUser;
-        }
-
-        // Find admin user by DNS info
-        if(!adminUser && false) {
-            console.info("Querying WHOIS for admin email: " + hostname);
-            let dnsAdminEmail = await DNSManager.queryDNSAdmin(hostname);
-            if (dnsAdminEmail) {
-                // dnsAdminEmail.split('@')[0]
-                adminUser = await userDB.createUser('admin', dnsAdminEmail, null, 'admin');
-                console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
-                // TODO: send email;
-            }
-        }
-
-        // if(!adminUser && interactive) {
-        //     // Insert admin user
-        //     let adminUser = await userDB.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
-        //     if (adminUser) {
-        //         console.info("Admin user found: " + adminUser.id);
-        //     } else {
-        //         for (let i = 0; i < 4; i++) {
-        //             try {
-        //                 // const hostname = require('os').hostname().toLowerCase();
-        //                 let adminUsername = await PromptManager.prompt(`Please enter an Administrator username`, 'admin');
-        //                 let adminEmail = await PromptManager.prompt(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + hostname);
-        //                 let adminPassword = await PromptManager.prompt(`Please enter a password for ${adminUsername}`, "");
-        //                 let adminPassword2 = await PromptManager.prompt(`Please re-enter a password for ${adminUsername}`, "");
-        //                 if (!adminPassword) {
-        //                     adminPassword = (await bcrypt.genSalt(10)).replace(/\W/g, '').substr(0, 8);
-        //                     adminPassword2 = adminPassword;
-        //                     console.info("Using generated password: " + adminPassword);
-        //                 }
-        //                 if (adminPassword !== adminPassword2) {
-        //                     console.error("Password mismatch");
-        //                     continue;
-        //                 }
-        //                 adminUser = await userDB.createUser(adminUsername, adminEmail, adminPassword, 'admin');
-        //                 console.info(`Admin user created (${adminUser.id}: ` + adminUsername);
-        //                 break;
-        //             } catch (e) {
-        //                 console.error(e);
-        //             }
-        //         }
-        //     }
-        // }
-
-        if(adminUser) {
-            // Configure site
-            const configDB = await DatabaseManager.getConfigDB(database);
-            let siteConfig = await configDB.fetchConfigValues('site');
-
-            if (!siteConfig.contact)
-                await configDB.updateConfigValue('site.contact', adminUser.email);
-        }
+        const userDB = new UserDatabase(database);
 
         return adminUser;
 
@@ -284,7 +226,7 @@ class UserAPI {
             throw new Error("Password is required");
 
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = await DatabaseManager.getUserDB(database);
+        const userDB = new UserDatabase(database);
         const user = await userDB.fetchUserByID(userID, 'u.*');
         if(!user)
             throw new Error("User not found: " + userID);
@@ -310,7 +252,7 @@ class UserAPI {
 
     async logout(req, res) {
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = await DatabaseManager.getUserDB(database);
+        const userDB = new UserDatabase(database);
         if(req.session.user_session) {
             await userDB.deleteUserSessionByID(req.session.user_session);
         }
@@ -328,7 +270,7 @@ class UserAPI {
             // Render View
             if(asJSON) {
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = await DatabaseManager.getUserDB(database);
+                const userDB = new UserDatabase(database);
                 const user = await userDB.fetchUserByID(userID);
                 if(!user)
                     throw new Error("User not found: " + userID);
@@ -341,7 +283,7 @@ class UserAPI {
                     }
                 }
                 if(req.query.getAll || req.query.getProfileConfig) {
-                    const configDB = await DatabaseManager.getConfigDB(database);
+                    const configDB = new ConfigDatabase(database);
                     response.profileConfig = JSON.parse(await configDB.fetchConfigValue('user.profile'));
                 }
                 res.json(response);
@@ -509,7 +451,7 @@ class UserAPI {
                 if(!req.body.userID)
                     throw new Error("userID is required");
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = await DatabaseManager.getUserDB(database);
+                const userDB = new UserDatabase(database);
                 const user = await userDB.fetchUserByID(req.body.userID);
                 if(!user)
                     throw new Error("User was not found: " + userID);
@@ -544,7 +486,7 @@ class UserAPI {
         try {
 
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = await DatabaseManager.getUserDB(database);
+            const userDB = new UserDatabase(database);
             const user = await userDB.fetchUserByID(userID);
             if(!user)
                 throw new Error("User was not found: " + userID);
@@ -595,7 +537,7 @@ class UserAPI {
     async handleUpdateRequest(type, userID, req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = await DatabaseManager.getUserDB(database);
+            const userDB = new UserDatabase(database);
             if(!userID)
                 throw new Error("Invalid user id");
             // const user = await this.userDB.fetchUserByID(userID);
@@ -687,7 +629,7 @@ class UserAPI {
 
             } else {
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = await DatabaseManager.getUserDB(database);
+                const userDB = new UserDatabase(database);
                 // Handle POST
                 let whereSQL = '1', values = null;
                 if(req.body.search) {
