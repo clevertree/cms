@@ -5,6 +5,7 @@ const { ThemeManager } = require('../theme/theme.manager');
 const { ConfigDatabase } = require("./config.database");
 const { UserDatabase } = require("../user/user.database");
 const { UserAPI } = require('../user/user.api');
+const { SessionAPI } = require('../service/session/session.api');
 
 class ConfigAPI {
     constructor() {
@@ -17,7 +18,7 @@ class ConfigAPI {
         const bodyParser = require('body-parser');
         router.use(bodyParser.urlencoded({ extended: true }));
         router.use(bodyParser.json());
-        router.use(UserAPI.getSessionMiddleware());
+        router.use(SessionAPI.getMiddleware());
 
         // Handle Config requests
         router.get('/[:]config/[:]json',                    async (req, res) => await this.renderConfigJSON(req, res));

@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
-            console.log("RENDER", this.state);
+            // console.log("RENDER", this.state);
             this.innerHTML =
                 `
                  <table class="themed">
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <td class="label">Flags</td>
                             <td>${(this.state.user.flags || ['none']).join(', ')}</td>
                         </tr>
-                        ${this.state.user.profile && Object.keys(this.state.user.profile).map(key => `
+                        ${Object.keys(this.state.user.profile || {}).map(key => `
                         <tr>
                             <td class="label">${key}</td>
                             <td>${this.state.user.profile[key]}</td>

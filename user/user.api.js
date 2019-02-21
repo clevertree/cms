@@ -4,16 +4,17 @@ const cookieParser = require('cookie-parser');
 const session = require('client-sessions');
 const uuidv4 = require('uuid/v4');
 
-// const { LocalConfig } = require('../config/local.config');
+const { LocalConfig } = require('../config/local.config');
 // const { ConfigManager } = require('../config/config.manager');
 const { DatabaseManager } = require('../database/database.manager');
 // const { ArticleDatabase } = require("../article/article.database");
 const { UserDatabase } = require('./user.database');
 const { ConfigDatabase } = require("../config/config.database");
+const { SessionAPI } = require('../service/session/session.api');
 
 const { DNSManager } = require('../service/domain/dns.manager');
 const { ThemeManager } = require('../theme/theme.manager');
-const { TaskManager } = require('../service/task/task.manager');
+const { TaskAPI } = require('../service/task/task.api');
 const { ResetPasswordEmail } = require("./mail/resetpassword.class");
 
 class UserAPI {
@@ -23,26 +24,6 @@ class UserAPI {
         };
     }
 
-    getSessionMiddleware() {
-        // const localConfig = new LocalConfig(config, !config);
-        const cookieConfig = {}; // await localConfig.getOrCreate('cookie');
-
-        const sessionConfig = {}; //await localConfig.getOrCreate('session');
-        if(!sessionConfig.secret) {
-            sessionConfig.secret = require('uuid/v4')();
-        }
-        sessionConfig.cookieName = 'session';
-
-        // const bodyParser = require('body-parser');
-
-        const routerSession = express.Router();
-        routerSession.use(session(sessionConfig));
-        routerSession.use(cookieParser(cookieConfig));
-
-        return (req, res, next) => {
-            return routerSession(req, res, next);
-        }
-    }
 
     getMiddleware() {
         // const localConfig = new LocalConfig(config, !config);
@@ -63,7 +44,7 @@ class UserAPI {
         // API Routes
         routerAPI.use(bodyParser.urlencoded({ extended: true }));
         routerAPI.use(bodyParser.json());
-        routerAPI.use(this.getSessionMiddleware());
+        routerAPI.use(SessionAPI.getMiddleware());
 
         routerAPI.get('/[:]user/:userID(\\w+)/[:]json',                 async (req, res, next) => await this.handleViewRequest(true, req.params.userID, req, res, next));
         routerAPI.get('/[:]user/:userID(\\w+)',                         async (req, res, next) => await this.handleViewRequest(false, req.params.userID, req, res, next));
@@ -244,7 +225,11 @@ class UserAPI {
             req.session.setDuration(1000 * 60 * 60 * 24 * 14) // 2 weeks;
         }
 
-        this.addSessionMessage(req,`<div class='success'>Login Successful: ${user.username}</div>`);
+        const activeTaskIDs = await TaskAPI.getActiveTaskIDs(req);
+        let activeTaskHTML = '';
+        if(activeTaskIDs.length > 0)
+            activeTaskHTML = `<br/><a href=":task">You have ${activeTaskIDs.length} pending task${activeTaskIDs.length > 1 ? 's' : ''}</a>`;
+        this.addSessionMessage(req,`<div class='success'>Login Successful: ${user.username}${activeTaskHTML}</div>`);
 
         return user;
     }

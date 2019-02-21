@@ -5,7 +5,7 @@ const ejs = require('ejs');
 const { UserAPI } = require('../../user/user.api');
 const { ArticleDatabase } = require('../../article/article.database');
 const { DatabaseManager } = require('../../database/database.manager');
-const { TaskManager } = require('../../service/task/task.manager');
+const { TaskAPI } = require('../../service/task/task.manager');
 
 const TEMPLATE_DIR = path.resolve(__dirname + '/template');
 const BASE_DIR = path.resolve((path.dirname(path.dirname(__dirname))));
@@ -32,10 +32,10 @@ class DefaultTheme {
 
         // const configDB = new ConfigDatabase(database);
 
-        const activeTaskIDs = await TaskManager.getActiveTaskIDs(req);
+        const activeTaskIDs = await TaskAPI.getActiveTaskIDs(req);
 
         let prependHTML = await UserAPI.getSessionHTML(req);
-        // prependHTML += await TaskManager.getSessionHTML(req);
+        // prependHTML += await TaskAPI.getSessionHTML(req);
         if(prependHTML)
             article.content = prependHTML + article.content;
 

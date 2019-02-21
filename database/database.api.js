@@ -2,8 +2,9 @@ const express = require('express');
 
 const { DatabaseManager } = require('./database.manager');
 const { UserAPI } = require('../user/user.api');
+const { UserDatabase } = require('../user/user.database');
 const { ThemeManager } = require('../theme/theme.manager');
-
+const { SessionAPI } = require('../service/session/session.api');
 class DatabaseAPI {
     constructor() {
     }
@@ -15,7 +16,7 @@ class DatabaseAPI {
         const bodyParser = require('body-parser');
         router.use(bodyParser.urlencoded({ extended: true }));
         router.use(bodyParser.json());
-        router.use(UserAPI.getSessionMiddleware());
+        router.use(SessionAPI.getMiddleware());
 
         // Handle Database requests
         router.get('/[:]database/[:]json',                    async (req, res) => await this.renderDatabaseJSON(req, res));

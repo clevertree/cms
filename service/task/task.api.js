@@ -3,10 +3,21 @@ const express = require('express');
 const { DatabaseManager } = require('../../database/database.manager');
 const { ThemeManager } = require('../../theme/theme.manager');
 const { UserAPI } = require('../../user/user.api');
-const { TaskManager } = require('./task.manager');
+const { TaskAPI } = require('./task.manager');
+const { AdminConfigureTask } = require('../../user/task/admin-configure.task');
+const { UserDatabase } = require("../../user/user.database");
+const { SessionAPI } = require('../service/session/session.api');
+// TODO: approve all drafts
+
 
 class TaskAPI {
     constructor() {
+        this.tasks = [];
+    }
+
+    async configure(promptCallback) {
+        this.tasks = [];
+        await this.addTask(new AdminConfigureTask);
     }
 
 
@@ -16,11 +27,11 @@ class TaskAPI {
         const bodyParser = require('body-parser');
         router.use(bodyParser.urlencoded({ extended: true }));
         router.use(bodyParser.json());
-        router.use(UserAPI.getSessionMiddleware());
+        router.use(SessionAPI.getMiddleware());
 
         // Handle Task requests
         router.get('/[:]task/:taskID/[:]json',        async (req, res) => await this.renderTaskJSON(req.params.taskID || null, req, res));
-        router.all('/[:]task(/:taskID)?',             async (req, res) => await this.renderTaskManager(req.params.taskID || null, req, res));
+        router.all('/[:]task(/:taskID)?',             async (req, res) => await this.renderTaskAPI(req.params.taskID || null, req, res));
 
         return (req, res, next) => {
             if(!req.url.startsWith('/:task'))
@@ -39,8 +50,8 @@ class TaskAPI {
             const userDB = new UserDatabase(database);
             const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
 
-            const taskList = await TaskManager.getTasks();
-            const task = TaskManager.getTask(taskID);
+            const taskList = await TaskAPI.getTasks();
+            const task = TaskAPI.getTask(taskID);
             const htmlForm = await task.renderFormHTML(req, taskID, database, sessionUser);
             const taskData = {
                 // taskID: taskID,
@@ -63,7 +74,7 @@ class TaskAPI {
         }
     }
 
-    async renderTaskManager(taskID, req, res) {
+    async renderTaskAPI(taskID, req, res) {
         try {
 
             if (req.method === 'GET') {
@@ -74,7 +85,7 @@ class TaskAPI {
                     const userDB = new UserDatabase(database);
                     const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
 
-                    const taskList = await TaskManager.getTasks();
+                    const taskList = await TaskAPI.getTasks();
                     for (let currentTaskID = 0; currentTaskID < taskList.length; currentTaskID++) {
                         if (await taskList[currentTaskID].isActive(database, sessionUser))
                             activeResponseHTML += `\n\t<taskform-manager taskID="${currentTaskID}" active="true"></taskform-manager>`;
@@ -107,7 +118,7 @@ class TaskAPI {
                     throw new Error("Missing required field: taskID");
                 const taskID = parseInt(req.body.taskID);
 
-                const task = await TaskManager.getTask(taskID);
+                const task = await TaskAPI.getTask(taskID);
                 const responseHTML = await task.handleFormSubmit(req, database, sessionUser)
 
                 return res.json({
@@ -128,6 +139,66 @@ class TaskAPI {
             }
         }
     }
+
+
+    async addTask(task) {
+        this.tasks.push(task);
+    }
+
+    getTask(taskID) {
+        if(typeof this.tasks[taskID] === "undefined")
+            throw new Error("Task ID not found: " + taskID);
+        return this.tasks[taskID];
+    }
+
+    getTasks() {
+        return this.tasks.slice();
+    }
+
+    async getTaskIDs() {
+        const taskIDs = [];
+        this.tasks.forEach((task, taskID) => taskIDs.push(taskID));
+        return taskIDs;
+    }
+
+    async getActiveTaskIDs(req) {
+        if (!req.session || !req.session.userID)
+            return [];
+
+        if(typeof req.session.activeTaskIDs === 'undefined') {
+            const activeTaskIDs = [];
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const userDB = new UserDatabase(database);
+            const sessionUser = await userDB.fetchSessionUser(req);
+            for (let i = 0; i < this.tasks.length; i++) {
+                const task = this.tasks[i];
+                if (await task.isActive(database, sessionUser))
+                    activeTaskIDs.push(i);
+            }
+            req.session.activeTaskIDs = activeTaskIDs;
+        }
+        return req.session.activeTaskIDs;
+    }
+
+    async getActiveTasks(req) {
+        const activeTasks = await this.getActiveTaskIDs(req);
+        return activeTasks.map(taskID => this.getTask(taskID));
+    }
+
+    // async getSessionHTML(req) {
+    //     let sessionHTML = '';
+    //     const activeTaskIDs = await this.getActiveTaskIDs(req);
+    //     if(activeTaskIDs.length > 0) {
+    //         sessionHTML = `
+    //         <section class="message">
+    //             <div class='message'>
+    //                 <a href=":task">You have ${activeTaskIDs.length} pending task${activeTaskIDs.length > 1 ? 's' : ''}</a>
+    //             </div>
+    //         </section>
+    //         ${sessionHTML}`;
+    //     }
+    //     return sessionHTML;
+    // }
 }
 
 

@@ -5,6 +5,7 @@ const { ThemeManager } = require('../theme/theme.manager');
 const { ArticleDatabase } = require("./article.database");
 const { UserDatabase } = require("../user/user.database");
 const { UserAPI } = require('../user/user.api');
+const { SessionAPI } = require('../service/session/session.api');
 
 class ArticleAPI {
     constructor() {
@@ -15,7 +16,7 @@ class ArticleAPI {
         const router = express.Router();
         const bodyParser = require('body-parser');
         const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
-        const SM = UserAPI.getSessionMiddleware();
+        const SM = SessionAPI.getMiddleware();
         // Handle Article requests
         router.get(['/[\\w/_-]+', '/'],                         SM, async (req, res, next) => await this.renderArticleByPath(req, res,next));
 

@@ -6,6 +6,7 @@ const { DomainDatabase } = require("./domain.database");
 // const { ArticleDatabase } = require("../article/article.database");
 const { UserDatabase } = require("../user/user.database");
 const { UserAPI } = require('../../user/user.api');
+const { SessionAPI } = require('../service/session/session.api');
 
 class DomainAPI {
     constructor() {
@@ -30,7 +31,7 @@ class DomainAPI {
         const bodyParser = require('body-parser');
         router.use(bodyParser.urlencoded({ extended: true }));
         router.use(bodyParser.json());
-        router.use(UserAPI.getSessionMiddleware());
+        router.use(SessionAPI.getMiddleware());
 
         // Handle Domain requests
         router.get('/[:]domain/[:]json',                    async (req, res) => await this.renderDomainJSON(req, res));

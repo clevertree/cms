@@ -125,8 +125,8 @@ class DatabaseManager {
 
 
         // Init Task Manager
-        // const { TaskManager } = require('../service/task/task.manager');
-        // await TaskManager.configure(database);
+        // const { TaskAPI } = require('../service/task/task.manager');
+        // await TaskAPI.configure(database);
 
     }
 
