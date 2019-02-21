@@ -1,0 +1,63 @@
+/** Forms **/
+
+form.user {
+    max-width: 520px;
+}
+
+form.user > fieldset {
+    margin: 0px auto;
+}
+
+form.user > fieldset > table {
+    width: 100%;
+    border-collapse: collapse;
+}
+form.user > fieldset > table > caption {
+    /* font-weight: bold; */
+    /*font-style: italic;*/
+    text-align: left;
+    /* padding-bottom: 1em; */
+}
+/** Form Input **/
+
+form.user input[type=text],
+form.user input[type=email],
+form.user input[type=password],
+form.user select,
+form.user textarea {
+    min-width: 90%;
+}
+
+
+/** Custom Forms **/
+
+form.user-registerform {
+    /*text-align: center;*/
+}
+
+
+/** Tables **/
+
+table.user .icon-edit {
+    text-decoration: none;
+}
+
+/** Row **/
+table.user tr.odd {
+    background-color: #0001;
+}
+
+/** Labels **/
+
+table.user td.label {
+    text-align: right;
+    padding: 8px 8px 8px 0px;
+    font-weight: bold;
+    white-space: nowrap;
+    display: block;
+    min-width: 90%;
+}
+table.user td.label:after {
+    content: ':'
+}
+

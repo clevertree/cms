@@ -1,5 +1,3 @@
-const express = require('express');
-
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeManager } = require('../theme/theme.manager');
 const { ArticleDatabase } = require("./article.database");
@@ -13,8 +11,10 @@ class ArticleAPI {
 
 
     getMiddleware() {
-        const router = express.Router();
+        const express = require('express');
         const bodyParser = require('body-parser');
+
+        const router = express.Router();
         const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
         const SM = SessionAPI.getMiddleware();
         // Handle Article requests

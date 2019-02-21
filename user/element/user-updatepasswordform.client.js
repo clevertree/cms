@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("user/form/userform.css");
+    })("user/element/user.css");
 });
 
 {
-    class HTMLUserChangePasswordFormElement extends HTMLElement{
+    class HTMLUserUpdatePasswordFormElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
         render() {
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.user.id}/:password" method="POST" class="userform userform-update-password themed">
+                <form action="/:user/${this.state.user.id}/:password" method="POST" class="user user-changepasswordform themed">
                     <fieldset ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>
                         <legend>Change Password</legend>
                         <table>
@@ -166,6 +166,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('userform-update-password', HTMLUserChangePasswordFormElement);
+    customElements.define('user-updatepasswordform', HTMLUserUpdatePasswordFormElement);
 
 }

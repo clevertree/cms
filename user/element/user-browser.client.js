@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("user/form/userform.css");
+    })("user/element/user.css");
 });
 
 
@@ -117,7 +117,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
         let searchField = this.querySelector('input[name=search]');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
-            `<form action="/:user/:list" method="POST" class="userform userform-browser themed">
+            `<form action="/:user/:list" method="POST" class="user user-browser themed">
              <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
                 <table>
                     <thead>
@@ -192,4 +192,4 @@ class HTMLUserFormBrowserElement extends HTMLElement {
 //     // isGuest() { return this.hasFlag('guest'); }
 // };
 
-customElements.define('userform-browser', HTMLUserFormBrowserElement);
+customElements.define('user-browser', HTMLUserFormBrowserElement);

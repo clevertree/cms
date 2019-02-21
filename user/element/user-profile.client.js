@@ -10,8 +10,11 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
-                userID: -1,
-                message: "Loading Profile.."
+                // message: "No Message",
+                // status: 0,
+                processing: false,
+                editable: false,
+                user: {id: -1, flags:[]}
             };
             // this.state = {id:-1, flags:[]};
         }
@@ -36,22 +39,20 @@ document.addEventListener('DOMContentLoaded', function() {
         requestFormData(userID) {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
-                this.setState({processing: false}, xhr.response);
-                this.setState({editable: this.state.sessionUser && this.state.user &&
-                        (this.state.sessionUser.flags.indexOf('admin') !== -1 || this.state.sessionUser.id === this.state.user.id)});
+                this.setState(xhr.response, {processing: false});
             };
             xhr.responseType = 'json';
             xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
             // xhr.setRequestHeader("Accept", "application/json");
             xhr.send ();
-            this.setState({processing: true, userID: userID});
+            this.setState({processing: true, user: {id: userID}});
         }
 
         render() {
-            // console.log("RENDER", this.state);
+            console.log("RENDER", this.state);
             this.innerHTML =
                 `
-                 <table class="themed">
+                 <table class="user themed">
                     <tbody>
                     ${this.state.user ? `
                         <tr>
@@ -59,15 +60,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         </tr>
                         <tr>
                             <td class="label">ID</td>
-                            <td>${this.state.userID}</td>
+                            <td>
+                                ${this.state.user.id}
+                                ${this.state.editable ? `<a href=":user/${this.state.user.id}/:profile" class="icon-edit" title="Edit Profile" style="float: right;">[&#x270D;]</a>` : ''}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Flags</td>
+                            <td>
+                                ${(this.state.user.flags || ['none']).join(', ')}
+                                ${this.state.editable ? `<a href=":user/${this.state.user.id}/:flags" class="icon-edit" title="Edit Flags" style="float: right;">[&#x270D;]</a>` : ''}
+                            </td>
                         </tr>
                         <tr>
                             <td class="label">Email</td>
                             <td>${this.state.user.email}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Flags</td>
-                            <td>${(this.state.user.flags || ['none']).join(', ')}</td>
                         </tr>
                         ${Object.keys(this.state.user.profile || {}).map(key => `
                         <tr>

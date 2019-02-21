@@ -2,18 +2,19 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("user/form/userform.css");
+    })("user/element/user.css");
 });
 
 {
-    class HTMLUserResetPasswordFormElement extends HTMLElement{
+    class HTMLUserUpdateFlagsFormElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
-                userID: "",
-                password: "",
-                message: "Please enter a new password and hit submit below",
-                status: 0
+                message: "In order to update this flag, please modify this form and hit 'Update' below",
+                status: 0,
+                processing: false,
+                editable: true,
+                user: {id: -1, flags:[]}
             };
             // this.state = {id:-1, flags:[]};
         }
@@ -28,16 +29,12 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('change', e => this.onChange(e));
             this.addEventListener('submit', e => this.onSubmit(e));
 
-            this.state.userID = this.getAttribute('userID');
-            if(!this.state.userID)
-                this.setState({message: "Error: userID is required", status: 400});
-            this.state.uuid = this.getAttribute('uuid');
-            if(!this.state.uuid)
-                this.setState({message: "Error: UUID is required", status: 400});
-            this.state.username = this.getAttribute('username');
-
             this.render();
+            const userID = this.getAttribute('userID');
+            if(userID)
+                this.requestFormData(userID);
         }
+
 
         onSuccess(e, response) {
             console.log(e, response);
@@ -51,7 +48,40 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error(e, response);
         }
 
-        onSubmit(e) {
+        onChange(e) {
+            let value = e.target.value;
+            if(e.target.getAttribute('type') === 'checkbox')
+                value = e.target.checked;
+            if(e.target.name && typeof this.state.user.profile[e.target.name] !== 'undefined')
+                this.state.user.flags[e.target.name] = value;
+            if(e.target.getAttribute('type') === 'checkbox') {
+                if(e.target.checked) {
+                    this.state.user.flags =
+                        this.state.user.flags.concat(e.target.name)
+                            .filter((v, i, a) => a.indexOf(v) === i);
+                } else {
+                    this.state.user.flags =
+                        this.state.user.flags.filter((v) => v !== e.target.name);
+                }
+            }
+        }
+
+        requestFormData(userID) {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = () => {
+                this.setState({processing: false, editable: false}, xhr.response);
+                if(this.state.sessionUser && this.state.user) {
+                    if(this.state.sessionUser.flags.indexOf('admin') !== -1)
+                        this.setState({editable: 'admin'});
+                }
+            };
+            xhr.responseType = 'json';
+            xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
+            xhr.send ();
+            this.setState({processing: true});
+        }
+
+        submit(e) {
             e.preventDefault();
             const form = e.target; // querySelector('form.user-login-form');
             this.setState({processing: true});
@@ -64,31 +94,33 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.onload = (e) => {
                 console.log(e, xhr.response);
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                this.setState({processing: false, status: xhr.status}, response);
+                response.status = xhr.status;
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
                     this.onError(e, response);
                 }
+                this.setState({response, user:response.user, processing: false});
             };
             xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            // xhr.setRequestHeader("Accept", "application/json");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
         }
 
         render() {
-            const messageClass = this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error');
+            // console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.userID}/:resetpassword/${this.state.uuid}" method="POST" class="userform userform-resetpassword themed">
-                    <fieldset>
-                        <legend>Reset Password</legend>
+                <form action="/:user/${this.state.user.id}/:flags" method="POST" class="user user-flagsform themed">
+                    <fieldset ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>
+                        <legend>Update User Flags</legend>
                         <table>
                             <thead>
                                 <tr>
                                     <td colspan="2">
-                                        <div class="${messageClass} status-${this.state.status}">
+                                        <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
                                             ${this.state.message}
                                         </div>
                                     </td>
@@ -97,21 +129,20 @@ document.addEventListener('DOMContentLoaded', function() {
                             </thead>
                             <tbody class="themed">
                                 <tr>
-                                    <td class="label">Username</td>
+                                    <td class="label">Email</td>
                                     <td>
-                                        <input type="text" name="username" value="${this.state.username}" disabled />
+                                        <input type="email" name="email" value="${this.state.user.email}" disabled/>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="label">New Password</td>
+                                    <td class="label">Flags</td>
                                     <td>
-                                        <input type="password" name="password_new" autocomplete="off" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Confirm Password</td>
-                                    <td>
-                                        <input type="password" name="password_confirm" autocomplete="off" required />
+                                        ${['admin'].map(flagName => `
+                                        <label>
+                                            <input type="checkbox" class="themed" name="${flagName.toLowerCase()}" value="1" ${this.state.user.flags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
+                                            ${flagName.replace('-', ' ')}
+                                        </label>
+                                        `).join('')}
                                     </td>
                                 </tr>
                             </tbody>
@@ -119,10 +150,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td>
-                                        <button onclick="location.href=':user/:login'" type="button">Go Back</button>
                                     </td>
                                     <td style="text-align: right;">
-                                        <button type="submit">Submit</button>
+                                        <button type="submit">Update Flags</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -132,6 +162,5 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('userform-resetpassword', HTMLUserResetPasswordFormElement);
-
+    customElements.define('user-updateflagsform', HTMLUserUpdateFlagsFormElement);
 }

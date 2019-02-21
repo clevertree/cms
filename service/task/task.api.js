@@ -2,11 +2,10 @@ const express = require('express');
 
 const { DatabaseManager } = require('../../database/database.manager');
 const { ThemeManager } = require('../../theme/theme.manager');
-const { UserAPI } = require('../../user/user.api');
-const { TaskAPI } = require('./task.manager');
+// const { UserAPI } = require('../../user/user.api');
 const { AdminConfigureTask } = require('../../user/task/admin-configure.task');
 const { UserDatabase } = require("../../user/user.database");
-const { SessionAPI } = require('../service/session/session.api');
+const { SessionAPI } = require('../session/session.api');
 // TODO: approve all drafts
 
 
@@ -88,17 +87,17 @@ class TaskAPI {
                     const taskList = await TaskAPI.getTasks();
                     for (let currentTaskID = 0; currentTaskID < taskList.length; currentTaskID++) {
                         if (await taskList[currentTaskID].isActive(database, sessionUser))
-                            activeResponseHTML += `\n\t<taskform-manager taskID="${currentTaskID}" active="true"></taskform-manager>`;
+                            activeResponseHTML += `\n\t<service-task-managerform taskID="${currentTaskID}" active="true"></service-task-managerform>`;
                         else
-                            inactiveResponseHTML += `\n\t<taskform-manager taskID="${currentTaskID}"></taskform-manager>`;
+                            inactiveResponseHTML += `\n\t<service-task-managerform taskID="${currentTaskID}"></service-task-managerform>`;
                     }
                 } else {
-                    activeResponseHTML += `\n\t<taskform-manager taskID="${taskID}" active="true"></taskform-manager>`;
+                    activeResponseHTML += `\n\t<service-task-managerform taskID="${taskID}" active="true"></service-task-managerform>`;
                 }
 
                 const responseHTML = `
 <section>
-    <script src="/service/task/form/taskform-manager.client.js"></script>
+    <script src="/service/task/element/service-task-managerform.client.js"></script>
     ${activeResponseHTML}
     ${inactiveResponseHTML}
 </section>`;

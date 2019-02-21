@@ -2,26 +2,26 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("user/form/userform.css");
+    })("user/element/user.css");
 });
 
 {
-    class HTMLUserProfileFormElement extends HTMLElement{
+    class HTMLUserLoginFormElement extends HTMLElement {
         constructor() {
             super();
             this.state = {
-                message: "In order to update this profile, please modify this form and hit 'Update Profile' below",
+                message: "In order to start a new session please enter your username or email and password and hit 'Log in' below",
                 status: 0,
                 processing: false,
-                editable: true,
-                user: {id: -1, profile: {}},
+                userID: "",
+                password: "",
+                session_save: ""
             };
-            // this.state = {id:-1, flags:[]};
         }
 
         setState(newState) {
             for(let i=0; i<arguments.length; i++)
-                Object.assign(this.state, arguments[i]);
+               Object.assign(this.state, arguments[i]);
             this.render();
         }
 
@@ -29,10 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('change', e => this.onChange(e));
             this.addEventListener('submit', e => this.onSubmit(e));
 
+            this.state.userID = this.getAttribute('userID');
             this.render();
-            const userID = this.getAttribute('userID');
-            if(userID)
-                this.requestFormData(userID);
         }
 
 
@@ -49,27 +47,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         onChange(e) {
-            if(!this.state.user.profile)
-                this.state.user.profile = {};
-            if(e.target.name) // typeof this.state.user.profile[e.target.name] !== 'undefined')
-                this.state.user.profile[e.target.name] = e.target.value;
-        }
-
-        requestFormData(userID) {
-            const xhr = new XMLHttpRequest();
-            xhr.onload = () => {
-                this.setState({processing: false, editable: false}, xhr.response);
-                if(this.state.sessionUser && this.state.user) {
-                    if(this.state.sessionUser.flags.indexOf('admin') !== -1)
-                        this.setState({editable: 'admin'});
-                    else if (this.state.sessionUser.id === this.state.user.id)
-                        this.setState({editable: 'user'});
-                }
-            };
-            xhr.responseType = 'json';
-            xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
-            xhr.send ();
-            this.setState({processing: true});
+            if(typeof this.state[e.target.name] !== 'undefined')
+                this.state[e.target.name] = e.target.value;
         }
 
         onSubmit(e) {
@@ -102,28 +81,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return formData;
         }
 
-        renderProfileField(field) {
-            const userProfile = this.state.user.profile || {};
-            const value = userProfile[field.name];
-            let attributeHTML = field.attributes || '';
-            attributeHTML += field.class ? ` class="${field.class}"` : '';
-            switch(field.type) {
-                case 'textarea':
-                    return `<textarea name="${field.name}" ${attributeHTML}>${value||''}</textarea>`;
-                case 'select':
-                    return `<select name="${field.name}" ${attributeHTML}></select>`;
-                default:
-                    return `<input name="${field.name}" type="${field.type||'text'}" value="${value||''}" ${attributeHTML}/>`;
-            }
-        }
-
         render() {
             // console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.user.id}/:profile" method="POST" class="userform userform-update-profile themed">
-                    <fieldset ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>
-                        <legend>Update Profile</legend>
+                <form action="/:user/:login" method="POST" class="user user-loginform themed">
+                    <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
+                        <legend>Log In</legend>
                         <table>
                             <thead>
                                 <tr>
@@ -135,29 +99,39 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
                             </thead>
-                            <tbody class="themed">
+                            <tbody>
                                 <tr>
-                                    <td class="label">Email</td>
+                                    <td class="label">Username</td>
                                     <td>
-                                        <input type="email" name="email" value="${this.state.user.email}" disabled/>
+                                        <input type="text" name="userID" value="${this.state.userID}" required />
                                     </td>
                                 </tr>
-                            ${(this.state.profileConfig || []).map(profileField => `
                                 <tr>
-                                    <td class="label">${profileField.title || profileField.name}</td>
+                                    <td class="label">Password</td>
                                     <td>
-                                        ${this.renderProfileField(profileField)}
+                                        <input type="password" name="password" value="" required />
                                     </td>
                                 </tr>
-                            `).join('')}
+                                <tr>
+                                    <td class="label">Stay Logged In</td>
+                                    <td>
+                                        <input type="checkbox" name="session_save" ${this.state.session_save ? 'checked="checked"' : ''} value="1"/>
+                                        <div style="float: right">
+                                            <a href=":user/:forgotpassword${this.state.userID ? '?userID=' + this.state.userID : ''}">Forgot Password?</a>
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
+                                <tr>
                                     <td>
+                                        <a href=":user/:register${this.state.userID ? '?userID=' + this.state.userID : ''}">Register</a>
                                     </td>
                                     <td style="text-align: right;">
-                                        <button type="submit">Update Profile</button>
+                                        <button type="submit">Log In</button>
                                     </td>
+                                </tr>
                             </tfoot>
                         </table>
                     </fieldset>
@@ -165,6 +139,5 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('userform-update-profile', HTMLUserProfileFormElement);
-
+    customElements.define('user-loginform', HTMLUserLoginFormElement);
 }

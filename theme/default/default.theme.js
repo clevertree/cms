@@ -5,7 +5,7 @@ const ejs = require('ejs');
 const { UserAPI } = require('../../user/user.api');
 const { ArticleDatabase } = require('../../article/article.database');
 const { DatabaseManager } = require('../../database/database.manager');
-const { TaskAPI } = require('../../service/task/task.manager');
+const { TaskAPI } = require('../../service/task/task.api');
 
 const TEMPLATE_DIR = path.resolve(__dirname + '/template');
 const BASE_DIR = path.resolve((path.dirname(path.dirname(__dirname))));

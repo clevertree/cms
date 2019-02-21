@@ -2,19 +2,20 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("user/form/userform.css");
+    })("user/element/user.css");
 });
 
 {
-    class HTMLUserRegisterFormElement extends HTMLElement {
+    class HTMLUserForgotPasswordFormElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
-                message: "To register a new account, please enter your email and password",
+                message: "In order to recover your password, please enter your email and hit submit below",
                 status: 0,
-                response: null,
-                processing: false
-            }
+                userID: "",
+                password: "",
+            };
+            // this.state = {id:-1, flags:[]};
         }
 
         setState(newState) {
@@ -27,35 +28,29 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('change', e => this.onChange(e));
             this.addEventListener('submit', e => this.onSubmit(e));
 
+            this.state.userID = this.getAttribute('userID');
             this.render();
-            // const userID = this.getAttribute('userID');
-            // if(userID)
-            //     this.requestFormData(userID);
         }
 
         onSuccess(e, response) {
             console.log(e, response);
-            if(response.redirect) {
-                this.setState({processing: true});
-                setTimeout(() => window.location.href = response.redirect, 3000);
-            }
+            this.setState({processing: true});
+            setTimeout(() => window.location.href = response.redirect, 3000);
         }
 
         onError(e, response) {
             console.error(e, response);
+            this.setState({processing: false});
         }
 
         onChange(e) {
-            const form = e.target.form || e.target;
-            if(!form.username.value && form.email.value) {
-                form.username.value = form.email.value.split('@')[0];
-            }
-            form.username.value = (form.username.value || '').replace(/[^\w.]/g, '');
+            if(typeof this.state[e.target.name] !== 'undefined')
+                this.state[e.target.name] = e.target.value;
         }
 
         onSubmit(e) {
             e.preventDefault();
-            const form = e.target;
+            const form = e.target; // querySelector('form.user-login-form');
             const request = this.getFormData(form);
             const method = form.getAttribute('method');
             const action = form.getAttribute('action');
@@ -63,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                this.setState({processing: false, status: xhr.status}, response);
+                this.setState({status: xhr.status}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
@@ -84,19 +79,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
-            const formData = this.getFormData();
-            // console.log(formData);
-            const hostname = document.location.host.split(':')[0];
+            const messageClass = this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error');
+            // console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/:register" method="POST" class="userform userform-register themed">
+                <form action="/:user/:forgotpassword" method="POST" class="user user-forgotpasswordform themed">
                     <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
-                        <legend>Register a new account</legend>
+                        <legend>Forgot Password</legend>
                         <table>
                             <thead>
                                 <tr>
                                     <td colspan="2">
-                                        <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                        <div class="${messageClass} status-${this.state.status}">
                                             ${this.state.message}
                                         </div>
                                     </td>
@@ -105,28 +99,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="label">Email</td>
+                                    <td class="label">Email or UserID</td>
                                     <td>
-                                        <input type="email" name="email" value="${formData.email||''}" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Username</td>
-                                    <td style="position: relative;">
-                                        <input type="text" name="username" value="${formData.username||''}" required /> 
-                                        <div style="position: absolute; right: 30px; top: 7px; color: grey;">@${hostname}</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Password</td>
-                                    <td>
-                                        <input type="password" name="password" value="${formData.password||''}" autocomplete="off" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Confirm</td>
-                                    <td>
-                                        <input type="password" name="password_confirm" value="${formData.password_confirm||''}" autocomplete="off" required/>
+                                        <input type="text" name="userID" value="${this.state.userID}" placeholder="Username or Email" required />
                                     </td>
                                 </tr>
                             </tbody>
@@ -134,10 +109,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td>
-                                        <a href=":user/:login${this.state.userID ? '?userID=' + this.state.userID : ''}">Back to Login</a>
+                                        <button onclick="location.href=':user/:login'" type="button">Go Back</button>
                                     </td>
                                     <td style="text-align: right;">
-                                        <button type="submit">Register</button>
+                                        <button type="submit">Submit</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -147,6 +122,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('userform-register', HTMLUserRegisterFormElement);
+    customElements.define('user-forgotpasswordform', HTMLUserForgotPasswordFormElement);
 
 }

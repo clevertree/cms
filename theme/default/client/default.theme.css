@@ -392,15 +392,6 @@ body.theme-default {
     background: #CCC;
 }
 
-.theme-default .themed td.label {
-    /* padding-right: 6px; */
-    /* text-align: right; */
-    /* font-weight: bold; */
-    /* max-width: 36px; */
-    /* text-transform: capitalize; */
-    /* white-space: nowrap; */
-}
-
 
 /** Flex List **/
 
