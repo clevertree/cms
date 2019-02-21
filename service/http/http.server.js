@@ -21,7 +21,7 @@ class HTTPServer {
         this.app = null;
     }
 
-    async configure(interactive=false) {
+    async configure(promptCallback) {
 
         // if(this.config)
         //     return this.config;
@@ -102,13 +102,6 @@ class HTTPServer {
     }
 
     async listen(httpPort=8080, sslPort=8443) {
-        try {
-            await ConfigManager.configure(false);
-        } catch (e) {
-            console.error("Automatic configuration failed. Please use: \n$ npm start --configure\n", e);
-            process.exit(1);
-        }
-
         try {
             // await this.configure();
             // try {

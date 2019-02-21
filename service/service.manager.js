@@ -4,8 +4,8 @@ class ServiceManager {
     constructor() {
     }
 
-    async configure(interactive=false) {
-        await HTTPServer.configure(interactive);
+    async configure(promptCallback) {
+        await HTTPServer.configure(promptCallback);
     }
 }
 

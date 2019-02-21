@@ -9,7 +9,7 @@ const uuidv4 = require('uuid/v4');
 const { DatabaseManager } = require('../database/database.manager');
 // const { ArticleDatabase } = require("../article/article.database");
 const { UserDatabase } = require('./user.database');
-const { ConfigDatabase } = require("../../config.database");
+const { ConfigDatabase } = require("../config/config.database");
 
 const { DNSManager } = require('../service/domain/dns.manager');
 const { ThemeManager } = require('../theme/theme.manager');
@@ -28,10 +28,9 @@ class UserAPI {
         const cookieConfig = {}; // await localConfig.getOrCreate('cookie');
 
         const sessionConfig = {}; //await localConfig.getOrCreate('session');
-        // if(!sessionConfig.secret) {
-        //     sessionConfig.secret = require('uuid/v4')();
-        //     await localConfig.saveAll();
-        // }
+        if(!sessionConfig.secret) {
+            sessionConfig.secret = require('uuid/v4')();
+        }
         sessionConfig.cookieName = 'session';
 
         // const bodyParser = require('body-parser');

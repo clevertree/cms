@@ -1,16 +1,14 @@
-const express = require('express');
-const nodemailer = require('nodemailer');
-const smtpTransport = require("nodemailer-smtp-transport");
 const path = require('path');
 
 const { FileManager } = require('../service/file/file.manager');
-const { ConfigManager } = require('./config.manager');
+// const { ConfigManager } = require('./config.manager');promptCallback
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
 
 // Missing database config always prompts. --configure forces all config options
 class LocalConfig {
-    constructor() {
+    constructor(promptCallback) {
+        this.promptCallback = promptCallback || function(text, defaultValue) { return defaultValue; };
         this.config = null;
         // if(config) {
         //     if(typeof config !== 'object')
@@ -84,7 +82,7 @@ class LocalConfig {
         }
         if(typeof target[lastPath] !== "undefined")
             defaultValue = target[lastPath];
-        const value = await ConfigManager.prompt(text, defaultValue, validation);
+        const value = await this.promptCallback(text, defaultValue, validation);
         target[lastPath] = value;
         // if(this.saveLocal)
         //     await this.saveAll();

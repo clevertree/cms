@@ -6,8 +6,15 @@ class ConfigManager {
     }
 
     async configure(interactive=false) {
-        await DatabaseManager.configure(interactive);
-        await ServiceManager.configure(interactive);
+        try {
+            let promptCallback = interactive === true ? this.prompt : this.autoPrompt;
+            await DatabaseManager.configure(promptCallback);
+            await ServiceManager.configure(promptCallback);
+        } catch (e) {
+            console.error("Configuration failed: ", e);
+            if(!interactive)
+                console.log("Please run $ npm start --configure")
+        }
     }
 
     prompt(text, defaultValue=null, validation=null) {
@@ -25,7 +32,13 @@ class ConfigManager {
             });
         });
     }
-    // var readline = require('readline');
+
+    autoPrompt(text, defaultValue=null, validation=null) {
+        return defaultValue;
+    }
+
+
+        // var readline = require('readline');
     //
     // var rl = readline.createInterface({
     //     input: process.stdin,

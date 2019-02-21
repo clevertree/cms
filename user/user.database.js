@@ -4,6 +4,7 @@ const uuidv4 = require('uuid/v4');
 const { DatabaseManager } = require('../database/database.manager');
 // const { LocalConfig } = require('../config/local.config');
 const { ConfigManager } = require('../config/config.manager');
+const { ConfigDatabase } = require("../config/config.database");
 
 
 // const { ConfigManager } = require('../config/config.manager');
@@ -17,19 +18,37 @@ class UserDatabase  {
         this.debug = debug;
     }
 
-    async configure(interactive=false) {
+    async configure(promptCallback) {
         // const localConfig = new LocalConfig(config, !config);
 
         // Configure tables
-        await UserRow.configure(this.table.user);
+        await DatabaseManager.configureTable(this.table.user,            UserRow.getTableSQL(this.table.user));
+
 
         // Set up admin user
 
         // Find admin user
-        let adminUser = await this.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
+        let adminUser = await this.fetchUser("FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
         if (adminUser) {
             console.info("Admin user found: " + adminUser.id);
-            return adminUser;
+            let changePassword = await promptCallback(`Would you like to change the admin password (Username: ${adminUser.username}) [y or n]?`, 'n');
+            if(changePassword.toLowerCase() === 'y') {
+                for (let i = 0; i < 4; i++) {
+                    let adminPassword = await promptCallback(`Please enter a new password for ${adminUser.username}`, "", 'password');
+                    let adminPassword2 = await promptCallback(`Please re-enter the new password for ${adminUser.username}`, "", 'password');
+                    if (!adminPassword) {
+                        console.info("Password is required");
+                        continue;
+                    }
+                    if (adminPassword !== adminPassword2) {
+                        console.error("Password mismatch");
+                        continue;
+                    }
+                    await this.updateUser(adminUser.id, null, adminPassword);
+                    console.info(`Admin user password changed (${adminUser.id}: ` + adminUser.username);
+                    break;
+                }
+            }
         }
 
         // Find admin user by DNS info
@@ -44,45 +63,32 @@ class UserDatabase  {
             }
         }
 
-        if(!adminUser && interactive) {
+        if(!adminUser && promptCallback) {
             // Insert admin user
-            let adminUser = await this.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
-            if (adminUser) {
-                console.info("Admin user found: " + adminUser.id);
-            } else {
-                for (let i = 0; i < 4; i++) {
-                    try {
-                        // const hostname = require('os').hostname().toLowerCase();
-                        let adminUsername = await ConfigManager.prompt(`Please enter an Administrator username`, 'admin');
-                        let adminEmail = await ConfigManager.prompt(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + hostname);
-                        let adminPassword = await ConfigManager.prompt(`Please enter a password for ${adminUsername}`, "");
-                        let adminPassword2 = await ConfigManager.prompt(`Please re-enter a password for ${adminUsername}`, "");
-                        if (!adminPassword) {
-                            adminPassword = (await bcrypt.genSalt(10)).replace(/\W/g, '').substr(0, 8);
-                            adminPassword2 = adminPassword;
-                            console.info("Using generated password: " + adminPassword);
-                        }
-                        if (adminPassword !== adminPassword2) {
-                            console.error("Password mismatch");
-                            continue;
-                        }
-                        adminUser = await this.createUser(adminUsername, adminEmail, adminPassword, 'admin');
-                        console.info(`Admin user created (${adminUser.id}: ` + adminUsername);
-                        break;
-                    } catch (e) {
-                        console.error(e);
+            for (let i = 0; i < 4; i++) {
+                try {
+                    // const hostname = require('os').hostname().toLowerCase();
+                    const defaultHostname     = (require('os').hostname()).toLowerCase();
+                    let adminUsername =     await promptCallback(`Please enter an Administrator username`, 'admin');
+                    let adminEmail =        await promptCallback(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + defaultHostname);
+                    let adminPassword =     await promptCallback(`Please enter a password for ${adminUsername}`, "", 'password');
+                    let adminPassword2 =    await promptCallback(`Please re-enter a password for ${adminUsername}`, "", 'password');
+                    if (!adminPassword) {
+                        adminPassword = (await bcrypt.genSalt(10)).replace(/\W/g, '').substr(0, 8);
+                        adminPassword2 = adminPassword;
+                        console.info("Using generated password: " + adminPassword);
                     }
+                    if (adminPassword !== adminPassword2) {
+                        console.error("Password mismatch");
+                        continue;
+                    }
+                    adminUser = await this.createUser(adminUsername, adminEmail, adminPassword, 'admin');
+                    console.info(`Admin user created (${adminUser.id}: ` + adminUsername);
+                    break;
+                } catch (e) {
+                    console.error(e);
                 }
             }
-        }
-
-        if(adminUser) {
-            // Configure site
-            const configDB = new ConfigDatabase(database);
-            let siteConfig = await configDB.fetchConfigValues('site');
-
-            if (!siteConfig.contact)
-                await configDB.updateConfigValue('site.contact', adminUser.email);
         }
 
     }
@@ -160,13 +166,13 @@ class UserDatabase  {
 
     async updateUser(userID, email, password, profile, flags) {
         let set = {};
-        if(email !== null) set.email = email;
         if(password) {
             const salt = await bcrypt.genSalt(10);
             set.password = await bcrypt.hash(password, salt);
         }
-        if(profile !== null) set.profile = JSON.stringify(profile);
-        if(flags !== null) set.flags = Array.isArray(flags) ? flags.join(',') : flags;
+        if(email)   set.email = email;
+        if(profile) set.profile = JSON.stringify(profile);
+        if(flags)   set.flags = Array.isArray(flags) ? flags.join(',') : flags;
         let SQL = `UPDATE ${this.table.user} SET ? WHERE id = ?`;
 
         return (await DatabaseManager.queryAsync(SQL, [set, userID]))
@@ -200,10 +206,6 @@ CREATE TABLE ${tableName} (
             this.profile = JSON.parse(this.profile);
         if(this.flags)
             this.flags = this.flags.split(',');
-    }
-
-    async configure(tableName) {
-        await DatabaseManager.configureTable(tableName,             UserRow.getTableSQL(tableName));
     }
 
     hasFlag(flag) { return this.flags && this.flags.indexOf(flag) !== -1; }

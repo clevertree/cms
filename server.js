@@ -1,15 +1,13 @@
 
 const { ConfigManager } = require('./config/config.manager');
+const { HTTPServer } = require('./service/http/http.server');
 
 (async () => {
     if(process && process.argv && process.argv.indexOf('--configure') !== -1) {
-        try {
-            console.log("Starting configuration");
-            await ConfigManager.configure(true);
-        } catch (e) {
-            console.error(e);
-            process.exit(1);
-        }
+        console.log("Starting configuration");
+        await ConfigManager.configure(true);
+    } else {
+        await ConfigManager.configure(false);
     }
 
 

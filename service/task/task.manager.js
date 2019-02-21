@@ -1,6 +1,7 @@
 // TODO: approve all drafts
-const { AdminConfigureTask } = require('../../user/task/admin-configure.task');
 const { DatabaseManager } = require('../../database/database.manager');
+const { AdminConfigureTask } = require('../../user/task/admin-configure.task');
+const { UserDatabase } = require("../../user/user.database");
 
 class TaskManager {
     constructor() {

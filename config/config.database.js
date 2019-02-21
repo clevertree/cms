@@ -1,8 +1,9 @@
 const { DatabaseManager } = require('../database/database.manager');
 
 class ConfigDatabase  {
-    constructor(dbName, debug=false) {
-        const tablePrefix = dbName ? `\`${dbName}\`.` : '';
+    constructor(database, debug=false) {
+        const tablePrefix = database ? `\`${database}\`.` : '';
+        this.database = database;
         this.table = {
             config: tablePrefix + '`config`'
         };
@@ -10,9 +11,9 @@ class ConfigDatabase  {
     }
 
 
-    async configure() {
+    async configure(promptCallback) {
         // Configure tables
-        await ConfigRow.configure(this.table.config);
+        await DatabaseManager.configureTable(this.table.config, ConfigRow.getTableSQL(this.table.config));
 
         // Set up default config
         let userProfile = await this.fetchConfigValue('user.profile');
@@ -21,6 +22,18 @@ class ConfigDatabase  {
                 {name: 'name', title: "Full Name"},
                 {name: 'description', type: "textarea", title: "Description"},
             ]));
+
+        // Find admin user
+            // Configure site
+        let siteContact = await this.fetchConfigValue('site.contact');
+        if (!siteContact) {
+            const UserDatabase = require('../user/user.database').UserDatabase;
+            const userDB = new UserDatabase(this.database);
+            let adminUser = await userDB.fetchUser("FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
+            if(adminUser) {
+                await this.updateConfigValue('site.contact', adminUser.email);
+            }
+        }
 
     }
 
@@ -143,10 +156,6 @@ CREATE TABLE ${tableName} (
         Object.assign(this, row);
         if(this.updated)
             this.updated = new Date(this.updated);
-    }
-
-    async configure(tableName) {
-        await DatabaseManager.configureTable(tableName,             ConfigRow.getTableSQL(tableName));
     }
 }
 
