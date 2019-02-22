@@ -1,0 +1,77 @@
+/** Anchors **/
+form.config a,
+table.config a{
+    text-decoration: none;
+    min-width: 300px;
+}
+
+/** Forms **/
+
+form.config {
+    max-width: 1200px;
+
+}
+
+form.config > fieldset {
+    margin: 0px auto;
+}
+
+form.config > fieldset > table {
+    width: 100%;
+    border-collapse: collapse;
+}
+form.config > fieldset > table > caption {
+    /* font-weight: bold; */
+    /*font-style: italic;*/
+    text-align: left;
+    /* padding-bottom: 1em; */
+}
+/** Form Input **/
+
+form.config input[type=text],
+form.config input[type=email],
+form.config input[type=password],
+form.config select,
+form.config textarea {
+    min-width: 90%;
+}
+form.config textarea {
+    min-height: 300px;
+}
+
+/** Custom Forms **/
+
+form.config-registerform {
+    /*text-align: center;*/
+}
+
+
+/** Tables **/
+
+table.config {
+    width: 100%;
+}
+
+table.config .icon-edit {
+    text-decoration: none;
+}
+
+/** Row **/
+table.config tr.odd {
+    background-color: #0001;
+}
+
+/** Labels **/
+
+table.config td.label {
+    text-align: right;
+    padding: 8px 8px 8px 0px;
+    font-weight: bold;
+    white-space: nowrap;
+    display: block;
+    min-width: 90%;
+}
+table.config td.label:after {
+    content: ':'
+}
+

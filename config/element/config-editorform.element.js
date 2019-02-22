@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("config/form/taskform.css");
+    })("config/element/config.css");
 });
 
 
@@ -30,6 +30,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
 
         this.state.userID = this.getAttribute('userID');
         this.render();
+        this.requestFormData();
     }
 
 
@@ -92,43 +93,39 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         this.setState({processing: true});
     }
 
-    submit(e) {
-        if(e)
-            e.preventDefault();
-        const form = this.querySelector('form');
-        const configChanges = this.checkSubmittable();
+    onSubmit(e) {
+        if(e) e.preventDefault();
+        const form = e ? e.target : this.querySelector('form');
+        const request = this.getFormData(form);
+        const method = form.getAttribute('method');
+        const action = form.getAttribute('action');
 
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
-            const response = Object.assign({
-                processing: false,
-                status: xhr.status,
-            }, xhr.response);
-            this.setState(response);
-
+            const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+            this.setState({status: xhr.status, processing: false}, response);
             if(xhr.status === 200) {
                 this.onSuccess(e, response);
             } else {
                 this.onError(e, response);
             }
         };
-        xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
+        xhr.open(method, action, true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        // xhr.setRequestHeader("Accept", "application/json");
         xhr.responseType = 'json';
-        xhr.send(JSON.stringify(configChanges));
+        xhr.send(JSON.stringify(request));
         this.setState({processing: true});
     }
 
     render() {
         const form = this.querySelector('form');
-//         console.log("RENDER", this.state);
+        console.log("RENDER", this.state);
         let searchField = this.querySelector('input[name=search]');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
-        `<form action="/:config/:edit" method="POST" class="configform configform-editor themed">
+        `<form action="/:config/:edit" method="POST" class="config config-editorform themed">
             <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
-                <table>
+                <table class="config">
                     <thead>
                         <tr>
                             <td colspan="4">
@@ -207,4 +204,4 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         }
     }
 }
-customElements.define('configform-editor', HTMLConfigFormEditorElement);
+customElements.define('config-editorform', HTMLConfigFormEditorElement);
