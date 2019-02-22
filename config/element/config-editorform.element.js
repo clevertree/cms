@@ -10,6 +10,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
+            search: "",
             configList: [],
             status: null,
             message: null,
@@ -47,13 +48,16 @@ class HTMLConfigFormEditorElement extends HTMLElement {
     }
 
     onChange(e) {
+        console.log(this.state);
         this.checkSubmittable(e);
     }
 
     onKeyUp(e) {
         // this.requestFormData(e);
-        if(e.target.name === 'search')
+        if(e.target.id === 'search') {
+            this.state.search = e.target.value;
             this.renderResults();
+        }
         this.checkSubmittable(e);
     }
 
@@ -93,6 +97,13 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         this.setState({processing: true});
     }
 
+    getFormData(form) {
+        form = form || this.querySelector('form');
+        const formData = {};
+        new FormData(form).forEach((value, key) => formData[key] = value);
+        return formData;
+    }
+
     onSubmit(e) {
         if(e) e.preventDefault();
         const form = e ? e.target : this.querySelector('form');
@@ -120,7 +131,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
     render() {
         const form = this.querySelector('form');
         console.log("RENDER", this.state);
-        let searchField = this.querySelector('input[name=search]');
+        let searchField = this.querySelector('input#search');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
         `<form action="/:config/:edit" method="POST" class="config config-editorform themed">
@@ -129,7 +140,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
                     <thead>
                         <tr>
                             <td colspan="4">
-                                <input type="text" name="search" placeholder="Search Configs" value="${form ? form.search.value||'' : ''}"/>
+                                <input type="text" id="search" placeholder="Search Configs" value="${searchField ? searchField.value||'' : ''}"/>
                             </td>
                         </tr>
                         <tr><td colspan="4"><hr/></td></tr>
@@ -159,7 +170,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
                 </table>
             </fieldset>
         </form>`;
-        searchField = this.querySelector('input[name=search]');
+        searchField = this.querySelector('input#search');
         searchField.focus();
         if(selectionStart)
             searchField.selectionStart = selectionStart;

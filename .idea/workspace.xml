@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/form/configform-editor.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/element/config-editorform.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/form/configform.css" beforeDir="false" afterPath="$PROJECT_DIR$/config/element/config.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/element/config-editorform.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/element/config-editorform.element.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -18,8 +15,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/config/config.api.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="864">
-              <caret line="75" column="22" selection-start-line="75" selection-start-column="22" selection-end-line="75" selection-end-column="22" />
+            <state relative-caret-position="1254">
+              <caret line="66" column="40" lean-forward="true" selection-start-line="66" selection-start-column="40" selection-end-line="66" selection-end-column="40" />
             </state>
           </provider>
         </entry>
@@ -27,8 +24,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/config/element/config-editorform.element.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="344">
-              <caret line="32" column="31" selection-start-line="32" selection-start-column="31" selection-end-line="32" selection-end-column="31" />
+            <state relative-caret-position="649">
+              <caret line="57" selection-start-line="57" selection-end-line="57" />
               <folding>
                 <element signature="n#style#0;n#td#0;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
               </folding>
@@ -57,8 +54,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/article/element/article-browser.element.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="703">
-              <caret line="73" lean-forward="true" selection-start-line="73" selection-end-line="96" selection-end-column="5" />
+            <state relative-caret-position="773">
+              <caret line="104" lean-forward="true" selection-start-line="98" selection-start-column="4" selection-end-line="104" />
             </state>
           </provider>
         </entry>
@@ -91,7 +88,6 @@
       <find>.submit</find>
       <find>articleform-add</find>
       <find>const messageClass</find>
-      <find>getFormData</find>
       <find>/add</find>
       <find>console.log(e, response)</find>
       <find>console.log(e, response);</find>
@@ -104,6 +100,7 @@
       <find>article-add</find>
       <find>configform-</find>
       <find>article</find>
+      <find>getFormData</find>
     </findStrings>
     <replaceStrings>
       <replace>taskform</replace>
@@ -360,12 +357,12 @@
       <workItem from="1550514731637" duration="6794000" />
       <workItem from="1550681264188" duration="16758000" />
       <workItem from="1550769794414" duration="1963000" />
-      <workItem from="1550784757575" duration="15988000" />
+      <workItem from="1550784757575" duration="16950000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="117235000" />
+    <option name="totallyTimeSpent" value="118197000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -380,7 +377,7 @@
     <frame x="0" y="-2" width="3840" height="2162" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.0782815" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.0782815" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="npm" order="2" side_tool="true" />
       <window_info id="Favorites" order="3" side_tool="true" />
@@ -398,7 +395,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Database" order="3" />
-      <window_info anchor="right" id="Debug" order="4" visible="true" weight="0.2775435" />
+      <window_info active="true" anchor="right" id="Debug" order="4" visible="true" weight="0.2775435" />
       <window_info anchor="right" id="Find" order="5" weight="0.32948753" />
     </layout>
   </component>
@@ -473,6 +470,12 @@
           <line>207</line>
           <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="113" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/config/config.api.js</url>
+          <line>95</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="127" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -755,20 +758,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config/config.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="864">
-          <caret line="75" column="22" selection-start-line="75" selection-start-column="22" selection-end-line="75" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/article/element/article-browser.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="703">
-          <caret line="73" lean-forward="true" selection-start-line="73" selection-end-line="96" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/article/element/article.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="760">
@@ -783,10 +772,24 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/article/element/article-browser.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="773">
+          <caret line="104" lean-forward="true" selection-start-line="98" selection-start-column="4" selection-end-line="104" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/config.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1254">
+          <caret line="66" column="40" lean-forward="true" selection-start-line="66" selection-start-column="40" selection-end-line="66" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/config/element/config-editorform.element.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="344">
-          <caret line="32" column="31" selection-start-line="32" selection-start-column="31" selection-end-line="32" selection-end-column="31" />
+        <state relative-caret-position="649">
+          <caret line="57" selection-start-line="57" selection-end-line="57" />
           <folding>
             <element signature="n#style#0;n#td#0;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
           </folding>
