@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
         onSuccess(e, response) {
-            console.log(e, response);
+            console.log(response);
             if(response.redirect) {
                 this.setState({processing: true});
                 setTimeout(() => window.location.href = response.redirect, 3000);

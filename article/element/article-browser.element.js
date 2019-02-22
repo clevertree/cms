@@ -33,7 +33,7 @@ class HTMLArticleBrowserElement extends HTMLElement {
     }
 
     onSuccess(e, response) {
-        console.log(e, response);
+        console.log(response);
         if(response.redirect) {
             this.setState({processing: true});
             setTimeout(() => window.location.href = response.redirect, 3000);
@@ -105,7 +105,7 @@ class HTMLArticleBrowserElement extends HTMLElement {
 
     render() {
         const formData = this.getFormData();
-        console.log("RENDER", this.state);
+        // console.log("RENDER", this.state);
         let searchField = this.querySelector('input[name=search]');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =

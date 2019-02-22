@@ -20,14 +20,15 @@ class ArticleAPI {
         // Handle Article requests
         router.get(['/[\\w/_-]+', '/'],                         SM, async (req, res, next) => await this.renderArticleByPath(req, res,next));
 
-        router.get('/[:]article/:id/[:]json',                       SM, async (req, res, next) => await this.renderArticleByID(true, req, res, next));
-        router.get(['/[:]article/:id/view', '/[:]article/:id'],   SM, async (req, res, next) => await this.renderArticleByID(false, req, res, next));
-        router.get('/[:]article/[:]sync',                           SM, async (req, res) => await this.renderArticleBrowser(req, res));
+        router.get('/[:]article/:id/[:]json',                   SM, async (req, res, next) => await this.renderArticleByID(true, req, res, next));
+        router.get(['/[:]article/:id/view', '/[:]article/:id'], SM, async (req, res, next) => await this.renderArticleByID(false, req, res, next));
+        router.get('/[:]article/[:]sync',                       SM, async (req, res) => await this.renderArticleBrowser(req, res));
         // TODO: sync
 
-        router.all('/[:]article/:id/[:]edit',                       SM, PM, async (req, res) => await this.renderArticleEditorByID(req, res));
-        router.all('/[:]article/[:]add',                            SM, PM, async (req, res) => await this.renderArticleAdd(req, res));
-        router.all(['/[:]article', '/[:]article/[:]list'],           SM, PM, async (req, res) => await this.renderArticleBrowser(req, res));
+        router.all('/[:]article/:id/[:]edit',                   SM, PM, async (req, res) => await this.renderArticleEditorByID(req, res));
+        router.all('/[:]article/:id/[:]delete',                 SM, PM, async (req, res) => await this.renderArticleDeleteByID(req, res));
+        router.all('/[:]article/[:]add',                        SM, PM, async (req, res) => await this.renderArticleAdd(req, res));
+        router.all(['/[:]article', '/[:]article/[:]list'],      SM, PM, async (req, res) => await this.renderArticleBrowser(req, res));
 
         return (req, res, next) => {
             // if(!req.url.startsWith('/:article'))
@@ -36,6 +37,18 @@ class ArticleAPI {
         }
     }
 
+    async renderError(error, req, res, asJSON=false) {
+        console.error(`${req.method} ${req.url}`, error);
+        res.status(400);
+        if(req.method === 'GET' && !asJSON) {          // Handle GET
+            res.send(
+                await ThemeManager.get()
+                    .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
+            );
+        } else {
+            res.json({message: error.stack});
+        }
+    }
 
     async checkForRevisionContent(req, article) {
         const database = await DatabaseManager.selectDatabaseByRequest(req);
@@ -72,12 +85,7 @@ class ArticleAPI {
                     .render(req, article)
             );
         } catch (error) {
-            console.error(`${req.method} ${req.url}`, error);
-            res.status(400);
-            res.send(
-                await ThemeManager.get()
-                    .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-            );
+            await this.renderError(error, req, res);
         }
     }
 
@@ -126,20 +134,11 @@ class ArticleAPI {
                 );
             }
         } catch (error) {
-            console.error(`${req.method} ${req.url}`, error);
-            res.status(400);
-            if(asJSON) {
-                res.json({message: error.stack});
-            } else {
-                res.send(
-                    await ThemeManager.get()
-                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-                );
-            }
+            await this.renderError(error, req, res, asJSON);
         }
     }
 
-    async renderArticleEditorByID(req, res, next) {
+    async renderArticleEditorByID(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
             const articleDB = new ArticleDatabase(database);
@@ -147,15 +146,9 @@ class ArticleAPI {
 
             if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
+            const sessionUser = await userDB.fetchUserByID(req.session.userID);
 
             let article = await articleDB.fetchArticleByID(req.params.id);
-            if(!article)
-                return next();
-
-            const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
-            if(!sessionUser || !sessionUser.isAdmin())
-                throw new Error("Not authorized");
-
 
             if(req.method === 'GET') {          // Handle GET
                 // Render Editor
@@ -163,8 +156,8 @@ class ArticleAPI {
                     await ThemeManager.get(article.theme)
                         .render(req, `
 <section style="max-width: 1600px;">
-    <script src="/article/element/article-editor.element.js"></script>
-    <article-editor id="${article.id}"></article-editor>
+    <script src="/article/element/article-editorform.element.js"></script>
+    <article-editorform id="${req.params.id}"></article-editorform>
 </section>
 <section class="article-preview-container">
     <h1 style="text-align: center;">Preview</h1>
@@ -182,6 +175,8 @@ class ArticleAPI {
                 switch (req.body.action) {
                     default:
                     case 'publish':
+                        if(!sessionUser || !sessionUser.isAdmin())
+                            throw new Error("Not authorized");
                         const affectedRows = await articleDB.updateArticle(
                             article.id,
                             req.body.title,
@@ -226,16 +221,51 @@ class ArticleAPI {
                 }
             }
         } catch (error) {
-            console.error(`${req.method} ${req.url}`, error);
-            res.status(400);
+            await this.renderError(error, req, res);
+        }
+    }
+
+    async renderArticleDeleteByID(req, res) {
+        try {
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const articleDB = new ArticleDatabase(database);
+            const userDB = new UserDatabase(database);
+
+            if(!req.session || !req.session.userID)
+                throw new Error("Must be logged in");
+            const sessionUser = await userDB.fetchUserByID(req.session.userID);
+            if(!sessionUser || !sessionUser.isAdmin())
+                throw new Error("Not authorized");
+
+            let article = await articleDB.fetchArticleByID(req.params.id);
+
+
             if(req.method === 'GET') {          // Handle GET
+                // Render Editor
                 res.send(
-                    await ThemeManager.get()
-                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
+                    await ThemeManager.get(article.theme)
+                        .render(req, `
+<section style="max-width: 1600px;">
+    <script src="/article/element/article-deleteform.element.js"></script>
+    <article-deleteform id="${req.params.id}"></article-editorform>
+</section>
+`)
                 );
+
             } else {
-                res.json({message: error.stack});
+                // Handle POST
+                const affectedRows = await articleDB.deleteArticle(
+                    article.id
+                );
+
+                return res.json({
+                    redirect: '/:article/',
+                    message: "Article deleted successfully.<br/>Redirecting...",
+                    affectedArticleRows: affectedRows
+                });
             }
+        } catch (error) {
+            await this.renderError(error, req, res);
         }
     }
 
@@ -261,7 +291,6 @@ class ArticleAPI {
     <script src="/article/element/article-addform.element.js"></script>
     <article-addform></article-addform>
 </section>
-
 `)
                 );
 
@@ -284,16 +313,7 @@ class ArticleAPI {
                 });
             }
         } catch (error) {
-            console.error(`${req.method} ${req.url}`, error);
-            res.status(400);
-            if(req.method === 'GET') {          // Handle GET
-                res.send(
-                    await ThemeManager.get()
-                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-                );
-            } else {
-                res.json({message: error.stack});
-            }
+            await this.renderError(error, req, res);
         }
     }
 
@@ -331,16 +351,7 @@ class ArticleAPI {
                 });
             }
         } catch (error) {
-            console.error(`${req.method} ${req.url}`, error);
-            res.status(400);
-            if(req.method === 'GET') {
-                res.send(
-                    await ThemeManager.get()
-                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-                );
-            } else {
-                res.json({message: error.stack});
-            }
+            await this.renderError(error, req, res);
         }
 
     }

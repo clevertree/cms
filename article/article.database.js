@@ -67,7 +67,7 @@ class ArticleDatabase {
         let set = {};
         if(title) set.title = title;
         if(content) set.content = content;
-        if(path) set.path = path;
+        if(path) set.path = path[0] === '/' ? path : '/' + path;
         if(user_id !== null) set.user_id = user_id;
         if(parent_id !== null) set.parent_id = parent_id;
         if(theme) set.theme = theme;
@@ -95,6 +95,15 @@ class ArticleDatabase {
           WHERE a.id = ?
         `;
         const results = await DatabaseManager.queryAsync(SQL, [set, id]);
+        return results.affectedRows;
+    }
+
+    async deleteArticle(id) {
+        let SQL = `
+          DELETE FROM ${this.table.article}
+          WHERE id = ?
+        `;
+        const results = await DatabaseManager.queryAsync(SQL, [id]);
         return results.affectedRows;
     }
 

@@ -2,13 +2,25 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/article/element/article-deleteform.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/article/article.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/article/article.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/article/element/article-addform.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/article/element/article-addform.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/article/article.database.js" beforeDir="false" afterPath="$PROJECT_DIR$/article/article.database.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/article/element/article-browser.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/article/element/article-browser.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/article/element/article-editor.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/article/element/article-editor.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/article/element/article-editor.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/article/element/article-editorform.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/article/element/article.css" beforeDir="false" afterPath="$PROJECT_DIR$/article/element/article.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/form/configform-editor.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/form/configform-editor.client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/form/databaseform-connect.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/form/databaseform-connect.client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/form/databaseform-manage.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/form/databaseform-manage.client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/task/element/service-task-managerform.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/task/element/service-task-managerform.client.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/element/user-forgotpasswordform.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/element/user-forgotpasswordform.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/element/user-loginform.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/element/user-loginform.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/element/user-logoutform.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/element/user-logoutform.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/element/user-registerform.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/element/user-registerform.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/element/user-resetpasswordform.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/element/user-resetpasswordform.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/element/user-updateflagsform.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/element/user-updateflagsform.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/element/user-updatepasswordform.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/element/user-updatepasswordform.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/element/user-updateprofileform.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/element/user-updateprofileform.client.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,10 +31,10 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/article/element/article-addform.element.js">
+        <entry file="file://$PROJECT_DIR$/article/element/article-deleteform.element.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1047">
-              <caret line="76" column="38" selection-start-line="76" selection-start-column="38" selection-end-line="76" selection-end-column="38" />
+            <state relative-caret-position="971">
+              <caret line="102" selection-start-line="102" selection-end-line="102" />
               <folding>
                 <element signature="n#style#0;n#td#0;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
               </folding>
@@ -31,49 +43,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/article/element/article-browser.element.js">
+        <entry file="file://$PROJECT_DIR$/article/element/article-editorform.element.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="228">
-              <caret line="12" column="39" selection-start-line="12" selection-start-column="39" selection-end-line="12" selection-end-column="39" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/article/element/article-editor.element.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1666">
-              <caret line="141" column="29" selection-start-line="141" selection-start-column="29" selection-end-line="141" selection-end-column="29" />
-              <folding>
-                <element signature="n#!!block;n#renderWYSIWYGEditor#0;n#HTMLArticleEditorElement#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/user/element/user-profile.element.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="722">
-              <caret line="38" column="33" lean-forward="true" selection-start-line="38" selection-start-column="33" selection-end-line="38" selection-end-column="33" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/user/element/user-registerform.element.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1653">
-              <caret line="87" selection-start-line="87" selection-end-line="87" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/user/element/user-updateflagsform.element.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1539">
-              <caret line="81" column="49" selection-start-line="81" selection-start-column="49" selection-end-line="81" selection-end-column="49" />
+            <state relative-caret-position="876">
+              <caret line="636" column="79" selection-start-line="636" selection-start-column="79" selection-end-line="636" selection-end-column="79" />
             </state>
           </provider>
         </entry>
@@ -81,8 +54,35 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/article/article.api.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="199">
-              <caret line="18" column="46" lean-forward="true" selection-start-line="18" selection-start-column="46" selection-end-line="18" selection-end-column="46" />
+            <state relative-caret-position="1294">
+              <caret line="322" column="39" lean-forward="true" selection-start-line="322" selection-start-column="39" selection-end-line="322" selection-end-column="39" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/article/article.database.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1333">
+              <caret line="106" column="23" selection-start-line="106" selection-start-column="23" selection-end-line="106" selection-end-column="23" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/article/element/article-addform.element.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1073">
+              <caret line="76" column="38" selection-start-line="76" selection-start-column="38" selection-end-line="76" selection-end-column="38" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/article/element/article.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="741">
+              <caret line="39" selection-start-line="39" selection-end-line="39" />
             </state>
           </provider>
         </entry>
@@ -98,15 +98,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>UpdateProfil</find>
-      <find>Profile</find>
-      <find>style=&quot;float: right;&quot;</find>
-      <find>flags</find>
-      <find>form.elemen</find>
-      <find>xhr.onload</find>
-      <find>request</find>
-      <find>User Profile</find>
-      <find>updateFlags</find>
       <find>Using generat</find>
       <find>Using ge</find>
       <find>set to adm</find>
@@ -128,11 +119,17 @@
       <find>const messageClass</find>
       <find>getFormData</find>
       <find>/add</find>
+      <find>console.log(e, response)</find>
+      <find>console.log(e, response);</find>
+      <find>:mode</find>
+      <find>Editor</find>
+      <find>article-delete</find>
+      <find>renderArticleAdd</find>
+      <find>article-editor</find>
+      <find>article-editor.</find>
+      <find>article-add</find>
     </findStrings>
     <replaceStrings>
-      <replace>(!this.state.status ?</replace>
-      <replace>!this.state.status? 'message'</replace>
-      <replace>!this.state.status ? 'message'</replace>
       <replace>status-${this.state.status}</replace>
       <replace>taskform</replace>
       <replace>Manager</replace>
@@ -158,8 +155,11 @@
       <replace>form/article</replace>
       <replace>element/article.css</replace>
       <replace>.element.js</replace>
-      <replace>article</replace>
       <replace>article-preview</replace>
+      <replace>console.log(response);</replace>
+      <replace>Delete</replace>
+      <replace>article</replace>
+      <replace>article-editorform</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -168,9 +168,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/service/file/file.api.js" />
-        <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/config/config.api.js" />
         <option value="$PROJECT_DIR$/service/domain/domain.api.js" />
         <option value="$PROJECT_DIR$/service/domain/domain.database.js" />
@@ -179,7 +176,6 @@
         <option value="$PROJECT_DIR$/config/config.manager.js" />
         <option value="$PROJECT_DIR$/server.js" />
         <option value="$PROJECT_DIR$/service/http/http.server.js" />
-        <option value="$PROJECT_DIR$/article/article.database.js" />
         <option value="$PROJECT_DIR$/service/task/task.manager.js" />
         <option value="$PROJECT_DIR$/service/service.manager.js" />
         <option value="$PROJECT_DIR$/service/session/session.api.js" />
@@ -209,16 +205,20 @@
         <option value="$PROJECT_DIR$/user/element/user-profile.client.js" />
         <option value="$PROJECT_DIR$/user/user.api.js" />
         <option value="$PROJECT_DIR$/theme/default/template/theme.ejs" />
-        <option value="$PROJECT_DIR$/article/element/article.css" />
         <option value="$PROJECT_DIR$/user/element/user-updateprofileform.element.js" />
         <option value="$PROJECT_DIR$/user/element/user-loginform.element.js" />
-        <option value="$PROJECT_DIR$/article/article.api.js" />
         <option value="$PROJECT_DIR$/user/element/user-forgotpasswordform.element.js" />
         <option value="$PROJECT_DIR$/user/element/user-logoutform.element.js" />
         <option value="$PROJECT_DIR$/user/element/user-resetpasswordform.element.js" />
-        <option value="$PROJECT_DIR$/article/element/article-browser.element.js" />
         <option value="$PROJECT_DIR$/article/element/article-addform.element.js" />
         <option value="$PROJECT_DIR$/article/element/article-editor.element.js" />
+        <option value="$PROJECT_DIR$/article/element/article-browser.element.js" />
+        <option value="$PROJECT_DIR$/article/element/article-delete.element.js" />
+        <option value="$PROJECT_DIR$/article/element/article-editorform.element.js" />
+        <option value="$PROJECT_DIR$/article/element/article-deleteform.element.js" />
+        <option value="$PROJECT_DIR$/article/article.database.js" />
+        <option value="$PROJECT_DIR$/article/article.api.js" />
+        <option value="$PROJECT_DIR$/article/element/article.css" />
       </list>
     </option>
   </component>
@@ -304,11 +304,11 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/article/element" />
       <recent name="$PROJECT_DIR$/service" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/database/form" />
       <recent name="$PROJECT_DIR$/database" />
-      <recent name="$PROJECT_DIR$/service/task" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/theme/default/element" />
@@ -373,12 +373,12 @@
       <workItem from="1550514731637" duration="6794000" />
       <workItem from="1550681264188" duration="16758000" />
       <workItem from="1550769794414" duration="1963000" />
-      <workItem from="1550784757575" duration="12561000" />
+      <workItem from="1550784757575" duration="15475000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="113808000" />
+    <option name="totallyTimeSpent" value="116722000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -393,7 +393,7 @@
     <frame x="0" y="-2" width="3840" height="2162" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.0782815" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.0782815" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="npm" order="2" side_tool="true" />
       <window_info id="Favorites" order="3" side_tool="true" />
@@ -411,7 +411,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Database" order="3" />
-      <window_info active="true" anchor="right" id="Debug" order="4" visible="true" weight="0.2775435" />
+      <window_info anchor="right" id="Debug" order="4" visible="true" weight="0.2775435" />
       <window_info anchor="right" id="Find" order="5" weight="0.32948753" />
     </layout>
   </component>
@@ -487,29 +487,10 @@
           <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="113" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/article/element/article-editor.element.js</url>
-          <line>136</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="122" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/article/element/article-editor.element.js</url>
-          <line>141</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="123" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/service/http/ssl.server.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="4" selection-start-line="4" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/config/config.api.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="76">
@@ -614,13 +595,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/article/article.database.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="13" column="34" selection-start-line="13" selection-start-column="34" selection-end-line="13" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/user/element/userform-update-flags.client.js" />
     <entry file="file://$PROJECT_DIR$/user/element/user-profile.ejs" />
     <entry file="file://$PROJECT_DIR$/user/element/userform.css" />
@@ -635,13 +609,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="76">
           <caret line="4" column="41" selection-start-line="4" selection-start-column="41" selection-end-line="4" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/theme/default/default.theme.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="133">
-          <caret line="7" column="56" selection-start-line="7" selection-start-column="56" selection-end-line="7" selection-end-column="56" />
         </state>
       </provider>
     </entry>
@@ -704,17 +671,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/user.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1029">
-          <caret line="630" column="19" lean-forward="true" selection-start-line="630" selection-start-column="19" selection-end-line="630" selection-end-column="19" />
-          <folding>
-            <element signature="n#!!block;n#logout#0;n#UserAPI#0" />
-            <element signature="n#!!block;n#handleLogoutRequest#0;n#UserAPI#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/theme/default/template/theme.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="190">
@@ -726,20 +682,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="171">
           <caret line="9" column="11" lean-forward="true" selection-end-line="71" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/article/element/article.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="10" column="17" selection-start-line="10" selection-start-column="17" selection-end-line="10" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/element/user-updateprofileform.client.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="513">
-          <caret line="27" column="29" lean-forward="true" selection-start-line="27" selection-start-column="29" selection-end-line="29" selection-end-column="67" />
         </state>
       </provider>
     </entry>
@@ -771,23 +713,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/article/element/article-browser.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="228">
-          <caret line="12" column="39" selection-start-line="12" selection-start-column="39" selection-end-line="12" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/article/element/article-addform.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1047">
-          <caret line="76" column="38" selection-start-line="76" selection-start-column="38" selection-end-line="76" selection-end-column="38" />
-          <folding>
-            <element signature="n#style#0;n#td#0;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/user/element/user-profile.element.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="722">
@@ -809,20 +734,80 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/article/article.api.js">
+    <entry file="file://$PROJECT_DIR$/article/element/article-browser.element.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="199">
-          <caret line="18" column="46" lean-forward="true" selection-start-line="18" selection-start-column="46" selection-end-line="18" selection-end-column="46" />
+        <state relative-caret-position="914">
+          <caret line="108" column="67" lean-forward="true" selection-start-line="108" selection-start-column="67" selection-end-line="108" selection-end-column="67" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/article/element/article-editor.element.js">
+    <entry file="file://$PROJECT_DIR$/user/user.api.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1666">
-          <caret line="141" column="29" selection-start-line="141" selection-start-column="29" selection-end-line="141" selection-end-column="29" />
+        <state relative-caret-position="969">
+          <caret line="51" column="118" selection-start-line="51" selection-start-column="118" selection-end-line="51" selection-end-column="118" />
           <folding>
-            <element signature="n#!!block;n#renderWYSIWYGEditor#0;n#HTMLArticleEditorElement#0" />
+            <element signature="n#!!block;n#logout#0;n#UserAPI#0" />
+            <element signature="n#!!block;n#handleLogoutRequest#0;n#UserAPI#0" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/default/default.theme.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="513">
+          <caret line="27" column="10" selection-start-line="27" selection-start-column="10" selection-end-line="27" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/element/user-updateprofileform.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1389">
+          <caret line="146" selection-start-line="137" selection-end-line="146" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/article/element/article-editorform.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="876">
+          <caret line="636" column="79" selection-start-line="636" selection-start-column="79" selection-end-line="636" selection-end-column="79" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/article/element/article-deleteform.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="971">
+          <caret line="102" selection-start-line="102" selection-end-line="102" />
+          <folding>
+            <element signature="n#style#0;n#td#0;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/article/article.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1294">
+          <caret line="322" column="39" lean-forward="true" selection-start-line="322" selection-start-column="39" selection-end-line="322" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/article/article.database.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1333">
+          <caret line="106" column="23" selection-start-line="106" selection-start-column="23" selection-end-line="106" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/article/element/article-addform.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1073">
+          <caret line="76" column="38" selection-start-line="76" selection-start-column="38" selection-end-line="76" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/article/element/article.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="741">
+          <caret line="39" selection-start-line="39" selection-end-line="39" />
         </state>
       </provider>
     </entry>

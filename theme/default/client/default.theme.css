@@ -339,7 +339,7 @@ body.theme-default {
     font-size: large;
 }
 .theme-default .themed textarea {
-    min-height: 100px;
+    /* min-height: 100px; */
 }
 .theme-default .themed input[type=checkbox] {
     width: 16px;

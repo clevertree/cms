@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-class HTMLArticleEditorElement extends HTMLElement {
+class HTMLArticleEditorFormElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
@@ -15,7 +15,7 @@ class HTMLArticleEditorElement extends HTMLElement {
             processing: false,
             mode: null,
             revisionID: null,
-            editor: sessionStorage.getItem("article-editor:editor"),
+            editor: sessionStorage.getItem("article-editorform:editor"),
             article: {id: -1},
             revision: {},
             history: [],
@@ -54,10 +54,10 @@ class HTMLArticleEditorElement extends HTMLElement {
     }
 
     onSuccess(e, response) {
-        console.log(e, response);
+        console.log(response);
         if(response.redirect) {
             this.setState({processing: true});
-            setTimeout(() => window.location.href = response.redirect, 3000);
+            setTimeout(() => window.location.href = response.redirect, 1000);
         }
     }
 
@@ -83,7 +83,7 @@ class HTMLArticleEditorElement extends HTMLElement {
                 break;
             case 'editor':
                 this.state.editor = e.target.value;
-                sessionStorage.setItem("article-editor:editor",this.state.editor);
+                sessionStorage.setItem("article-editorform:editor",this.state.editor);
                 this.renderWYSIWYGEditor();
                 break;
             case 'title':
@@ -528,7 +528,7 @@ class HTMLArticleEditorElement extends HTMLElement {
 
         console.log("RENDER", this.state);
         this.innerHTML =
-            `<form action="${action}" method="POST" class="article article-editor themed">
+            `<form action="${action}" method="POST" class="article article-editorform themed">
             <input type="hidden" name="id" value="${this.state.article.id}" />
             <fieldset ${this.state.mode === 'edit' && !this.state.editable ? 'disabled="disabled"' : ''}>
                 <table class="article">
@@ -634,7 +634,7 @@ class HTMLArticleEditorElement extends HTMLElement {
                             <tr><td colspan="2"><hr/></td></tr>
                             <tr>
                                 <td style="text-align: right;" colspan="2">
-                                    <a href=":article/${this.state.article.id}" style="float: left;">Back to article</a>
+                                    <a href=":article/${this.state.article.id}">Back to article</a>
                                     <button type="submit">Publish</button>
                                 </td>
                             </tr>
@@ -686,4 +686,4 @@ class HTMLArticleEditorElement extends HTMLElement {
     }
 
 }
-customElements.define('article-editor', HTMLArticleEditorElement);
+customElements.define('article-editorform', HTMLArticleEditorFormElement);

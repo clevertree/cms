@@ -35,7 +35,9 @@ form.article select,
 form.article textarea {
     min-width: 90%;
 }
-
+form.article textarea {
+    min-height: 300px;
+}
 
 /** Custom Forms **/
 
