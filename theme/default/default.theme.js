@@ -6,16 +6,13 @@ const { UserAPI } = require('../../user/user.api');
 const { ArticleDatabase } = require('../../article/article.database');
 const { DatabaseManager } = require('../../database/database.manager');
 const { TaskAPI } = require('../../service/task/task.api');
+const { ConfigDatabase } = require("../../config/config.database");
 
 const TEMPLATE_DIR = path.resolve(__dirname + '/template');
 const BASE_DIR = path.resolve((path.dirname(path.dirname(__dirname))));
 
 class DefaultTheme {
     constructor() {
-        this.siteConfig = {
-            name: require('os').hostname,
-            baseURL: '/'
-        };
         this.renderOptions = {
             views: [
                 path.resolve(TEMPLATE_DIR),
@@ -25,10 +22,10 @@ class DefaultTheme {
         };
     }
 
+
     async render(req, article) {
         if(typeof article === "string")
             article = {content: article};
-
 
         // const configDB = new ConfigDatabase(database);
 
@@ -44,7 +41,7 @@ class DefaultTheme {
         // renderData.baseHRef = slashCount > 1 ? "../".repeat(slashCount-1) : null;
         const renderData = {
             article,
-            site: this.siteConfig
+            site: {}
         };
 
 
@@ -54,6 +51,11 @@ class DefaultTheme {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
             const articleDB = new ArticleDatabase(database);
             renderData.menu = await articleDB.queryMenuData(req, true);
+
+            const configDB = new ConfigDatabase(database);
+            const configList = await configDB.selectAllConfigValues();
+            const configValues = await configDB.parseConfigValues(configList);
+            renderData.site = configValues.site; // TODO: cache site values per host;
         }
 
         if(!req.session || !req.session.userID) { // If not logged in

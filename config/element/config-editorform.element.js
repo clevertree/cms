@@ -186,12 +186,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         const search = form ? form.search.value : null;
         resultsElement.innerHTML = this.state.configList
             .filter(config => !search || config.name.indexOf(search) !== -1)
-            .map(config => `
-            <tr class="results ${classOdd=classOdd===''?'odd':''}">
-                <td>${config.name}</td>
-                <td>${this.renderConfig(config, form && form.elements[config.name] ? form.elements[config.name].value : null)}</td>
-            </tr>
-            `).join('');
+            .map(config => this.renderConfig(form, config, classOdd=classOdd===''?'odd':'')).join('');
 
         const statusElement = this.querySelector('td.status');
         statusElement.innerHTML = this.state.message
@@ -199,19 +194,36 @@ class HTMLConfigFormEditorElement extends HTMLElement {
             : `<div class="message">Config Editor</div>`;
     }
 
-    renderConfig(config, value=null) {
-        if(value === null)
-            value = config.value;
+    renderConfig(form, config, trClass='') {
+        let value = config.value;
+        if(form && form.elements[config.name])
+            value = form.elements[config.name].value;
+
         switch(config.type) {
             default:
-                return `<input type='text' name='${config.name}' value='${value||''}' />`;
             case 'text':
             case 'email':
             case 'checkbox':
             case 'password':
-                return `<input type='${config.type}' name='${config.name}' value='${value||''}' />`;
+                return `
+                <tr class="results ${trClass}">
+                    <td class="label">${config.name}</td>
+                    <td><input type='${config.type || 'text'}' name='${config.name}' value='${value||''}' /></td>
+                </tr>`;
+
+            case 'json':
             case 'textarea':
-                return `<textarea name='${config.name}'>${value||''}</textarea>`;
+                return `
+                <tr class="results ${trClass}">
+                    <td class="label">${config.name}</td>
+                    <td></td>
+                </tr>
+                <tr class="results ${trClass}">
+                    <td colspan="2">
+                            <textarea name='${config.name}'>${value||''}</textarea>
+                        </label>
+                    </td>
+                </tr>`;
         }
     }
 }

@@ -33,10 +33,10 @@ form.config input[type=email],
 form.config input[type=password],
 form.config select,
 form.config textarea {
-    min-width: 90%;
+    min-width: 100%;
 }
 form.config textarea {
-    min-height: 300px;
+    min-height: 120px;
 }
 
 /** Custom Forms **/
@@ -57,18 +57,30 @@ table.config .icon-edit {
 }
 
 /** Row **/
+table.config tr {
+}
+
 table.config tr.odd {
     background-color: #0001;
 }
 
+/** Column **/
+table.config td {
+}
+
 /** Labels **/
 
+table.config label,
 table.config td.label {
-    text-align: right;
-    padding: 8px 8px 8px 0px;
+    text-align: center;
     font-weight: bold;
     white-space: nowrap;
     display: block;
+}
+
+table.config td.label {
+    text-align: right;
+    margin: 8px 8px 8px 0px;
     min-width: 90%;
 }
 table.config td.label:after {

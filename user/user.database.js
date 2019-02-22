@@ -3,7 +3,6 @@ const uuidv4 = require('uuid/v4');
 
 const { DatabaseManager } = require('../database/database.manager');
 // const { LocalConfig } = require('../config/local.config');
-const { ConfigManager } = require('../config/config.manager');
 const { ConfigDatabase } = require("../config/config.database");
 
 
@@ -24,12 +23,12 @@ class UserDatabase  {
         // Configure tables
         await DatabaseManager.configureTable(this.table.user,            UserRow.getTableSQL(this.table.user));
 
+        // Find admin user
+        let adminUser = await this.fetchUser("u.username = 'admin' OR FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
 
         // Set up admin user
         if(promptCallback) {
 
-            // Find admin user
-            let adminUser = await this.fetchUser("u.username = 'admin' OR FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
             if (adminUser) {
                 console.info("Admin user found: " + adminUser.id);
                 let changePassword = await promptCallback(`Would you like to change the admin password (Username: ${adminUser.username}) [y or n]?`, 'n');
@@ -98,8 +97,6 @@ class UserDatabase  {
                 }
             }
         }
-
-
     }
 
     /** User Table **/

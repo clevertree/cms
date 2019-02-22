@@ -37,19 +37,6 @@ class ArticleAPI {
         }
     }
 
-    async renderError(error, req, res, asJSON=false) {
-        console.error(`${req.method} ${req.url}`, error);
-        res.status(400);
-        if(req.method === 'GET' && !asJSON) {          // Handle GET
-            res.send(
-                await ThemeManager.get()
-                    .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-            );
-        } else {
-            res.json({message: error.stack});
-        }
-    }
-
     async checkForRevisionContent(req, article) {
         const database = await DatabaseManager.selectDatabaseByRequest(req);
         const articleDB = new ArticleDatabase(database);
@@ -69,7 +56,6 @@ class ArticleAPI {
         return null;
     }
 
-
     async renderArticleByPath(req, res, next) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
@@ -88,6 +74,7 @@ class ArticleAPI {
             await this.renderError(error, req, res);
         }
     }
+
 
     async renderArticleByID(asJSON, req, res, next) {
         try {
@@ -354,6 +341,19 @@ class ArticleAPI {
             await this.renderError(error, req, res);
         }
 
+    }
+
+    async renderError(error, req, res, asJSON=false) {
+        console.error(`${req.method} ${req.url}`, error);
+        res.status(400);
+        if(req.method === 'GET' && !asJSON) {          // Handle GET
+            res.send(
+                await ThemeManager.get()
+                    .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
+            );
+        } else {
+            res.json({message: error.stack});
+        }
     }
 }
 

@@ -3,6 +3,33 @@ const { ServiceManager } = require('../service/service.manager');
 
 class ConfigManager {
     constructor() {
+        this.configList = [];
+
+        // Add Site-specific configuration
+        const hostname = require('os').hostname().toLowerCase();
+        this.setConfigSetting('site.contact', () => 'admin@' + hostname, 'email');
+        this.setConfigSetting('site.keywords', () => 'cms, ' + hostname);
+
+        this.setConfigSetting('user.profile', () => JSON.stringify([
+            {"name":"name","title":"Full Name"},
+            {"name":"description","title":"Description","type":"textarea"}
+        ], null, 4), 'json');
+
+    }
+
+    setConfigSetting(name, defaultValue, type=null) {
+        let p = this.configList.length;
+        for(let i=0; i<this.configList.length; i++) {
+            if(this.configList[i].name === name)
+                p = i;
+                // throw new Error("Config setting already exists: " + name);
+        }
+        this.configList[p] = {name, defaultValue, type};
+    }
+
+
+    getConfigList() {
+        return this.configList.slice();
     }
 
     async configure(interactive=false) {

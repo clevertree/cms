@@ -41,26 +41,16 @@ class ConfigAPI {
                 throw new Error("Not authorized");
 
             // Handle POST
-            let whereSQL = '1', values = null;
-            if(req.body.search) {
-                whereSQL = 'c.name LIKE ?';
-                values = ['%'+req.body.search+'%'];
-            }
-            const configList = await configDB.selectConfigs(whereSQL, values);
-            const config = await configDB.parseConfigValues(configList);
+            const configList = await configDB.selectAllConfigValues();
+            const configValues = await configDB.parseConfigValues(configList);
 
             return res.json({
                 message: `${configList.length} Config${configList.length !== 1 ? 's' : ''} queried successfully`,
-                config,
+                config: configValues,
                 configList,
             });
         } catch (error) {
-            console.error(`${req.method} ${req.url}`, error);
-            res.status(400);
-            return res.json({
-                message: `<div class='error'>${error.message || error}</div>`,
-                error: error.stack
-            });
+            await this.renderError(error, req, res, true);
         }
     }
 
@@ -103,23 +93,28 @@ class ConfigAPI {
                 }
 
 
-                const configList = await configDB.selectConfigs('1');
+                const configList = await configDB.selectConfigValues('1');
                 return res.json({
                     message: `<div class='success'>${configUpdateList.length} Config${configUpdateList.length !== 1 ? 's' : ''} updated successfully</div>`,
                     configList
                 });
             }
         } catch (error) {
-            console.error(`${req.method} ${req.url}`, error);
-            res.status(400);
-            if(req.method === 'GET') {
-                res.send(
-                    await ThemeManager.get()
-                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-                );
-            } else {
-                res.json({message: error.stack});
-            }
+            await this.renderError(error, req, res);
+        }
+    }
+
+
+    async renderError(error, req, res, asJSON=false) {
+        console.error(`${req.method} ${req.url}`, error);
+        res.status(400);
+        if(req.method === 'GET' && !asJSON) {          // Handle GET
+            res.send(
+                await ThemeManager.get()
+                    .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
+            );
+        } else {
+            res.json({message: error.stack});
         }
     }
 }

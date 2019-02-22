@@ -14,32 +14,31 @@ class ConfigDatabase  {
     async configure(promptCallback) {
         // Configure tables
         await DatabaseManager.configureTable(this.table.config, ConfigRow.getTableSQL(this.table.config));
-
-        // Set up default config
-        let userProfile = await this.fetchConfigValue('user.profile');
-        if (!userProfile)
-            await this.updateConfigValue('user.profile', JSON.stringify([
-                {name: 'name', title: "Full Name"},
-                {name: 'description', type: "textarea", title: "Description"},
-            ]));
-
-        // Find admin user
-            // Configure site
-        let siteContact = await this.fetchConfigValue('site.contact');
-        if (!siteContact) {
-            const UserDatabase = require('../user/user.database').UserDatabase;
-            const userDB = new UserDatabase(this.database);
-            let adminUser = await userDB.fetchUser("FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
-            if(adminUser) {
-                await this.updateConfigValue('site.contact', adminUser.email);
-            }
-        }
-
     }
 
     /** Config Table **/
 
-    async selectConfigs(whereSQL, values) {
+    async selectAllConfigValues(withDefaults=true) {
+        let defaultConfigList = [];
+
+        const {ConfigManager} = require("./config.manager");
+        if(withDefaults)
+            defaultConfigList = ConfigManager.getConfigList();
+        const configList = await this.selectConfigValues('1');
+        for(let i=0; i<defaultConfigList.length; i++) {
+            let pos = configList.indexOf(configEntry => configEntry.name === defaultConfigList[i].name);
+            if(pos === -1) {
+                configList.push(new ConfigRow({name: defaultConfigList[i].name}));
+                pos = configList.length - 1;
+            }
+            if(!configList[pos].value && defaultConfigList[i].defaultValue)
+                configList[pos].value = typeof defaultConfigList[i].defaultValue === 'function' ? defaultConfigList[i].defaultValue() : defaultConfigList[i].defaultValue;
+            configList[pos].type = defaultConfigList[i].type;
+        }
+        return configList;
+    }
+
+    async selectConfigValues(whereSQL, values) {
         let SQL = `
           SELECT c.*
           FROM ${this.table.config} c
@@ -51,22 +50,22 @@ class ConfigDatabase  {
     }
     // async searchConfigs(search) {
     //     if(!isNaN(parseInt(search)) && isFinite(search)) {
-    //         return await this.selectConfigs('? IN (u.id)', search);
+    //         return await this.selectConfigValues('? IN (u.id)', search);
     //     } else {
-    //         return await this.selectConfigs('? IN (u.email, u.configname)', search);
+    //         return await this.selectConfigValues('? IN (u.email, u.configname)', search);
     //     }
     // }
 
     // async fetchConfig(whereSQL, values) {
-    //     const configs = await this.selectConfigs(whereSQL, values);
+    //     const configs = await this.selectConfigValues(whereSQL, values);
     //     return configs[0];
     // }
     async fetchConfigValue(name) {
-        const results = await this.selectConfigs('c.name = ? LIMIT 1', name);
+        const results = await this.selectConfigValues('c.name = ? LIMIT 1', name);
         return results.length > 0 ? results[0].value : null;
     }
     async fetchConfigValues(name) {
-        const configList = await this.selectConfigs('c.name LIKE ?', name+'%');
+        const configList = await this.selectConfigValues('c.name LIKE ?', name+'%');
         const config = await this.parseConfigValues(configList);
         if(typeof config[name] === "undefined")
             return {};
@@ -139,6 +138,7 @@ class ConfigDatabase  {
     // };
 }
 
+// TODO: remove 'type' from database. It should be gotten elsewhare
 class ConfigRow {
     static getTableSQL(tableName) {
         return `
