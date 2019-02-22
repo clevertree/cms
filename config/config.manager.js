@@ -87,7 +87,7 @@ class ConfigManager {
                 value = value.trim() || defaultValue;
                 switch(validation) {
                     case 'boolean':
-                        value = ['y', 'Y', '1'].indexOf(value) !== -1;
+                        value = ['y', 'Y', '1', true].indexOf(value) !== -1;
                         break;
                 }
                 resolve(value);

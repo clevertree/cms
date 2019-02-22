@@ -7,9 +7,9 @@ class ServiceManager {
     }
 
     async configure(promptCallback=null) {
+        await SessionAPI.configure(promptCallback);
         await HTTPServer.configure(promptCallback);
         await TaskAPI.configure(promptCallback);
-        await SessionAPI.configure(promptCallback);
 
     }
 }

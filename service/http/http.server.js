@@ -35,18 +35,16 @@ class HTTPServer {
         const serverConfig = await localConfig.getOrCreate('server');
         // const defaultHostname     = (require('os').hostname()).toLowerCase();
 
-        let attempts = promptCallback ? 3 : 1;
-        while(attempts-- > 0) {
-            if(promptCallback) {
-                await localConfig.promptValue('server.httpPort', `Please enter the Server HTTP Port`, serverConfig.httpPort || 8080, 'integer');
-                await localConfig.promptValue('server.ssl', `Enable SSL Server with GreenLock [y or n]?`, serverConfig.ssl || false, 'boolean');
-                if(serverConfig.ssl)
-                    await localConfig.promptValue('server.sslPort', `Please enter the Server HTTPS/SSL Port`, serverConfig.sslPort || 443, 'integer');
-                await localConfig.saveAll();
-            }
-            // dbConfig.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain === 'y';
+        if(promptCallback) {
+            await localConfig.promptValue('server.ssl', `Enable SSL Server with GreenLock [y or n]?`, serverConfig.ssl || false, 'boolean');
+            if(!serverConfig.ssl)
+                await localConfig.promptValue('server.port', `Please enter the Server HTTP Port`, serverConfig.port || 8080, 'integer');
+            await localConfig.saveAll();
+        }
 
-            break;
+        if(serverConfig.ssl) {
+            const { SSLServer } = require('./ssl.server');
+            await SSLServer.configure(promptCallback);
         }
         return serverConfig;
 
@@ -134,7 +132,7 @@ class HTTPServer {
 
             if(serverConfig.ssl) {
                 const { SSLServer } = require('./ssl.server');
-                await SSLServer.listen(serverConfig.httpPort, serverConfig.sslPort);
+                await SSLServer.listen();
                 return;
             }
             if (this.app)
@@ -144,8 +142,8 @@ class HTTPServer {
             this.app.use(this.getMiddleware());
 
             // HTTP
-            this.app.listen(serverConfig.httpPort);
-            console.log(`Listening on ${serverConfig.httpPort}`);
+            this.app.listen(serverConfig.port);
+            console.log(`Listening on ${serverConfig.port}`);
             return this.app;
         } catch (e) {
             console.error(e);

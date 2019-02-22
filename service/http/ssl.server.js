@@ -1,4 +1,4 @@
-const express = require('express');
+// const express = require('express');
 const path = require('path');
 
 const { LocalConfig } = require('../../config/local.config');
@@ -12,12 +12,13 @@ class SSLServer {
         this.server = null;
     }
 
-    async configure(config=null) {
-        const httpConfig = await HTTPServer.configure(config);
+    async configure(promptCallback=null) {
+        // const httpConfig = await HTTPServer.configure(config);
 
         // Configure SSL
-        const localConfig = new LocalConfig(config, !config);
+        const localConfig = new LocalConfig(promptCallback);
         const sslConfig = await localConfig.getOrCreate('ssl');
+        // const serverConfig = await localConfig.getOrCreate('server');
         if(!sslConfig.server)           sslConfig.server = 'https://acme-v02.api.letsencrypt.org/directory';
         // Note: If at first you don't succeed, stop and switch to staging:
         // https://acme-staging-v02.api.letsencrypt.org/directory
@@ -26,10 +27,12 @@ class SSLServer {
         if(!sslConfig.telemetry)        sslConfig.telemetry = true;
         // the default servername to use when the client doesn't specify
         // (because some IoT devices don't support servername indication)
-        if(!sslConfig.servername)       sslConfig.servername = httpConfig.hostname;
-        if(!sslConfig.servername)       await localConfig.promptValue('ssl.servername', `Please enter the SSL Server Hostname`, require('os').hostname());
-        if(!sslConfig.port)             sslConfig.port = httpConfig.port;
-        if(!sslConfig.port)             await localConfig.promptValue('ssl.port', `Please enter the SSL Server Port`, 443);
+        await localConfig.promptValue('ssl.servername', `Please enter the SSL Server Hostname`, sslConfig.servername || require('os').hostname());
+
+        await localConfig.promptValue('ssl.port', `Please enter the Server HTTPS/SSL Port`, sslConfig.port || 443, 'integer');
+        await localConfig.promptValue('ssl.planePort', `Please enter the Server Challenge HTTP Port`, sslConfig.planePort || 80, 'integer');
+        await localConfig.saveAll();
+
         // if(!sslConfig.store)
         //     sslConfig.store = require('le-store-certbot').create({
         //         configDir: require('path').join(require('os').homedir(), 'acme', 'etc')
@@ -85,14 +88,14 @@ class SSLServer {
     }
 
     async listen() {
-        const config = await this.configure();
+        const sslConfig = await this.configure();
 
 
-        const app = this.server.listen(80, 443, function () {
+        this.server.listen(sslConfig.planePort, sslConfig.port, function () {
             console.log("Listening on port 80 for ACME challenges and 443 for express app.");
         });
 
-        return app;
+        // return app;
     }
 }
 

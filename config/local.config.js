@@ -77,7 +77,7 @@ class LocalConfig {
             if(typeof target[path[i]] === "undefined")
                 target[path[i]] = {};
             if(typeof target[path[i]] !== "object")
-                throw new Error("Invalid path: " + path.join('.'))
+                throw new Error("Invalid path: " + path.join('.'));
             target = target[path[i]];
         }
         if(typeof target[lastPath] !== "undefined")
