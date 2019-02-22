@@ -70,7 +70,6 @@ class HTMLArticleEditorElement extends HTMLElement {
         const request = this.getFormData(form);
         this.renderPreview(request.content);
         this.state.article.content = request.content;
-        console.log(this.state.article);
     }
 
     onChange(e) {
@@ -113,11 +112,10 @@ class HTMLArticleEditorElement extends HTMLElement {
     requestFormData() {
         const xhr = new XMLHttpRequest();
         xhr.onload = () => {
-            this.setState({processing: false});
             // console.info(xhr.response);
             if(!xhr.response || !xhr.response.article)
                 throw new Error("Invalid Response");
-            this.setState(xhr.response);
+            this.setState({processing: false}, xhr.response);
             // this.state = xhr.response.user;
             // this.render();
         };
@@ -522,22 +520,11 @@ class HTMLArticleEditorElement extends HTMLElement {
     }
 
     render() {
-        const messageClass = this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error');
         // const formData = this.getFormData();
-        let action = null;
-        let message = null;
-        switch(this.state.mode) {
-            case 'edit':
-                action = `/:article/${this.state.article.id}/:edit`;
-                message = `Editing article ID ${this.state.article.id}`;
-                break;
-            case 'add':
-                action = `/:article/add`;
-                message = `Add a new article`;
-                break;
-            default:
-                console.error("Invalid editor mode", this.state.mode);
-        }
+        let action = `/:article/${this.state.article.id}/:edit`;
+        let message = `Editing article ID ${this.state.article.id}`;
+        if(this.state.message)
+            message = this.state.message;
 
         console.log("RENDER", this.state);
         this.innerHTML =
@@ -548,9 +535,9 @@ class HTMLArticleEditorElement extends HTMLElement {
                     <thead>
                         <tr>
                             <td colspan="2">
-                                <div class="${messageClass} status-${this.state.status}">
-                                    ${this.state.message}
-                                </div>
+                            <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                ${message}
+                            </div>
                             </td>
                         </tr>
                         <tr><td colspan="2"><hr/></td></tr>

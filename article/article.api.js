@@ -148,7 +148,7 @@ class ArticleAPI {
             if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
 
-            const article = await articleDB.fetchArticleByID(req.params.id);
+            let article = await articleDB.fetchArticleByID(req.params.id);
             if(!article)
                 return next();
 
@@ -192,6 +192,7 @@ class ArticleAPI {
                             req.body.theme,
                             req.body.flags
                         );
+                        article = await articleDB.fetchArticleByID(req.params.id);
 
                         insertArticleRevisionID = await articleDB.insertArticleRevision(
                             article.id,
@@ -257,8 +258,8 @@ class ArticleAPI {
                     await ThemeManager.get()
                         .render(req, `
 <section>
-    <script src="/article/element/articleform-add.element.js"></script>
-    <articleform-add></articleform-add>
+    <script src="/article/element/article-addform.element.js"></script>
+    <article-addform></article-addform>
 </section>
 
 `)
@@ -306,8 +307,8 @@ class ArticleAPI {
 <section>
     <script src="/article/element/article-browser.element.js"></script>
     <article-browser></article-browser>
-    <script src="/article/element/articleform-add.element.js"></script>
-    <articleform-add></articleform-add>
+    <script src="/article/element/article-addform.element.js"></script>
+    <article-addform></article-addform>
 </section>
 `)
                 );

@@ -10,6 +10,9 @@ class HTMLArticleFormAddElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
+            message: "Add new article",
+            status: 0,
+            processing: false,
         };
     }
 
@@ -23,7 +26,7 @@ class HTMLArticleFormAddElement extends HTMLElement {
     connectedCallback() {
         // this.addEventListener('change', this.onEvent);
         // this.addEventListener('keyup', this.onEvent);
-        this.addEventListener('submit', this.onEvent);
+        this.addEventListener('submit', e => this.onSubmit(e));
 
         this.render();
     }
@@ -34,47 +37,35 @@ class HTMLArticleFormAddElement extends HTMLElement {
     }
     onError(e, response) {}
 
-    onEvent(e) {
-        switch (event.type) {
-            case 'submit':
-                this.submit(e);
-                break;
-        }
-    }
-
-    submit(e) {
-        e.preventDefault();
-        const form = e.target; // querySelector('form.user-login-form');
+    onSubmit(e) {
+        if(e) e.preventDefault();
+        const form = e ? e.target : this.querySelector('form');
         const request = this.getFormData(form);
+        const method = form.getAttribute('method');
+        const action = form.getAttribute('action');
 
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
-            console.log(e, xhr.response);
-            const response = xhr.response && typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-            response.status = xhr.status;
+            const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+            this.setState({status: xhr.status, processing: false}, response);
             if(xhr.status === 200) {
                 this.onSuccess(e, response);
             } else {
                 this.onError(e, response);
             }
-            this.setState({response, user:response.user, processing: false});
         };
-        xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
+        xhr.open(method, action, true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        // xhr.setRequestHeader("Accept", "application/json");
         xhr.responseType = 'json';
         xhr.send(JSON.stringify(request));
         this.setState({processing: true});
     }
 
-    getFormData() {
-        const form = this.querySelector('form');
+
+    getFormData(form) {
+        form = form || this.querySelector('form');
         const formData = {};
-        if(form) {
-            new FormData(form).forEach(function (value, key) {
-                formData[key] = value;
-            });
-        }
+        new FormData(form).forEach((value, key) => formData[key] = value);
         return formData;
     }
 
@@ -83,9 +74,9 @@ class HTMLArticleFormAddElement extends HTMLElement {
 
         // console.log("RENDER", this.state);
         this.innerHTML =
-            `<form action="/:article/add" method="POST" class="articleform articleform-add themed">
+            `<form action="/:article/:add" method="POST" class="article article-addform themed">
             <fieldset>
-                <table>
+                <table class="article">
                     <thead>
                         <tr>
                             <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
@@ -102,16 +93,21 @@ class HTMLArticleFormAddElement extends HTMLElement {
                         <tr>
                             <td class="label">Title</td>
                             <td>
-                                <input type="text" name="title" value="${formData.title || ''}" required/>
+                                <input type="text" name="title" placeholder="New Article Title" value="${formData.title || ''}" required/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Path</td>
+                            <td>
+                                <input type="text" name="path" placeholder="/new/article/path" value="${formData.path || ''}" required/>
                             </td>
                         </tr>
                     </tbody>
                     <tfoot>
                         <tr><td colspan="2"><hr/></td></tr>
                         <tr>
-                            <td class="label"></td>
-                            <td>
-                                <button type="submit">Add</button>
+                            <td colspan="2" style="text-align: right;">
+                                <button type="submit">Add New Page</button>
                             </td>
                         </tr>
                     </tfoot>            
@@ -121,4 +117,4 @@ class HTMLArticleFormAddElement extends HTMLElement {
     }
 
 }
-customElements.define('articleform-add', HTMLArticleFormAddElement);
+customElements.define('article-addform', HTMLArticleFormAddElement);

@@ -10,9 +10,10 @@ class HTMLArticleBrowserElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
-            articles: [],
-            status: null,
-            message: null,
+            message: "Browsing Articles",
+            status: 0,
+            processing: false,
+            articles: []
         };
         this.keyTimeout = null;
         // this.state = {id:-1, flags:[]};

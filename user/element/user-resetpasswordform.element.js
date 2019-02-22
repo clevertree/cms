@@ -78,7 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
-            const messageClass = this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error');
             this.innerHTML =
                 `
                 <form action="/:user/${this.state.userID}/:resetpassword/${this.state.uuid}" method="POST" class="user user-resetpasswordform themed">
@@ -88,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <thead>
                                 <tr>
                                     <td colspan="2">
-                                        <div class="${messageClass} status-${this.state.status}">
+                                        <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
                                             ${this.state.message}
                                         </div>
                                     </td>
