@@ -72,7 +72,7 @@ class ConfigAPI {
                     await ThemeManager.get()
                         .render(req, `
 <section>
-    <script src="/config/form/configform-editor.client.js"></script>
+    <script src="/config/form/configform-editor.element.js"></script>
     <configform-editor></configform-editor>
 </section>
 `)

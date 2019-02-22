@@ -2,17 +2,20 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("article/form/articleform.css");
+    })("article/element/article.css");
 });
 
 
-class HTMLArticleFormEditorElement extends HTMLElement {
+class HTMLArticleEditorElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
+            message: "Editing article",
+            status: 0,
+            processing: false,
             mode: null,
             revisionID: null,
-            editor: sessionStorage.getItem("articleform-editor:editor"),
+            editor: sessionStorage.getItem("article-editor:editor"),
             article: {id: -1},
             revision: {},
             history: [],
@@ -26,16 +29,16 @@ class HTMLArticleFormEditorElement extends HTMLElement {
     }
 
     setState(newState) {
-            for(let i=0; i<arguments.length; i++)
-               Object.assign(this.state, arguments[i]);
-            this.render();
-        }
+        for(let i=0; i<arguments.length; i++)
+           Object.assign(this.state, arguments[i]);
+        this.render();
+    }
 
 
     connectedCallback() {
-        this.addEventListener('change', this.onEvent);
-        this.addEventListener('keyup', this.onEvent);
-        this.addEventListener('submit', this.onEvent);
+        this.addEventListener('change', e => this.onChange(e));
+        this.addEventListener('submit', e => this.onSubmit(e));
+        this.addEventListener('keyup', e => this.onKeyUp(e));
 
         const articleID = this.getAttribute('id');
         if(articleID) {
@@ -51,62 +54,58 @@ class HTMLArticleFormEditorElement extends HTMLElement {
     }
 
     onSuccess(e, response) {
-        if(response.redirect)
-            setTimeout(() => window.location.href = response.redirect, 2000);
+        console.log(e, response);
+        if(response.redirect) {
+            this.setState({processing: true});
+            setTimeout(() => window.location.href = response.redirect, 3000);
+        }
     }
-    onError(e, response) {}
 
-    onEvent(e) {
-        switch (event.type) {
-            case 'submit':
-                this.submit(e);
+    onError(e, response) {
+        console.error(e, response);
+    }
+
+    onKeyUp(e) {
+        const form = e.target.form; // querySelector('form.user-login-form');
+        const request = this.getFormData(form);
+        this.renderPreview(request.content);
+        this.state.article.content = request.content;
+        console.log(this.state.article);
+    }
+
+    onChange(e) {
+        switch(e.target.name) {
+            case 'revision':
+                const revisionID = e.target.value;
+                console.log("Load Revision: " + revisionID);
+                // this.setState({revisionID});
+                this.setState({revisionID});
+                this.requestFormData();
                 break;
-
-            case 'change':
-                switch(e.target.name) {
-                    case 'revision':
-                        const revisionID = e.target.value;
-                        console.log("Load Revision: " + revisionID);
-                        // this.setState({revisionID});
-                        this.setState({revisionID});
-                        this.requestFormData();
-                        break;
-                    case 'editor':
-                        this.state.editor = e.target.value;
-                        sessionStorage.setItem("articleform-editor:editor",this.state.editor);
-                        this.renderWYSIWYGEditor();
-                        break;
-                    case 'title':
-                    case 'path':
-                    case 'theme':
-                    case 'parent_id':
-                        this.state.article[e.target.name] = e.target.value;
-                        break;
-                    case 'content':
-                        if(typeof html_beautify !== "undefined")
-                            e.target.value = html_beautify(e.target.value);
-                        this.state.article[e.target.name] = e.target.value;
-                        this.renderPreview(e.target.value);
-                        break;
-                }
-
+            case 'editor':
+                this.state.editor = e.target.value;
+                sessionStorage.setItem("article-editor:editor",this.state.editor);
+                this.renderWYSIWYGEditor();
                 break;
-
-            case 'keyup':
-                switch(e.target.name) {
-                    case 'content':
-                        this.renderPreview(e.target.value);
-                        // console.log(e.target.name, previewContent);
-                        break;
-                }
-
+            case 'title':
+            case 'path':
+            case 'theme':
+            case 'parent_id':
+                this.state.article[e.target.name] = e.target.value;
+                break;
+            case 'content':
+                if(typeof html_beautify !== "undefined")
+                    e.target.value = html_beautify(e.target.value);
+                this.state.article[e.target.name] = e.target.value;
+                this.renderPreview(e.target.value);
                 break;
         }
+
     }
 
 
     renderPreview(html) {
-        const previewContent = document.querySelector('.articleform-preview-content');
+        const previewContent = document.querySelector('.article-preview-content');
         if(previewContent)
             previewContent.innerHTML = html;
     }
@@ -133,181 +132,36 @@ class HTMLArticleFormEditorElement extends HTMLElement {
         this.setState({processing: true});
     }
 
-    submit(e) {
-        e.preventDefault();
-        const form = e.target; // querySelector('form.user-login-form');
+    onSubmit(e) {
+        if(e) e.preventDefault();
+        const form = e ? e.target : this.querySelector('form');
         const request = this.getFormData(form);
+        const method = form.getAttribute('method');
+        const action = form.getAttribute('action');
 
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
-            console.log(e, xhr.response);
-            const response = xhr.response && typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-            response.status = xhr.status;
+            const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+            this.setState({status: xhr.status, processing: false}, response);
             if(xhr.status === 200) {
                 this.onSuccess(e, response);
             } else {
                 this.onError(e, response);
             }
-            this.setState({response, user:response.user, processing: false});
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
-        xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
+        xhr.open(method, action, true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        // xhr.setRequestHeader("Accept", "application/json");
         xhr.responseType = 'json';
         xhr.send(JSON.stringify(request));
         this.setState({processing: true});
     }
 
 
-
     getFormData(form) {
         form = form || this.querySelector('form');
         const formData = {};
-        if(form) {
-            new FormData(form).forEach(function (value, key) {
-                formData[key] = value;
-            });
-        }
+        new FormData(form).forEach((value, key) => formData[key] = value);
         return formData;
-    }
-
-    render() {
-        const formData = this.getFormData();
-        let action = null;
-        let message = null;
-        switch(this.state.mode) {
-            case 'edit':
-                action = `/:article/${this.state.article.id}/:edit`;
-                message = `Editing article ID ${this.state.article.id}`;
-                break;
-            case 'add':
-                action = `/:article/add`;
-                message = `Add a new article`;
-                break;
-            default:
-                console.error("Invalid editor mode", this.state.mode);
-        }
-
-        // console.log("RENDER", this.state);
-        this.innerHTML =
-            `<form action="${action}" method="POST" class="articleform articleform-editor themed">
-            <input type="hidden" name="id" value="${this.state.article.id}" />
-            <fieldset ${this.state.mode === 'edit' && !this.state.editable ? 'disabled="disabled"' : ''}>
-                <table>
-                    <thead>
-                        <tr>
-                            <td colspan="2">
-                                ${this.state.response ? `<div class="${this.state.response.status === 200 ? 'success' : 'error'}">
-                                    ${this.state.response.message}
-                                </div>` : message}
-                            </td>
-                        </tr>
-                        <tr><td colspan="2"><hr/></td></tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th style="width: 65px;"></th>
-                            <th></th>
-                        </tr>
-                        <tr>
-                            <td class="label">Title</td>
-                            <td>
-                                <input type="text" name="title" value="${this.state.article.title || ''}" required/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Path</td>
-                            <td>
-                                <input type="text" name="path" placeholder="/path/to/article/" value="${this.state.article.path || ''}" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Parent</td>
-                            <td>
-                                <select name="parent_id" onchange="this.form.parent_id.value = this.value;" class="articleform-select-parent">
-                                    <option value="">Select Parent</option>
-                                ${this.state.parentList.map(article => `
-                                    <option value="${article.id}" ${this.state.article.parent_id === article.id ? 'selected="selected"' : null}>
-                                        ${article.title} ${article.path ? `(${article.path})` : null}
-                                    </option>
-                                `)}
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Theme</td>
-                            <td>
-                                <select name="theme">
-                                    <option value="">Default Site Theme</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Content</td>
-                            <td>
-                                <textarea class="editor-plain editor-wysiwyg-target" name="content"
-                                    >${this.state.revision.content || this.state.article.content || ''}</textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Switch Editor</td>
-                            <td>
-                                <label>
-                                    <select name="editor">
-                                    ${[
-                                        ['', 'Plain Text / HTML'],
-                                        ['summernote', 'SummerNote'],
-                                        ['jodit', 'Jodit (Image Uploads)'],
-                                        ['trumbowyg', 'Trumbowyg'],
-                                        ['pell', 'Pell'],
-                                        ['froala', 'Froala (Not free)'],
-                                        ['quill', 'Quill (Broken)'],
-                                    ].map(option => `
-                                        <option value="${option[0]}"${option[0] === this.state.editor ? ' selected="selected"' : ''}>${option[1]}</option>
-                                    `)}
-                                    </select>
-                                </label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Revision</td>
-                            <td>
-                                <select name="revision">
-                                    <option value="">Load a revision</option>
-                                ${this.state.history.map(revision => `
-                                    <option value="${revision.id}">${new Date(revision.created).toLocaleString()}</option>
-                                `)}
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Preview</td>
-                            <td>
-                                <label>
-                                    <select name="action">
-                                        <option value="publish">Publish Now (No Preview)</option>
-                                        <option value="draft">Save as Unpublished Draft</option>
-                                    </select>
-                                </label>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr><td colspan="2"><hr/></td></tr>
-                        <tr>
-                            <td class="label"></td>
-                            <td>
-                                <button type="submit">Publish</button>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </fieldset>
-        </form>`;
-
-        clearTimeout(this.renderEditorTimeout);
-        this.renderEditorTimeout = setTimeout(e => this.renderWYSIWYGEditor(), 100);
     }
 
     renderWYSIWYGEditor() {
@@ -656,15 +510,154 @@ class HTMLArticleFormEditorElement extends HTMLElement {
                         console.log("Unloaded Froala WYSIWYG Editor", target);
                         ["font-awesome.min.css", "froala_editor.pkgd.min.css", "froala_style.min.css"]
                             .forEach(sel => {
-                            const cssLink = document.head.querySelector("link[href$='" + sel + "']");
-                            if(cssLink) cssLink.parentNode.removeChild(cssLink);
-                        });
+                                const cssLink = document.head.querySelector("link[href$='" + sel + "']");
+                                if(cssLink) cssLink.parentNode.removeChild(cssLink);
+                            });
                     };
                 });
 
 
                 break;
         }
+    }
+
+    render() {
+        const messageClass = this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error');
+        // const formData = this.getFormData();
+        let action = null;
+        let message = null;
+        switch(this.state.mode) {
+            case 'edit':
+                action = `/:article/${this.state.article.id}/:edit`;
+                message = `Editing article ID ${this.state.article.id}`;
+                break;
+            case 'add':
+                action = `/:article/add`;
+                message = `Add a new article`;
+                break;
+            default:
+                console.error("Invalid editor mode", this.state.mode);
+        }
+
+        console.log("RENDER", this.state);
+        this.innerHTML =
+            `<form action="${action}" method="POST" class="article article-editor themed">
+            <input type="hidden" name="id" value="${this.state.article.id}" />
+            <fieldset ${this.state.mode === 'edit' && !this.state.editable ? 'disabled="disabled"' : ''}>
+                <table class="article">
+                    <thead>
+                        <tr>
+                            <td colspan="2">
+                                <div class="${messageClass} status-${this.state.status}">
+                                    ${this.state.message}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr><td colspan="2"><hr/></td></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th style="width: 65px;"></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <td class="label">Title</td>
+                            <td>
+                                <input type="text" name="title" value="${this.state.article.title || ''}" required/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Path</td>
+                            <td>
+                                <input type="text" name="path" placeholder="/path/to/article/" value="${this.state.article.path || ''}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Parent</td>
+                            <td>
+                                <select name="parent_id" onchange="this.form.parent_id.value = this.value;" class="articleform-select-parent">
+                                    <option value="">Select Parent</option>
+                                ${this.state.parentList.map(article => `
+                                    <option value="${article.id}" ${this.state.article.parent_id === article.id ? 'selected="selected"' : null}>
+                                        ${article.title} ${article.path ? `(${article.path})` : null}
+                                    </option>
+                                `)}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Theme</td>
+                            <td>
+                                <select name="theme">
+                                    <option value="">Default Site Theme</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Content</td>
+                            <td>
+                                <textarea class="editor-plain editor-wysiwyg-target" name="content"
+                                    >${this.state.article.content || ''}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Switch Editor</td>
+                            <td>
+                                <label>
+                                    <select name="editor">
+                                    ${[
+                                        ['', 'Plain Text / HTML'],
+                                        ['summernote', 'SummerNote'],
+                                        ['jodit', 'Jodit (Image Uploads)'],
+                                        ['trumbowyg', 'Trumbowyg'],
+                                        ['pell', 'Pell'],
+                                        ['froala', 'Froala (Not free)'],
+                                        ['quill', 'Quill (Broken)'],
+                                    ].map(option => `
+                                        <option value="${option[0]}"${option[0] === this.state.editor ? ' selected="selected"' : ''}>${option[1]}</option>
+                                    `)}
+                                    </select>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Revision</td>
+                            <td>
+                                <select name="revision">
+                                    <option value="">Load a revision</option>
+                                ${this.state.history.map(revision => `
+                                    <option value="${revision.id}">${new Date(revision.created).toLocaleString()}</option>
+                                `)}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Preview</td>
+                            <td>
+                                <label>
+                                    <select name="action">
+                                        <option value="publish">Publish Now (No Preview)</option>
+                                        <option value="draft">Save as Unpublished Draft</option>
+                                    </select>
+                                </label>
+                            </td>
+                        </tr>
+                    </tbody>
+                        <tfoot>
+                            <tr><td colspan="2"><hr/></td></tr>
+                            <tr>
+                                <td style="text-align: right;" colspan="2">
+                                    <a href=":article/${this.state.article.id}" style="float: left;">Back to article</a>
+                                    <button type="submit">Publish</button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                </table>
+            </fieldset>
+        </form>`;
+
+        clearTimeout(this.renderEditorTimeout);
+        this.renderEditorTimeout = setTimeout(e => this.renderWYSIWYGEditor(), 100);
     }
 
     loadScripts(scriptPaths, onLoaded) {
@@ -706,4 +699,4 @@ class HTMLArticleFormEditorElement extends HTMLElement {
     }
 
 }
-customElements.define('articleform-editor', HTMLArticleFormEditorElement);
+customElements.define('article-editor', HTMLArticleEditorElement);

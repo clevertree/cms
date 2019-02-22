@@ -278,7 +278,7 @@ class UserAPI {
                     await ThemeManager.get()
                         .render(req, `
 <section>
-    <script src="/user/element/user-profile.client.js"></script>
+    <script src="/user/element/user-profile.element.js"></script>
     <user-profile id="${userID}"></user-profile>
 </section>
 `)
@@ -337,7 +337,7 @@ class UserAPI {
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
-<script src="/user/element/user-loginform.client.js"></script>
+<script src="/user/element/user-loginform.element.js"></script>
 <user-loginform userID="${userID || ''}"></user-loginform>`)
                 );
 
@@ -365,7 +365,7 @@ class UserAPI {
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
-<script src="/user/element/userform-logout.client.js"></script>
+<script src="/user/element/userform-logout.element.js"></script>
 <userform-logout></userform-logout>`)
                 );
 
@@ -392,7 +392,7 @@ class UserAPI {
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
-<script src="/user/element/userform-register.client.js"></script>
+<script src="/user/element/userform-register.element.js"></script>
 <userform-register></userform-register>`)
                 );
 
@@ -426,7 +426,7 @@ class UserAPI {
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
-<script src="/user/element/user-forgotpasswordform.client.js"></script>
+<script src="/user/element/user-forgotpasswordform.element.js"></script>
 <user-forgotpasswordform userID="${userID || ''}"></user-forgotpasswordform>`)
                 );
 
@@ -489,7 +489,7 @@ class UserAPI {
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
-<script src="/user/element/user-changepasswordform.client.js"></script>
+<script src="/user/element/user-changepasswordform.element.js"></script>
 <user-changepasswordform uuid="${uuid}" userID="${userID}" username="${user.username}"></user-changepasswordform>`)
                 );
 
@@ -532,18 +532,18 @@ class UserAPI {
                     res.send(
                         await ThemeManager.get()
                             .render(req, `
-<script src="/user/element/user-updateprofileform.client.js"></script>
+<script src="/user/element/user-updateprofileform.element.js"></script>
 <user-updateprofileform userID="${userID}"></user-updateprofileform>
-<script src="/user/element/user-updatepasswordform.client.js"></script>
+<script src="/user/element/user-updatepasswordform.element.js"></script>
 <user-updatepasswordform userID="${userID}"></user-updatepasswordform>
-<script src="/user/element/user-updateflagsform.client.js"></script>
+<script src="/user/element/user-updateflagsform.element.js"></script>
 <user-updateflagsform userID="${userID}"></user-updateflagsform>`)
                     );
                 } else {
                     res.send(
                         await ThemeManager.get()
                             .render(req, `
-<script src="/user/element/user-update${type}form.client.js"></script>
+<script src="/user/element/user-update${type}form.element.js"></script>
 <user-update${type}form userID="${userID}"></user-update${type}form>`)
                     );
                 }
@@ -562,13 +562,15 @@ class UserAPI {
 
 
                 // Handle Form (POST) Request
-                console.log(`Profile ${type} request`, req.body);
+                console.log(`Update ${type} request`, req.body);
                 let affectedRows = -1;
                 switch(type) {
                     case 'profile':
                         affectedRows = await this.updateProfile(req, userID, req.body);
                         break;
                     case 'flags':
+                        if(!sessionUser.isAdmin())
+                            throw new Error("Not authorized");
                         affectedRows = await this.updateFlags(req, userID, req.body);
                         break;
                     case 'password':
@@ -604,9 +606,9 @@ class UserAPI {
                     await ThemeManager.get()
                         .render(req, `
 <section>
-    <script src="/user/element/user-browser.client.js"></script>
+    <script src="/user/element/user-browser.element.js"></script>
     <user-browser></user-browser>
-    <script src="/user/element/user-addform.client.js"></script>
+    <script src="/user/element/user-addform.element.js"></script>
     <user-addform></user-addform>
 </section>
 `)

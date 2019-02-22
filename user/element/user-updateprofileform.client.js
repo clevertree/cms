@@ -137,10 +137,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             </thead>
                             <tbody class="themed">
                                 <tr>
-                                    <td class="label">Email</td>
-                                    <td>
-                                        <input type="email" name="email" value="${this.state.user.email}" disabled/>
-                                    </td>
+                                    <td class="label">User ID</td>
+                                    <td><a href=":user/${this.state.user.id}">${this.state.user.id}</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Username</td>
+                                    <td><a href=":user/${this.state.user.username}">${this.state.user.username}</a></td>
                                 </tr>
                             ${(this.state.profileConfig || []).map(profileField => `
                                 <tr>

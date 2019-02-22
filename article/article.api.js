@@ -163,13 +163,13 @@ class ArticleAPI {
                     await ThemeManager.get(article.theme)
                         .render(req, `
 <section style="max-width: 1600px;">
-    <script src="/article/form/articleform-editor.client.js"></script>
-    <articleform-editor id="${article.id}"></articleform-editor>
+    <script src="/article/element/article-editor.element.js"></script>
+    <article-editor id="${article.id}"></article-editor>
 </section>
-<section class="articleform-preview-container">
+<section class="article-preview-container">
     <h1 style="text-align: center;">Preview</h1>
     <hr/>
-    <div class="articleform-preview-content">
+    <div class="article-preview-content">
         ${article.content}
     </div>
 </section>
@@ -257,7 +257,7 @@ class ArticleAPI {
                     await ThemeManager.get()
                         .render(req, `
 <section>
-    <script src="/article/form/articleform-add.client.js"></script>
+    <script src="/article/element/articleform-add.element.js"></script>
     <articleform-add></articleform-add>
 </section>
 
@@ -304,9 +304,9 @@ class ArticleAPI {
                     await ThemeManager.get()
                         .render(req, `
 <section>
-    <script src="/article/form/articleform-browser.client.js"></script>
-    <articleform-browser></articleform-browser>
-    <script src="/article/form/articleform-add.client.js"></script>
+    <script src="/article/element/article-browser.element.js"></script>
+    <article-browser></article-browser>
+    <script src="/article/element/articleform-add.element.js"></script>
     <articleform-add></articleform-add>
 </section>
 `)

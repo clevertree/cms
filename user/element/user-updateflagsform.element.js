@@ -10,12 +10,16 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
-                message: "In order to update this flag, please modify this form and hit 'Update' below",
+                message: "In order to update this user's flags, please modify this form and hit 'Update' below",
                 status: 0,
                 processing: false,
-                editable: true,
+                editable: false,
                 user: {id: -1, flags:[]}
             };
+            this.flags = {
+                admin: 'Admin',
+                debug: 'Debug',
+            }
             // this.state = {id:-1, flags:[]};
         }
 
@@ -49,31 +53,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         onChange(e) {
-            let value = e.target.value;
-            if(e.target.getAttribute('type') === 'checkbox')
-                value = e.target.checked;
-            if(e.target.name && typeof this.state.user.profile[e.target.name] !== 'undefined')
-                this.state.user.flags[e.target.name] = value;
-            if(e.target.getAttribute('type') === 'checkbox') {
-                if(e.target.checked) {
-                    this.state.user.flags =
-                        this.state.user.flags.concat(e.target.name)
-                            .filter((v, i, a) => a.indexOf(v) === i);
-                } else {
-                    this.state.user.flags =
-                        this.state.user.flags.filter((v) => v !== e.target.name);
-                }
+
+            const form = e.target.form;
+            const newFlags = [];
+            for(let i=0; i<form.elements.length; i++) {
+                const elm = form.elements[i];
+                if(elm.name && elm.getAttribute('type') === 'checkbox' && elm.checked === true)
+                    newFlags.push(elm.name);
             }
+            this.state.user.flags = newFlags;
+            console.log(this.state.user.flags);
         }
 
         requestFormData(userID) {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
-                this.setState({processing: false, editable: false}, xhr.response);
-                if(this.state.sessionUser && this.state.user) {
-                    if(this.state.sessionUser.flags.indexOf('admin') !== -1)
-                        this.setState({editable: 'admin'});
-                }
+                this.setState({processing: false}, xhr.response);
             };
             xhr.responseType = 'json';
             xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
@@ -81,39 +76,35 @@ document.addEventListener('DOMContentLoaded', function() {
             this.setState({processing: true});
         }
 
-        submit(e) {
+        onSubmit(e) {
             e.preventDefault();
-            const form = e.target; // querySelector('form.user-login-form');
-            this.setState({processing: true});
-            const request = {};
-            new FormData(form).forEach(function (value, key) {
-                request[key] = value;
-            });
+            const form = e.target;
+            const request = this.state.user.flags;
+            const method = form.getAttribute('method');
+            const action = form.getAttribute('action');
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
-                console.log(e, xhr.response);
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                response.status = xhr.status;
+                this.setState({processing: false, status: xhr.status}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
                     this.onError(e, response);
                 }
-                this.setState({response, user:response.user, processing: false});
             };
-            xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
+            xhr.open(method, action, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            // xhr.setRequestHeader("Accept", "application/json");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
+            this.setState({processing: true});
         }
 
         render() {
             // console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.user.id}/:flags" method="POST" class="user user-flagsform themed">
+                <form action="/:user/${this.state.user.id}/:flags" method="POST" class="user user-updateflagsform themed">
                     <fieldset ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>
                         <legend>Update User Flags</legend>
                         <table>
@@ -129,18 +120,20 @@ document.addEventListener('DOMContentLoaded', function() {
                             </thead>
                             <tbody class="themed">
                                 <tr>
-                                    <td class="label">Email</td>
-                                    <td>
-                                        <input type="email" name="email" value="${this.state.user.email}" disabled/>
-                                    </td>
+                                    <td class="label">User ID</td>
+                                    <td><a href=":user/${this.state.user.id}">${this.state.user.id}</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Username</td>
+                                    <td><a href=":user/${this.state.user.username}">${this.state.user.username}</a></td>
                                 </tr>
                                 <tr>
                                     <td class="label">Flags</td>
                                     <td>
-                                        ${['admin'].map(flagName => `
+                                        ${Object.keys(this.flags).map(flagName => `
                                         <label>
                                             <input type="checkbox" class="themed" name="${flagName.toLowerCase()}" value="1" ${this.state.user.flags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
-                                            ${flagName.replace('-', ' ')}
+                                            ${this.flags[flagName]}
                                         </label>
                                         `).join('')}
                                     </td>

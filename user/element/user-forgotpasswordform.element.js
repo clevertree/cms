@@ -34,8 +34,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         onSuccess(e, response) {
             console.log(e, response);
-            this.setState({processing: true});
-            setTimeout(() => window.location.href = response.redirect, 3000);
+            if(response.redirect) {
+                this.setState({processing: true});
+                setTimeout(() => window.location.href = response.redirect, 3000);
+            }
         }
 
         onError(e, response) {
@@ -49,8 +51,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         onSubmit(e) {
-            e.preventDefault();
-            const form = e.target; // querySelector('form.user-login-form');
+            if(e) e.preventDefault();
+            const form = e ? e.target : this.querySelector('form');
             const request = this.getFormData(form);
             const method = form.getAttribute('method');
             const action = form.getAttribute('action');
@@ -58,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                this.setState({status: xhr.status}, response);
+                this.setState({status: xhr.status, processing: false}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
@@ -73,6 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         getFormData(form) {
+            form = form || this.querySelector('form');
             const formData = {};
             new FormData(form).forEach((value, key) => formData[key] = value);
             return formData;

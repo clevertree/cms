@@ -81,7 +81,7 @@ class DomainAPI {
                     await ThemeManager.get()
                         .render(req, `
 <section>
-    <script src="/domain/form/domainform-editor.client.js"></script>
+    <script src="/domain/form/domainform-editor.element.js"></script>
     <domainform-editor></domainform-editor>
 </section>
 `)

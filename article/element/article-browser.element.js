@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("article/form/articleform.css");
+    })("article/element/article.css");
 });
 
 
-class HTMLArticleFormBrowserElement extends HTMLElement {
+class HTMLArticleBrowserElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
@@ -25,34 +25,33 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
     }
 
     connectedCallback() {
-        this.addEventListener('keyup', this.onEvent);
-        this.addEventListener('submit', this.onEvent);
+        this.addEventListener('submit', e => this.onSubmit(e));
+        this.addEventListener('keyup', e => this.onKeyUp(e));
         this.render();
-        this.submit();
+        this.onSubmit();
     }
 
     onSuccess(e, response) {
-        // if(response.redirect)
-        //     setTimeout(() => window.location.href = response.redirect, 3000);
+        console.log(e, response);
+        if(response.redirect) {
+            this.setState({processing: true});
+            setTimeout(() => window.location.href = response.redirect, 3000);
+        }
     }
-    onError(e, response) {}
 
-    onEvent(e) {
-        switch (event.type) {
-            case 'submit':
-                this.submit(e);
-                break;
+    onError(e, response) {
+        console.error(e, response);
+    }
 
-            case 'keyup':
-                switch(e.target.name) {
-                    case 'search':
-                        clearTimeout(this.keyTimeout);
-                        this.keyTimeout = setTimeout(e => this.submit(), 500);
-                        break;
-                }
+    onKeyUp(e) {
+        switch(e.target.name) {
+            case 'search':
+                clearTimeout(this.keyTimeout);
+                this.keyTimeout = setTimeout(e => this.onSubmit(), 500);
                 break;
         }
     }
+
 
     // requestFormData() {
     //     const xhr = new XMLHttpRequest();
@@ -72,42 +71,34 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
     //     this.setState({processing: true});
     // }
 
-    submit(e) {
-        if(e)
-            e.preventDefault();
-        const form = this.querySelector('form');
-        this.setState({processing: true});
-        const formData = this.getFormData();
+    onSubmit(e) {
+        if(e) e.preventDefault();
+        const form = e ? e.target : this.querySelector('form');
+        const request = this.getFormData(form);
+        const method = form.getAttribute('method');
+        const action = form.getAttribute('action');
 
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
-            this.setState({processing: false});
-            // console.log(e, xhr.response);
-            const response = xhr.response && typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-            response.status = xhr.status;
+            const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+            this.setState({status: xhr.status, processing: false}, response);
             if(xhr.status === 200) {
                 this.onSuccess(e, response);
             } else {
                 this.onError(e, response);
             }
-            this.setState(response);
         };
-        xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
+        xhr.open(method, action, true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        // xhr.setRequestHeader("Accept", "application/json");
         xhr.responseType = 'json';
-        xhr.send(JSON.stringify(formData));
+        xhr.send(JSON.stringify(request));
         this.setState({processing: true});
     }
 
-    getFormData() {
-        const form = this.querySelector('form');
+    getFormData(form) {
+        form = form || this.querySelector('form');
         const formData = {};
-        if(form) {
-            new FormData(form).forEach(function (value, key) {
-                formData[key] = value;
-            });
-        }
+        new FormData(form).forEach((value, key) => formData[key] = value);
         return formData;
     }
 
@@ -117,17 +108,17 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
         let searchField = this.querySelector('input[name=search]');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
-            `<form action="/:article/:list" method="POST" class="articleform articleform-browser themed">
+            `<form action="/:article/:list" method="POST" class="article article-browser themed">
             <fieldset>
-                <table>
+                <table class="article">
                     <thead>
                         <tr>
-                            <td colspan="4">
+                            <td colspan="5">
                                 <input type="text" name="search" placeholder="Search Articles" value="${formData.search||''}"/>
                             </td>
                         </tr>
-                        <tr><td colspan="4"><hr/></td></tr>
-                        <tr>
+                        <tr><td colspan="5"><hr/></td></tr>
+                        <tr style="text-align: left;">
                             <th>ID</th>
                             <th>Path</th>
                             <th>Title</th>
@@ -137,13 +128,13 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
                     </thead>
                     <tbody class="results">
                         <tr>
-                            <th colspan="4">No Results</th>
+                            <th colspan="5">No Results</th>
                         </tr>
                     </tbody>
                     <tfoot>
-                        <tr><td colspan="4"><hr/></td></tr>
+                        <tr><td colspan="5"><hr/></td></tr>
                         <tr>
-                            <td colspan="4" class="status">
+                            <td colspan="5" class="status">
                                 <div class="message">Article Browser</div> 
                             </td>
                         </tr>
@@ -179,4 +170,4 @@ class HTMLArticleFormBrowserElement extends HTMLElement {
             : `Article Browser`;
     }
 }
-customElements.define('articleform-browser', HTMLArticleFormBrowserElement);
+customElements.define('article-browser', HTMLArticleBrowserElement);

@@ -97,7 +97,7 @@ class TaskAPI {
 
                 const responseHTML = `
 <section>
-    <script src="/service/task/element/service-task-managerform.client.js"></script>
+    <script src="/service/task/element/service-task-managerform.element.js"></script>
     ${activeResponseHTML}
     ${inactiveResponseHTML}
 </section>`;

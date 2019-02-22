@@ -82,12 +82,12 @@ class DatabaseManager {
         // Configure Databases
         this.primaryDatabase = dbConfig.database;
 
-        await this.configureDatabase(promptCallback, this.primaryDatabase, defaultHostname);
+        await this.configureDatabase(this.primaryDatabase, defaultHostname, promptCallback);
     }
 
 
 
-    async configureDatabase(promptCallback, database, hostname) {
+    async configureDatabase(database, hostname, promptCallback=null) {
         const databaseExists = await this.queryAsync(`SHOW DATABASES LIKE '${database}'`);
         if(databaseExists.length === 0) {
             console.log("Database not found: ", database);
@@ -114,7 +114,8 @@ class DatabaseManager {
 
         // Configure Domain
         const domainDB = this.getDomainDB(this.primaryDatabase);
-        await domainDB.configure();
+        if(this.primaryDatabase === database)
+            await domainDB.configure();
         const domain = await domainDB.fetchDomainByHostname(hostname);
         if(!domain) {
             await domainDB.insertDomain(hostname, database);
@@ -186,9 +187,7 @@ class DatabaseManager {
             } else {
                 database = hostname.replace('.', '_') + '_cms';
             }
-            await this.configureDatabase(function(text, defaultValue, validation) {
-                return defaultValue;
-            }, database, hostname);
+            await this.configureDatabase(database, hostname);
             this.cacheHostname[hostname] = database;
             return database;
         } else {

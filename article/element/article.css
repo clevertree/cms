@@ -1,26 +1,26 @@
 /** Anchors **/
-form.user a,
-table.user a{
+form.article a,
+table.article a{
     text-decoration: none;
     min-width: 300px;
 }
 
 /** Forms **/
 
-form.user {
-    max-width: 520px;
-   
+form.article {
+    max-width: 1200px;
+
 }
 
-form.user > fieldset {
+form.article > fieldset {
     margin: 0px auto;
 }
 
-form.user > fieldset > table {
+form.article > fieldset > table {
     width: 100%;
     border-collapse: collapse;
 }
-form.user > fieldset > table > caption {
+form.article > fieldset > table > caption {
     /* font-weight: bold; */
     /*font-style: italic;*/
     text-align: left;
@@ -28,36 +28,40 @@ form.user > fieldset > table > caption {
 }
 /** Form Input **/
 
-form.user input[type=text],
-form.user input[type=email],
-form.user input[type=password],
-form.user select,
-form.user textarea {
+form.article input[type=text],
+form.article input[type=email],
+form.article input[type=password],
+form.article select,
+form.article textarea {
     min-width: 90%;
 }
 
 
 /** Custom Forms **/
 
-form.user-registerform {
+form.article-registerform {
     /*text-align: center;*/
 }
 
 
 /** Tables **/
 
-table.user .icon-edit {
+table.article {
+    width: 100%;
+}
+
+table.article .icon-edit {
     text-decoration: none;
 }
 
 /** Row **/
-table.user tr.odd {
+table.article tr.odd {
     background-color: #0001;
 }
 
 /** Labels **/
 
-table.user td.label {
+table.article td.label {
     text-align: right;
     padding: 8px 8px 8px 0px;
     font-weight: bold;
@@ -65,7 +69,7 @@ table.user td.label {
     display: block;
     min-width: 90%;
 }
-table.user td.label:after {
+table.article td.label:after {
     content: ':'
 }
 

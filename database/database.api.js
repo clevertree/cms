@@ -81,7 +81,7 @@ class DatabaseAPI {
                     await ThemeManager.get()
                         .render(req, `
 <section>
-    <script src="/database/form/databaseform-manage.client.js"></script>
+    <script src="/database/form/databaseform-manage.element.js"></script>
     <databaseform-manage></databaseform-manage>
 </section>
 `)
@@ -142,7 +142,7 @@ class DatabaseAPI {
                             title: `Connect to Database`,
                             content: `
 <section>
-    <script src="/database/form/databaseform-connect.client.js"></script>
+    <script src="/database/form/databaseform-connect.element.js"></script>
     <databaseform-connect></databaseform-connect>
 </section>
 `
