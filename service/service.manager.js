@@ -6,7 +6,7 @@ class ServiceManager {
     constructor() {
     }
 
-    async configure(promptCallback) {
+    async configure(promptCallback=null) {
         await HTTPServer.configure(promptCallback);
         await TaskAPI.configure(promptCallback);
         await SessionAPI.configure(promptCallback);

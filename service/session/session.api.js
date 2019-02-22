@@ -10,7 +10,7 @@ class SessionAPI {
         this.sessionConfig = {};
     }
 
-    async configure(promptCallback) {
+    async configure(promptCallback=null) {
         const localConfig = new LocalConfig();
         this.cookieConfig = await localConfig.getOrCreate('cookie');
 

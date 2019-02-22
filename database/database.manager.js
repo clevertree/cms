@@ -29,7 +29,7 @@ class DatabaseManager {
     // getConfigDB(database=null)     { return new (require('../config/config.database').ConfigDatabase)(database); }
     getDomainDB(database=null)     { return new (require('../service/domain/domain.database').DomainDatabase)(database); }
 
-    async configure(promptCallback) {
+    async configure(promptCallback=null) {
         if(this.db) {
             console.warn("Closing existing DB Connection");
             this.db.end();
@@ -42,13 +42,15 @@ class DatabaseManager {
         if(!dbConfig.database)
             dbConfig.database = 'localhost_cms'; // defaultHostname.replace('.', '_') + '_cms';
 
-        let attempts = 3;
+        let attempts = promptCallback ? 3 : 1;
         while(attempts-- > 0) {
-            await localConfig.promptValue('database.host', `Please enter the Database Host`, dbConfig.host || 'localhost');
-            await localConfig.promptValue('database.user', `Please enter the Database User Name`, dbConfig.user || 'cms_user');
-            await localConfig.promptValue('database.password', `Please enter the Password for Database User '${dbConfig.user}'`, dbConfig.password || 'cms_pass', 'password');
-            await localConfig.promptValue('database.database', `Please enter the Database Name`, dbConfig.database || defaultDatabaseName);
-            await localConfig.promptValue('database.multiDomain', `Enable Multi-domain hosting? [y or n]`, dbConfig.multiDomain || 'n');
+            if(promptCallback) {
+                await localConfig.promptValue('database.host', `Please enter the Database Host`, dbConfig.host || 'localhost');
+                await localConfig.promptValue('database.user', `Please enter the Database User Name`, dbConfig.user || 'cms_user');
+                await localConfig.promptValue('database.password', `Please enter the Password for Database User '${dbConfig.user}'`, dbConfig.password || 'cms_pass', 'password');
+                await localConfig.promptValue('database.database', `Please enter the Database Name`, dbConfig.database);
+                await localConfig.promptValue('database.multiDomain', `Enable Multi-domain hosting (Requires admin MYSQL Privileges) [y or n]?`, dbConfig.multiDomain || false, 'boolean');
+            }
                 // dbConfig.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain === 'y';
 
             const connectConfig = Object.assign({
@@ -77,7 +79,8 @@ class DatabaseManager {
         if(typeof dbConfig.multiDomain !== "undefined")
             this.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain !== 'n';
 
-        await localConfig.saveAll();
+        if(promptCallback)
+            await localConfig.saveAll();
 
         // Configure Databases
         this.primaryDatabase = dbConfig.database;

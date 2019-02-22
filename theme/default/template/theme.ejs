@@ -11,42 +11,14 @@
         <script src="theme/default/element/default.theme.element.js"></script>
     </head>
     <body class='theme-default'>
-        <header>
-            <div class="logo-container">
-                <div class="logo"></div>
-                <a href="" class="logo-text">
-                    <%=site.name%>
-                </a>
-            </div>
-            <nav>
-                <%- include('nav.partial.ejs') %>
-            </nav>
-        </header>
+<%- site.customHeader || include('header.partial.ejs') %>
+
 
         <article>
             <%-article.content%>
         </article>
 
-        <footer>
-            <div class="flex-list">
-                <div>
-                    <h2>Created With</h2>
-                    <a class="created-by" target='_blank' href='https://github.com/clevertree/cms'>CleverTree CMS</a>
-                </div>
-                <div>
-                    <h2>Get Involved!</h2>
-                    <p>
-                    </p>
-                </div>
-                <div>
-                    <h2>Contact Us</h2>
-                    <p>
-                        Email: <a href="mailto:<%=site.contact%>"><%=site.contact%></a>
-                        <br/>
-                        Copyright Clevertree LLC
-                    </p>
-                </div>
-            </div>
-        </footer>
+
+<%- site.customFooter || include('footer.partial.ejs') %>
     </body>
 </html>

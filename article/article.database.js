@@ -11,7 +11,7 @@ class ArticleDatabase {
         this.debug = debug;
     }
 
-    async configure(promptCallback) {
+    async configure(promptCallback=null) {
         // Check for tables
         await DatabaseManager.configureTable(this.table.article,             ArticleRow.getTableSQL(this.table.article));
         await DatabaseManager.configureTable(this.table.article_revision,    ArticleRevisionRow.getTableSQL(this.table.article_revision));

@@ -31,8 +31,8 @@ class UserDatabase  {
 
             if (adminUser) {
                 console.info("Admin user found: " + adminUser.id);
-                let changePassword = await promptCallback(`Would you like to change the admin password (Username: ${adminUser.username}) [y or n]?`, 'n');
-                if(changePassword.toLowerCase() === 'y') {
+                let changePassword = await promptCallback(`Would you like to change the admin password (Username: ${adminUser.username}) [y or n]?`, false, 'boolean');
+                if(changePassword) {
                     for (let i = 0; i < 4; i++) {
                         let adminPassword = await promptCallback(`Please enter a new password for ${adminUser.username}`, "", 'password');
                         let adminPassword2 = await promptCallback(`Please re-enter the new password for ${adminUser.username}`, "", 'password');

@@ -11,7 +11,7 @@ class ConfigDatabase  {
     }
 
 
-    async configure(promptCallback) {
+    async configure(promptCallback=null) {
         // Configure tables
         await DatabaseManager.configureTable(this.table.config, ConfigRow.getTableSQL(this.table.config));
     }

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 
-// const { LocalConfig } = require('../../config/local.config');
+const { LocalConfig } = require('../../config/local.config');
 // const { ConfigManager } = require('../../config/config.manager');
 
 // const { TaskAPI } = require('../task/task.manager');
@@ -19,15 +19,36 @@ const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
 class HTTPServer {
     constructor() {
         this.app = null;
+        this.config = null;
     }
 
-    async configure(promptCallback) {
+    async configure(promptCallback=null) {
 
         // if(this.config)
         //     return this.config;
 
         // const localConfig = new LocalConfig(config, !config);
         // const serverConfig = await localConfig.getOrCreate('server');
+
+        const localConfig = new LocalConfig(promptCallback);
+        // const dbConfig = await localConfig.getOrCreate('database');
+        const serverConfig = await localConfig.getOrCreate('server');
+        // const defaultHostname     = (require('os').hostname()).toLowerCase();
+
+        let attempts = promptCallback ? 3 : 1;
+        while(attempts-- > 0) {
+            if(promptCallback) {
+                await localConfig.promptValue('server.httpPort', `Please enter the Server HTTP Port`, serverConfig.httpPort || 8080, 'integer');
+                await localConfig.promptValue('server.ssl', `Enable SSL Server with GreenLock [y or n]?`, serverConfig.ssl || false, 'boolean');
+                if(serverConfig.ssl)
+                    await localConfig.promptValue('server.sslPort', `Please enter the Server HTTPS/SSL Port`, serverConfig.sslPort || 443, 'integer');
+                await localConfig.saveAll();
+            }
+            // dbConfig.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain === 'y';
+
+            break;
+        }
+        return serverConfig;
 
         // Configure local
         // if(!serverConfig.hostname)                  await localConfig.promptValue('server.hostname', `Please enter the Server Hostname`, require('os').hostname());
@@ -101,9 +122,9 @@ class HTTPServer {
         // }
     }
 
-    async listen(httpPort=8080, sslPort=8443) {
+    async listen() {
         try {
-            // await this.configure();
+            const serverConfig = await this.configure();
             // try {
             //     await DatabaseManager.configure();
             // } catch (e) {
@@ -111,11 +132,11 @@ class HTTPServer {
             // }
 
 
-            // if(config.ssl === 'y') {
-            //     const { SSLServer } = require('./ssl.server');
-            //     await SSLServer.listen(httpPort);
-            //     return;
-            // }
+            if(serverConfig.ssl) {
+                const { SSLServer } = require('./ssl.server');
+                await SSLServer.listen(serverConfig.httpPort, serverConfig.sslPort);
+                return;
+            }
             if (this.app)
                 throw new Error("App already listening");
 
@@ -123,8 +144,8 @@ class HTTPServer {
             this.app.use(this.getMiddleware());
 
             // HTTP
-            this.app.listen(httpPort);
-            console.log(`Listening on ${httpPort}`);
+            this.app.listen(serverConfig.httpPort);
+            console.log(`Listening on ${serverConfig.httpPort}`);
             return this.app;
         } catch (e) {
             console.error(e);

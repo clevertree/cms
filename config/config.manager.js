@@ -6,9 +6,11 @@ class ConfigManager {
         this.configList = [];
 
         // Add Site-specific configuration
-        const hostname = require('os').hostname().toLowerCase();
-        this.setConfigSetting('site.contact', () => 'admin@' + hostname, 'email');
-        this.setConfigSetting('site.keywords', () => 'cms, ' + hostname);
+        const hostname = require('os').hostname();
+        this.setConfigSetting('site.contact', () => 'admin@' + hostname.toLowerCase(), 'email');
+        this.setConfigSetting('site.keywords', () => 'cms, ' + hostname.toLowerCase());
+        this.setConfigSetting('site.baseURL', () => '/');
+        // this.setConfigSetting('site.customFooter', () => '/');
 
         this.setConfigSetting('user.profile', () => JSON.stringify([
             {"name":"name","title":"Full Name"},
@@ -44,7 +46,7 @@ class ConfigManager {
         }
     }
 
-    prompt(text, defaultValue=null, validation=null) {
+    prompt2(text, defaultValue=null, validation=null) {
         var standard_input = process.stdin;
         standard_input.setEncoding('utf-8');
         return new Promise( ( resolve, reject ) => {
@@ -57,6 +59,50 @@ class ConfigManager {
                 }
                 resolve (data);
             });
+        });
+    }
+
+
+    prompt(promptText, defaultValue=null, validation=null) {
+        return new Promise( ( resolve, reject ) => {
+
+            var readline = require('readline');
+
+            var rl = readline.createInterface({
+                input: process.stdin,
+                output: process.stdout
+            });
+
+            switch(validation) {
+                case 'boolean':
+                    promptText += ` [${(defaultValue ? 'y' : 'n')}]: `;
+                    break;
+                default:
+                    promptText += ` [${(defaultValue === null ? 'null' : defaultValue)}]: `;
+            }
+
+            rl.query = promptText;
+            rl.question(rl.query, function(value) {
+                rl.close();
+                value = value.trim() || defaultValue;
+                switch(validation) {
+                    case 'boolean':
+                        value = ['y', 'Y', '1'].indexOf(value) !== -1;
+                        break;
+                }
+                resolve(value);
+            });
+
+            rl._writeToOutput = function _writeToOutput(stringToWrite) {
+                switch(validation) {
+                    case 'password':
+                        rl.output.write("\x1B[2K\x1B[200D"+rl.query+"["+((rl.line.length%2==1)?"=-":"-=")+"]");
+                        break;
+                    default:
+                        rl.output.write(stringToWrite);
+                }
+            };
+
         });
     }
 

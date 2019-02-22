@@ -14,7 +14,7 @@ class TaskAPI {
         this.tasks = [];
     }
 
-    async configure(promptCallback) {
+    async configure(promptCallback=null) {
         this.tasks = [];
         await this.addTask(new AdminConfigureTask);
     }
