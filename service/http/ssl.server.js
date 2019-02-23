@@ -28,7 +28,7 @@ class SSLServer {
         if(!sslConfig.telemetry)        sslConfig.telemetry = true;
         // the default servername to use when the client doesn't specify
         // (because some IoT devices don't support servername indication)
-        await localConfig.promptValue('ssl.servername', `Please enter the SSL Server Hostname`, sslConfig.servername || require('os').hostname());
+        // await localConfig.promptValue('ssl.servername', `Please enter the SSL Server Hostname`, sslConfig.servername || require('os').hostname());
 
         await localConfig.promptValue('ssl.sslPort', `Please enter the Server HTTPS/SSL Port`, sslConfig.sslPort || 443, 'integer');
         await localConfig.promptValue('ssl.httpPort', `Please enter the Server Challenge HTTP Port`, sslConfig.httpPort || 8080, 'integer');
@@ -51,11 +51,11 @@ class SSLServer {
             , approveDomains: (opts, certs, cb) => this.approveDomains(opts, certs, cb)
 
             // the default servername to use when the client doesn't specify
-            , servername: 'example.com'
+            // , servername: 'example.com'
 
             // If you wish to replace the default account and domain key storage plugin
             , store: require('le-store-certbot').create({
-                configDir: path.join(BASE_DIR, 'acme/etc')
+                configDir: path.join(BASE_DIR, '.acme/etc')
                 , webrootPath: '/tmp/acme-challenges'
             })
         }, sslConfig));
@@ -101,7 +101,7 @@ class SSLServer {
         // If you wish to replace the default challenge plugin, you may do so here
         // opts.challenges = { 'http-01': http01 };
 
-        opts.email = 'john.doe@' + this.config.servername;
+        opts.email = 'john.doe@' + opts.domain; // this.config.servername;
         opts.agreeTos = true;
 
         // NOTE: you can also change other options such as `challengeType` and `challenge`

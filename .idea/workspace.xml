@@ -3,17 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/article/article.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/article/article.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/database.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/database.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/domain/domain.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/domain/domain.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/file/file.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/file/file.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/http/http.server.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/http/http.server.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/http/ssl.server.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/http/ssl.server.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/session/session.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/session/session.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/task/task.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/task/task.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/user.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.api.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -26,10 +16,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/service/http/ssl.server.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1491">
-              <caret line="141" column="33" selection-start-line="141" selection-start-column="33" selection-end-line="141" selection-end-column="33" />
+            <state relative-caret-position="1624">
+              <caret line="103" column="51" selection-start-line="103" selection-start-column="51" selection-end-line="103" selection-end-column="51" />
               <folding>
-                <marker date="1550956904044" expanded="true" signature="7335:7641" ph="..." />
+                <marker date="1550957613231" expanded="true" signature="7357:7663" ph="..." />
               </folding>
             </state>
           </provider>
@@ -38,7 +28,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/node_modules/greenlock/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1774">
+            <state relative-caret-position="11476">
               <caret line="604" column="2" selection-start-line="604" selection-start-column="2" selection-end-line="604" selection-end-column="2" />
             </state>
           </provider>
@@ -47,7 +37,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/user/user.database.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="436">
+            <state relative-caret-position="627">
               <caret line="33" column="156" selection-start-line="33" selection-start-column="156" selection-end-line="33" selection-end-column="156" />
             </state>
           </provider>
@@ -56,8 +46,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/service/http/http.server.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="906">
-              <caret line="93" lean-forward="true" selection-start-line="93" selection-end-line="93" />
+            <state relative-caret-position="1875">
+              <caret line="159" column="22" selection-start-line="159" selection-start-column="22" selection-end-line="159" selection-end-column="22" />
             </state>
           </provider>
         </entry>
@@ -65,8 +55,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.config.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="418">
-              <caret line="22" column="20" lean-forward="true" selection-start-line="22" selection-start-column="20" selection-end-line="22" selection-end-column="20" />
+            <state relative-caret-position="399">
+              <caret line="21" selection-start-line="21" selection-end-line="21" />
             </state>
           </provider>
         </entry>
@@ -410,11 +400,12 @@
       <workItem from="1550887519193" duration="1139000" />
       <workItem from="1550888890547" duration="8477000" />
       <workItem from="1550952070172" duration="4915000" />
+      <workItem from="1550957148781" duration="465000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="151327000" />
+    <option name="totallyTimeSpent" value="151792000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -427,8 +418,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="-2" width="3840" height="2162" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.079862945" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.08012652" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="npm" order="2" side_tool="true" />
       <window_info id="Favorites" order="3" side_tool="true" />
@@ -446,7 +438,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Database" order="3" />
-      <window_info anchor="right" id="Debug" order="4" visible="true" weight="0.2775435" />
+      <window_info active="true" anchor="right" id="Debug" order="4" visible="true" weight="0.2775435" />
       <window_info anchor="right" id="Find" order="5" weight="0.3294676" />
     </layout>
   </component>
@@ -529,44 +521,34 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/service/http/ssl.server.js</url>
           <line>161</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="170" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/service/http/ssl.server.js</url>
           <line>150</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="171" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/node_modules/greenlock/lib/middleware.js</url>
           <line>42</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="172" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/service/http/ssl.server.js</url>
           <line>141</line>
           <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="174" />
+          <option name="timeStamp" value="176" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/service/http/ssl.server.js</url>
-          <line>139</line>
+          <line>103</line>
           <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="175" />
+          <option name="timeStamp" value="177" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/user/section/profile.ejs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="114">
-          <caret line="6" column="28" selection-start-line="6" selection-start-column="28" selection-end-line="6" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/user/element/user-browser.element.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1864">
@@ -843,13 +825,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/greenlock-express/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="668">
-          <caret line="53" column="29" selection-start-line="53" selection-start-column="29" selection-end-line="53" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/greenlock-express/index.js" />
     <entry file="file://$PROJECT_DIR$/node_modules/redirect-https/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-306">
@@ -878,24 +854,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/service/http/http.server.js">
+    <entry file="file://$PROJECT_DIR$/node_modules/greenlock/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="906">
-          <caret line="93" lean-forward="true" selection-start-line="93" selection-end-line="93" />
+        <state relative-caret-position="11476">
+          <caret line="604" column="2" selection-start-line="604" selection-start-column="2" selection-end-line="604" selection-end-column="2" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/user/user.database.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="436">
+        <state relative-caret-position="627">
           <caret line="33" column="156" selection-start-line="33" selection-start-column="156" selection-end-line="33" selection-end-column="156" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.config.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="22" column="20" lean-forward="true" selection-start-line="22" selection-start-column="20" selection-end-line="22" selection-end-column="20" />
         </state>
       </provider>
     </entry>
@@ -906,19 +875,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/greenlock/index.js">
+    <entry file="file://$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external/lib.dom.d.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1774">
-          <caret line="604" column="2" selection-start-line="604" selection-start-column="2" selection-end-line="604" selection-end-column="2" />
+        <state relative-caret-position="659">
+          <caret line="3243" column="10" selection-start-line="3243" selection-start-column="10" selection-end-line="3243" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/service/http/http.server.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1875">
+          <caret line="159" column="22" selection-start-line="159" selection-start-column="22" selection-end-line="159" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.config.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="399">
+          <caret line="21" selection-start-line="21" selection-end-line="21" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/service/http/ssl.server.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1491">
-          <caret line="141" column="33" selection-start-line="141" selection-start-column="33" selection-end-line="141" selection-end-column="33" />
+        <state relative-caret-position="1624">
+          <caret line="103" column="51" selection-start-line="103" selection-start-column="51" selection-end-line="103" selection-end-column="51" />
           <folding>
-            <marker date="1550956904044" expanded="true" signature="7335:7641" ph="..." />
+            <marker date="1550957613231" expanded="true" signature="7357:7663" ph="..." />
           </folding>
         </state>
       </provider>
