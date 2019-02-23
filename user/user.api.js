@@ -25,7 +25,7 @@ class UserAPI {
     }
 
 
-    getMiddleware() {
+    get middleware() {
         // const localConfig = new LocalConfig(config, !config);
         // const cookieConfig = await localConfig.getOrCreate('cookie');
 
@@ -44,7 +44,7 @@ class UserAPI {
         // API Routes
         routerAPI.use(bodyParser.urlencoded({ extended: true }));
         routerAPI.use(bodyParser.json());
-        routerAPI.use(SessionAPI.getMiddleware());
+        routerAPI.use(SessionAPI.middleware);
 
         routerAPI.get('/[:]user/:userID(\\w+)/[:]json',                 async (req, res, next) => await this.handleViewRequest(true, req.params.userID, req, res, next));
         routerAPI.get('/[:]user/:userID(\\w+)',                         async (req, res, next) => await this.handleViewRequest(false, req.params.userID, req, res, next));

@@ -1,5 +1,6 @@
-// const express = require('express');
+const express = require('express');
 const path = require('path');
+const os = require('os')
 
 const { LocalConfig } = require('../../config/local.config');
 const { HTTPServer } = require('./http.server');
@@ -9,7 +10,7 @@ const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
 class SSLServer {
     constructor() {
         this.config = null;
-        this.server = null;
+        this.greenlock = null;
     }
 
     async configure(promptCallback=null) {
@@ -39,30 +40,53 @@ class SSLServer {
         //         , webrootPath: '/tmp/acme-challenges'
         //     });
 
-        this.server = require('greenlock-express').create(Object.assign({
-            approveDomains: (opts, certs, cb) => this.approveDomains(opts, certs, cb),
-            app: HTTPServer.getMiddleware(),
-            debug: true,
-            store: require('le-store-certbot').create({
-                    configDir: path.join(BASE_DIR, '.acme', 'etc')
-                    // , privkeyPath: ':configDir/live/:hostname/privkey.pem'          //
-                    // , fullchainPath: ':configDir/live/:hostname/fullchain.pem'      // Note: both that :configDir and :hostname
-                    // , certPath: ':configDir/live/:hostname/cert.pem'                //       will be templated as expected by
-                    // , chainPath: ':configDir/live/:hostname/chain.pem'              //       greenlock.js
+        const Greenlock = require('greenlock');
 
-                    , logsDir: ':configDir/log'
+        this.greenlock = Greenlock.create(Object.assign({
+            version: 'draft-12'
+            , server: 'https://acme-v02.api.letsencrypt.org/directory'
 
-                    // , webrootPath: '~/acme/srv/www/:hostname/.well-known/acme-challenge'
+            // Use the approveDomains callback to set per-domain config
+            // (default: approve any domain that passes self-test of built-in challenges)
+            , approveDomains: (opts, certs, cb) => this.approveDomains(opts, certs, cb)
 
-                // , webrootPath: '/tmp/acme-challenges'
-                    })
+            // the default servername to use when the client doesn't specify
+            , servername: 'example.com'
+
+            // If you wish to replace the default account and domain key storage plugin
+            , store: require('le-store-certbot').create({
+                configDir: path.join(BASE_DIR, 'acme/etc')
+                , webrootPath: '/tmp/acme-challenges'
+            })
         }, sslConfig));
+
+
+        // this.greenlock = require('greenlock-express').create(Object.assign({
+        //     approveDomains: (opts, certs, cb) => this.approveDomains(opts, certs, cb),
+        //     app: HTTPServer.middleware,
+        //     debug: true,
+        //     store: require('le-store-certbot').create({
+        //             configDir: path.join(BASE_DIR, '.acme', 'etc')
+        //             // , privkeyPath: ':configDir/live/:hostname/privkey.pem'          //
+        //             // , fullchainPath: ':configDir/live/:hostname/fullchain.pem'      // Note: both that :configDir and :hostname
+        //             // , certPath: ':configDir/live/:hostname/cert.pem'                //       will be templated as expected by
+        //             // , chainPath: ':configDir/live/:hostname/chain.pem'              //       greenlock.js
+        //
+        //             , logsDir: ':configDir/log'
+        //
+        //             // , webrootPath: '~/acme/srv/www/:hostname/.well-known/acme-challenge'
+        //
+        //         // , webrootPath: '/tmp/acme-challenges'
+        //             })
+        // }, sslConfig));
 
         this.config = sslConfig;
         return sslConfig;
     }
 
     approveDomains(opts, certs, cb) {
+        // var http01 = require('le-challenge-fs').create({ webrootPath: '/tmp/acme-challenges' });
+
         // This is where you check your database and associated
         // email addresses with domains and agreements and such
         // if (!isAllowed(opts.domains)) { return cb(new Error("not allowed")); }
@@ -103,15 +127,45 @@ class SSLServer {
 //         });
 //
 // // handles your app
-//         require('https').createServer(this.server.httpsOptions, HTTPServer.getMiddleware()).listen(sslConfig.sslPort, function () {
+//         require('https').createServer(this.server.httpsOptions, HTTPServer.middleware).listen(sslConfig.sslPort, function () {
 //             console.log("Listening for ACME tls-sni-01 challenges and serve app on", this.address());
 //         });
 
-        this.server.listen(sslConfig.httpPort, sslConfig.sslPort, function () {
-            console.log(`Listening on port ${sslConfig.httpPort} for ACME challenges and ${sslConfig.sslPort} for express app.`);
-        },function () {
-            console.log("Listening for ACME tls-sni-01 challenges and serve app on", this.address());
+        // var redir = require('redirect-https')();
+        const appHTTP = express();
+        const appMiddleware = HTTPServer.middleware;
+        const greenLockMiddleware = this.greenlock.middleware();
+        appHTTP.use(function (req, res, next) {
+            try {
+                return greenLockMiddleware(req, res, next);
+            } catch (e) {
+                console.error(e);
+            }
         });
+        appHTTP.use(appMiddleware);
+        const serverHTTP = require('http').createServer(appHTTP).listen(sslConfig.httpPort, function(e) {
+            console.log(`HTTP listening on port ${sslConfig.httpPort}`);
+        });
+        serverHTTP.on('error', function (e) {
+            // Handle your error here
+            console.log(e);
+        });
+        const appSSL = express();
+        appSSL.use(appMiddleware);
+        const serverSSL = require('https').createServer(this.greenlock.tlsOptions, appSSL).listen(sslConfig.sslPort, function(e) {
+            console.log(`HTTPS listening on port ${sslConfig.sslPort}`);
+        });
+
+
+        serverSSL.on('error', function (e) {
+            // Handle your error here
+            console.log(e);
+        });
+        // this.server.listen(sslConfig.httpPort, sslConfig.sslPort, function () {
+        //     console.log(`Listening on port ${sslConfig.httpPort} for ACME challenges and ${sslConfig.sslPort} for express app.`);
+        // },function () {
+        //     console.log("Listening for ACME tls-sni-01 challenges and serve app on", this.address());
+        // });
 
         // return app;
     }

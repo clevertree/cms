@@ -26,7 +26,7 @@ class SessionAPI {
     }
 
 
-    getMiddleware() {
+    get middleware() {
         const routerSession = express.Router();
         routerSession.use(session(this.sessionConfig));
         routerSession.use(cookieParser(this.cookieConfig));

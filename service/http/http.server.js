@@ -78,35 +78,35 @@ class HTTPServer {
     }
 
 
-    getMiddleware() {
+    get middleware() {
         const router = express.Router();
         // Routes
-        router.use(DatabaseAPI.getMiddleware());
-        router.use(UserAPI.getMiddleware());
-        router.use(ArticleAPI.getMiddleware());
-        router.use(FileAPI.getMiddleware());
-        router.use(ConfigAPI.getMiddleware());
-        router.use(TaskAPI.getMiddleware());
+        router.use(DatabaseAPI.middleware);
+        router.use(UserAPI.middleware);
+        router.use(ArticleAPI.middleware);
+        router.use(FileAPI.middleware);
+        router.use(ConfigAPI.middleware);
+        router.use(TaskAPI.middleware);
 
 
         // CMS Asset files
         router.use(express.static(BASE_DIR));
 
         return (req, res, next) => {
-            next = next || (() => { // If no next()
-                console.error("Not Found: " + req.url);
-                res.status(404);
-                res.end("Not Found: " + req.url);
-            });
-
-            if (!req.query) {
-                let  val = parseUrl(req).query || "";
-                req.query = qs.parse(val); // opts
-            }
-            if(!res.status)
-                res.status = function() {};
-            if(!res.send)
-                res.send = res.end;
+            // next = next || (() => { // If no next()
+            //     console.error("Not Found: " + req.url);
+            //     res.status(404);
+            //     res.end("Not Found: " + req.url);
+            // });
+            //
+            // if (!req.query) {
+            //     let  val = parseUrl(req).query || "";
+            //     req.query = qs.parse(val); // opts
+            // }
+            // if(!res.status)
+            //     res.status = function() {};
+            // if(!res.send)
+            //     res.send = res.end;
             return router(req, res, next);
         };
 
@@ -150,7 +150,7 @@ class HTTPServer {
                 throw new Error("App already listening");
 
             this.app = express();
-            this.app.use(this.getMiddleware());
+            this.app.use(this.middleware);
 
             // HTTP
             this.app.listen(serverConfig.port);

@@ -12,13 +12,13 @@ class ConfigAPI {
     }
 
 
-    getMiddleware() {
+    get middleware() {
         // Configure Routes
         const router = express.Router();
         const bodyParser = require('body-parser');
         router.use(bodyParser.urlencoded({ extended: true }));
         router.use(bodyParser.json());
-        router.use(SessionAPI.getMiddleware());
+        router.use(SessionAPI.middleware);
 
         // Handle Config requests
         router.get('/[:]config/[:]json',                    async (req, res) => await this.renderConfigJSON(req, res));

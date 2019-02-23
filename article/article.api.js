@@ -10,13 +10,13 @@ class ArticleAPI {
     }
 
 
-    getMiddleware() {
+    get middleware() {
         const express = require('express');
         const bodyParser = require('body-parser');
 
         const router = express.Router();
         const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
-        const SM = SessionAPI.getMiddleware();
+        const SM = SessionAPI.middleware;
         // Handle Article requests
         router.get(['/[\\w/_-]+', '/'],                         SM, async (req, res, next) => await this.renderArticleByPath(req, res,next));
 

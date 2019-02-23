@@ -20,13 +20,13 @@ class TaskAPI {
     }
 
 
-    getMiddleware() {
+    get middleware() {
         // Configure Routes
         const router = express.Router();
         const bodyParser = require('body-parser');
         router.use(bodyParser.urlencoded({ extended: true }));
         router.use(bodyParser.json());
-        router.use(SessionAPI.getMiddleware());
+        router.use(SessionAPI.middleware);
 
         // Handle Task requests
         router.get('/[:]task/:taskID/[:]json',        async (req, res) => await this.renderTaskJSON(req.params.taskID || null, req, res));

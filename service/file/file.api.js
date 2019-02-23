@@ -15,7 +15,7 @@ class FileAPI {
     get fileDB () { return new FileDatabase(this.app.db); }
 
 
-    getMiddleware() {
+    get middleware() {
         const router = express.Router();
         router.post('/:?file/[:]upload', formidableMiddleware(), async (req, res) => await this.handleFileUpload(req, res));
         router.all('/:?file/[:]browse', formidableMiddleware(), async (req, res) => await this.handleFileBrowseRequest(req, res));
