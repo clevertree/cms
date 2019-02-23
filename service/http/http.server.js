@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+var qs = require('qs');
+var parseUrl = require('parseurl');
 
 const { LocalConfig } = require('../../config/local.config');
 // const { ConfigManager } = require('../../config/config.manager');
@@ -96,6 +98,11 @@ class HTTPServer {
                 res.status(404);
                 res.end("Not Found: " + req.url);
             });
+
+            if (!req.query) {
+                let  val = parseUrl(req).query || "";
+                req.query = qs.parse(val); // opts
+            }
             return router(req, res, next);
         };
 
