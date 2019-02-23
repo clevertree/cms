@@ -29,8 +29,8 @@ class SSLServer {
         // (because some IoT devices don't support servername indication)
         await localConfig.promptValue('ssl.servername', `Please enter the SSL Server Hostname`, sslConfig.servername || require('os').hostname());
 
-        await localConfig.promptValue('ssl.port', `Please enter the Server HTTPS/SSL Port`, sslConfig.port || 443, 'integer');
-        await localConfig.promptValue('ssl.planePort', `Please enter the Server Challenge HTTP Port`, sslConfig.planePort || 80, 'integer');
+        await localConfig.promptValue('ssl.sslPort', `Please enter the Server HTTPS/SSL Port`, sslConfig.sslPort || 443, 'integer');
+        await localConfig.promptValue('ssl.httpPort', `Please enter the Server Challenge HTTP Port`, sslConfig.httpPort || 8080, 'integer');
         await localConfig.saveAll();
 
         // if(!sslConfig.store)
@@ -90,9 +90,27 @@ class SSLServer {
     async listen() {
         const sslConfig = await this.configure();
 
+        // handles acme-challenge and redirects to https
+        // require('http').createServer(this.server.middleware(require('redirect-https')())).listen(sslConfig.httpPort, function () {
+        //     console.log("Listening for ACME http-01 challenges on", this.address());
+        // });
 
-        this.server.listen(sslConfig.planePort, sslConfig.port, function () {
-            console.log("Listening on port 80 for ACME challenges and 443 for express app.");
+
+
+//         var app = require('express')();
+//         app.use('/', function (req, res) {
+//             res.end('Hello, World!');
+//         });
+//
+// // handles your app
+//         require('https').createServer(this.server.httpsOptions, HTTPServer.getMiddleware()).listen(sslConfig.sslPort, function () {
+//             console.log("Listening for ACME tls-sni-01 challenges and serve app on", this.address());
+//         });
+
+        this.server.listen(sslConfig.httpPort, sslConfig.sslPort, function () {
+            console.log(`Listening on port ${sslConfig.httpPort} for ACME challenges and ${sslConfig.sslPort} for express app.`);
+        },function () {
+            console.log("Listening for ACME tls-sni-01 challenges and serve app on", this.address());
         });
 
         // return app;
