@@ -103,6 +103,10 @@ class HTTPServer {
                 let  val = parseUrl(req).query || "";
                 req.query = qs.parse(val); // opts
             }
+            if(!res.status)
+                res.status = function() {};
+            if(!res.send)
+                res.send = res.end;
             return router(req, res, next);
         };
 
