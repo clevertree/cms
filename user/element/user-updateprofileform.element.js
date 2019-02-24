@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
+                src: null,
                 action: null,
                 method: 'POST',
                 message: "In order to update this profile, please modify this form and hit 'Update Profile' below",
@@ -27,14 +28,19 @@ document.addEventListener('DOMContentLoaded', function() {
             this.render();
         }
 
+
         connectedCallback() {
             this.addEventListener('change', e => this.onChange(e));
             this.addEventListener('submit', e => this.onSubmit(e));
 
-            this.render();
-            const userID = this.getAttribute('userID');
-            if(userID)
-                this.requestFormData(userID);
+            const src = this.getAttribute('src');
+            if(src) {
+                this.setState({src});
+                this.requestFormData();
+            } else {
+                this.setState({message: "attribute src=':/user/[userID]' required", status: 400});
+            }
+
         }
 
 
@@ -57,21 +63,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.state.user.profile[e.target.name] = e.target.value;
         }
 
-        requestFormData(userID) {
-            const action = `/:user/${userID}/:profile`;
+        requestFormData() {
+            const form = this.querySelector('form');
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
                 this.setState({processing: false}, xhr.response);
             };
             xhr.responseType = 'json';
-            xhr.open ('OPTIONS', action, true);
+            xhr.open ('OPTIONS', form.getAttribute('action'), true);
             xhr.send ();
-            this.setState({action, user: {id: userID}, processing: true});
+            this.setState({processing: true});
         }
-
         onSubmit(e) {
             e.preventDefault();
-            const request = this.getFormData(e.target);
+            const form = e.target;
+            const request = this.getFormData(form);
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
@@ -83,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.onError(e, response);
                 }
             };
-            xhr.open(this.state.method, this.state.action, true);
+            xhr.open('POST', form.getAttribute('action'), true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
@@ -116,8 +122,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="${this.state.action}" method="${this.state.method}" class="user user-updateprofileform themed">
-                    <fieldset ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>
+                <form action="${this.state.src}/:profile" method="POST" class="user user-updateprofileform themed">
+                   <fieldset ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>
                         <legend>Update Profile</legend>
                         <table>
                             <thead>

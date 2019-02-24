@@ -169,7 +169,7 @@ class HTTPServer {
         // Certs being renewed are listed in certs.altnames (if that's useful)
 
         // Opt-in to submit stats and get important updates
-        opts.communityMember = true;
+        opts.communityMember = false;
 
         // var http01 = require('le-challenge-fs').create({ webrootPath: '/tmp/acme-challenges' });
         // If you wish to replace the default challenge plugin, you may do so here

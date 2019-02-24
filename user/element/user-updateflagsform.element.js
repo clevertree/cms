@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
-                action: null,
+                src: null,
                 method: 'POST',
                 message: "In order to update this user's flags, please modify this form and hit 'Update' below",
                 status: 0,
@@ -35,12 +35,15 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('change', e => this.onChange(e));
             this.addEventListener('submit', e => this.onSubmit(e));
 
-            this.render();
-            const userID = this.getAttribute('userID');
-            if(userID)
-                this.requestFormData(userID);
-        }
+            const src = this.getAttribute('src');
+            if(src) {
+                this.setState({src});
+                this.requestFormData();
+            } else {
+                this.setState({message: "attribute src=':/user/[userID]' required", status: 400});
+            }
 
+        }
 
         onSuccess(e, response) {
             console.log(response);
@@ -67,24 +70,22 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(this.state.user.flags);
         }
 
-        requestFormData(userID) {
-            const action = `/:user/${userID}/:flags`;
+        requestFormData() {
+            const form = this.querySelector('form');
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
-                if(this.state.sessionUser && this.state.user) {
-                    this.state({require_old_password: this.state.sessionUser.id === this.state.user.id});
-                }
                 this.setState({processing: false}, xhr.response);
             };
             xhr.responseType = 'json';
-            xhr.open ('OPTIONS', action, true);
+            xhr.open ('OPTIONS', form.getAttribute('action'), true);
             xhr.send ();
-            this.setState({action, user: {id: userID}, processing: true});
+            this.setState({processing: true});
         }
 
         onSubmit(e) {
             e.preventDefault();
-            const request = this.getFormData();
+            const form = e.target;
+            const request = this.getFormData(form);
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
@@ -96,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.onError(e, response);
                 }
             };
-            xhr.open(this.state.method, this.state.action, true);
+            xhr.open('POST', form.getAttribute('action'), true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
@@ -115,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const userFlags = this.state.user.flags || [];
             this.innerHTML =
                 `
-                <form action="${this.state.action}" method="${this.state.method}" class="user user-updateflagsform themed">
+                <form action="${this.state.src}/:flags" method="POST" class="user user-updateflagsform themed">
                     <fieldset ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>
                         <legend>Update User Flags</legend>
                         <table>

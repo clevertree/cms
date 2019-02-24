@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
-                action: null,
+                src: null,
                 method: 'POST',
-                message: "In order to change password, please modify this form and hit 'Update' below",
+                message: "In order to change password, please fill out this form and hit 'Update' below",
                 status: 0,
                 user: {id: -1},
                 require_old_password: true,
@@ -33,10 +33,14 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('change', e => this.onChange(e));
             this.addEventListener('submit', e => this.onSubmit(e));
 
-            this.render();
-            const userID = this.getAttribute('userID');
-            if(userID)
-                this.requestFormData(userID);
+            const src = this.getAttribute('src');
+            if(src) {
+                this.setState({src});
+                this.requestFormData();
+            } else {
+                this.setState({message: "attribute src=':/user/[userID]' required", status: 400});
+            }
+
         }
 
 
@@ -61,19 +65,16 @@ document.addEventListener('DOMContentLoaded', function() {
             // console.log(this.state);
         }
 
-        requestFormData(userID) {
-            const action = `/:user/${userID}/:password`;
+        requestFormData() {
+            const form = this.querySelector('form');
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
-                if(this.state.sessionUser && this.state.user) {
-                    this.state({require_old_password: this.state.sessionUser.id === this.state.user.id});
-                }
                 this.setState({processing: false}, xhr.response);
             };
             xhr.responseType = 'json';
-            xhr.open ('OPTIONS', action, true);
+            xhr.open ('OPTIONS', form.getAttribute('action'), true);
             xhr.send ();
-            this.setState({action, user: {id: userID}, processing: true});
+            this.setState({processing: true});
         }
 
         onSubmit(e) {
@@ -107,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
         render() {
             this.innerHTML =
                 `
-                <form action="${this.state.action}" method="${this.state.method}" class="user user-changepasswordform themed">
+               <form action="${this.state.src}/:password" method="POST" class="user user-updatepasswordform themed">
                     <fieldset ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>
                         <legend>Change Password</legend>
                         <table>

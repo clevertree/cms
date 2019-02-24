@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
+                src: null,
                 // message: "No Message",
                 // status: 0,
                 processing: false,
@@ -27,27 +28,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
         connectedCallback() {
-            // this.addEventListener('change', this.onEvent);
-            // this.addEventListener('submit', this.onEvent);
+            this.addEventListener('change', e => this.onChange(e));
+            this.addEventListener('submit', e => this.onSubmit(e));
 
-            this.render();
-            const userID = this.getAttribute('userID');
-            if(userID)
-                this.requestFormData(userID);
+            const src = this.getAttribute('src');
+            if(src) {
+                this.setState({src});
+                this.requestFormData();
+            } else {
+                this.setState({message: "attribute src=':/user/[userID]' required", status: 400});
+            }
+
         }
 
-        requestFormData(userID) {
-            const action = `/:user/${userID}`;
+        requestFormData() {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
-                this.setState(xhr.response, {processing: false});
+                this.setState({processing: false}, xhr.response);
             };
             xhr.responseType = 'json';
-            xhr.open ("OPTIONS", action, true);
+            xhr.open ('OPTIONS', this.state.src, true);
             xhr.send ();
-            this.setState({action, user: {id: userID}, processing: true});
+            this.setState({processing: true});
         }
-
 
         render() {
             console.log("RENDER", this.state);

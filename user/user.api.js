@@ -47,16 +47,16 @@ class UserAPI {
         routerAPI.use(SessionAPI.getMiddleware());
 
         routerAPI.all('/[:]user/:userID(\\w+)',                         async (req, res, next) => await this.handleUpdateRequest('profile', req.params.userID, req, res, next));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]edit',                 async (req, res) => await this.handleUpdateRequest('edit', req.params.userID, req, res));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]profile',              async (req, res) => await this.handleUpdateRequest('updateprofile', req.params.userID, req, res));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]flags',                async (req, res) => await this.handleUpdateRequest('updateflags', req.params.userID, req, res));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]password',             async (req, res) => await this.handleUpdateRequest('updatepassword', req.params.userID, req, res));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]edit',                 async (req, res, next) => await this.handleUpdateRequest('edit', req.params.userID, req, res, next));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]profile',              async (req, res, next) => await this.handleUpdateRequest('updateprofile', req.params.userID, req, res, next));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]flags',                async (req, res, next) => await this.handleUpdateRequest('updateflags', req.params.userID, req, res, next));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]password',             async (req, res, next) => await this.handleUpdateRequest('updatepassword', req.params.userID, req, res, next));
         routerAPI.all('/[:]user/:userID(\\w+)/[:]changepassword/:uuid', async (req, res) => await this.handleResetPassword(req.params.userID, req.params.uuid, req, res));
         routerAPI.all('/[:]user/[:]login',                              async (req, res) => await this.handleLoginRequest(req, res));
         // router.all('/[:]user/session',                               async (req, res) => await this.handleSessionLoginRequest(req, res));
         routerAPI.all('/[:]user/[:]logout',                             async (req, res) => await this.handleLogoutRequest(req, res));
         routerAPI.all('/[:]user/[:]register',                           async (req, res) => await this.handleRegisterRequest(req, res));
-        routerAPI.all('/[:]user/[:]forgotpassword',                     async (req, res) => await this.handleForgotPassword(req, res));
+        routerAPI.all('/[:]user/[:]forgotpassword',                     async (req, res, next) => await this.handleForgotPassword(req, res, next));
         routerAPI.all('/[:]user(/[:]list)?',                            async (req, res) => await this.handleBrowserRequest(req, res));
 
         return (req, res, next) => {
@@ -253,16 +253,15 @@ class UserAPI {
         // TODO: destroy db session
     }
 
-    async handleLoginRequest(req, res) {
+    async handleLoginRequest(req, res, next) {
         try {
-            const userID = UserAPI.sanitizeInput(req.query.userID || null);
             if(req.method === 'GET') {
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
 <script src="/user/element/user-loginform.element.js"></script>
-<user-loginform userID="${userID || ''}"></user-loginform>`)
+<user-loginform></user-loginform>`)
                 );
 
             } else {
@@ -342,16 +341,22 @@ class UserAPI {
         }
     }
 
-    async handleForgotPassword(req, res) {
+    async handleForgotPassword(req, res, next) {
         try {
+            const userID = UserAPI.sanitizeInput(req.query.userID || null);
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const userDB = new UserDatabase(database);
+            const user = await userDB.fetchUserByID(userID, 'u.*');
+            if(!user)
+                return next();
+
             if(req.method === 'GET') {
-                const userID = UserAPI.sanitizeInput(req.query.userID || null);
                 // Render Editor Form
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
 <script src="/user/element/user-forgotpasswordform.element.js"></script>
-<user-forgotpasswordform userID="${userID || ''}"></user-forgotpasswordform>`)
+<user-forgotpasswordform src="${user.url}"></user-forgotpasswordform>`)
                 );
 
             } else {
@@ -359,11 +364,6 @@ class UserAPI {
                 // console.log("Log in Request", req.body);
                 if(!req.body.userID)
                     throw new Error("userID is required");
-                const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = new UserDatabase(database);
-                const user = await userDB.fetchUserByID(req.body.userID);
-                if(!user)
-                    throw new Error("User was not found: " + userID);
 
                 const uuid = uuidv4();
                 const recoveryUrl = req.protocol + '://' + req.get('host') + `/:user/${user.id}/:changepassword/${uuid}`;
@@ -414,7 +414,7 @@ class UserAPI {
                     await ThemeManager.get()
                         .render(req, `
 <script src="/user/element/user-changepasswordform.element.js"></script>
-<user-changepasswordform uuid="${uuid}" userID="${userID}" username="${user.username}"></user-changepasswordform>`)
+<user-changepasswordform uuid="${uuid}" src="${user.url}" username="${user.username}"></user-changepasswordform>`)
                 );
 
             } else {
@@ -443,13 +443,15 @@ class UserAPI {
         }
     }
 
-    async handleUpdateRequest(type, userID, req, res) {
+    async handleUpdateRequest(type, userID, req, res, next) {
         try {
+            userID = UserAPI.sanitizeInput(userID);
             const database = await DatabaseManager.selectDatabaseByRequest(req);
             const userDB = new UserDatabase(database);
-            if(!userID)
-                throw new Error("Invalid user id");
-            let user;
+            let user = await userDB.fetchUserByID(userID, 'u.*');
+            if(!user)
+                return next();
+
             // const user = await this.userDB.fetchUserByID(userID);
             switch(req.method) {
                 case 'GET':
@@ -458,27 +460,23 @@ class UserAPI {
                             await ThemeManager.get()
                                 .render(req, `
 <script src="/user/element/user-updateprofileform.element.js"></script>
-<user-updateprofileform userID="${userID}"></user-updateprofileform>
+<user-updateprofileform src="${user.url}"></user-updateprofileform>
 <script src="/user/element/user-updatepasswordform.element.js"></script>
-<user-updatepasswordform userID="${userID}"></user-updatepasswordform>
+<user-updatepasswordform src="${user.url}"></user-updatepasswordform>
 <script src="/user/element/user-updateflagsform.element.js"></script>
-<user-updateflagsform userID="${userID}"></user-updateflagsform>`)
+<user-updateflagsform src="${user.url}"></user-updateflagsform>`)
                         );
                     } else {
                         res.send(
                             await ThemeManager.get()
                                 .render(req, `
 <script src="/user/element/user-${type}form.element.js"></script>
-<user-${type}form userID="${userID}"></user-${type}form>`)
+<user-${type}form src="${user.url}"></user-${type}form>`)
                         );
                     }
                     break;
-                case 'OPTIONS':
-                    const database = await DatabaseManager.selectDatabaseByRequest(req);
-                    user = await userDB.fetchUserByID(userID);
-                    if(!user)
-                        throw new Error("User not found: " + userID);
 
+                case 'OPTIONS':
                     const response = {user, sessionUser: null, editable: false};
                     if (req.session && req.session.userID) {
                         const sessionUser = await userDB.fetchUserByID(req.session.userID);
@@ -504,11 +502,8 @@ class UserAPI {
                     res.json(response);
 
                     break;
-                case 'POST':
-                    user = await userDB.fetchUserByID(userID);
-                    if(!user)
-                        throw new Error("User not found: " + userID);
 
+                case 'POST':
                     if(!req.session || !req.session.userID)
                         throw new Error("Must be logged in");
 
@@ -523,15 +518,15 @@ class UserAPI {
                     console.log(`Update ${type} request`, req.body);
                     let affectedRows = -1;
                     switch(type) {
-                        case 'profile':
+                        case 'updateprofile':
                             affectedRows = await this.updateProfile(req, userID, req.body);
                             break;
-                        case 'flags':
+                        case 'updateflags':
                             if(!sessionUser.isAdmin())
                                 throw new Error("Not authorized");
                             affectedRows = await this.updateFlags(req, userID, req.body);
                             break;
-                        case 'password':
+                        case 'updatepassword':
                             affectedRows = await this.updatePassword(req,
                                 userID,
                                 sessionUser.isAdmin ? null : req.body.password_old,
@@ -544,7 +539,7 @@ class UserAPI {
                     user = await userDB.fetchUserByID(userID);
 
                     return res.json({
-                        redirect: `/:user/${user.id}`,
+                        redirect: user.url, // `/:user/${user.id}`,
                         message: `User updated successfully (${type}): ${user.email}. Redirecting...`,
                         user,
                         affectedRows
