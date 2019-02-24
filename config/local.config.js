@@ -1,6 +1,6 @@
 const path = require('path');
 
-const { FileManager } = require('../service/file/file.manager');
+const { FileManager } = require('../file/file.manager');
 // const { ConfigManager } = require('./config.manager');promptCallback
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));

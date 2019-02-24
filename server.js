@@ -1,6 +1,6 @@
 
 const { ConfigManager } = require('./config/config.manager');
-const { HTTPServer } = require('./service/http/http.server');
+const { HTTPServer } = require('./http/http.server');
 
 (async () => {
     if(process && process.argv && process.argv.indexOf('--configure') !== -1) {

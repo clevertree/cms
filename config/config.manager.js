@@ -1,5 +1,7 @@
 const { DatabaseManager } = require('../database/database.manager');
-const { ServiceManager } = require('../service/service.manager');
+const { HTTPServer } = require('../http/http.server');
+const { TaskAPI } = require('../task/task.api');
+const { SessionAPI } = require('../session/session.api');
 
 class ConfigManager {
     constructor() {
@@ -38,7 +40,9 @@ class ConfigManager {
         try {
             let promptCallback = interactive === true ? this.prompt : this.autoPrompt;
             await DatabaseManager.configure(promptCallback);
-            await ServiceManager.configure(promptCallback);
+            await SessionAPI.configure(promptCallback);
+            await HTTPServer.configure(promptCallback);
+            await TaskAPI.configure(promptCallback);
         } catch (e) {
             console.error("Configuration failed: ", e);
             if(!interactive)

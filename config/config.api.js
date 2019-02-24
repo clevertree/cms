@@ -5,7 +5,7 @@ const { ThemeManager } = require('../theme/theme.manager');
 const { ConfigDatabase } = require("./config.database");
 const { UserDatabase } = require("../user/user.database");
 const { UserAPI } = require('../user/user.api');
-const { SessionAPI } = require('../service/session/session.api');
+const { SessionAPI } = require('../session/session.api');
 
 class ConfigAPI {
     constructor() {
@@ -62,7 +62,7 @@ class ConfigAPI {
                     await ThemeManager.get()
                         .render(req, `
 <section>
-    <script src="/config/element/config-editorform.element.js"></script>
+    <script src="/service/confige/config/element/config-editorform.element.js"></script>
     <config-editorform></config-editorform>
 </section>
 `)

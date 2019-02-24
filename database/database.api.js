@@ -4,7 +4,7 @@ const { DatabaseManager } = require('./database.manager');
 const { UserAPI } = require('../user/user.api');
 const { UserDatabase } = require('../user/user.database');
 const { ThemeManager } = require('../theme/theme.manager');
-const { SessionAPI } = require('../service/session/session.api');
+const { SessionAPI } = require('../session/session.api');
 class DatabaseAPI {
     constructor() {
     }

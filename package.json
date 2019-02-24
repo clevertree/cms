@@ -12,17 +12,17 @@
   },
   "repository": {
     "type": "git",
-    "customURL": "git+ssh://git@github.com/clevertree/afoh-site.git"
+    "customURL": "git+ssh://git@github.com/clevertree/cms.git"
   },
   "keywords": [
-    "arizona",
-    "friends",
-    "homeless"
+    "content management system",
+    "cms",
+    "clevertree"
   ],
   "bugs": {
-    "customURL": "https://github.com/clevertree/afoh-site/issues"
+    "customURL": "https://github.com/clevertree/cms/issues"
   },
-  "homepage": "https://github.com/clevertree/afoh-site#readme",
+  "homepage": "https://github.com/clevertree/cms#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",

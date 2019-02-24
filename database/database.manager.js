@@ -5,7 +5,7 @@ const { LocalConfig } = require('../config/local.config');
 // const { FileManager } = require('../service/file/file.manager');
 // const { UserAPI } = require('../user/user.api');
 
-// const { ArticleDatabase } = require('../article/article.database');
+// const { ContentDatabase } = require('../article/article.database');
 // const { UserDatabase } = require('../user/user.database');
 // const { ConfigDatabase } = require('../config/config.database');
 
@@ -24,10 +24,10 @@ class DatabaseManager {
     get isConnected() { return !!this.db;}
     get isAvailable() { return !!this.primaryDatabase;}
 
-    // getArticleDB(database=null)    { return new (require('../article/article.database').ArticleDatabase)(database); }
+    // getArticleDB(database=null)    { return new (require('../article/article.database').ContentDatabase)(database); }
     // getUserDB(database=null)       { return new (require('../user/user.database').UserDatabase)(database); }
     // getConfigDB(database=null)     { return new (require('../config/config.database').ConfigDatabase)(database); }
-    getDomainDB(database=null)     { return new (require('../service/domain/domain.database').DomainDatabase)(database); }
+    getDomainDB(database=null)     { return new (require('../domain/domain.database').DomainDatabase)(database); }
 
     async configure(promptCallback=null) {
         if(this.db) {
@@ -106,7 +106,7 @@ class DatabaseManager {
         // Configure Tables
         const tableClasses = [
             require('../user/user.database').UserDatabase,
-            require('../article/article.database').ArticleDatabase,
+            require('../content/content.database').ContentDatabase,
             require('../config/config.database').ConfigDatabase,
         ];
 

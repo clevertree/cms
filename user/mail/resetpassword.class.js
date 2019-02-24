@@ -1,4 +1,4 @@
-const { MailServer } = require('../../service/mail/mail.server');
+const { MailServer } = require('../../mail/mail.server');
 
 class ResetPasswordEmail {
     // sender info

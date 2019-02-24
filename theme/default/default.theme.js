@@ -1,11 +1,11 @@
 // const fs = require('fs');
 const path = require('path');
 const ejs = require('ejs');
-// const { ArticleDatabase } = require('../../article/article.database');
+// const { ContentDatabase } = require('../../article/article.database');
 const { UserAPI } = require('../../user/user.api');
-const { ArticleDatabase } = require('../../article/article.database');
+const { ContentDatabase } = require('../../content/content.database');
 const { DatabaseManager } = require('../../database/database.manager');
-const { TaskAPI } = require('../../service/task/task.api');
+const { TaskAPI } = require('../../task/task.api');
 const { ConfigDatabase } = require("../../config/config.database");
 
 const TEMPLATE_DIR = path.resolve(__dirname + '/template');
@@ -49,7 +49,7 @@ class DefaultTheme {
         renderData.menu = [];
         if(DatabaseManager.isAvailable) {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const articleDB = new ArticleDatabase(database);
+            const articleDB = new ContentDatabase(database);
             renderData.menu = await articleDB.queryMenuData(req, true);
 
             const configDB = new ConfigDatabase(database);
@@ -66,8 +66,8 @@ class DefaultTheme {
                     path: '/:user/:register',
                     title: 'Register'
                 }, {
-                    path: '/:article',
-                    title: 'Browse Articles'
+                    path: '/:content',
+                    title: 'Browse Content'
                 }]
             })
         } else { // If Logged In
@@ -79,13 +79,13 @@ class DefaultTheme {
             });
             if(article.id) {
                 submenu.push({
-                    path: `/:article/${article.id}/:edit`,
-                    title: 'Edit This Article',
+                    path: `/:content/${article.id}/:edit`,
+                    title: 'Edit This Page\'s Content',
                 });
             }
             submenu.push({
-                path: '/:article',
-                title: 'Browse Articles'
+                path: '/:content',
+                title: 'Site Index'
             }, "<hr/>", {
                 path: '/:task',
                 title: `${activeTaskIDs.length} Pending Task${activeTaskIDs.length > 1 ? 's' : ''}`

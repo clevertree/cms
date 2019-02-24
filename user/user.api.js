@@ -7,15 +7,16 @@ const uuidv4 = require('uuid/v4');
 // const { LocalConfig } = require('../config/local.config');
 // const { ConfigManager } = require('../config/config.manager');
 const { DatabaseManager } = require('../database/database.manager');
-// const { ArticleDatabase } = require("../article/article.database");
+// const { ContentDatabase } = require("../article/article.database");
 const { UserDatabase } = require('./user.database');
 const { ConfigDatabase } = require("../config/config.database");
-const { SessionAPI } = require('../service/session/session.api');
+const { SessionAPI } = require('../session/session.api');
 
 // const { DNSManager } = require('../service/domain/dns.manager');
 const { ThemeManager } = require('../theme/theme.manager');
-const { TaskAPI } = require('../service/task/task.api');
+const { TaskAPI } = require('../task/task.api');
 const { ResetPasswordEmail } = require("./mail/resetpassword.class");
+
 
 class UserAPI {
     constructor() {
@@ -38,31 +39,35 @@ class UserAPI {
 
         const bodyParser = require('body-parser');
 
-        const routerAPI = express.Router();
+        const router = express.Router();
         // TODO: handle session_save login
         // router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
         // API Routes
-        routerAPI.use(bodyParser.urlencoded({ extended: true }));
-        routerAPI.use(bodyParser.json());
-        routerAPI.use(SessionAPI.getMiddleware());
+        router.use(bodyParser.urlencoded({ extended: true }));
+        router.use(bodyParser.json());
+        router.use(SessionAPI.getMiddleware());
 
-        routerAPI.all('/[:]user/:userID(\\w+)',                         async (req, res, next) => await this.handleUpdateRequest('profile', req.params.userID, req, res, next));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]edit',                 async (req, res, next) => await this.handleUpdateRequest('edit', req.params.userID, req, res, next));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]profile',              async (req, res, next) => await this.handleUpdateRequest('updateprofile', req.params.userID, req, res, next));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]flags',                async (req, res, next) => await this.handleUpdateRequest('updateflags', req.params.userID, req, res, next));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]password',             async (req, res, next) => await this.handleUpdateRequest('updatepassword', req.params.userID, req, res, next));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]changepassword/:uuid', async (req, res) => await this.handleResetPassword(req.params.userID, req.params.uuid, req, res));
-        routerAPI.all('/[:]user/[:]login',                              async (req, res) => await this.handleLoginRequest(req, res));
+        router.all('/[:]user/:userID(\\w+)',                         async (req, res, next) => await this.handleUpdateRequest('profile', req.params.userID, req, res, next));
+        router.all('/[:]user/:userID(\\w+)/[:]edit',                 async (req, res, next) => await this.handleUpdateRequest('edit', req.params.userID, req, res, next));
+        router.all('/[:]user/:userID(\\w+)/[:]profile',              async (req, res, next) => await this.handleUpdateRequest('updateprofile', req.params.userID, req, res, next));
+        router.all('/[:]user/:userID(\\w+)/[:]flags',                async (req, res, next) => await this.handleUpdateRequest('updateflags', req.params.userID, req, res, next));
+        router.all('/[:]user/:userID(\\w+)/[:]password',             async (req, res, next) => await this.handleUpdateRequest('updatepassword', req.params.userID, req, res, next));
+        router.all('/[:]user/:userID(\\w+)/[:]changepassword/:uuid', async (req, res) => await this.handleResetPassword(req.params.userID, req.params.uuid, req, res));
+        router.all('/[:]user/[:]login',                              async (req, res) => await this.handleLoginRequest(req, res));
         // router.all('/[:]user/session',                               async (req, res) => await this.handleSessionLoginRequest(req, res));
-        routerAPI.all('/[:]user/[:]logout',                             async (req, res) => await this.handleLogoutRequest(req, res));
-        routerAPI.all('/[:]user/[:]register',                           async (req, res) => await this.handleRegisterRequest(req, res));
-        routerAPI.all('/[:]user/[:]forgotpassword',                     async (req, res, next) => await this.handleForgotPassword(req, res, next));
-        routerAPI.all('/[:]user(/[:]list)?',                            async (req, res) => await this.handleBrowserRequest(req, res));
+        router.all('/[:]user/[:]logout',                             async (req, res) => await this.handleLogoutRequest(req, res));
+        router.all('/[:]user/[:]register',                           async (req, res) => await this.handleRegisterRequest(req, res));
+        router.all('/[:]user/[:]forgotpassword',                     async (req, res, next) => await this.handleForgotPassword(req, res, next));
+        router.all('/[:]user(/[:]list)?',                            async (req, res) => await this.handleBrowserRequest(req, res));
+
+
+        // CMS Asset files
+        router.use(express.static(require('path').resolve(__dirname + '/client')));
 
         return (req, res, next) => {
             if(!req.url.startsWith('/:user'))
                 return next();
-            return routerAPI(req, res, next);
+            return router(req, res, next);
         }
     }
 
@@ -102,7 +107,7 @@ class UserAPI {
 
         const profileConfig = await this.fetchProfileConfig(database);
 
-        const newProfile = user.profile || {};
+        const newProfile = Object.assign({}, user.profile || {});
         for(var i=0; i<profileConfig.length; i++) {
             const profileField = profileConfig[i];
             if(typeof profile[profileField.name] === "undefined")
@@ -112,7 +117,7 @@ class UserAPI {
             newProfile[profileField.name] = value;
         }
 
-        return await userDB.updateUser(userID, null, null, newProfile, null);
+        return await userDB.updateUser(user.id, null, null, newProfile, null);
         // console.info("SET PROFILE", user, profile);
         // return user;
     }
@@ -123,9 +128,9 @@ class UserAPI {
         const userDB = new UserDatabase(database);
         if(!userID)
             throw new Error("Invalid User ID");
-        // const user = await this.userDB.fetchUserByID(userID);
-        // if(!user)
-        //     throw new Error("User not found: " + userID);
+        const user = await userDB.fetchUserByID(userID);
+        if(!user)
+            throw new Error("User not found: " + userID);
         if(typeof flags === 'string') {
             flags = flags.join(',');
         } else if(Array.isArray(flags)) {
@@ -141,7 +146,7 @@ class UserAPI {
             }
         }
 
-        return await userDB.updateUser(userID, null, null, null, flags);
+        return await userDB.updateUser(user.id, null, null, null, flags);
     }
 
     async updatePassword(req, userID, password_old, password_new, password_confirm) {
@@ -168,7 +173,7 @@ class UserAPI {
                 throw new Error("Old password is not correct. Please re-enter");
         }
 
-        return await userDB.updateUser(userID, null, password_new, null, null);
+        return await userDB.updateUser(user.id, null, password_new, null, null);
     }
 
     async register(req, username, email, password, password_confirm) {
@@ -260,7 +265,7 @@ class UserAPI {
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
-<script src="/user/element/user-loginform.element.js"></script>
+<script src="/:user/user-loginform.element.js"></script>
 <user-loginform></user-loginform>`)
                 );
 
@@ -288,7 +293,7 @@ class UserAPI {
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
-<script src="/user/element/userform-logout.element.js"></script>
+<script src="/:user/userform-logout.element.js"></script>
 <userform-logout></userform-logout>`)
                 );
 
@@ -315,7 +320,7 @@ class UserAPI {
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
-<script src="/user/element/userform-register.element.js"></script>
+<script src="/:user/userform-register.element.js"></script>
 <userform-register></userform-register>`)
                 );
 
@@ -355,7 +360,7 @@ class UserAPI {
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
-<script src="/user/element/user-forgotpasswordform.element.js"></script>
+<script src="/:user/user-forgotpasswordform.element.js"></script>
 <user-forgotpasswordform src="${user.url}"></user-forgotpasswordform>`)
                 );
 
@@ -413,7 +418,7 @@ class UserAPI {
                 res.send(
                     await ThemeManager.get()
                         .render(req, `
-<script src="/user/element/user-changepasswordform.element.js"></script>
+<script src="/:user/user-changepasswordform.element.js"></script>
 <user-changepasswordform uuid="${uuid}" src="${user.url}" username="${user.username}"></user-changepasswordform>`)
                 );
 
@@ -459,18 +464,18 @@ class UserAPI {
                         res.send(
                             await ThemeManager.get()
                                 .render(req, `
-<script src="/user/element/user-updateprofileform.element.js"></script>
+<script src="/:user/user-updateprofileform.element.js"></script>
 <user-updateprofileform src="${user.url}"></user-updateprofileform>
-<script src="/user/element/user-updatepasswordform.element.js"></script>
+<script src="/:user/user-updatepasswordform.element.js"></script>
 <user-updatepasswordform src="${user.url}"></user-updatepasswordform>
-<script src="/user/element/user-updateflagsform.element.js"></script>
+<script src="/:user/user-updateflagsform.element.js"></script>
 <user-updateflagsform src="${user.url}"></user-updateflagsform>`)
                         );
                     } else {
                         res.send(
                             await ThemeManager.get()
                                 .render(req, `
-<script src="/user/element/user-${type}form.element.js"></script>
+<script src="/:user/user-${type}form.element.js"></script>
 <user-${type}form src="${user.url}"></user-${type}form>`)
                         );
                     }
@@ -559,9 +564,9 @@ class UserAPI {
                     await ThemeManager.get()
                         .render(req, `
 <section>
-    <script src="/user/element/user-browser.element.js"></script>
+    <script src="/:user/user-browser.element.js"></script>
     <user-browser></user-browser>
-    <script src="/user/element/user-addform.element.js"></script>
+    <script src="/:user/user-addform.element.js"></script>
     <user-addform></user-addform>
 </section>
 `)
