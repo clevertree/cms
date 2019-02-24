@@ -31,21 +31,21 @@ document.addEventListener('DOMContentLoaded', function() {
             // this.addEventListener('submit', this.onEvent);
 
             this.render();
-            const userID = this.getAttribute('id');
+            const userID = this.getAttribute('userID');
             if(userID)
                 this.requestFormData(userID);
         }
 
         requestFormData(userID) {
+            const action = `/:user/${userID}`;
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
                 this.setState(xhr.response, {processing: false});
             };
             xhr.responseType = 'json';
-            xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
-            // xhr.setRequestHeader("Accept", "application/json");
+            xhr.open ("OPTIONS", action, true);
             xhr.send ();
-            this.setState({processing: true, user: {id: userID}});
+            this.setState({action, user: {id: userID}, processing: true});
         }
 
 
@@ -104,6 +104,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-profile', HTMLUserProfileElement);
+    customElements.define('user-profileform', HTMLUserProfileElement);
 
 }

@@ -46,12 +46,11 @@ class UserAPI {
         routerAPI.use(bodyParser.json());
         routerAPI.use(SessionAPI.middleware);
 
-        routerAPI.get('/[:]user/:userID(\\w+)/[:]json',                 async (req, res, next) => await this.handleViewRequest(true, req.params.userID, req, res, next));
-        routerAPI.get('/[:]user/:userID(\\w+)',                         async (req, res, next) => await this.handleViewRequest(false, req.params.userID, req, res, next));
+        routerAPI.all('/[:]user/:userID(\\w+)',                         async (req, res, next) => await this.handleUpdateRequest('profile', req.params.userID, req, res, next));
         routerAPI.all('/[:]user/:userID(\\w+)/[:]edit',                 async (req, res) => await this.handleUpdateRequest('edit', req.params.userID, req, res));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]profile',              async (req, res) => await this.handleUpdateRequest('profile', req.params.userID, req, res));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]flags',                async (req, res) => await this.handleUpdateRequest('flags', req.params.userID, req, res));
-        routerAPI.all('/[:]user/:userID(\\w+)/[:]password',             async (req, res) => await this.handleUpdateRequest('password', req.params.userID, req, res));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]profile',              async (req, res) => await this.handleUpdateRequest('updateprofile', req.params.userID, req, res));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]flags',                async (req, res) => await this.handleUpdateRequest('updateflags', req.params.userID, req, res));
+        routerAPI.all('/[:]user/:userID(\\w+)/[:]password',             async (req, res) => await this.handleUpdateRequest('updatepassword', req.params.userID, req, res));
         routerAPI.all('/[:]user/:userID(\\w+)/[:]changepassword/:uuid', async (req, res) => await this.handleResetPassword(req.params.userID, req.params.uuid, req, res));
         routerAPI.all('/[:]user/[:]login',                              async (req, res) => await this.handleLoginRequest(req, res));
         // router.all('/[:]user/session',                               async (req, res) => await this.handleSessionLoginRequest(req, res));
@@ -80,6 +79,15 @@ class UserAPI {
         return req.session.messages.pop();
     }
 
+    async fetchProfileConfig(database) {
+        const configDB = new ConfigDatabase(database);
+        const configList = await configDB.selectAllConfigValues();
+        const allConfig = configDB.parseConfigValues(configList);
+        if(!allConfig.user.profile)
+            throw new Error("Profile config is missing");
+        return JSON.parse(allConfig.user.profile);
+    }
+
     async updateProfile(req, userID, profile) {
         if(!userID)
             throw new Error("Invalid User ID");
@@ -92,8 +100,7 @@ class UserAPI {
         if(!user)
             throw new Error("User not found: " + userID);
 
-        const configDB = new ConfigDatabase(database);
-        const profileConfig = JSON.parse(await configDB.fetchConfigValue('user.profile'));
+        const profileConfig = await this.fetchProfileConfig(database);
 
         const newProfile = user.profile || {};
         for(var i=0; i<profileConfig.length; i++) {
@@ -246,43 +253,37 @@ class UserAPI {
         // TODO: destroy db session
     }
 
-    async handleViewRequest(asJSON, userID, req, res) {
+    async handleViewRequest(userID, req, res) {
         try {
             if(!userID)
                 throw new Error("Invalid user id");
 
             // Render View
-            if(asJSON) {
-                const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = new UserDatabase(database);
-                const user = await userDB.fetchUserByID(userID);
-                if(!user)
-                    throw new Error("User not found: " + userID);
-
-                const response = {user};
-                if(req.query['getAll'] || req.query['getSessionUser'] || req.query['getEditable']) {
-                    response.sessionUser = null;
-                    if (req.session && req.session.userID) {
-                        response.sessionUser = await userDB.fetchUserByID(req.session.userID);
-                        response.editable = (response.sessionUser.isAdmin() || response.sessionUser.id === user.id);
-                    }
-                }
-                if(req.query['getAll'] || req.query['getProfileConfig']) {
-                    const configDB = new ConfigDatabase(database);
-                    response.profileConfig = JSON.parse(await configDB.fetchConfigValue('user.profile'));
-                }
-                res.json(response);
-
-            } else {
-                res.send(
-                    await ThemeManager.get()
-                        .render(req, `
+            switch(req.method) {
+                case 'GET':
+                    res.send(
+                        await ThemeManager.get()
+                            .render(req, `
 <section>
     <script src="/user/element/user-profile.element.js"></script>
     <user-profile id="${userID}"></user-profile>
 </section>
 `)
-                );
+                    );
+                    break;
+
+                case 'OPTIONS':
+                    const database = await DatabaseManager.selectDatabaseByRequest(req);
+                    const userDB = new UserDatabase(database);
+                    const user = await userDB.fetchUserByID(userID);
+                    if(!user)
+                        throw new Error("User not found: " + userID);
+
+                    const response = {user};
+                    response.editable = (response.sessionUser.isAdmin());
+                    response.profileConfig = await this.fetchProfileConfig(database);
+                    res.json(response);
+                    break;
             }
 
         } catch (error) {
@@ -298,36 +299,6 @@ class UserAPI {
             }
         }
     }
-
-    // async handleSessionLoginRequest(req, res) {
-    //     try {
-    //         if(req.method === 'GET') {
-    //             if(req.query.uuid && req.query.password) {
-    //                 const userSession = await this.loginSession(req, res, req.query.uuid, req.query.password);
-    //                 return res.redirect(`/:user/${userSession.user_id}`);
-    //             }
-    //             // Render Editor Form
-    //             res.send(
-    //                 await ThemeManager.get()
-    //                     .render(req, `<%- include("user/section/session.ejs")%>`)
-    //             );
-    //
-    //         } else {
-    //             // Handle Form (POST) Request
-    //             // console.log("Log in Request", req.body);
-    //             const user = await this.loginSession(req, req.body.uuid, req.body.password);
-    //
-    //             return res.json({
-    //                 redirect: `/:user/${user.id}`,
-    //                 message: `User logged in successfully: ${user.email}. <br/>Redirecting...`,
-    //                 user
-    //             });
-    //         }
-    //     } catch (error) {
-    //         console.error(error);
-    //         res.status(400).json({message: "Error: " + error.message, error: error.stack});
-    //     }
-    // }
 
     async handleLoginRequest(req, res) {
         try {
@@ -525,72 +496,106 @@ class UserAPI {
             const userDB = new UserDatabase(database);
             if(!userID)
                 throw new Error("Invalid user id");
+            let user;
             // const user = await this.userDB.fetchUserByID(userID);
-            if(req.method === 'GET') {
-                // Render Editor Form
-                if(type === 'edit') {
-                    res.send(
-                        await ThemeManager.get()
-                            .render(req, `
+            switch(req.method) {
+                case 'GET':
+                    if(type === 'edit') {
+                        res.send(
+                            await ThemeManager.get()
+                                .render(req, `
 <script src="/user/element/user-updateprofileform.element.js"></script>
 <user-updateprofileform userID="${userID}"></user-updateprofileform>
 <script src="/user/element/user-updatepasswordform.element.js"></script>
 <user-updatepasswordform userID="${userID}"></user-updatepasswordform>
 <script src="/user/element/user-updateflagsform.element.js"></script>
 <user-updateflagsform userID="${userID}"></user-updateflagsform>`)
-                    );
-                } else {
-                    res.send(
-                        await ThemeManager.get()
-                            .render(req, `
-<script src="/user/element/user-update${type}form.element.js"></script>
-<user-update${type}form userID="${userID}"></user-update${type}form>`)
-                    );
-                }
+                        );
+                    } else {
+                        res.send(
+                            await ThemeManager.get()
+                                .render(req, `
+<script src="/user/element/user-${type}form.element.js"></script>
+<user-${type}form userID="${userID}"></user-${type}form>`)
+                        );
+                    }
+                    break;
+                case 'OPTIONS':
+                    const database = await DatabaseManager.selectDatabaseByRequest(req);
+                    user = await userDB.fetchUserByID(userID);
+                    if(!user)
+                        throw new Error("User not found: " + userID);
 
-            } else {
-                let user = await userDB.fetchUserByID(userID);
+                    const response = {user, sessionUser: null, editable: false};
+                    if (req.session && req.session.userID) {
+                        const sessionUser = await userDB.fetchUserByID(req.session.userID);
 
-                if(!req.session || !req.session.userID)
-                    throw new Error("Must be logged in");
+                        switch(type) {
+                            case 'updateflags':
+                                response.editable = (sessionUser.isAdmin());
+                                break;
+                            case 'updatepassword':
+                                response.require_old_password = user.id === sessionUser.id;
+                                response.editable = (sessionUser.isAdmin() || sessionUser.id === user.id);
+                                break;
+                            case 'profile':
+                            case 'updateprofile':
+                            default:
+                                response.editable = (sessionUser.isAdmin() || sessionUser.id === user.id);
+                                break;
+                        }
+                    }
 
-                const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
-                if(!sessionUser)
-                    throw new Error("Session User Not Found: " + req.session.userID);
-                if(!sessionUser.isAdmin() && sessionUser.id !== user.id)
-                    throw new Error("Not authorized");
+                    response.profileConfig = await this.fetchProfileConfig(database);
+
+                    res.json(response);
+
+                    break;
+                case 'POST':
+                    user = await userDB.fetchUserByID(userID);
+                    if(!user)
+                        throw new Error("User not found: " + userID);
+
+                    if(!req.session || !req.session.userID)
+                        throw new Error("Must be logged in");
+
+                    const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+                    if(!sessionUser)
+                        throw new Error("Session User Not Found: " + req.session.userID);
+                    if(!sessionUser.isAdmin() && sessionUser.id !== user.id)
+                        throw new Error("Not authorized");
 
 
-                // Handle Form (POST) Request
-                console.log(`Update ${type} request`, req.body);
-                let affectedRows = -1;
-                switch(type) {
-                    case 'profile':
-                        affectedRows = await this.updateProfile(req, userID, req.body);
-                        break;
-                    case 'flags':
-                        if(!sessionUser.isAdmin())
-                            throw new Error("Not authorized");
-                        affectedRows = await this.updateFlags(req, userID, req.body);
-                        break;
-                    case 'password':
-                        affectedRows = await this.updatePassword(req,
-                            userID,
-                            sessionUser.isAdmin ? null : req.body.password_old,
-                            req.body.password_new,
-                            req.body.password_confirm);
-                        break;
-                    default:
-                        throw new Error("Invalid Profile Request: " + type);
-                }
-                user = await userDB.fetchUserByID(userID);
+                    // Handle Form (POST) Request
+                    console.log(`Update ${type} request`, req.body);
+                    let affectedRows = -1;
+                    switch(type) {
+                        case 'profile':
+                            affectedRows = await this.updateProfile(req, userID, req.body);
+                            break;
+                        case 'flags':
+                            if(!sessionUser.isAdmin())
+                                throw new Error("Not authorized");
+                            affectedRows = await this.updateFlags(req, userID, req.body);
+                            break;
+                        case 'password':
+                            affectedRows = await this.updatePassword(req,
+                                userID,
+                                sessionUser.isAdmin ? null : req.body.password_old,
+                                req.body.password_new,
+                                req.body.password_confirm);
+                            break;
+                        default:
+                            throw new Error("Invalid Profile Request: " + type);
+                    }
+                    user = await userDB.fetchUserByID(userID);
 
-                return res.json({
-                    redirect: `/:user/${user.id}`,
-                    message: `User updated successfully (${type}): ${user.email}. Redirecting...`,
-                    user,
-                    affectedRows
-                });
+                    return res.json({
+                        redirect: `/:user/${user.id}`,
+                        message: `User updated successfully (${type}): ${user.email}. Redirecting...`,
+                        user,
+                        affectedRows
+                    });
             }
         } catch (error) {
             console.error(error);

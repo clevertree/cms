@@ -42,7 +42,7 @@ class ConfigAPI {
 
             // Handle POST
             const configList = await configDB.selectAllConfigValues();
-            const configValues = await configDB.parseConfigValues(configList);
+            const configValues = configDB.parseConfigValues(configList);
 
             return res.json({
                 message: `${configList.length} Config${configList.length !== 1 ? 's' : ''} queried successfully`,

@@ -54,7 +54,7 @@ class DefaultTheme {
 
             const configDB = new ConfigDatabase(database);
             const configList = await configDB.selectAllConfigValues();
-            const configValues = await configDB.parseConfigValues(configList);
+            const configValues = configDB.parseConfigValues(configList);
             renderData.site = configValues.site; // TODO: cache site values per host;
         }
 
@@ -92,6 +92,9 @@ class DefaultTheme {
             },{
                 path: '/:config',
                 title: 'Configure Site'
+            }, "<hr/>", {
+                path: '/:file',
+                title: 'Browse Files'
             }, "<hr/>", {
                 path: '/:user',
                 title: 'Browse Users'

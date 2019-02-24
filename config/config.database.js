@@ -66,7 +66,7 @@ class ConfigDatabase  {
     }
     async fetchConfigValues(name) {
         const configList = await this.selectConfigValues('c.name LIKE ?', name+'%');
-        const config = await this.parseConfigValues(configList);
+        const config = this.parseConfigValues(configList);
         if(typeof config[name] === "undefined")
             return {};
         return config[name];
@@ -78,7 +78,7 @@ class ConfigDatabase  {
         return result.affectedRows;
     }
 
-    async parseConfigValues(configList) {
+    parseConfigValues(configList) {
         const config = {};
         for(let i=0; i<configList.length; i++) {
             const path = configList[i].name.split('.');

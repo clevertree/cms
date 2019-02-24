@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
+                action: null,
+                method: 'POST',
                 message: "In order to update this user's flags, please modify this form and hit 'Update' below",
                 status: 0,
                 processing: false,
@@ -66,22 +68,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         requestFormData(userID) {
+            const action = `/:user/${userID}/:flags`;
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
+                if(this.state.sessionUser && this.state.user) {
+                    this.state({require_old_password: this.state.sessionUser.id === this.state.user.id});
+                }
                 this.setState({processing: false}, xhr.response);
             };
             xhr.responseType = 'json';
-            xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
+            xhr.open ('OPTIONS', action, true);
             xhr.send ();
-            this.setState({processing: true});
+            this.setState({action, user: {id: userID}, processing: true});
         }
 
         onSubmit(e) {
             e.preventDefault();
-            const form = e.target;
-            const request = this.state.user.flags;
-            const method = form.getAttribute('method');
-            const action = form.getAttribute('action');
+            const request = this.getFormData();
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
@@ -93,18 +96,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.onError(e, response);
                 }
             };
-            xhr.open(method, action, true);
+            xhr.open(this.state.method, this.state.action, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
             this.setState({processing: true});
         }
 
+        getFormData(form=null) {
+            form = form || this.querySelector('form');
+            const formData = {};
+            new FormData(form).forEach((value, key) => formData[key] = value);
+            return formData;
+        }
+
         render() {
-            // console.log("STATE", this.state);
+            // console.log("STATE", this.state.user);
+            const userFlags = this.state.user.flags || [];
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.user.id}/:flags" method="POST" class="user user-updateflagsform themed">
+                <form action="${this.state.action}" method="${this.state.method}" class="user user-updateflagsform themed">
                     <fieldset ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>
                         <legend>Update User Flags</legend>
                         <table>
@@ -132,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <td>
                                         ${Object.keys(this.flags).map(flagName => `
                                         <label>
-                                            <input type="checkbox" class="themed" name="${flagName.toLowerCase()}" value="1" ${this.state.user.flags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
+                                            <input type="checkbox" class="themed" name="${flagName.toLowerCase()}" value="1" ${userFlags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
                                             ${this.flags[flagName]}
                                         </label>
                                         `).join('')}

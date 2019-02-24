@@ -10,9 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
+                action: null,
+                method: 'POST',
                 message: "In order to change password, please modify this form and hit 'Update' below",
                 status: 0,
                 user: {id: -1},
+                require_old_password: true,
                 password_old: null,
                 password_new: null,
                 password_confirm: null,
@@ -59,54 +62,52 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         requestFormData(userID) {
+            const action = `/:user/${userID}/:password`;
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
-                this.setState({processing: false, editable: false}, xhr.response);
                 if(this.state.sessionUser && this.state.user) {
-                    if(this.state.sessionUser.flags.indexOf('admin') !== -1)
-                        this.setState({editable: 'admin'});
-                    else if (this.state.sessionUser.id === this.state.user.id)
-                        this.setState({editable: 'user'});
+                    this.state({require_old_password: this.state.sessionUser.id === this.state.user.id});
                 }
+                this.setState({processing: false}, xhr.response);
             };
             xhr.responseType = 'json';
-            xhr.open ("GET", `:user/${userID}/:json?getAll=true`, true);
+            xhr.open ('OPTIONS', action, true);
             xhr.send ();
-            this.setState({processing: true});
+            this.setState({action, user: {id: userID}, processing: true});
         }
 
         onSubmit(e) {
             e.preventDefault();
-            const form = e.target; // querySelector('form.user-login-form');
-            this.setState({processing: true});
-            const request = {};
-            new FormData(form).forEach(function (value, key) {
-                request[key] = value;
-            });
+            const request = this.getFormData();
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
-                console.log(e, xhr.response);
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                response.status = xhr.status;
+                this.setState({processing: false, status: xhr.status}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
                     this.onError(e, response);
                 }
-                this.setState({response, processing: false});
             };
-            xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
+            xhr.open(this.state.method, this.state.action, true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            // xhr.setRequestHeader("Accept", "application/json");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
+            this.setState({processing: true});
+        }
+
+        getFormData(form=null) {
+            form = form || this.querySelector('form');
+            const formData = {};
+            new FormData(form).forEach((value, key) => formData[key] = value);
+            return formData;
         }
 
         render() {
             this.innerHTML =
                 `
-                <form action="/:user/${this.state.user.id}/:password" method="POST" class="user user-changepasswordform themed">
+                <form action="${this.state.action}" method="${this.state.method}" class="user user-changepasswordform themed">
                     <fieldset ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>
                         <legend>Change Password</legend>
                         <table>
@@ -127,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <input type="email" name="email" value="${this.state.user.email}" disabled/>
                                     </td>
                                 </tr>
-                                ${this.state.editable !== 'admin' ? `
+                                ${this.state.require_old_password ? `
                                 <tr>
                                     <td class="label">Old Password</td>
                                     <td>
@@ -141,14 +142,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <input type="password" name="password_new" value="${this.state.password_new||''}" required />
                                     </td>
                                 </tr>
-                                ${this.state.editable !== 'admin' ? `
                                 <tr>
                                     <td class="label">Confirm Password</td>
                                     <td>
                                         <input type="password" name="password_confirm" value="${this.state.password_confirm||''}" required />
                                     </td>
                                 </tr>
-                                ` : ''}
                             </tbody>
                             <tfoot>
                                 <tr><td colspan="2"><hr/></td></tr>
