@@ -25,7 +25,7 @@ class UserAPI {
     }
 
 
-    get middleware() {
+    getMiddleware() {
         // const localConfig = new LocalConfig(config, !config);
         // const cookieConfig = await localConfig.getOrCreate('cookie');
 
@@ -44,7 +44,7 @@ class UserAPI {
         // API Routes
         routerAPI.use(bodyParser.urlencoded({ extended: true }));
         routerAPI.use(bodyParser.json());
-        routerAPI.use(SessionAPI.middleware);
+        routerAPI.use(SessionAPI.getMiddleware());
 
         routerAPI.all('/[:]user/:userID(\\w+)',                         async (req, res, next) => await this.handleUpdateRequest('profile', req.params.userID, req, res, next));
         routerAPI.all('/[:]user/:userID(\\w+)/[:]edit',                 async (req, res) => await this.handleUpdateRequest('edit', req.params.userID, req, res));
@@ -251,53 +251,6 @@ class UserAPI {
         res.clearCookie('session_save');
         this.addSessionMessage(req,`<div class='success'>User has been logged out</div>`);
         // TODO: destroy db session
-    }
-
-    async handleViewRequest(userID, req, res) {
-        try {
-            if(!userID)
-                throw new Error("Invalid user id");
-
-            // Render View
-            switch(req.method) {
-                case 'GET':
-                    res.send(
-                        await ThemeManager.get()
-                            .render(req, `
-<section>
-    <script src="/user/element/user-profile.element.js"></script>
-    <user-profile id="${userID}"></user-profile>
-</section>
-`)
-                    );
-                    break;
-
-                case 'OPTIONS':
-                    const database = await DatabaseManager.selectDatabaseByRequest(req);
-                    const userDB = new UserDatabase(database);
-                    const user = await userDB.fetchUserByID(userID);
-                    if(!user)
-                        throw new Error("User not found: " + userID);
-
-                    const response = {user};
-                    response.editable = (response.sessionUser.isAdmin());
-                    response.profileConfig = await this.fetchProfileConfig(database);
-                    res.json(response);
-                    break;
-            }
-
-        } catch (error) {
-            console.error(error);
-            if(asJSON) {
-                res.status(400).json({message: "Error: " + error.message, error: error.stack});
-            } else {
-                res.status(400);
-                res.send(
-                    await ThemeManager.get()
-                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-                );
-            }
-        }
     }
 
     async handleLoginRequest(req, res) {

@@ -10,13 +10,13 @@ class DatabaseAPI {
     }
 
 
-    get middleware() {
+    getMiddleware() {
         // Configure Routes
         let router = express.Router();
         const bodyParser = require('body-parser');
         router.use(bodyParser.urlencoded({ extended: true }));
         router.use(bodyParser.json());
-        router.use(SessionAPI.middleware);
+        router.use(SessionAPI.getMiddleware());
 
         // Handle Database requests
         router.get('/[:]database/[:]json',                    async (req, res) => await this.renderDatabaseJSON(req, res));

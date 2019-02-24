@@ -61,24 +61,6 @@ class SSLServer {
         }, sslConfig));
 
 
-        // this.greenlock = require('greenlock-express').create(Object.assign({
-        //     approveDomains: (opts, certs, cb) => this.approveDomains(opts, certs, cb),
-        //     app: HTTPServer.middleware,
-        //     debug: true,
-        //     store: require('le-store-certbot').create({
-        //             configDir: path.join(BASE_DIR, '.acme', 'etc')
-        //             // , privkeyPath: ':configDir/live/:hostname/privkey.pem'          //
-        //             // , fullchainPath: ':configDir/live/:hostname/fullchain.pem'      // Note: both that :configDir and :hostname
-        //             // , certPath: ':configDir/live/:hostname/cert.pem'                //       will be templated as expected by
-        //             // , chainPath: ':configDir/live/:hostname/chain.pem'              //       greenlock.js
-        //
-        //             , logsDir: ':configDir/log'
-        //
-        //             // , webrootPath: '~/acme/srv/www/:hostname/.well-known/acme-challenge'
-        //
-        //         // , webrootPath: '/tmp/acme-challenges'
-        //             })
-        // }, sslConfig));
 
         this.config = sslConfig;
         return sslConfig;
@@ -101,7 +83,7 @@ class SSLServer {
         // If you wish to replace the default challenge plugin, you may do so here
         // opts.challenges = { 'http-01': http01 };
 
-        opts.email = 'john.doe@' + opts.domain; // this.config.servername;
+        opts.email = 'admin@' + opts.domain; // this.config.servername;
         opts.agreeTos = true;
 
         // NOTE: you can also change other options such as `challengeType` and `challenge`
@@ -114,60 +96,24 @@ class SSLServer {
     async listen() {
         const sslConfig = await this.configure();
 
-        // handles acme-challenge and redirects to https
-        // require('http').createServer(this.server.middleware(require('redirect-https')())).listen(sslConfig.httpPort, function () {
-        //     console.log("Listening for ACME http-01 challenges on", this.address());
-        // });
-
-
-
-//         var app = require('express')();
-//         app.use('/', function (req, res) {
-//             res.end('Hello, World!');
-//         });
-//
-// // handles your app
-//         require('https').createServer(this.server.httpsOptions, HTTPServer.middleware).listen(sslConfig.sslPort, function () {
-//             console.log("Listening for ACME tls-sni-01 challenges and serve app on", this.address());
-//         });
 
         // var redir = require('redirect-https')();
         const appHTTP = express();
-        const appMiddleware = HTTPServer.middleware;
-        const greenLockMiddleware = this.greenlock.middleware();
-        appHTTP.use(function (req, res, next) {
-            try {
-                return greenLockMiddleware(req, res, next);
-            } catch (e) {
-                console.error(e);
-            }
-        });
+        const appMiddleware = HTTPServer.getMiddleware();
+        appHTTP.use(this.greenlock.middleware());
         appHTTP.use(appMiddleware);
         const serverHTTP = require('http').createServer(appHTTP).listen(sslConfig.httpPort, function(e) {
             console.log(`HTTP listening on port ${sslConfig.httpPort}`);
         });
-        serverHTTP.on('error', function (e) {
-            // Handle your error here
-            console.log(e);
-        });
+        serverHTTP.on('error', (e) => console.log(e) );
+
         const appSSL = express();
         appSSL.use(appMiddleware);
         const serverSSL = require('https').createServer(this.greenlock.tlsOptions, appSSL).listen(sslConfig.sslPort, function(e) {
             console.log(`HTTPS listening on port ${sslConfig.sslPort}`);
         });
+        serverSSL.on('error', (e) => console.log(e) );
 
-
-        serverSSL.on('error', function (e) {
-            // Handle your error here
-            console.log(e);
-        });
-        // this.server.listen(sslConfig.httpPort, sslConfig.sslPort, function () {
-        //     console.log(`Listening on port ${sslConfig.httpPort} for ACME challenges and ${sslConfig.sslPort} for express app.`);
-        // },function () {
-        //     console.log("Listening for ACME tls-sni-01 challenges and serve app on", this.address());
-        // });
-
-        // return app;
     }
 }
 

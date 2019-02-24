@@ -10,13 +10,13 @@ class ArticleAPI {
     }
 
 
-    get middleware() {
+    getMiddleware() {
         const express = require('express');
         const bodyParser = require('body-parser');
 
         const router = express.Router();
         const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
-        const SM = SessionAPI.middleware;
+        const SM = SessionAPI.getMiddleware();
         // Handle Article requests
         router.get(['/[\\w/_-]+', '/'],                         SM, async (req, res, next) => await this.renderArticleByPath(req, res,next));
 
@@ -137,75 +137,105 @@ class ArticleAPI {
 
             let article = await articleDB.fetchArticleByID(req.params.id);
 
-            if(req.method === 'GET') {          // Handle GET
-                // Render Editor
-                res.send(
-                    await ThemeManager.get(article.theme)
-                        .render(req, `
-<section style="max-width: 1600px;">
-    <script src="/article/element/article-editorform.element.js"></script>
-    <article-editorform id="${req.params.id}"></article-editorform>
-</section>
-<section class="article-preview-container">
-    <h1 style="text-align: center;">Preview</h1>
-    <hr/>
-    <div class="article-preview-content">
-        ${article.content}
-    </div>
-</section>
-`)
-                );
+            switch(req.method) {
+                case 'GET':
+                    // Render Editor
+                    res.send(
+                        await ThemeManager.get(article.theme)
+                            .render(req, `
+    <section style="max-width: 1600px;">
+        <script src="/article/element/article-editorform.element.js"></script>
+        <article-editorform id="${req.params.id}"></article-editorform>
+    </section>
+    <section class="article-preview-container">
+        <h1 style="text-align: center;">Preview</h1>
+        <hr/>
+        <div class="article-preview-content">
+            ${article.content}
+        </div>
+    </section>
+    `)
+                    );
+                    break;
+                case 'OPTIONS':
 
-            } else {
-                // Handle POST
-                let insertArticleRevisionID, revision;
-                switch (req.body.action) {
-                    default:
-                    case 'publish':
-                        if(!sessionUser || !sessionUser.isAdmin())
-                            throw new Error("Not authorized");
-                        const affectedRows = await articleDB.updateArticle(
-                            article.id,
-                            req.body.title,
-                            req.body.content,
-                            req.body.path,
-                            sessionUser.id,
-                            req.body.parent_id ? parseInt(req.body.parent_id) : null,
-                            req.body.theme,
-                            req.body.flags
-                        );
-                        article = await articleDB.fetchArticleByID(req.params.id);
+                    let articleRevision = await this.checkForRevisionContent(req, article);
 
-                        insertArticleRevisionID = await articleDB.insertArticleRevision(
-                            article.id,
-                            req.body.title,
-                            req.body.content,
-                            sessionUser.id
-                        );
+                    const response = {
+                        redirect: '/:article/' + article.id + '/view',
+                        message: "Article Queried Successfully",
+                        editable: false,
+                        article
+                    };
+                    if(req.session && req.session.userID) {
+                        const database = await DatabaseManager.selectDatabaseByRequest(req);
+                        const userDB = new UserDatabase(database);
+                        const sessionUser = await userDB.fetchUserByID(req.session.userID);
+                        if (sessionUser.isAdmin() || sessionUser.id === article.user_id)
+                            response.editable = true;
+                    }
+                    response.history = await articleDB.fetchArticleRevisionsByArticleID(article.id);
+                    // response.revision = await articleDB.fetchArticleRevisionByID(article.id, req.query.getRevision || null);
+                    if(!articleRevision && response.history.length > 0) // Fetch latest revision? sloppy
+                        articleRevision = await articleDB.fetchArticleRevisionByID(response.history[0].id); // response.history[0]; // (await articleDB.fetchArticleRevisionsByArticleID(article.id))[0];
+                    if(articleRevision)
+                        response.revision = articleRevision;
+                    response.parentList = await articleDB.selectArticles("a.path IS NOT NULL", null, "id, parent_id, path, title");
 
-                        return res.json({
-                            redirect: '/:article/' + article.id + '/view',
-                            message: "Article published successfully.<br/>Redirecting...",
-                            insertArticleRevisionID: insertArticleRevisionID,
-                            affectedArticleRows: affectedRows,
-                            article
-                        });
+                    res.json(response);
 
-                    case 'draft':
-                        insertArticleRevisionID = await articleDB.insertArticleRevision(
-                            article.id,
-                            req.body.title,
-                            req.body.content,
-                            sessionUser.id
-                        );
-                        revision = await articleDB.fetchArticleRevisionByID(insertArticleRevisionID);
-                        return res.json({
-                            redirect: '/:article/' + article.id + '/view?r=' + revision.id,
-                            message: "Draft saved successfully",
-                            insertArticleRevisionID: insertArticleRevisionID,
-                            article
-                        });
-                }
+                    break;
+                case 'POST':
+                   // Handle POST
+                    let insertArticleRevisionID, revision;
+                    switch (req.body.action) {
+                        default:
+                        case 'publish':
+                            if(!sessionUser || !sessionUser.isAdmin())
+                                throw new Error("Not authorized");
+                            const affectedRows = await articleDB.updateArticle(
+                                article.id,
+                                req.body.title,
+                                req.body.content,
+                                req.body.path,
+                                sessionUser.id,
+                                req.body.parent_id ? parseInt(req.body.parent_id) : null,
+                                req.body.theme,
+                                req.body.flags
+                            );
+                            article = await articleDB.fetchArticleByID(req.params.id);
+
+                            insertArticleRevisionID = await articleDB.insertArticleRevision(
+                                article.id,
+                                req.body.title,
+                                req.body.content,
+                                sessionUser.id
+                            );
+
+                            return res.json({
+                                redirect: '/:article/' + article.id + '/view',
+                                message: "Article published successfully.<br/>Redirecting...",
+                                insertArticleRevisionID: insertArticleRevisionID,
+                                affectedArticleRows: affectedRows,
+                                article
+                            });
+
+                        case 'draft':
+                            insertArticleRevisionID = await articleDB.insertArticleRevision(
+                                article.id,
+                                req.body.title,
+                                req.body.content,
+                                sessionUser.id
+                            );
+                            revision = await articleDB.fetchArticleRevisionByID(insertArticleRevisionID);
+                            return res.json({
+                                redirect: '/:article/' + article.id + '/view?r=' + revision.id,
+                                message: "Draft saved successfully",
+                                insertArticleRevisionID: insertArticleRevisionID,
+                                article
+                            });
+                    }
+                    break;
             }
         } catch (error) {
             await this.renderError(error, req, res);

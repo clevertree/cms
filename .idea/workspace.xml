@@ -3,13 +3,15 @@
   <component name="ChangeListManager">
     <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/article/article.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/article/article.api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/config.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.database.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.database.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/theme/default/default.theme.js" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/default.theme.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/element/user-profile.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/element/user-profileform.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/element/user-updateflagsform.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/element/user-updateflagsform.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/element/user-updatepasswordform.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/element/user-updatepasswordform.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/element/user-updateprofileform.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/element/user-updateprofileform.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/database.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/database.api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/domain/domain.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/domain/domain.api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/file/file.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/file/file.api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/http/http.server.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/http/http.server.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/http/ssl.server.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/http/ssl.server.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/session/session.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/session/session.api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/task/task.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/task/task.api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/user.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.api.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,29 +22,47 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/service/http/ssl.server.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="857">
+              <caret line="67" lean-forward="true" selection-start-line="67" selection-end-line="94" />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/user/element/user-updateflagsform.element.js">
+        <entry file="file://$PROJECT_DIR$/service/http/http.server.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="788">
-              <caret line="113" column="54" selection-start-line="113" selection-start-column="54" selection-end-line="113" selection-end-column="54" />
+            <state relative-caret-position="754">
+              <caret line="112" column="30" selection-start-line="112" selection-start-column="30" selection-end-line="112" selection-end-column="30" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/user/element/user-updateprofileform.element.js">
+        <entry file="file://$PROJECT_DIR$/.config.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1615">
-              <caret line="115" selection-start-line="115" selection-end-line="116" />
+            <state relative-caret-position="437">
+              <caret line="23" selection-start-line="23" selection-end-line="23" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/user/element/user-updatepasswordform.element.js">
+        <entry file="file://$PROJECT_DIR$/database/database.manager.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1216">
-              <caret line="106" column="18" lean-forward="true" selection-start-line="106" selection-start-column="18" selection-end-line="106" selection-end-column="18" />
+            <state relative-caret-position="579">
+              <caret line="43" lean-forward="true" selection-start-line="43" selection-end-line="45" selection-end-column="31" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/article/article.api.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="342">
+              <caret line="18" column="45" selection-start-line="18" selection-start-column="45" selection-end-line="18" selection-end-column="45" />
             </state>
           </provider>
         </entry>
@@ -58,13 +78,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>httpPort</find>
-      <find>maxHeadersCount</find>
-      <find>.then(</find>
-      <find>_then</find>
-      <find>80</find>
-      <find>planePort</find>
-      <find>kittenton.ff</find>
       <find>no match, skipping middleware</find>
       <find>dnsResolveMxAsync</find>
       <find>.query =</find>
@@ -88,10 +101,15 @@
       <find>handleViewRequest</find>
       <find>editable</find>
       <find>render</find>
+      <find>this.state.user.flags</find>
+      <find>getAll</find>
+      <find>ssl</find>
+      <find>.ssl</find>
+      <find>.middleware)</find>
+      <find>get middleware()</find>
+      <find>.middleware</find>
     </findStrings>
     <replaceStrings>
-      <replace>DatabaseManager.get</replace>
-      <replace>articleDB = new ArticleDatabase(database</replace>
       <replace>userDB = new UserDatabase(database</replace>
       <replace>new ConfigDatabase</replace>
       <replace>user-</replace>
@@ -120,6 +138,8 @@
       <replace>.middleware</replace>
       <replace>get middleware() {</replace>
       <replace>configDB.parseConfigValues</replace>
+      <replace>.getMiddleware())</replace>
+      <replace>getMiddleware()</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/node_modules</dir>
@@ -156,7 +176,6 @@
         <option value="$PROJECT_DIR$/article/element/article.css" />
         <option value="$PROJECT_DIR$/article/element/article-editorform.element.js" />
         <option value="$PROJECT_DIR$/config/element/configform-editor.element.js" />
-        <option value="$PROJECT_DIR$/article/article.api.js" />
         <option value="$PROJECT_DIR$/config/config.api.js" />
         <option value="$PROJECT_DIR$/config/element/config.css" />
         <option value="$PROJECT_DIR$/theme/default/client/default.theme.css" />
@@ -171,17 +190,18 @@
         <option value="$PROJECT_DIR$/service/service.manager.js" />
         <option value="$PROJECT_DIR$/database/database.manager.js" />
         <option value="$PROJECT_DIR$/package.json" />
-        <option value="$PROJECT_DIR$/service/http/http.server.js" />
         <option value="$PROJECT_DIR$/.config.json" />
-        <option value="$PROJECT_DIR$/service/http/ssl.server.js" />
         <option value="$PROJECT_DIR$/theme/default/default.theme.js" />
         <option value="$PROJECT_DIR$/config/config.database.js" />
         <option value="$PROJECT_DIR$/user/element/user-updateprofileform.element.js" />
         <option value="$PROJECT_DIR$/user/element/user-profile.element.js" />
-        <option value="$PROJECT_DIR$/user/user.api.js" />
         <option value="$PROJECT_DIR$/user/element/user-profileform.element.js" />
         <option value="$PROJECT_DIR$/user/element/user-updatepasswordform.element.js" />
         <option value="$PROJECT_DIR$/user/element/user-updateflagsform.element.js" />
+        <option value="$PROJECT_DIR$/user/user.api.js" />
+        <option value="$PROJECT_DIR$/article/article.api.js" />
+        <option value="$PROJECT_DIR$/service/http/ssl.server.js" />
+        <option value="$PROJECT_DIR$/service/http/http.server.js" />
       </list>
     </option>
   </component>
@@ -383,12 +403,13 @@
       <workItem from="1550887519193" duration="1139000" />
       <workItem from="1550888890547" duration="8477000" />
       <workItem from="1550952070172" duration="4915000" />
-      <workItem from="1550957148781" duration="5090000" />
+      <workItem from="1550957148781" duration="6731000" />
+      <workItem from="1551022838633" duration="3758000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="156417000" />
+    <option name="totallyTimeSpent" value="161816000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -401,9 +422,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="-2" width="3840" height="2162" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49950787" visible="true" weight="0.08012652" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49950787" visible="true" weight="0.08039009" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="npm" order="2" sideWeight="0.50049216" side_tool="true" weight="0.08012652" />
       <window_info id="Favorites" order="3" side_tool="true" />
@@ -421,7 +441,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Database" order="3" />
-      <window_info anchor="right" id="Debug" order="4" visible="true" weight="0.2775435" />
+      <window_info active="true" anchor="right" id="Debug" order="4" visible="true" weight="0.2775435" />
       <window_info anchor="right" id="Find" order="5" weight="0.3294676" />
     </layout>
   </component>
@@ -453,17 +473,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/user/user.api.js</url>
-          <line>474</line>
+          <line>427</line>
           <option name="timeStamp" value="31" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/user/user.api.js</url>
-          <line>431</line>
+          <line>384</line>
           <option name="timeStamp" value="40" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/user/user.api.js</url>
-          <line>472</line>
+          <line>425</line>
           <option name="timeStamp" value="41" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -502,25 +522,9 @@
           <option name="timeStamp" value="127" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/service/http/ssl.server.js</url>
-          <line>161</line>
-          <option name="timeStamp" value="170" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/service/http/ssl.server.js</url>
-          <line>150</line>
-          <option name="timeStamp" value="171" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/node_modules/greenlock/lib/middleware.js</url>
           <line>42</line>
           <option name="timeStamp" value="172" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/service/http/ssl.server.js</url>
-          <line>141</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="176" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -554,13 +558,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1206">
           <caret line="83" column="18" selection-start-line="83" selection-start-column="18" selection-end-line="83" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/element/user-resetpasswordform.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="819">
-          <caret line="80" selection-start-line="80" selection-end-line="80" />
         </state>
       </provider>
     </entry>
@@ -606,13 +603,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="760">
           <caret line="40" lean-forward="true" selection-end-line="77" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/article/article.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1522">
-          <caret line="340" selection-start-line="340" selection-end-line="341" />
         </state>
       </provider>
     </entry>
@@ -714,13 +704,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/database/database.manager.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3401">
-          <caret line="179" column="16" selection-start-line="179" selection-start-column="16" selection-end-line="179" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/node_modules/express/lib/middleware/query.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="171">
@@ -764,13 +747,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/user.database.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="627">
-          <caret line="33" column="156" selection-start-line="33" selection-start-column="156" selection-end-line="33" selection-end-column="156" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/node_modules/greenlock/lib/middleware.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1254">
@@ -782,30 +758,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="659">
           <caret line="3243" column="10" selection-start-line="3243" selection-start-column="10" selection-end-line="3243" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/service/http/http.server.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1875">
-          <caret line="159" column="22" selection-start-line="159" selection-start-column="22" selection-end-line="159" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.config.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="21" selection-start-line="21" selection-end-line="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/service/http/ssl.server.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1197">
-          <caret line="63" column="79" lean-forward="true" selection-start-line="63" selection-start-column="79" selection-end-line="63" selection-end-column="79" />
-          <folding>
-            <marker date="1550957665500" expanded="true" signature="7358:7664" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -846,10 +798,38 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/user/element/user-profileform.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="627">
+          <caret line="33" column="55" selection-start-line="33" selection-start-column="55" selection-end-line="33" selection-end-column="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/element/user-updateflagsform.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2033">
+          <caret line="107" column="32" selection-start-line="107" selection-start-column="32" selection-end-line="107" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/element/user-resetpasswordform.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1520">
+          <caret line="80" selection-start-line="80" selection-end-line="80" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/user.database.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="627">
+          <caret line="33" column="156" selection-start-line="33" selection-start-column="156" selection-end-line="33" selection-end-column="156" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/user/user.api.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret line="282" column="73" lean-forward="true" selection-start-line="282" selection-start-column="73" selection-end-line="283" selection-end-column="85" />
+        <state relative-caret-position="5358">
+          <caret line="472" column="26" lean-forward="true" selection-start-line="472" selection-start-column="26" selection-end-line="472" selection-end-column="26" />
           <folding>
             <element signature="n#!!block;n#logout#0;n#UserAPI#0" />
             <element signature="n#!!block;n#handleLoginRequest#0;n#UserAPI#0" />
@@ -861,31 +841,52 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/element/user-profileform.element.js">
+    <entry file="file://$PROJECT_DIR$/user/element/user-updateprofileform.element.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="627">
-          <caret line="33" column="55" selection-start-line="33" selection-start-column="55" selection-end-line="33" selection-end-column="55" />
+        <state relative-caret-position="2185">
+          <caret line="115" selection-start-line="115" selection-end-line="116" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/user/element/user-updatepasswordform.element.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1216">
+        <state relative-caret-position="2014">
           <caret line="106" column="18" lean-forward="true" selection-start-line="106" selection-start-column="18" selection-end-line="106" selection-end-column="18" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/element/user-updateprofileform.element.js">
+    <entry file="file://$PROJECT_DIR$/database/database.manager.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1615">
-          <caret line="115" selection-start-line="115" selection-end-line="116" />
+        <state relative-caret-position="579">
+          <caret line="43" lean-forward="true" selection-start-line="43" selection-end-line="45" selection-end-column="31" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/element/user-updateflagsform.element.js">
+    <entry file="file://$PROJECT_DIR$/article/article.api.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="788">
-          <caret line="113" column="54" selection-start-line="113" selection-start-column="54" selection-end-line="113" selection-end-column="54" />
+        <state relative-caret-position="342">
+          <caret line="18" column="45" selection-start-line="18" selection-start-column="45" selection-end-line="18" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/service/http/ssl.server.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="857">
+          <caret line="67" lean-forward="true" selection-start-line="67" selection-end-line="94" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.config.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="437">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/service/http/http.server.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="754">
+          <caret line="112" column="30" selection-start-line="112" selection-start-column="30" selection-end-line="112" selection-end-column="30" />
         </state>
       </provider>
     </entry>
