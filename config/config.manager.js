@@ -2,6 +2,7 @@ const { DatabaseManager } = require('../database/database.manager');
 const { HTTPServer } = require('../http/http.server');
 const { TaskAPI } = require('../task/task.api');
 const { SessionAPI } = require('../session/session.api');
+const { ThemeAPI } = require('../theme/theme.api');
 
 class ConfigManager {
     constructor() {
@@ -43,6 +44,7 @@ class ConfigManager {
             await SessionAPI.configure(promptCallback);
             await HTTPServer.configure(promptCallback);
             await TaskAPI.configure(promptCallback);
+            await ThemeAPI.configure(promptCallback);
         } catch (e) {
             console.error("Configuration failed: ", e);
             if(!interactive)

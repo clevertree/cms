@@ -1,7 +1,7 @@
 const express = require('express');
 
 const { DatabaseManager } = require('../database/database.manager');
-const { ThemeManager } = require('../theme/theme.manager');
+const { ThemeAPI } = require('../theme/theme.api');
 // const { UserAPI } = require('../../user/user.api');
 const { AdminConfigureTask } = require('../user/task/admin-configure.task');
 const { UserDatabase } = require("../user/user.database");
@@ -22,8 +22,9 @@ class TaskAPI {
 
     getMiddleware() {
         // Configure Routes
-        const router = express.Router();
         const bodyParser = require('body-parser');
+
+        const router = express.Router();
         router.use(bodyParser.urlencoded({ extended: true }));
         router.use(bodyParser.json());
         router.use(SessionAPI.getMiddleware());
@@ -103,7 +104,7 @@ class TaskAPI {
 </section>`;
 
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, responseHTML)
                 );
 
@@ -130,7 +131,7 @@ class TaskAPI {
             res.status(400);
             if(req.method === 'GET') {
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
                 );
             } else {

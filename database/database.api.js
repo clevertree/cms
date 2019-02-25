@@ -3,7 +3,7 @@ const express = require('express');
 const { DatabaseManager } = require('./database.manager');
 const { UserAPI } = require('../user/user.api');
 const { UserDatabase } = require('../user/user.database');
-const { ThemeManager } = require('../theme/theme.manager');
+const { ThemeAPI } = require('../theme/theme.api');
 const { SessionAPI } = require('../session/session.api');
 class DatabaseAPI {
     constructor() {
@@ -78,7 +78,7 @@ class DatabaseAPI {
 
             if (req.method === 'GET') {
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `
 <section>
     <script src="/database/form/databaseform-manage.element.js"></script>
@@ -123,7 +123,7 @@ class DatabaseAPI {
             res.status(400);
             if(req.method === 'GET') {
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
                 );
             } else {
@@ -137,7 +137,7 @@ class DatabaseAPI {
 
             if (req.method === 'GET') {
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, {
                             title: `Connect to Database`,
                             content: `

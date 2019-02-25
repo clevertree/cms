@@ -1,9 +1,14 @@
+const path = require('path');
+
+const { HTTPServer } = require('../http/http.server');
 const { DatabaseManager } = require('../database/database.manager');
-const { ThemeManager } = require('../theme/theme.manager');
+const { ThemeAPI } = require('../theme/theme.api');
 const { ContentDatabase } = require("./content.database");
 const { UserDatabase } = require("../user/user.database");
 const { UserAPI } = require('../user/user.api');
 const { SessionAPI } = require('../session/session.api');
+
+const DIR_CONTENT = path.resolve(__dirname);
 
 class ContentApi {
     constructor() {
@@ -31,14 +36,25 @@ class ContentApi {
         router.all(['/[:]content', '/[:]content/[:]list'],      SM, PM, async (req, res) => await this.renderContentBrowser(req, res));
 
 
-        // CMS Asset files
-        router.use(express.static(require('path').resolve(__dirname + '/client')));
+        // User Asset files
+        router.get('/[:]content/[:]client/*',                      async (req, res, next) => await this.handleContentStaticFiles(req, res, next));
+
 
         return (req, res, next) => {
             // if(!req.url.startsWith('/:content'))
             //     return next();
             return router(req, res, next);
         }
+    }
+
+    async handleContentStaticFiles(req, res, next) {
+        const routePrefix = '/:content/:client/';
+        if(!req.url.startsWith(routePrefix))
+            throw new Error("Invalid Route Prefix: " + req.url);
+        const assetPath = req.url.substr(routePrefix.length);
+
+        const staticFile = path.resolve(DIR_CONTENT + '/client/' + assetPath);
+        HTTPServer.renderStaticFile(staticFile, req, res, next);
     }
 
     async checkForRevisionContent(req, content) {
@@ -71,7 +87,7 @@ class ContentApi {
             await this.checkForRevisionContent(req, content);
 
             res.send(
-                await ThemeManager.get(content.theme)
+                await ThemeAPI.get(content.theme)
                     .render(req, content)
             );
         } catch (error) {
@@ -113,14 +129,14 @@ class ContentApi {
                 if(contentRevision)
                     response.revision = contentRevision;
                 if(req.query.getAll) {
-                    response.parentList = await contentDB.selectContents("a.path IS NOT NULL", null, "id, parent_id, path, title");
+                    response.parentList = await contentDB.selectContent("a.path IS NOT NULL", null, "id, parent_id, path, title");
                 }
 
                 res.json(response);
 
             } else {
                 res.send(
-                    await ThemeManager.get(content.theme)
+                    await ThemeAPI.get(content.theme)
                         .render(req, content)
                 );
             }
@@ -145,10 +161,10 @@ class ContentApi {
                 case 'GET':
                     // Render Editor
                     res.send(
-                        await ThemeManager.get(content.theme)
+                        await ThemeAPI.get(content.theme)
                             .render(req, `
     <section style="max-width: 1600px;">
-        <script src="/:content/content-editorform.element.js"></script>
+        <script src="/:content/:client/content-editorform.element.js"></script>
         <content-editorform id="${req.params.id}"></content-editorform>
     </section>
     <section class="content-preview-container">
@@ -184,7 +200,7 @@ class ContentApi {
                         contentRevision = await contentDB.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentDB.fetchContentRevisionsByContentID(content.id))[0];
                     if(contentRevision)
                         response.revision = contentRevision;
-                    response.parentList = await contentDB.selectContents("a.path IS NOT NULL", null, "id, parent_id, path, title");
+                    response.parentList = await contentDB.selectContent("a.path IS NOT NULL", null, "id, parent_id, path, title");
 
                     res.json(response);
 
@@ -264,10 +280,10 @@ class ContentApi {
             if(req.method === 'GET') {          // Handle GET
                 // Render Editor
                 res.send(
-                    await ThemeManager.get(content.theme)
+                    await ThemeAPI.get(content.theme)
                         .render(req, `
 <section style="max-width: 1600px;">
-    <script src="/:content/content-deleteform.element.js"></script>
+    <script src="/:content/:client/content-deleteform.element.js"></script>
     <content-deleteform id="${req.params.id}"></content-editorform>
 </section>
 `)
@@ -306,10 +322,10 @@ class ContentApi {
             if(req.method === 'GET') {          // Handle GET
                 // Render Editor
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `
 <section>
-    <script src="/:content/content-addform.element.js"></script>
+    <script src="/:content/:client/content-addform.element.js"></script>
     <content-addform></content-addform>
 </section>
 `)
@@ -343,12 +359,12 @@ class ContentApi {
 
             if (req.method === 'GET') {
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `
 <section>
-    <script src="/:content/content-browser.element.js"></script>
+    <script src="/:content/:client/content-browser.element.js"></script>
     <content-browser></content-browser>
-    <script src="/:content/content-addform.element.js"></script>
+    <script src="/:content/:client/content-addform.element.js"></script>
     <content-addform></content-addform>
 </section>
 `)
@@ -364,11 +380,11 @@ class ContentApi {
                     whereSQL = 'a.title LIKE ? OR a.content LIKE ? OR a.path LIKE ? OR a.id = ?';
                     values = ['%'+req.body.search+'%', '%'+req.body.search+'%', '%'+req.body.search+'%', parseInt(req.body.search)];
                 }
-                const contents = await contentDB.selectContents(whereSQL, values);
+                const content = await contentDB.selectContent(whereSQL, values);
 
                 return res.json({
-                    message: `${contents.length} Content${contents.length !== 1 ? 's' : ''} queried successfully`,
-                    contents
+                    message: `${content.length} Content${content.length !== 1 ? 's' : ''} queried successfully`,
+                    content
                 });
             }
         } catch (error) {
@@ -382,7 +398,7 @@ class ContentApi {
         res.status(400);
         if(req.method === 'GET' && !asJSON) {          // Handle GET
             res.send(
-                await ThemeManager.get()
+                await ThemeAPI.get()
                     .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
             );
         } else {

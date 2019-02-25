@@ -1,7 +1,7 @@
 const express = require('express');
 
 const { DatabaseManager } = require('../database/database.manager');
-const { ThemeManager } = require('../theme/theme.manager');
+const { ThemeAPI } = require('../theme/theme.api');
 const { ConfigDatabase } = require("./config.database");
 const { UserDatabase } = require("../user/user.database");
 const { UserAPI } = require('../user/user.api');
@@ -59,7 +59,7 @@ class ConfigAPI {
 
             if (req.method === 'GET') {
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `
 <section>
     <script src="/service/confige/config/element/config-editorform.element.js"></script>
@@ -110,7 +110,7 @@ class ConfigAPI {
         res.status(400);
         if(req.method === 'GET' && !asJSON) {          // Handle GET
             res.send(
-                await ThemeManager.get()
+                await ThemeAPI.get()
                     .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
             );
         } else {

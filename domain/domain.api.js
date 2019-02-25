@@ -1,7 +1,7 @@
 const express = require('express');
 
 const { DatabaseManager } = require('../database/database.manager');
-const { ThemeManager } = require('../theme/theme.manager');
+const { ThemeAPI } = require('../theme/theme.api');
 const { DomainDatabase } = require("./domain.database");
 // const { ContentDatabase } = require("../article/article.database");
 const { UserDatabase } = require("../user/user.database");
@@ -78,7 +78,7 @@ class DomainAPI {
 
             if (req.method === 'GET') {
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `
 <section>
     <script src="/domain/form/domainform-editor.element.js"></script>
@@ -123,7 +123,7 @@ class DomainAPI {
             res.status(400);
             if(req.method === 'GET') {
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
                 );
             } else {

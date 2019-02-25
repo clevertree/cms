@@ -7,8 +7,8 @@
         <meta name="keywords" CONTENT="<%=article.keywords || site.keywords || ""%>">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link href="theme/default/client/default.theme.css" rel="stylesheet" />
-        <script src="theme/default/element/default.theme.element.js"></script>
+        <link href=":theme/default/:client/default.theme.css" rel="stylesheet" />
+        <script src=":theme/default/:client/default.theme.client.js"></script>
     </head>
     <body class='theme-default'>
 <%- site.customHeader || include('header.partial.ejs') %>

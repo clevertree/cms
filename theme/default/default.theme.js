@@ -7,21 +7,19 @@ const { ContentDatabase } = require('../../content/content.database');
 const { DatabaseManager } = require('../../database/database.manager');
 const { TaskAPI } = require('../../task/task.api');
 const { ConfigDatabase } = require("../../config/config.database");
+const { AbstractTheme } = require("../../theme/theme.api");
 
-const TEMPLATE_DIR = path.resolve(__dirname + '/template');
-const BASE_DIR = path.resolve((path.dirname(path.dirname(__dirname))));
+const DIR_TEMPLATE = path.resolve(__dirname + '/template');
+const DIR_CLIENT_ASSETS = path.resolve(__dirname + '/client');
+// const BASE_DIR = path.resolve((path.dirname(path.dirname(__dirname))));
 
 class DefaultTheme {
     constructor() {
-        this.renderOptions = {
-            views: [
-                path.resolve(TEMPLATE_DIR),
-                path.resolve(BASE_DIR)
-            ]
-            // async: true
-        };
     }
 
+    getThemeAssetsDirectory() {
+        return DIR_CLIENT_ASSETS;
+    }
 
     async render(req, article) {
         if(typeof article === "string")
@@ -116,7 +114,7 @@ class DefaultTheme {
 
 
         try {
-            const templatePath = path.resolve(TEMPLATE_DIR + '/theme.ejs');
+            const templatePath = path.resolve(DIR_TEMPLATE + '/theme.ejs');
             // res.render(templatePath)
             return await ejs.renderFile(templatePath, renderData, this.renderOptions);
         } catch (e) {

@@ -1,8 +1,8 @@
 const bcrypt = require('bcryptjs');
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const session = require('client-sessions');
+// const cookieParser = require('cookie-parser');
+// const session = require('client-sessions');
 const uuidv4 = require('uuid/v4');
+const path = require('path');
 
 // const { LocalConfig } = require('../config/local.config');
 // const { ConfigManager } = require('../config/config.manager');
@@ -11,12 +11,14 @@ const { DatabaseManager } = require('../database/database.manager');
 const { UserDatabase } = require('./user.database');
 const { ConfigDatabase } = require("../config/config.database");
 const { SessionAPI } = require('../session/session.api');
+const { HTTPServer } = require('../http/http.server');
 
 // const { DNSManager } = require('../service/domain/dns.manager');
-const { ThemeManager } = require('../theme/theme.manager');
+const { ThemeAPI } = require('../theme/theme.api');
 const { TaskAPI } = require('../task/task.api');
 const { ResetPasswordEmail } = require("./mail/resetpassword.class");
 
+const DIR_USER = path.resolve(__dirname);
 
 class UserAPI {
     constructor() {
@@ -27,6 +29,7 @@ class UserAPI {
 
 
     getMiddleware() {
+        const express = require('express');
         // const localConfig = new LocalConfig(config, !config);
         // const cookieConfig = await localConfig.getOrCreate('cookie');
 
@@ -61,8 +64,8 @@ class UserAPI {
         router.all('/[:]user(/[:]list)?',                            async (req, res) => await this.handleBrowserRequest(req, res));
 
 
-        // CMS Asset files
-        router.use(express.static(require('path').resolve(__dirname + '/client')));
+        // User Asset files
+        router.get('/[:]user/[:]client/*',                          async (req, res, next) => await this.handleUserStaticFiles(req, res, next));
 
         return (req, res, next) => {
             if(!req.url.startsWith('/:user'))
@@ -258,14 +261,27 @@ class UserAPI {
         // TODO: destroy db session
     }
 
+
+
+    async handleUserStaticFiles(req, res, next) {
+        const routePrefix = '/:user/:client/';
+        if(!req.url.startsWith(routePrefix))
+            throw new Error("Invalid Route Prefix: " + req.url);
+        const assetPath = req.url.substr(routePrefix.length);
+
+        const staticFile = path.resolve(DIR_USER + '/client/' + assetPath);
+        HTTPServer.renderStaticFile(staticFile, req, res, next);
+    }
+
+
     async handleLoginRequest(req, res, next) {
         try {
             if(req.method === 'GET') {
                 // Render Editor Form
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `
-<script src="/:user/user-loginform.element.js"></script>
+<script src="/:user/:client/user-loginform.element.js"></script>
 <user-loginform></user-loginform>`)
                 );
 
@@ -291,9 +307,9 @@ class UserAPI {
             if(req.method === 'GET') {
                 // Render Editor Form
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `
-<script src="/:user/userform-logout.element.js"></script>
+<script src="/:user/:client/user-logoutform.element.js"></script>
 <userform-logout></userform-logout>`)
                 );
 
@@ -318,9 +334,9 @@ class UserAPI {
             if(req.method === 'GET') {
                 // Render Editor Form
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `
-<script src="/:user/userform-register.element.js"></script>
+<script src="/:user/:client/user-registerform.element.js"></script>
 <userform-register></userform-register>`)
                 );
 
@@ -358,9 +374,9 @@ class UserAPI {
             if(req.method === 'GET') {
                 // Render Editor Form
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `
-<script src="/:user/user-forgotpasswordform.element.js"></script>
+<script src="/:user/:client/user-forgotpasswordform.element.js"></script>
 <user-forgotpasswordform src="${user.url}"></user-forgotpasswordform>`)
                 );
 
@@ -416,9 +432,9 @@ class UserAPI {
             if(req.method === 'GET') {
                 // Render Editor Form
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `
-<script src="/:user/user-changepasswordform.element.js"></script>
+<script src="/:user/:client/user-changepasswordform.element.js"></script>
 <user-changepasswordform uuid="${uuid}" src="${user.url}" username="${user.username}"></user-changepasswordform>`)
                 );
 
@@ -462,20 +478,20 @@ class UserAPI {
                 case 'GET':
                     if(type === 'edit') {
                         res.send(
-                            await ThemeManager.get()
+                            await ThemeAPI.get()
                                 .render(req, `
-<script src="/:user/user-updateprofileform.element.js"></script>
+<script src="/:user/:client/user-updateprofileform.element.js"></script>
 <user-updateprofileform src="${user.url}"></user-updateprofileform>
-<script src="/:user/user-updatepasswordform.element.js"></script>
+<script src="/:user/:client/user-updatepasswordform.element.js"></script>
 <user-updatepasswordform src="${user.url}"></user-updatepasswordform>
-<script src="/:user/user-updateflagsform.element.js"></script>
+<script src="/:user/:client/user-updateflagsform.element.js"></script>
 <user-updateflagsform src="${user.url}"></user-updateflagsform>`)
                         );
                     } else {
                         res.send(
-                            await ThemeManager.get()
+                            await ThemeAPI.get()
                                 .render(req, `
-<script src="/:user/user-${type}form.element.js"></script>
+<script src="/:user/:client/user-${type}form.element.js"></script>
 <user-${type}form src="${user.url}"></user-${type}form>`)
                         );
                     }
@@ -561,12 +577,12 @@ class UserAPI {
 
             if (req.method === 'GET') {
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `
 <section>
-    <script src="/:user/user-browser.element.js"></script>
+    <script src="/:user/:client/user-browser.element.js"></script>
     <user-browser></user-browser>
-    <script src="/:user/user-addform.element.js"></script>
+    <script src="/:user/:client/user-addform.element.js"></script>
     <user-addform></user-addform>
 </section>
 `)
@@ -593,7 +609,7 @@ class UserAPI {
             res.status(400);
             if(req.method === 'GET') {
                 res.send(
-                    await ThemeManager.get()
+                    await ThemeAPI.get()
                         .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
                 );
             } else {

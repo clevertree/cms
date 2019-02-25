@@ -9,12 +9,6 @@ const { LocalConfig } = require('../config/local.config');
 
 // const { TaskAPI } = require('../task/task.manager');
 // const { DatabaseManager } = require('../../database/database.manager');
-const { DatabaseAPI } = require('../database/database.api');
-const { UserAPI } = require('../user/user.api');
-const { ContentAPI } = require('../content/content.api');
-const { FileAPI } = require('../file/file.api');
-const { ConfigAPI } = require('../config/config.api');
-const { TaskAPI } = require('../task/task.api');
 
 const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
 
@@ -86,6 +80,14 @@ class HTTPServer {
 
 
     getMiddleware() {
+        const { DatabaseAPI } = require('../database/database.api');
+        const { UserAPI } = require('../user/user.api');
+        const { ContentAPI } = require('../content/content.api');
+        const { FileAPI } = require('../file/file.api');
+        const { ConfigAPI } = require('../config/config.api');
+        const { TaskAPI } = require('../task/task.api');
+        const { ThemeAPI } = require('../theme/theme.api');
+
         const router = express.Router();
         // Routes
         router.use(DatabaseAPI.getMiddleware());
@@ -94,6 +96,7 @@ class HTTPServer {
         router.use(FileAPI.getMiddleware());
         router.use(ConfigAPI.getMiddleware());
         router.use(TaskAPI.getMiddleware());
+        router.use(ThemeAPI.getMiddleware());
 
 
         // CMS Asset files
@@ -185,6 +188,50 @@ class HTTPServer {
         cb(null, { options: opts, certs: certs });
     }
 
+
+
+    renderStaticFile(filePath, req, res, next) {
+        const ext = path.extname(filePath);
+
+        fs.exists(filePath, function (exist) {
+            if(!exist) {
+                // if the file is not found, return 404
+                res.statusCode = 404;
+                res.end(`File ${req.url} not found!`);
+                return;
+            }
+
+            // read file from file system
+            fs.readFile(filePath, function(err, data){
+                if(err){
+                    res.statusCode = 500;
+                    res.end(`Error reading file: ${err}.`);
+                } else {
+                    // if the file is found, set Content-type and send data
+                    res.setHeader('Content-type', mapMimeTypes[ext] || 'text/plain' );
+                    res.end(data);
+                }
+            });
+        });
+    }
+
 }
 
 exports.HTTPServer = new HTTPServer();
+
+
+// maps file extention to MIME typere
+const mapMimeTypes = {
+    '.ico': 'image/x-icon',
+    '.html': 'text/html',
+    '.js': 'text/javascript',
+    '.json': 'application/json',
+    '.css': 'text/css',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.wav': 'audio/wav',
+    '.mp3': 'audio/mpeg',
+    '.svg': 'image/svg+xml',
+    '.pdf': 'application/pdf',
+    '.doc': 'application/msword'
+};
