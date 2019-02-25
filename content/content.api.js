@@ -108,7 +108,7 @@ class ContentApi {
 
             if(asJSON) {
                 const response = {
-                    redirect: '/:content/' + content.id + '/view',
+                    redirect: content.url,
                     message: "Content Queried Successfully",
                     editable: false,
                     content
@@ -162,18 +162,17 @@ class ContentApi {
                     // Render Editor
                     res.send(
                         await ThemeAPI.get(content.theme)
-                            .render(req, `
-    <section style="max-width: 1600px;">
-        <script src="/:content/:client/content-editorform.element.js"></script>
-        <content-editorform id="${req.params.id}"></content-editorform>
-    </section>
-    <section class="content-preview-container">
-        <h1 style="text-align: center;">Preview</h1>
-        <hr/>
-        <div class="content-preview-content">
-            ${content.content}
-        </div>
-    </section>
+                            .render(req, `<section style="max-width: 1600px;">
+                <script src="/:content/:client/content-editorform.element.js"></script>
+                <content-editorform id="${req.params.id}"></content-editorform>
+            </section>
+            <section class="content-preview-container">
+                <h1 style="text-align: center;">Preview</h1>
+                <hr/>
+                <div class="content-preview-content">
+                    ${content.content}
+                </div>
+            </section>
     `)
                     );
                     break;
@@ -182,7 +181,7 @@ class ContentApi {
                     let contentRevision = await this.checkForRevisionContent(req, content);
 
                     const response = {
-                        redirect: '/:content/' + content.id + '/view',
+                        redirect: content.url,
                         message: "Content Queried Successfully",
                         editable: false,
                         content
@@ -233,7 +232,7 @@ class ContentApi {
                             );
 
                             return res.json({
-                                redirect: '/:content/' + content.id + '/view',
+                                redirect: content.url,
                                 message: "Content published successfully.<br/>Redirecting...",
                                 insertContentRevisionID: insertContentRevisionID,
                                 affectedContentRows: affectedRows,
@@ -249,7 +248,7 @@ class ContentApi {
                             );
                             revision = await contentDB.fetchContentRevisionByID(insertContentRevisionID);
                             return res.json({
-                                redirect: '/:content/' + content.id + '/view?r=' + revision.id,
+                                redirect: content.url + '?r=' + revision.id,
                                 message: "Draft saved successfully",
                                 insertContentRevisionID: insertContentRevisionID,
                                 content
@@ -268,38 +267,56 @@ class ContentApi {
             const contentDB = new ContentDatabase(database);
             const userDB = new UserDatabase(database);
 
-            if(!req.session || !req.session.userID)
-                throw new Error("Must be logged in");
-            const sessionUser = await userDB.fetchUserByID(req.session.userID);
-            if(!sessionUser || !sessionUser.isAdmin())
-                throw new Error("Not authorized");
 
             let content = await contentDB.fetchContentByID(req.params.id);
 
 
-            if(req.method === 'GET') {          // Handle GET
-                // Render Editor
+            switch(req.method) {
+                case 'GET':
+                    // Render Editor
                 res.send(
                     await ThemeAPI.get(content.theme)
-                        .render(req, `
-<section style="max-width: 1600px;">
-    <script src="/:content/:client/content-deleteform.element.js"></script>
-    <content-deleteform id="${req.params.id}"></content-editorform>
-</section>
-`)
+                        .render(req, `<section style="max-width: 1600px;">
+                <script src="/:content/:client/content-deleteform.element.js"></script>
+                <content-deleteform id="${req.params.id}"></content-editorform>
+            </section>`)
                 );
+                    break;
 
-            } else {
-                // Handle POST
-                const affectedRows = await contentDB.deleteContent(
-                    content.id
-                );
+                case 'OPTIONS':
+                    const response = {
+                        message: `Delete content ID ${content.id}?`,
+                        editable: false,
+                        content
+                    };
+                    if(req.session && req.session.userID) {
+                        const database = await DatabaseManager.selectDatabaseByRequest(req);
+                        const userDB = new UserDatabase(database);
+                        const sessionUser = await userDB.fetchUserByID(req.session.userID);
+                        if (sessionUser.isAdmin() || sessionUser.id === content.user_id)
+                            response.editable = true;
+                    }
+                    res.json(response);
+                    break;
 
-                return res.json({
-                    redirect: '/:content/',
-                    message: "Content deleted successfully.<br/>Redirecting...",
-                    affectedContentRows: affectedRows
-                });
+                case 'POST':
+                    // Handle POST
+                    if(!req.session || !req.session.userID)
+                        throw new Error("Must be logged in");
+                    const sessionUser = await userDB.fetchUserByID(req.session.userID);
+                    if(!sessionUser || !sessionUser.isAdmin())
+                        throw new Error("Not authorized");
+                    // TODO: recommend articles for deletion
+
+                    const affectedRows = await contentDB.deleteContent(
+                        content.id
+                    );
+
+                    return res.json({
+                        redirect: '/:content/',
+                        message: "Content deleted successfully.<br/>Redirecting...",
+                        affectedContentRows: affectedRows
+                    });
             }
         } catch (error) {
             await this.renderError(error, req, res);
@@ -314,24 +331,25 @@ class ContentApi {
             if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
 
-            const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
-            if(!sessionUser || !sessionUser.isAdmin())
-                throw new Error("Not authorized");
-
-
             if(req.method === 'GET') {          // Handle GET
                 // Render Editor
                 res.send(
                     await ThemeAPI.get()
-                        .render(req, `
-<section>
-    <script src="/:content/:client/content-addform.element.js"></script>
-    <content-addform></content-addform>
-</section>
+                        .render(req, `<section>
+                <script src="/:content/:client/content-addform.element.js"></script>
+                <content-addform></content-addform>
+            </section>
 `)
                 );
 
             } else {
+                if(!req.session || !req.session.userID)
+                    throw new Error("Must be logged in");
+                const sessionUser = await userDB.fetchUserByID(req.session.userID);
+                if(!sessionUser || !sessionUser.isAdmin())
+                    throw new Error("Not authorized");
+                // TODO: submit articles for approval
+
                 // Handle POST
                 const insertID = await contentDB.insertContent(
                     req.body.title,
@@ -343,9 +361,9 @@ class ContentApi {
                 );
                 const content = await contentDB.fetchContentByID(insertID);
                 return res.json({
-                    redirect: '/:content/' + insertID + '/:edit',
+                    redirect: content.url + '/:edit',
                     message: "Content created successfully. Redirecting...",
-                    insertID: insertID,
+                    insertID,
                     content
                 });
             }
@@ -360,13 +378,12 @@ class ContentApi {
             if (req.method === 'GET') {
                 res.send(
                     await ThemeAPI.get()
-                        .render(req, `
-<section>
-    <script src="/:content/:client/content-browser.element.js"></script>
-    <content-browser></content-browser>
-    <script src="/:content/:client/content-addform.element.js"></script>
-    <content-addform></content-addform>
-</section>
+                        .render(req, `<section>
+                <script src="/:content/:client/content-browser.element.js"></script>
+                <content-browser></content-browser>
+                <script src="/:content/:client/content-addform.element.js"></script>
+                <content-addform></content-addform>
+            </section>
 `)
                 );
 
@@ -383,7 +400,7 @@ class ContentApi {
                 const content = await contentDB.selectContent(whereSQL, values);
 
                 return res.json({
-                    message: `${content.length} Content${content.length !== 1 ? 's' : ''} queried successfully`,
+                    message: `${content.length} page${content.length !== 1 ? 's' : ''} queried successfully`,
                     content
                 });
             }

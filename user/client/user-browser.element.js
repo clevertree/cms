@@ -25,10 +25,10 @@ class HTMLUserFormBrowserElement extends HTMLElement {
     }
 
     connectedCallback() {
-        this.addEventListener('keyup', this.onEvent);
-        this.addEventListener('submit', this.onEvent);
+        this.addEventListener('keyup', this.onKeyUp);
+        this.addEventListener('submit', this.onSubmit);
         this.render();
-        this.submit();
+        this.onSubmit();
     }
 
     onSuccess(e, response) {
@@ -37,19 +37,11 @@ class HTMLUserFormBrowserElement extends HTMLElement {
     }
     onError(e, response) {}
 
-    onEvent(e) {
-        switch (event.type) {
-            case 'submit':
-                this.submit(e);
-                break;
-
-            case 'keyup':
-                switch(e.target.name) {
-                    case 'search':
-                        clearTimeout(this.keyTimeout);
-                        this.keyTimeout = setTimeout(e => this.submit(), 500);
-                        break;
-                }
+    onKeyUp(e) {
+        switch(e.target.name) {
+            case 'search':
+                clearTimeout(this.keyTimeout);
+                this.keyTimeout = setTimeout(e => this.submit(), 500);
                 break;
         }
     }
@@ -72,7 +64,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
     //     this.setState({processing: true});
     // }
 
-    submit(e) {
+    onSubmit(e) {
         if(e)
             e.preventDefault();
         const form = this.querySelector('form');
@@ -119,7 +111,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
         this.innerHTML =
             `<form action="/:user/:list" method="POST" class="user user-browser themed">
              <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
-                <table>
+                <table class="user">
                     <thead>
                         <tr>
                             <td colspan="5">

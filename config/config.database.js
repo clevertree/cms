@@ -25,17 +25,18 @@ class ConfigDatabase  {
         if(withDefaults)
             defaultConfigList = ConfigManager.getConfigList();
         const configList = await this.selectConfigValues('1');
+        const allConfigList = [];
         for(let i=0; i<defaultConfigList.length; i++) {
-            let pos = configList.indexOf(configEntry => configEntry.name === defaultConfigList[i].name);
-            if(pos === -1) {
-                configList.push(new ConfigRow({name: defaultConfigList[i].name}));
-                pos = configList.length - 1;
+            let configEntry = configList.find(configEntry => configEntry.name === defaultConfigList[i].name);
+            if(!configEntry) {
+                configEntry = new ConfigRow({name: defaultConfigList[i].name});
             }
-            if(!configList[pos].value && defaultConfigList[i].defaultValue)
-                configList[pos].value = typeof defaultConfigList[i].defaultValue === 'function' ? defaultConfigList[i].defaultValue() : defaultConfigList[i].defaultValue;
-            configList[pos].type = defaultConfigList[i].type;
+            allConfigList.push(configEntry);
+            if(!configEntry.value && defaultConfigList[i].defaultValue)
+                configEntry.value = typeof defaultConfigList[i].defaultValue === 'function' ? defaultConfigList[i].defaultValue() : defaultConfigList[i].defaultValue;
+            configEntry.type = defaultConfigList[i].type;
         }
-        return configList;
+        return allConfigList;
     }
 
     async selectConfigValues(whereSQL, values) {

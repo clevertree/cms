@@ -75,7 +75,8 @@ document.addEventListener('DOMContentLoaded', function() {
             this.setState({processing: true});
         }
 
-        getFormData(form) {
+        getFormData(form=null) {
+            form = form || this.querySelector('form');
             const formData = {};
             new FormData(form).forEach((value, key) => formData[key] = value);
             return formData;
@@ -86,9 +87,9 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/:logout" method="POST" class="user user-logoutform themed">
-                    <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
+                    <fieldset>
                         <legend>Log Out</legend>
-                            <table>
+                            <table class="user">
                                 <thead>
                                     <tr>
                                         <td colspan="2">
@@ -104,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <td>
                                         </td>
                                         <td style="text-align: right;">
-                                            <button type="submit">Log Out</button>
+                                            <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Log Out</button>
                                         </td>
                                     </tr>
                                 </tfoot>

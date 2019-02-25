@@ -215,6 +215,7 @@ CREATE TABLE ${tableName} (
         Object.assign(this, row);
     }
 
+    get url() { return this.path || `/:content/${this.id}/`}
     // hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
 }
 

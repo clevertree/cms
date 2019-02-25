@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
             super();
             this.state = {
                 src: null,
-                method: 'POST',
                 message: "In order to change password, please fill out this form and hit 'Update' below",
                 status: 0,
                 user: {id: -1},
@@ -79,7 +78,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         onSubmit(e) {
             e.preventDefault();
-            const request = this.getFormData();
+            const form = e.target;
+            const request = this.getFormData(form);
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.onError(e, response);
                 }
             };
-            xhr.open(this.state.method, this.state.action, true);
+            xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.responseType = 'json';
             xhr.send(JSON.stringify(request));
@@ -109,9 +109,9 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                <form action="${this.state.src}/:password" method="POST" class="user user-updatepasswordform themed">
-                    <fieldset ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>
+                    <fieldset>
                         <legend>Change Password</legend>
-                        <table>
+                        <table class="user">
                             <thead>
                                 <tr>
                                     <td colspan="2">
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <td>
                                     </td>
                                     <td style="text-align: right;">
-                                        <button type="submit">Update Password</button>
+                                        <button type="submit" ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>Update Password</button>
                                     </td>
                                 </tr>
                             </tfoot>

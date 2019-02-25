@@ -13,7 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 message: "To register a new account, please enter your email and password",
                 status: 0,
                 response: null,
-                processing: false
+                processing: false,
+                duplicateRegistration: false
             }
         }
 
@@ -43,6 +44,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         onError(e, response) {
             console.error(e, response);
+            if(this.state.duplicateRegistration) {
+                this.state.duplicateRegistration = false;
+                if(confirm("This user account already exists. Would you like to attempt logging in?")) {
+                    const formData = this.getFormData();
+                    console.log(formData);
+                    document.location.href = ':user/:login?userID=' + (formData.username || formData.email);
+                }
+            }
         }
 
         onChange(e) {
@@ -77,7 +86,8 @@ document.addEventListener('DOMContentLoaded', function() {
             this.setState({processing: true});
         }
 
-        getFormData(form) {
+        getFormData(form=null) {
+            form = form || this.querySelector('form');
             const formData = {};
             new FormData(form).forEach((value, key) => formData[key] = value);
             return formData;
@@ -90,9 +100,9 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/:register" method="POST" class="user user-registerform themed">
-                    <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
+                    <fieldset>
                         <legend>Register a new account</legend>
-                        <table>
+                        <table class="user">
                             <thead>
                                 <tr>
                                     <td colspan="2">
@@ -137,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <a href=":user/:login${this.state.userID ? '?userID=' + this.state.userID : ''}">Back to Login</a>
                                     </td>
                                     <td style="text-align: right;">
-                                        <button type="submit">Register</button>
+                                        <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Register</button>
                                     </td>
                                 </tr>
                             </tfoot>

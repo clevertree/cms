@@ -103,63 +103,183 @@ class HTMLContentEditorFormElement extends HTMLElement {
     }
 
 
-    renderPreview(html) {
-        const previewContent = document.querySelector('.content-preview-content');
-        if(previewContent)
-            previewContent.innerHTML = html;
-    }
-
     requestFormData() {
+        const form = this.querySelector('form');
         const xhr = new XMLHttpRequest();
         xhr.onload = () => {
-            // console.info(xhr.response);
-            if(!xhr.response || !xhr.response.content)
-                throw new Error("Invalid Response");
             this.setState({processing: false}, xhr.response);
-            // this.state = xhr.response.user;
-            // this.render();
         };
         xhr.responseType = 'json';
-        let params = 'getAll=true';
+        let params = '?t=' + new Date().getTime();
         if(this.state.revisionID)
-            params += `&r=${this.state.revisionID}`;
-        params += '&t=' + new Date().getTime();
-        xhr.open ("GET", `:content/${this.state.content.id}/:json?${params}`, true);
-        // xhr.setRequestHeader("Accept", "application/json");
+            params = `&r=${this.state.revisionID}`;
+        xhr.open ('OPTIONS', form.getAttribute('action') + params, true);
         xhr.send ();
         this.setState({processing: true});
     }
 
     onSubmit(e) {
-        if(e) e.preventDefault();
-        const form = e ? e.target : this.querySelector('form');
+        e.preventDefault();
+        const form = e.target;
         const request = this.getFormData(form);
-        const method = form.getAttribute('method');
-        const action = form.getAttribute('action');
 
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
             const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-            this.setState({status: xhr.status, processing: false}, response);
+            this.setState({processing: false, status: xhr.status}, response);
             if(xhr.status === 200) {
                 this.onSuccess(e, response);
             } else {
                 this.onError(e, response);
             }
         };
-        xhr.open(method, action, true);
+        xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.responseType = 'json';
         xhr.send(JSON.stringify(request));
         this.setState({processing: true});
     }
 
-
     getFormData(form) {
         form = form || this.querySelector('form');
         const formData = {};
         new FormData(form).forEach((value, key) => formData[key] = value);
         return formData;
+    }
+
+
+    renderPreview(html) {
+        const previewContent = document.querySelector('.content-preview-content');
+        if(previewContent)
+            previewContent.innerHTML = html;
+    }
+
+    render() {
+        // const formData = this.getFormData();
+        let action = `/:content/${this.state.content.id}/:edit`;
+        let message = `Editing content ID ${this.state.content.id}`;
+        if(this.state.message)
+            message = this.state.message;
+
+        console.log("RENDER", this.state);
+        this.innerHTML =
+            `<form action="${action}" method="POST" class="content content-editorform themed">
+            <input type="hidden" name="id" value="${this.state.content.id}" />
+            <fieldset>
+                <table class="content">
+                    <thead>
+                        <tr>
+                            <td colspan="2">
+                            <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                ${message}
+                            </div>
+                            </td>
+                        </tr>
+                        <tr><td colspan="2"><hr/></td></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th style="width: 65px;"></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <td class="label">Title</td>
+                            <td>
+                                <input type="text" name="title" value="${this.state.content.title || ''}" required/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Path</td>
+                            <td>
+                                <input type="text" name="path" placeholder="/path/to/content/" value="${this.state.content.path || ''}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Parent</td>
+                            <td>
+                                <select name="parent_id" onchange="this.form.parent_id.value = this.value;" class="contentform-select-parent">
+                                    <option value="">Select Parent</option>
+                                ${this.state.parentList.map(content => `
+                                    <option value="${content.id}" ${this.state.content.parent_id === content.id ? 'selected="selected"' : null}>
+                                        ${content.title} ${content.path ? `(${content.path})` : null}
+                                    </option>
+                                `)}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Theme</td>
+                            <td>
+                                <select name="theme">
+                                    <option value="">Default Site Theme</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Content</td>
+                            <td>
+                                <textarea class="editor-plain editor-wysiwyg-target" name="content"
+                                    >${this.state.content.content || ''}</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Switch Editor</td>
+                            <td>
+                                <label>
+                                    <select name="editor">
+                                    ${[
+                ['', 'Plain Text / HTML'],
+                ['summernote', 'SummerNote'],
+                ['jodit', 'Jodit (Image Uploads)'],
+                ['trumbowyg', 'Trumbowyg'],
+                ['pell', 'Pell'],
+                ['froala', 'Froala (Not free)'],
+                ['quill', 'Quill (Broken)'],
+            ].map(option => `
+                                        <option value="${option[0]}"${option[0] === this.state.editor ? ' selected="selected"' : ''}>${option[1]}</option>
+                                    `)}
+                                    </select>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Revision</td>
+                            <td>
+                                <select name="revision">
+                                    <option value="">Load a revision</option>
+                                ${this.state.history.map(revision => `
+                                    <option value="${revision.id}">${new Date(revision.created).toLocaleString()}</option>
+                                `)}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Preview</td>
+                            <td>
+                                <label>
+                                    <select name="action">
+                                        <option value="publish">Publish Now (No Preview)</option>
+                                        <option value="draft">Save as Unpublished Draft</option>
+                                    </select>
+                                </label>
+                            </td>
+                        </tr>
+                    </tbody>
+                        <tfoot>
+                            <tr><td colspan="2"><hr/></td></tr>
+                            <tr>
+                                <td style="text-align: right;" colspan="2">
+                                    <a href=":content/${this.state.content.id}">Back to content</a>
+                                    <button type="submit" ${this.state.processing || !this.state.editable ? 'disabled="disabled"' : ''}>Publish</button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                </table>
+            </fieldset>
+        </form>`;
+
+        clearTimeout(this.renderEditorTimeout);
+        this.renderEditorTimeout = setTimeout(e => this.renderWYSIWYGEditor(), 100);
     }
 
     renderWYSIWYGEditor() {
@@ -517,134 +637,6 @@ class HTMLContentEditorFormElement extends HTMLElement {
 
                 break;
         }
-    }
-
-    render() {
-        // const formData = this.getFormData();
-        let action = `/:content/${this.state.content.id}/:edit`;
-        let message = `Editing content ID ${this.state.content.id}`;
-        if(this.state.message)
-            message = this.state.message;
-
-        console.log("RENDER", this.state);
-        this.innerHTML =
-            `<form action="${action}" method="POST" class="content content-editorform themed">
-            <input type="hidden" name="id" value="${this.state.content.id}" />
-            <fieldset ${this.state.mode === 'edit' && !this.state.editable ? 'disabled="disabled"' : ''}>
-                <table class="content">
-                    <thead>
-                        <tr>
-                            <td colspan="2">
-                            <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                                ${message}
-                            </div>
-                            </td>
-                        </tr>
-                        <tr><td colspan="2"><hr/></td></tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th style="width: 65px;"></th>
-                            <th></th>
-                        </tr>
-                        <tr>
-                            <td class="label">Title</td>
-                            <td>
-                                <input type="text" name="title" value="${this.state.content.title || ''}" required/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Path</td>
-                            <td>
-                                <input type="text" name="path" placeholder="/path/to/content/" value="${this.state.content.path || ''}" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Parent</td>
-                            <td>
-                                <select name="parent_id" onchange="this.form.parent_id.value = this.value;" class="contentform-select-parent">
-                                    <option value="">Select Parent</option>
-                                ${this.state.parentList.map(content => `
-                                    <option value="${content.id}" ${this.state.content.parent_id === content.id ? 'selected="selected"' : null}>
-                                        ${content.title} ${content.path ? `(${content.path})` : null}
-                                    </option>
-                                `)}
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Theme</td>
-                            <td>
-                                <select name="theme">
-                                    <option value="">Default Site Theme</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Content</td>
-                            <td>
-                                <textarea class="editor-plain editor-wysiwyg-target" name="content"
-                                    >${this.state.content.content || ''}</textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Switch Editor</td>
-                            <td>
-                                <label>
-                                    <select name="editor">
-                                    ${[
-                                        ['', 'Plain Text / HTML'],
-                                        ['summernote', 'SummerNote'],
-                                        ['jodit', 'Jodit (Image Uploads)'],
-                                        ['trumbowyg', 'Trumbowyg'],
-                                        ['pell', 'Pell'],
-                                        ['froala', 'Froala (Not free)'],
-                                        ['quill', 'Quill (Broken)'],
-                                    ].map(option => `
-                                        <option value="${option[0]}"${option[0] === this.state.editor ? ' selected="selected"' : ''}>${option[1]}</option>
-                                    `)}
-                                    </select>
-                                </label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Revision</td>
-                            <td>
-                                <select name="revision">
-                                    <option value="">Load a revision</option>
-                                ${this.state.history.map(revision => `
-                                    <option value="${revision.id}">${new Date(revision.created).toLocaleString()}</option>
-                                `)}
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Preview</td>
-                            <td>
-                                <label>
-                                    <select name="action">
-                                        <option value="publish">Publish Now (No Preview)</option>
-                                        <option value="draft">Save as Unpublished Draft</option>
-                                    </select>
-                                </label>
-                            </td>
-                        </tr>
-                    </tbody>
-                        <tfoot>
-                            <tr><td colspan="2"><hr/></td></tr>
-                            <tr>
-                                <td style="text-align: right;" colspan="2">
-                                    <a href=":content/${this.state.content.id}">Back to content</a>
-                                    <button type="submit">Publish</button>
-                                </td>
-                            </tr>
-                        </tfoot>
-                </table>
-            </fieldset>
-        </form>`;
-
-        clearTimeout(this.renderEditorTimeout);
-        this.renderEditorTimeout = setTimeout(e => this.renderWYSIWYGEditor(), 100);
     }
 
     loadScripts(scriptPaths, onLoaded) {

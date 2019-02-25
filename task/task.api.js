@@ -1,5 +1,7 @@
 const express = require('express');
+const path = require('path');
 
+const { HTTPServer } = require('../http/http.server');
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeAPI } = require('../theme/theme.api');
 // const { UserAPI } = require('../../user/user.api');
@@ -8,6 +10,7 @@ const { UserDatabase } = require("../user/user.database");
 const { SessionAPI } = require('../session/session.api');
 // TODO: approve all drafts
 
+const DIR_TASK = path.resolve(__dirname);
 
 class TaskAPI {
     constructor() {
@@ -16,7 +19,7 @@ class TaskAPI {
 
     async configure(promptCallback=null) {
         this.tasks = [];
-        await this.addTask(new AdminConfigureTask);
+        await this.addTask('admin-configure', new AdminConfigureTask);
     }
 
 
@@ -33,6 +36,9 @@ class TaskAPI {
         router.get('/[:]task/:taskID/[:]json',        async (req, res) => await this.renderTaskJSON(req.params.taskID || null, req, res));
         router.all('/[:]task(/:taskID)?',             async (req, res) => await this.renderTaskAPI(req.params.taskID || null, req, res));
 
+        // Task Asset files
+        router.get('/[:]task/[:]client/*',                async (req, res, next) => await this.handleTaskStaticFiles(req, res, next));
+
         return (req, res, next) => {
             if(!req.url.startsWith('/:task'))
                 return next();
@@ -40,6 +46,15 @@ class TaskAPI {
         }
     }
 
+    async handleTaskStaticFiles(req, res, next) {
+        const routePrefix = '/:task/:client/';
+        if(!req.url.startsWith(routePrefix))
+            throw new Error("Invalid Route Prefix: " + req.url);
+        const assetPath = req.url.substr(routePrefix.length);
+
+        const staticFile = path.resolve(DIR_TASK + '/client/' + assetPath);
+        HTTPServer.renderStaticFile(staticFile, req, res, next);
+    }
 
     async renderTaskJSON(taskID, req, res) {
         try {
@@ -50,8 +65,8 @@ class TaskAPI {
             const userDB = new UserDatabase(database);
             const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
 
-            const taskList = await TaskAPI.getTasks();
-            const task = TaskAPI.getTask(taskID);
+            const taskList = await this.getTasks();
+            const task = this.getTask(taskID);
             const htmlForm = await task.renderFormHTML(req, taskID, database, sessionUser);
             const taskData = {
                 // taskID: taskID,
@@ -85,20 +100,20 @@ class TaskAPI {
                     const userDB = new UserDatabase(database);
                     const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
 
-                    const taskList = await TaskAPI.getTasks();
+                    const taskList = await this.getTasks();
                     for (let currentTaskID = 0; currentTaskID < taskList.length; currentTaskID++) {
                         if (await taskList[currentTaskID].isActive(database, sessionUser))
-                            activeResponseHTML += `\n\t<service-task-managerform taskID="${currentTaskID}" active="true"></service-task-managerform>`;
+                            activeResponseHTML += `\n\t<task-managerform taskID="${currentTaskID}" active="true"></task-managerform>`;
                         else
-                            inactiveResponseHTML += `\n\t<service-task-managerform taskID="${currentTaskID}"></service-task-managerform>`;
+                            inactiveResponseHTML += `\n\t<task-managerform taskID="${currentTaskID}"></task-managerform>`;
                     }
                 } else {
-                    activeResponseHTML += `\n\t<service-task-managerform taskID="${taskID}" active="true"></service-task-managerform>`;
+                    activeResponseHTML += `\n\t<task-managerform taskID="${taskID}" active="true"></task-managerform>`;
                 }
 
                 const responseHTML = `
 <section>
-    <script src="/task/element/service-task-managerform.element.js"></script>
+    <script src="/:task/:client/task-managerform.element.js"></script>
     ${activeResponseHTML}
     ${inactiveResponseHTML}
 </section>`;
@@ -118,7 +133,7 @@ class TaskAPI {
                     throw new Error("Missing required field: taskID");
                 const taskID = parseInt(req.body.taskID);
 
-                const task = await TaskAPI.getTask(taskID);
+                const task = await this.getTask(taskID);
                 const responseHTML = await task.handleFormSubmit(req, database, sessionUser)
 
                 return res.json({
@@ -141,8 +156,8 @@ class TaskAPI {
     }
 
 
-    async addTask(task) {
-        this.tasks.push(task);
+    async addTask(taskName, taskClass) {
+        this.tasks[taskName] = taskClass;
     }
 
     getTask(taskID) {
@@ -164,7 +179,7 @@ class TaskAPI {
     async getActiveTaskIDs(req) {
         if (!req.session || !req.session.userID)
             return [];
-
+// TODO: REFACTOR!
         if(typeof req.session.activeTaskIDs === 'undefined') {
             const activeTaskIDs = [];
             const database = await DatabaseManager.selectDatabaseByRequest(req);

@@ -75,6 +75,16 @@ class UserAPI {
     }
 
 
+    async handleUserStaticFiles(req, res, next) {
+        const routePrefix = '/:user/:client/';
+        if(!req.url.startsWith(routePrefix))
+            throw new Error("Invalid Route Prefix: " + req.url);
+        const assetPath = req.url.substr(routePrefix.length);
+
+        const staticFile = path.resolve(DIR_USER + '/client/' + assetPath);
+        HTTPServer.renderStaticFile(staticFile, req, res, next);
+    }
+
     addSessionMessage(req, message) {
         if(typeof req.session.messages === 'undefined')
             req.session.messages = [];
@@ -95,6 +105,7 @@ class UserAPI {
             throw new Error("Profile config is missing");
         return JSON.parse(allConfig.user.profile);
     }
+
 
     async updateProfile(req, userID, profile) {
         if(!userID)
@@ -124,7 +135,6 @@ class UserAPI {
         // console.info("SET PROFILE", user, profile);
         // return user;
     }
-
 
     async updateFlags(req, userID, flags) {
         const database = await DatabaseManager.selectDatabaseByRequest(req);
@@ -171,9 +181,14 @@ class UserAPI {
 
 
         if(password_old !== null) {
-            const matches = await bcrypt.compare(password_old, encryptedPassword);
+            // if(password_new === password_old)
+            //     throw new Error("New password must be different from the old");
+            let matches = await bcrypt.compare(password_old, encryptedPassword);
             if(matches !== true)
                 throw new Error("Old password is not correct. Please re-enter");
+            matches = await bcrypt.compare(password_new, encryptedPassword);
+            if(matches === true)
+                throw new Error("New password must be different from the old");
         }
 
         return await userDB.updateUser(user.id, null, password_new, null, null);
@@ -249,6 +264,8 @@ class UserAPI {
         return user;
     }
 
+
+
     async logout(req, res) {
         const database = await DatabaseManager.selectDatabaseByRequest(req);
         const userDB = new UserDatabase(database);
@@ -262,27 +279,16 @@ class UserAPI {
     }
 
 
-
-    async handleUserStaticFiles(req, res, next) {
-        const routePrefix = '/:user/:client/';
-        if(!req.url.startsWith(routePrefix))
-            throw new Error("Invalid Route Prefix: " + req.url);
-        const assetPath = req.url.substr(routePrefix.length);
-
-        const staticFile = path.resolve(DIR_USER + '/client/' + assetPath);
-        HTTPServer.renderStaticFile(staticFile, req, res, next);
-    }
-
-
     async handleLoginRequest(req, res, next) {
         try {
             if(req.method === 'GET') {
+                const userID = UserAPI.sanitizeInput(req.query.userID || null, 'email');
                 // Render Editor Form
                 res.send(
                     await ThemeAPI.get()
                         .render(req, `
 <script src="/:user/:client/user-loginform.element.js"></script>
-<user-loginform></user-loginform>`)
+<user-loginform${userID ? ` userID='${userID}'` : ''}></user-loginform>`)
                 );
 
             } else {
@@ -310,7 +316,7 @@ class UserAPI {
                     await ThemeAPI.get()
                         .render(req, `
 <script src="/:user/:client/user-logoutform.element.js"></script>
-<userform-logout></userform-logout>`)
+<user-logoutform></user-logoutform>`)
                 );
 
             } else {
@@ -337,7 +343,7 @@ class UserAPI {
                     await ThemeAPI.get()
                         .render(req, `
 <script src="/:user/:client/user-registerform.element.js"></script>
-<userform-register></userform-register>`)
+<user-registerform></user-registerform>`)
                 );
 
             } else {
@@ -540,24 +546,24 @@ class UserAPI {
                     let affectedRows = -1;
                     switch(type) {
                         case 'updateprofile':
-                            affectedRows = await this.updateProfile(req, userID, req.body);
+                            affectedRows = await this.updateProfile(req, user.id, req.body);
                             break;
                         case 'updateflags':
                             if(!sessionUser.isAdmin())
                                 throw new Error("Not authorized");
-                            affectedRows = await this.updateFlags(req, userID, req.body);
+                            affectedRows = await this.updateFlags(req, user.id, req.body);
                             break;
                         case 'updatepassword':
                             affectedRows = await this.updatePassword(req,
-                                userID,
-                                sessionUser.isAdmin ? null : req.body.password_old,
+                                user.id,
+                                sessionUser.isAdmin() && sessionUser.id !== user.id ? null : req.body.password_old,
                                 req.body.password_new,
                                 req.body.password_confirm);
                             break;
                         default:
                             throw new Error("Invalid Profile Request: " + type);
                     }
-                    user = await userDB.fetchUserByID(userID);
+                    user = await userDB.fetchUserByID(user.id);
 
                     return res.json({
                         redirect: user.url, // `/:user/${user.id}`,
@@ -582,11 +588,11 @@ class UserAPI {
 <section>
     <script src="/:user/:client/user-browser.element.js"></script>
     <user-browser></user-browser>
-    <script src="/:user/:client/user-addform.element.js"></script>
-    <user-addform></user-addform>
 </section>
 `)
                 );
+            // <script src="/:user/:client/user-addform.element.js"></script>
+            // <user-addform></user-addform>
 
             } else {
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
@@ -635,7 +641,7 @@ class UserAPI {
         return sessionHTML;
     }
 
-    static sanitizeInput(input, type='username') {
+    static sanitizeInput(input, type=null) {
         switch(type) {
             case 'username':
                 input = (input || '').replace(/[^\w._]/g, '');

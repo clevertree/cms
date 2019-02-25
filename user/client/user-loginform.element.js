@@ -75,20 +75,23 @@ document.addEventListener('DOMContentLoaded', function() {
             this.setState({processing: true});
         }
 
-        getFormData(form) {
+        getFormData(form=null) {
+            form = form || this.querySelector('form');
             const formData = {};
             new FormData(form).forEach((value, key) => formData[key] = value);
             return formData;
         }
 
         render() {
+            const formData = this.getFormData();
+            const userID = formData.userID || this.state.userID || null;
             // console.log("STATE", this.state);
             this.innerHTML =
                 `
                 <form action="/:user/:login" method="POST" class="user user-loginform themed">
-                    <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
+                    <fieldset>
                         <legend>Log In</legend>
-                        <table>
+                        <table class="user">
                             <thead>
                                 <tr>
                                     <td colspan="2">
@@ -103,21 +106,21 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr>
                                     <td class="label">Username</td>
                                     <td>
-                                        <input type="text" name="userID" value="${this.state.userID}" required />
+                                        <input type="text" name="userID" value="${userID || ''}" required />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Password</td>
                                     <td>
-                                        <input type="password" name="password" value="" required />
+                                        <input type="password" name="password" value="${formData.password || ''}" required />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Stay Logged In</td>
                                     <td>
-                                        <input type="checkbox" name="session_save" ${this.state.session_save ? 'checked="checked"' : ''} value="1"/>
+                                        <input type="checkbox" name="session_save" ${formData.session_save || this.state.session_save ? 'checked="checked"' : ''} value="1"/>
                                         <div style="float: right">
-                                            <a href=":user/:forgotpassword${this.state.userID ? '?userID=' + this.state.userID : ''}">Forgot Password?</a>
+                                            <a href=":user/:forgotpassword${userID ? '?userID=' + userID : ''}">Forgot Password?</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -126,10 +129,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td>
-                                        <a href=":user/:register${this.state.userID ? '?userID=' + this.state.userID : ''}">Register</a>
+                                        <a href=":user/:register${userID ? '?userID=' + userID : ''}">Register</a>
                                     </td>
                                     <td style="text-align: right;">
-                                        <button type="submit">Log In</button>
+                                        <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Log In</button>
                                     </td>
                                 </tr>
                             </tfoot>

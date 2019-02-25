@@ -1,11 +1,15 @@
 const express = require('express');
+const path = require('path');
 
+const { HTTPServer } = require('../http/http.server');
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeAPI } = require('../theme/theme.api');
 const { ConfigDatabase } = require("./config.database");
 const { UserDatabase } = require("../user/user.database");
 const { UserAPI } = require('../user/user.api');
 const { SessionAPI } = require('../session/session.api');
+
+const DIR_CONFIG = path.resolve(__dirname);
 
 class ConfigAPI {
     constructor() {
@@ -24,11 +28,25 @@ class ConfigAPI {
         router.get('/[:]config/[:]json',                    async (req, res) => await this.renderConfigJSON(req, res));
         router.all('/[:]config(/[:]edit)?',                 async (req, res) => await this.renderConfigEditor(req, res));
 
+        // User Asset files
+        router.get('/[:]config/[:]client/*',                async (req, res, next) => await this.handleConfigStaticFiles(req, res, next));
+
+
         return (req, res, next) => {
             if(!req.url.startsWith('/:config'))
                 return next();
             return router(req, res, next);
         }
+    }
+
+    async handleConfigStaticFiles(req, res, next) {
+        const routePrefix = '/:config/:client/';
+        if(!req.url.startsWith(routePrefix))
+            throw new Error("Invalid Route Prefix: " + req.url);
+        const assetPath = req.url.substr(routePrefix.length);
+
+        const staticFile = path.resolve(DIR_CONFIG + '/client/' + assetPath);
+        HTTPServer.renderStaticFile(staticFile, req, res, next);
     }
 
     async renderConfigJSON(req, res) {
@@ -56,48 +74,56 @@ class ConfigAPI {
 
     async renderConfigEditor(req, res) {
         try {
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const userDB = new UserDatabase(database);
+            const configDB = new ConfigDatabase(database);
+            const configList = await configDB.selectAllConfigValues();
+            const configValues = configDB.parseConfigValues(configList);
 
-            if (req.method === 'GET') {
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `
+            const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+
+            switch(req.method) {
+                case 'GET':
+                    res.send(
+                        await ThemeAPI.get()
+                            .render(req, `
 <section>
-    <script src="/service/confige/config/element/config-editorform.element.js"></script>
+    <script src="/:config/:client/config-editorform.element.js"></script>
     <config-editorform></config-editorform>
 </section>
 `)
-                );
+                    );
+                    break;
 
-            } else {
-                // Handle POST
-                const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = new UserDatabase(database);
-                const configDB = new ConfigDatabase(database);
+                case 'OPTIONS':
 
-                const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
-                if(!sessionUser || !sessionUser.isAdmin())
-                    throw new Error("Not authorized");
+                    return res.json({
+                        message: `${configList.length} Config${configList.length !== 1 ? 's' : ''} queried successfully`,
+                        editable: !!sessionUser && sessionUser.isAdmin(),
+                        config: configValues,
+                        configList,
+                    });
 
-                let configChanges = req.body, configUpdateList=[];
-                for(let configName in configChanges) {
-                    if(configChanges.hasOwnProperty(configName)) {
-                        const configEntry = await configDB.fetchConfigValue(configName)
-                        if(!configEntry)
-                            throw new Error("Config entry not found: " + configName);
-                        if(configChanges[configName] !== configEntry)
-                            configUpdateList.push([configName, configChanges[configName]])
+                case 'POST':
+                    if(!sessionUser || !sessionUser.isAdmin())
+                        throw new Error("Not authorized");
+
+                    // Handle POST
+                    const database = await DatabaseManager.selectDatabaseByRequest(req);
+                    const configDB = new ConfigDatabase(database);
+                    let affectedRows = 0;
+                    for(let i=0; i<configList.length; i++) {
+                        const configName = configList[i].name;
+                        if(typeof req.body[configName] !== 'undefined' && req.body[configName] !== configList[i].value) {
+                            affectedRows += await configDB.updateConfigValue(configName, req.body[configName])
+                        }
                     }
-                }
-                for(let i=0; i<configUpdateList.length; i++) {
-                    await configDB.updateConfigValue(configUpdateList[i][0], configUpdateList[i][1])
-                }
 
-
-                const configList = await configDB.selectConfigValues('1');
-                return res.json({
-                    message: `<div class='success'>${configUpdateList.length} Config${configUpdateList.length !== 1 ? 's' : ''} updated successfully</div>`,
-                    configList
-                });
+                    return res.json({
+                        message: `<div class='success'>${affectedRows.length} config setting${affectedRows.length !== 1 ? 's' : ''} updated successfully</div>`,
+                        affectedRows,
+                        configList
+                    });
             }
         } catch (error) {
             await this.renderError(error, req, res);

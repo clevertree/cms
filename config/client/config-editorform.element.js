@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("config/element/config.css");
+    })(":config/:client/config.css");
 });
 
 
@@ -12,8 +12,10 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         this.state = {
             search: "",
             configList: [],
-            status: null,
+            status: 0,
             message: null,
+            editable: false,
+            processing: false,
         };
         // this.state = {id:-1, flags:[]};
     }
@@ -48,6 +50,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
     }
 
     onChange(e) {
+        // TODO: only send configs that have been changed
         console.log(this.state);
         this.checkSubmittable(e);
     }
@@ -83,17 +86,36 @@ class HTMLConfigFormEditorElement extends HTMLElement {
 
 
     requestFormData() {
+        const form = this.querySelector('form');
         const xhr = new XMLHttpRequest();
         xhr.onload = () => {
-            this.setState(Object.assign({
-                processing: false,
-                status: xhr.status,
-            }, xhr.response));
+            this.setState({processing: false}, xhr.response);
         };
         xhr.responseType = 'json';
-        xhr.open ("GET", `:config/:json?getAll=true`, true);
-        // xhr.setRequestHeader("Accept", "application/json");
+        xhr.open ('OPTIONS', form.getAttribute('action'), true);
         xhr.send ();
+        this.setState({processing: true});
+    }
+
+    onSubmit(e) {
+        e.preventDefault();
+        const form = e.target;
+        const request = this.getFormData(form);
+
+        const xhr = new XMLHttpRequest();
+        xhr.onload = (e) => {
+            const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+            this.setState({processing: false, status: xhr.status}, response);
+            if(xhr.status === 200) {
+                this.onSuccess(e, response);
+            } else {
+                this.onError(e, response);
+            }
+        };
+        xhr.open('POST', form.getAttribute('action'), true);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.responseType = 'json';
+        xhr.send(JSON.stringify(request));
         this.setState({processing: true});
     }
 
@@ -104,43 +126,24 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         return formData;
     }
 
-    onSubmit(e) {
-        if(e) e.preventDefault();
-        const form = e ? e.target : this.querySelector('form');
-        const request = this.getFormData(form);
-        const method = form.getAttribute('method');
-        const action = form.getAttribute('action');
-
-        const xhr = new XMLHttpRequest();
-        xhr.onload = (e) => {
-            const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-            this.setState({status: xhr.status, processing: false}, response);
-            if(xhr.status === 200) {
-                this.onSuccess(e, response);
-            } else {
-                this.onError(e, response);
-            }
-        };
-        xhr.open(method, action, true);
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhr.responseType = 'json';
-        xhr.send(JSON.stringify(request));
-        this.setState({processing: true});
-    }
 
     render() {
-        const form = this.querySelector('form');
         console.log("RENDER", this.state);
         let searchField = this.querySelector('input#search');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
         `<form action="/:config/:edit" method="POST" class="config config-editorform themed">
-            <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
+            <fieldset ${!this.state.editable || this.state.processing ? 'disabled="disabled"' : null}>
                 <table class="config">
                     <thead>
                         <tr>
                             <td colspan="4">
                                 <input type="text" id="search" placeholder="Search Configs" value="${searchField ? searchField.value||'' : ''}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="status">
+                                <div class="message">Config Editor</div> 
                             </td>
                         </tr>
                         <tr><td colspan="4"><hr/></td></tr>
@@ -161,11 +164,6 @@ class HTMLConfigFormEditorElement extends HTMLElement {
                                 <button type="submit" disabled>Update Config</button>
                             </td>
                         </tr>
-                        <tr>
-                            <td colspan="4" class="status">
-                                <div class="message">Config Editor</div> 
-                            </td>
-                        </tr>
                     </tfoot>
                 </table>
             </fieldset>
@@ -184,14 +182,14 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         const resultsElement = this.querySelector('tbody.results');
         let classOdd = '';
         const search = form ? form.search.value : null;
-        resultsElement.innerHTML = this.state.configList
+        const results = this.state.configList
             .filter(config => !search || config.name.indexOf(search) !== -1)
-            .map(config => this.renderConfig(form, config, classOdd=classOdd===''?'odd':'')).join('');
+        resultsElement.innerHTML = results
+            .map(config => this.renderConfig(form, config, classOdd=classOdd===''?'odd':''))
+            .join('');
 
         const statusElement = this.querySelector('td.status');
-        statusElement.innerHTML = this.state.message
-            ? `<div class="${this.state.status === 200 ? 'message' : 'error'}">${this.state.message}</div>`
-            : `<div class="message">Config Editor</div>`;
+        statusElement.innerHTML = `<div class="message">${results.length} config setting${results.length===1?'':'s'} displayed</div>`;
     }
 
     renderConfig(form, config, trClass='') {

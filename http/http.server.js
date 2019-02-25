@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+const etag = require('etag')
 // var qs = require('qs');
 // var parseUrl = require('parseurl');
 
@@ -195,23 +196,65 @@ class HTTPServer {
 
         fs.exists(filePath, function (exist) {
             if(!exist) {
-                // if the file is not found, return 404
-                res.statusCode = 404;
-                res.end(`File ${req.url} not found!`);
-                return;
+                return next();
+                // // if the file is not found, return 404
+                // res.statusCode = 404;
+                // res.end(`File ${req.url} not found!`);
+                // return;
             }
 
-            // read file from file system
-            fs.readFile(filePath, function(err, data){
-                if(err){
-                    res.statusCode = 500;
-                    res.end(`Error reading file: ${err}.`);
-                } else {
-                    // if the file is found, set Content-type and send data
-                    res.setHeader('Content-type', mapMimeTypes[ext] || 'text/plain' );
-                    res.end(data);
+            fs.stat(filePath, function(err, stats) {
+
+
+                //check if if-modified-since header is the same as the mtime of the file
+                if (req.headers["if-modified-since"]) {
+                    //Get the if-modified-since header from the request
+                    const reqModDate = new Date(req.headers["if-modified-since"]);
+                    if (reqModDate.getTime() === stats.mtime.getTime()) {
+                        //Yes: then send a 304 header without image data (will be loaded by cache)
+                        res.writeHead(304, {
+                            "Last-Modified": stats.mtime.toUTCString()
+                        });
+
+                        res.end();
+                        return true;
+                    }
                 }
+
+
+                fs.readFile(filePath, function(err, data){
+                    if(err){
+                        res.statusCode = 500;
+                        res.end(`Error reading file: ${err}.`);
+                    } else {
+                        // if the file is found, set Content-type and send data
+                        // TODO: if-modified-since
+                        // res.setHeader("Expires", new Date(Date.now() + 1000 * 60 * 60 * 24).toUTCString()); // Static files deserve long term caching
+
+                        const newETAG = etag(data);
+
+                        //check if if-modified-since header is the same as the mtime of the file
+                        if (req.headers["if-none-match"]) {
+                            //Get the if-modified-since header from the request
+                            const oldETAG = req.headers["if-none-match"];
+                            if (oldETAG === newETAG) {
+                                //Yes: then send a 304 header without image data (will be loaded by cache)
+                                res.writeHead(304, {
+                                    "Last-Modified": stats.mtime.toUTCString()
+                                });
+
+                                res.end();
+                                return true;
+                            }
+                        }
+
+                        res.setHeader('Content-type', mapMimeTypes[ext] || 'text/plain' );
+                        res.setHeader('ETag', newETAG);
+                        res.end(data);
+                    }
+                });
             });
+
         });
     }
 

@@ -32,7 +32,7 @@ class HTMLContentDeleteFormElement extends HTMLElement {
 
         const contentID = this.getAttribute('id');
         if(contentID) {
-            this.setState({content: {id: contentID}, mode: 'edit'});
+            this.setState({content: {id: contentID}});
         }
 
         this.render();
@@ -59,53 +59,40 @@ class HTMLContentDeleteFormElement extends HTMLElement {
     }
 
 
+
     requestFormData() {
+        const form = this.querySelector('form');
         const xhr = new XMLHttpRequest();
         xhr.onload = () => {
-            // console.info(xhr.response);
-            if(!xhr.response || !xhr.response.content)
-                throw new Error("Invalid Response");
             this.setState({processing: false}, xhr.response);
-            // this.state = xhr.response.user;
-            // this.render();
         };
         xhr.responseType = 'json';
-        let params = 'getAll=true';
-        if(this.state.revisionID)
-            params += `&r=${this.state.revisionID}`;
-        params += '&t=' + new Date().getTime();
-        xhr.open ("GET", `:content/${this.state.content.id}/:json?${params}`, true);
-        // xhr.setRequestHeader("Accept", "application/json");
+        xhr.open ('OPTIONS', form.getAttribute('action'), true);
         xhr.send ();
         this.setState({processing: true});
     }
 
     onSubmit(e) {
-        if(e) e.preventDefault();
-        const form = e ? e.target : this.querySelector('form');
+        e.preventDefault();
+        const form = e.target;
         const request = this.getFormData(form);
-        const method = form.getAttribute('method');
-        const action = form.getAttribute('action');
 
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
             const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-            this.setState({status: xhr.status, processing: false}, response);
+            this.setState({processing: false, status: xhr.status}, response);
             if(xhr.status === 200) {
                 this.onSuccess(e, response);
             } else {
                 this.onError(e, response);
             }
         };
-        xhr.open(method, action, true);
+        xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.responseType = 'json';
-        if(!confirm("Are you sure you want to delete content #" + this.state.content.id + "?"))
-            throw new Error("Submit canceled");
         xhr.send(JSON.stringify(request));
         this.setState({processing: true});
     }
-
 
     getFormData(form) {
         form = form || this.querySelector('form');
@@ -113,24 +100,19 @@ class HTMLContentDeleteFormElement extends HTMLElement {
         new FormData(form).forEach((value, key) => formData[key] = value);
         return formData;
     }
-    render() {
-        // const formData = this.getFormData();
-        let action = `/:content/${this.state.content.id}/:delete`;
-        let message = `Delete content ID ${this.state.content.id}?`;
-        if(this.state.message)
-            message = this.state.message;
 
+    render() {
         console.log("RENDER", this.state);
         this.innerHTML =
-            `<form action="${action}" method="POST" class="content content-delete themed">
+            `<form action="/:content/${this.state.content.id}/:delete" method="POST" class="content content-delete themed">
             <input type="hidden" name="id" value="${this.state.content.id}" />
-            <fieldset ${!this.state.editable ? 'disabled="disabled"' : ''}>
+            <fieldset>
                 <table class="content">
                     <thead>
                         <tr>
                             <td colspan="2">
                             <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                                ${message}
+                                ${this.state.message}
                             </div>
                             </td>
                         </tr>
@@ -161,7 +143,7 @@ class HTMLContentDeleteFormElement extends HTMLElement {
                         <tr>
                             <td style="text-align: right;" colspan="2">
                                 <a href=":content/${this.state.content.id}">Back to content</a>
-                                <button type="submit">Delete Content</button>
+                                <button type="submit" ${!this.state.editable ? 'disabled="disabled"' : ''}>Delete Content</button>
                             </td>
                         </tr>
                     </tfoot>
