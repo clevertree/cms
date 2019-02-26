@@ -118,7 +118,6 @@ class HTTPServer {
         this.httpServer = require('http').createServer(appHTTP).listen(this.config.httpPort, () => {
             console.log(`HTTP listening on port ${this.config.httpPort}`);
         });
-        this.httpServer.on('error', (e) => console.log(e) );
 
         if (this.config.sslEnable) {
 
@@ -126,7 +125,6 @@ class HTTPServer {
             this.sslServer = require('https').createServer(this.greenlock.tlsOptions, appSSL).listen(this.config.sslPort, () => {
                 console.log(`HTTPS listening on port ${this.config.sslPort}`);
             });
-            this.sslServer.on('error', (e) => console.log(e));
 
             appSSL.use(appMiddleware);
             appHTTP.use(this.greenlock.middleware());

@@ -76,8 +76,8 @@ class TaskAPI {
                     break;
 
                 case 'OPTIONS':
-                    if(!sessionUser)
-                        throw new Error("Must be logged in");
+                    // if(!sessionUser)
+                    //     throw new Error("Must be logged in");
 
 // render all forms to minimize user interaction, organize by priority value
                     let taskForms = {};

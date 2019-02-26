@@ -180,6 +180,8 @@ class DatabaseManager {
         if(this.multiDomain && req) {
             // const parse = require('url').parse(req.url);
             let hostname = req.get ? req.get('host') : req.headers.host;
+            if(!hostname)
+                throw new Error("Host name is required for multi-domain serving");
             hostname = hostname.split(':')[0];
             if(typeof this.cacheHostname[hostname] !== "undefined")
                 return this.cacheHostname[hostname];

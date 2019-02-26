@@ -24,10 +24,10 @@ class DNSManager {
             matches = regEmail.exec(redirectResponse);
             if(matches)
                 return matches[1];
-            console.log("Redirect URL detected, but captcha might be required:\n", redirectURL);
+            throw new Error("Redirect URL detected, but captcha might be required:\n" + redirectURL);
         }
 
-        return null;
+        throw new Error("No admin email found in WHOIS Information for: " + hostname);
     }
 
     async queryWHOISData(hostname) {

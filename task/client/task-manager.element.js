@@ -166,7 +166,7 @@ class HTMLTaskFormManagerElement extends HTMLElement {
 
 
         const statusElement = this.querySelector('td.status');
-        statusElement.innerHTML = `<div class="message">${resultCount} task setting${resultCount===1?'':'s'} displayed</div>`;
+        statusElement.innerHTML = `<div class="message">${resultCount} available task${resultCount===1?'':'s'} displayed</div>`;
     }
 
 }

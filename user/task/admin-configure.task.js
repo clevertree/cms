@@ -1,50 +1,42 @@
 // TODO: approve all drafts
 
+const { DNSManager } = require('../../domain/dns.manager');
 const { UserDatabase } = require('../user.database');
 
 class AdminConfigureTask {
     constructor(taskName, database) {
         this.database = database;
         this.taskName = taskName;
-        this.dbMissingAdmin = {};
     }
 
     async isActive(sessionUser) {
-        return !!sessionUser;
+        // if(!sessionUser)
+        //     return false;
+        // if(sessionUser.isAdmin())
+        //     return false;
 
-        if(typeof this.dbMissingAdmin[database] !== 'undefined') {
-            return this.dbMissingAdmin[database];
-        }
-
-        if(sessionUser.isAdmin()) {
-            this.dbMissingAdmin[database] = false;
-            return false;
-        }
-
-        const userDB = new UserDatabase(database);
+        const userDB = new UserDatabase(this.database);
         let adminUser = await userDB.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
         if(adminUser) {
-            console.log(`Admin User Found [DB: ${database}]: `, adminUser);
-            this.dbMissingAdmin[database] = false;
-
-        } else {
-            console.warn(`Admin User Not Found in ${database}`);
-            this.dbMissingAdmin[database] = true;
+            // console.log(`Admin User Found [DB: ${this.database}]: `, adminUser);
+            return false;
         }
-        return this.dbMissingAdmin[database];
+        // console.warn(`Admin User Not Found in ${this.database}`);
+        return true;
     }
 
     async handleFormSubmit(req, sessionUser) {
+        if(!(await this.isActive(sessionUser)))
+            throw new Error("This task is not active");
 
         const hostname = req.get ? req.get('host') : req.headers.host;
         console.info("Querying WHOIS for admin email: " + hostname);
         let dnsAdminEmail = await DNSManager.queryDNSAdmin(hostname);
-        if (dnsAdminEmail) {
             // dnsAdminEmail.split('@')[0]
-            adminUser = await this.createUser('admin', dnsAdminEmail, null, 'admin');
-            console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
-            // TODO: send email;
-        }
+        const userDB = new UserDatabase(this.database);
+        const adminUser = await userDB.createUser('admin', dnsAdminEmail, null, 'admin');
+        console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
+        // TODO: send email;
     }
 
     async renderFormHTML(req, sessionUser) {
