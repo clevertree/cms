@@ -11,7 +11,7 @@ class HTMLTaskFormManagerElement extends HTMLElement {
         super();
         this.state = {
             taskName: null,
-            message: "No tasks available",
+            message: "Loading available tasks...",
             status: 0,
             taskData: [],
             taskForms: {}
@@ -30,6 +30,7 @@ class HTMLTaskFormManagerElement extends HTMLElement {
     connectedCallback() {
         this.addEventListener('change', e => this.onChange(e));
         this.addEventListener('submit', e => this.onSubmit(e));
+        this.addEventListener('keyup', e => this.onKeyUp(e));
 
         const taskName = this.getAttribute('taskName');
         if(taskName)
@@ -39,6 +40,10 @@ class HTMLTaskFormManagerElement extends HTMLElement {
 
 
     onSuccess(e, response) {
+        if(response.result) {
+            this.state.taskForms[response.result.taskName] = response.result.taskForm;
+            this.render();
+        }
         console.log(response);
         if(response.redirect) {
             this.setState({processing: true});
@@ -57,12 +62,22 @@ class HTMLTaskFormManagerElement extends HTMLElement {
             this.state.user.profile[e.target.name] = e.target.value;
     }
 
+    onKeyUp(e) {
+        // this.requestFormData(e);
+        if(e.target.id === 'search') {
+            this.state.search = e.target.value;
+            this.renderResults();
+        }
+    }
+
+
     requestFormData() {
         // const form = this.querySelector('form');
         const action = '/:task' + (this.state.taskName ? '/' + this.state.taskName : '');
         const xhr = new XMLHttpRequest();
         xhr.onload = () => {
-            this.setState({processing: false}, xhr.response);
+            const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+            this.setState({processing: false, status: xhr.status}, response);
         };
         xhr.responseType = 'json';
         xhr.open ('OPTIONS', action, true);
@@ -100,9 +115,59 @@ class HTMLTaskFormManagerElement extends HTMLElement {
     }
 
     render() {
-        console.log("STATE", this.state);
-        this.innerHTML = Object.values(this.state.taskForms).join('');
+        console.log("RENDER", this.state);
+        let searchField = this.querySelector('input#search');
+        const selectionStart = searchField ? searchField.selectionStart : null;
+        this.innerHTML =
+            `<form action="#" class="task task-editor themed">
+                <fieldset>
+                    <table class="task">
+                        <thead>
+                            <tr>
+                                <td>
+                                    <input type="text" id="search" placeholder="Search Tasks" value="${searchField ? searchField.value||'' : ''}"/>
+                                </td>
+                                <td class="status">
+                                    <div class="message">Task Editor</div> 
+                                </td>
+                            </tr>
+                        </thead>
+                    </table>
+                </fieldset>
+            </form>
+            <ul class="results"></ul>
+`;
+        searchField = this.querySelector('input#search');
+        searchField.focus();
+        if(selectionStart)
+            searchField.selectionStart = selectionStart;
+        this.renderResults();
+    }
+
+    renderResults() {
+        const form = this.querySelector('form');
+        // const formData = this.getFormData();
+        const resultsElement = this.querySelector('ul.results');
+        let classOdd = '';
+        const search = form ? form.search.value : null;
+        let resultHTML = '', resultCount = 0;
+        for(let taskName in this.state.taskForms) {
+            if(this.state.taskForms.hasOwnProperty(taskName)) {
+                if(!search || taskName.indexOf(search) !== -1) {
+                    resultHTML += `<li class="${classOdd=classOdd===''?'odd':''}">
+                        ${this.state.taskForms[taskName]}
+                    </li>`;
+                    resultCount++;
+                }
+            }
+        }
+
+        resultsElement.innerHTML = resultHTML;
+
+
+        const statusElement = this.querySelector('td.status');
+        statusElement.innerHTML = `<div class="message">${resultCount} task setting${resultCount===1?'':'s'} displayed</div>`;
     }
 
 }
-customElements.define('task-managerform', HTMLTaskFormManagerElement);
+customElements.define('task-manager', HTMLTaskFormManagerElement);

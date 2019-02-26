@@ -15,7 +15,7 @@ class HTMLContentEditorFormElement extends HTMLElement {
             processing: false,
             mode: null,
             revisionID: null,
-            editor: sessionStorage.getItem("content-editorform:editor"),
+            editor: sessionStorage.getItem("content-editor:editor"),
             content: {id: -1},
             revision: {},
             history: [],
@@ -83,7 +83,7 @@ class HTMLContentEditorFormElement extends HTMLElement {
                 break;
             case 'editor':
                 this.state.editor = e.target.value;
-                sessionStorage.setItem("content-editorform:editor",this.state.editor);
+                sessionStorage.setItem("content-editor:editor",this.state.editor);
                 this.renderWYSIWYGEditor();
                 break;
             case 'title':
@@ -163,7 +163,7 @@ class HTMLContentEditorFormElement extends HTMLElement {
 
         console.log("RENDER", this.state);
         this.innerHTML =
-            `<form action="${action}" method="POST" class="content content-editorform themed">
+            `<form action="${action}" method="POST" class="content content-editor themed">
             <input type="hidden" name="id" value="${this.state.content.id}" />
             <fieldset>
                 <table class="content">
@@ -678,4 +678,4 @@ class HTMLContentEditorFormElement extends HTMLElement {
     }
 
 }
-customElements.define('content-editorform', HTMLContentEditorFormElement);
+customElements.define('content-editor', HTMLContentEditorFormElement);

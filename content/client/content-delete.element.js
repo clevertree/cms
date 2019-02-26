@@ -152,4 +152,4 @@ class HTMLContentDeleteFormElement extends HTMLElement {
         </form>`;
     }
 }
-customElements.define('content-deleteform', HTMLContentDeleteFormElement);
+customElements.define('content-delete', HTMLContentDeleteFormElement);

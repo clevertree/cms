@@ -88,8 +88,8 @@ class ConfigAPI {
                         await ThemeAPI.get()
                             .render(req, `
 <section>
-    <script src="/:config/:client/config-editorform.element.js"></script>
-    <config-editorform></config-editorform>
+    <script src="/:config/:client/config-editor.element.js"></script>
+    <config-editor></config-editor>
 </section>
 `)
                     );

@@ -287,7 +287,7 @@ class UserAPI {
                 res.send(
                     await ThemeAPI.get()
                         .render(req, `
-<script src="/:user/:client/user-loginform.element.js"></script>
+<script src="/:user/:client/user-login.element.js"></script>
 <user-loginform${userID ? ` userID='${userID}'` : ''}></user-loginform>`)
                 );
 
@@ -315,7 +315,7 @@ class UserAPI {
                 res.send(
                     await ThemeAPI.get()
                         .render(req, `
-<script src="/:user/:client/user-logoutform.element.js"></script>
+<script src="/:user/:client/user-logout.element.js"></script>
 <user-logoutform></user-logoutform>`)
                 );
 
@@ -342,7 +342,7 @@ class UserAPI {
                 res.send(
                     await ThemeAPI.get()
                         .render(req, `
-<script src="/:user/:client/user-registerform.element.js"></script>
+<script src="/:user/:client/user-register.element.js"></script>
 <user-registerform></user-registerform>`)
                 );
 
@@ -382,7 +382,7 @@ class UserAPI {
                 res.send(
                     await ThemeAPI.get()
                         .render(req, `
-<script src="/:user/:client/user-forgotpasswordform.element.js"></script>
+<script src="/:user/:client/user-forgotpassword.element.js"></script>
 <user-forgotpasswordform src="${user.url}"></user-forgotpasswordform>`)
                 );
 
@@ -440,7 +440,7 @@ class UserAPI {
                 res.send(
                     await ThemeAPI.get()
                         .render(req, `
-<script src="/:user/:client/user-changepasswordform.element.js"></script>
+<script src="/:user/:client/user-changepassword.element.js"></script>
 <user-changepasswordform uuid="${uuid}" src="${user.url}" username="${user.username}"></user-changepasswordform>`)
                 );
 
@@ -486,18 +486,18 @@ class UserAPI {
                         res.send(
                             await ThemeAPI.get()
                                 .render(req, `
-<script src="/:user/:client/user-updateprofileform.element.js"></script>
+<script src="/:user/:client/user-updateprofile.element.js"></script>
 <user-updateprofileform src="${user.url}"></user-updateprofileform>
-<script src="/:user/:client/user-updatepasswordform.element.js"></script>
+<script src="/:user/:client/user-updatepassword.element.js"></script>
 <user-updatepasswordform src="${user.url}"></user-updatepasswordform>
-<script src="/:user/:client/user-updateflagsform.element.js"></script>
+<script src="/:user/:client/user-updateflags.element.js"></script>
 <user-updateflagsform src="${user.url}"></user-updateflagsform>`)
                         );
                     } else {
                         res.send(
                             await ThemeAPI.get()
                                 .render(req, `
-<script src="/:user/:client/user-${type}form.element.js"></script>
+<script src="/:user/:client/user-${type}.element.js"></script>
 <user-${type}form src="${user.url}"></user-${type}form>`)
                         );
                     }
@@ -591,7 +591,7 @@ class UserAPI {
 </section>
 `)
                 );
-            // <script src="/:user/:client/user-addform.element.js"></script>
+            // <script src="/:user/:client/user-add.element.js"></script>
             // <user-addform></user-addform>
 
             } else {

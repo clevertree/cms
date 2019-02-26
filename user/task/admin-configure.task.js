@@ -44,7 +44,7 @@ class AdminConfigureTask {
         return `
             <form action="/:task/${taskName}" method="POST" class="task task-admin-configure themed">
                 <input type="hidden" name="taskName" value="${taskName}" />
-                <fieldset ${!isActive ? 'disabled="disabled"' : null}>
+                <fieldset>
                     <table>
                         <thead>
                             <td colspan="2">

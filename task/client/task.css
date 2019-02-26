@@ -1,16 +1,16 @@
-form.taskform {
+form.task {
     max-width: 620px;
 }
 
-form.taskform > fieldset {
+form.task > fieldset {
     margin: 0px auto;
 }
 
-form.taskform > fieldset > table {
+form.task > fieldset > table {
     width: 100%;
     border-collapse: collapse;
 }
-form.taskform > fieldset > table > caption {
+form.task > fieldset > table > caption {
     /* font-weight: bold; */
     /*font-style: italic;*/
     text-align: left;
@@ -18,29 +18,29 @@ form.taskform > fieldset > table > caption {
 }
 /** Form Input **/
 
-form.taskform input[type=text],
-form.taskform input[type=email],
-form.taskform input[type=password],
-form.taskform select,
-form.taskform textarea {
+form.task input[type=text],
+form.task input[type=email],
+form.task input[type=password],
+form.task select,
+form.task textarea {
     min-width: 90%;
 }
 
 /** Form Actions **/
 
-form.taskform .action-edit {
+form.task .action-edit {
     font-size: x-small;
     text-decoration: none;
 }
 
 /** Row **/
-form.taskform tr.odd {
+form.task tr.odd {
     background-color: #0001;
 }
 
 /** Labels **/
 
-form.taskform td.label {
+form.task td.label {
     text-align: right;
     padding: 8px 8px 8px 0px;
     font-weight: bold;
@@ -48,13 +48,51 @@ form.taskform td.label {
     display: block;
     min-width: 90%;
 }
-form.taskform td.label:after {
+form.task td.label:after {
     content: ':'
 }
 
 
 /** Custom Forms **/
 
-form.taskform-register {
+form.task-register {
     /*text-align: center;*/
+}
+
+
+/** Tables **/
+
+table.task {
+    width: 100%;
+}
+
+table.task .icon-edit {
+    text-decoration: none;
+}
+
+/** Row **/
+table.task tr.odd {
+    background-color: #0001;
+}
+
+/** Labels **/
+
+table.task td.label {
+    text-align: right;
+    padding: 8px 8px 8px 0px;
+    font-weight: bold;
+    white-space: nowrap;
+    display: block;
+    min-width: 90%;
+}
+table.task td.label:after {
+    content: ':'
+}
+
+
+
+/** Task List **/
+task-manager ul.results {
+    list-style: none;
+    padding: 0 0;
 }

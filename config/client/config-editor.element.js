@@ -132,7 +132,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         let searchField = this.querySelector('input#search');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
-        `<form action="/:config/:edit" method="POST" class="config config-editorform themed">
+        `<form action="/:config/:edit" method="POST" class="config config-editor themed">
             <fieldset ${!this.state.editable || this.state.processing ? 'disabled="disabled"' : null}>
                 <table class="config">
                     <thead>
@@ -225,4 +225,4 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         }
     }
 }
-customElements.define('config-editorform', HTMLConfigFormEditorElement);
+customElements.define('config-editor', HTMLConfigFormEditorElement);

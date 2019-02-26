@@ -69,8 +69,8 @@ class TaskAPI {
                     res.send(
                         await ThemeAPI.get()
                             .render(req, `<section>
-        <script src="/:task/:client/task-managerform.element.js"></script>
-        <task-managerform ${taskName ? `taskName="${taskName}` : ''}></task-managerform>
+        <script src="/:task/:client/task-manager.element.js"></script>
+        <task-manager ${taskName ? `taskName="${taskName}` : ''}></task-manager>
     </section>`)
                     );
                     break;
@@ -79,7 +79,7 @@ class TaskAPI {
                     if(!sessionUser)
                         throw new Error("Must be logged in");
 
-// render all forms to minimize user interaction
+// render all forms to minimize user interaction, organize by priority value
                     let taskForms = {};
                     let taskCount = 0;
                     if (!taskName) {
@@ -113,14 +113,20 @@ class TaskAPI {
                     //     throw new Error("Missing required field: taskName");
                     // const taskName = parseInt(req.body.taskName);
 
+                    if(!taskName)
+                        throw new Error("Missing required field: taskName");
                     if(!this.tasks[taskName])
                         throw new Error("Task not found: " + taskName);
                     const task = this.tasks[taskName];
-                    await task.handleFormSubmit(req, database, sessionUser)
+                    await task.handleFormSubmit(req, database, sessionUser);
+                    const resultTaskForm = await task.renderFormHTML(req, taskName, database, sessionUser);
 
                     return res.json({
-                        message: `<div class='success'>${activeTasks.length} Task${activeTasks.length !== 1 ? 's' : ''} updated successfully</div>`,
-                        activeTasks
+                        message: `<div class='success'>Task '${taskName}' has been run successfully</div>`,
+                        result: {
+                            taskName,
+                            taskForm: resultTaskForm
+                        }
                     });
             }
         } catch (error) {

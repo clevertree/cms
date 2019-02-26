@@ -163,8 +163,8 @@ class ContentApi {
                     res.send(
                         await ThemeAPI.get(content.theme)
                             .render(req, `<section style="max-width: 1600px;">
-                <script src="/:content/:client/content-editorform.element.js"></script>
-                <content-editorform id="${req.params.id}"></content-editorform>
+                <script src="/:content/:client/content-editor.element.js"></script>
+                <content-editor id="${req.params.id}"></content-editor>
             </section>
             <section class="content-preview-container">
                 <h1 style="text-align: center;">Preview</h1>
@@ -277,8 +277,8 @@ class ContentApi {
                 res.send(
                     await ThemeAPI.get(content.theme)
                         .render(req, `<section style="max-width: 1600px;">
-                <script src="/:content/:client/content-deleteform.element.js"></script>
-                <content-deleteform id="${req.params.id}"></content-editorform>
+                <script src="/:content/:client/content-delete.element.js"></script>
+                <content-delete id="${req.params.id}"></content-editor>
             </section>`)
                 );
                     break;
@@ -336,7 +336,7 @@ class ContentApi {
                 res.send(
                     await ThemeAPI.get()
                         .render(req, `<section>
-                <script src="/:content/:client/content-addform.element.js"></script>
+                <script src="/:content/:client/content-add.element.js"></script>
                 <content-addform></content-addform>
             </section>
 `)
@@ -381,7 +381,7 @@ class ContentApi {
                         .render(req, `<section>
                 <script src="/:content/:client/content-browser.element.js"></script>
                 <content-browser></content-browser>
-                <script src="/:content/:client/content-addform.element.js"></script>
+                <script src="/:content/:client/content-add.element.js"></script>
                 <content-addform></content-addform>
             </section>
 `)
