@@ -11,7 +11,7 @@ class ContentDatabase {
         this.debug = debug;
     }
 
-    async configure(promptCallback=null) {
+    async configure(promptCallback=null, hostname=null) {
         // Check for tables
         await DatabaseManager.configureTable(this.table.content,             ContentRow.getTableSQL(this.table.content));
         await DatabaseManager.configureTable(this.table.content_revision,    ContentRevisionRow.getTableSQL(this.table.content_revision));
@@ -21,12 +21,13 @@ class ContentDatabase {
         if(homeContent) {
             console.info("Home Content Found: " + homeContent.id);
         } else {
+            hostname = hostname || require('os').hostname();
             let homeContentTitle = 'Home';
             let homeContentContent = `
             <section>
-                <h1 class="themed" id="activities">${require('os').hostname()}</h1>
+                <h1 class="themed" id="activities">${hostname}</h1>
                 <p>
-                    Welcome to ${require('os').hostname()}!
+                    Welcome to ${hostname}!
                 </p>
             </section>
 `;

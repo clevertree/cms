@@ -112,7 +112,7 @@ class DatabaseManager {
 
         for(let i=0; i<tableClasses.length; i++) {
             const table = new tableClasses[i](database);
-            await table.configure(promptCallback);
+            await table.configure(promptCallback, hostname);
         }
 
         // Configure Domain

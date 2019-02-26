@@ -27,7 +27,7 @@ class DefaultTheme {
 
         // const configDB = new ConfigDatabase(database);
 
-        const activeTaskIDs = await TaskAPI.getActiveTaskIDs(req);
+        // const activeTaskIDs = await TaskAPI.getActiveTaskIDs(req);
 
         let prependHTML = await UserAPI.getSessionHTML(req);
         // prependHTML += await TaskAPI.getSessionHTML(req);
@@ -63,7 +63,10 @@ class DefaultTheme {
                 subMenu: [{
                     path: '/:user/:register',
                     title: 'Register'
-                }, {
+                }, "<hr/>", {
+                    path: '/:task',
+                    title: `Browse Tasks`
+                }, "<hr/>", {
                     path: '/:content',
                     title: 'Browse Content'
                 }]
@@ -86,7 +89,7 @@ class DefaultTheme {
                 title: 'Site Index'
             }, "<hr/>", {
                 path: '/:task',
-                title: `${activeTaskIDs.length} Pending Task${activeTaskIDs.length > 1 ? 's' : ''}`
+                title: `Browse Tasks`
             },{
                 path: '/:config',
                 title: 'Configure Site'

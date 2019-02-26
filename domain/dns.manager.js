@@ -27,7 +27,8 @@ class DNSManager {
             throw new Error("Redirect URL detected, but captcha might be required:\n" + redirectURL);
         }
 
-        throw new Error("No admin email found in WHOIS Information for: " + hostname);
+        return null;
+        // throw new Error("No admin email found in WHOIS Information for: " + hostname);
     }
 
     async queryWHOISData(hostname) {

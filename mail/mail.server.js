@@ -1,7 +1,8 @@
 const nodemailer = require('nodemailer');
 const smtpTransport = require("nodemailer-smtp-transport");
 
-const { DatabaseManager } = require('../database/database.manager');
+const { LocalConfig } = require('../config/local.config');
+// const { DatabaseManager } = require('../database/database.manager');
 
 // const BASE_DIR = path.resolve(path.dirname(__dirname));
 
@@ -11,39 +12,30 @@ class MailServer {
         this.config = null;
     }
 
-    async configure(forcePrompt=0)
+    async configure(promptCallback=null)
     {
-        const configDB = new ConfigDatabase();
-        let mailConfig = await configDB.fetchConfigValues('mail');
+        const localConfig = new LocalConfig(promptCallback);
+        const mailConfig = await localConfig.getOrCreate('mail');
         if(typeof mailConfig.auth === "undefined")
             mailConfig.auth = {};
-        // let verifyConfig = false;
-        if(forcePrompt || !mailConfig.host || !mailConfig.port || !mailConfig.auth.user) {
-            const hostname = 'mail.' + require('os').hostname();
 
-            await configDB.promptValue('mail.host', `Please enter the Mail Server Host`, mailConfig.host || hostname);
-            await configDB.promptValue('mail.port', `Please enter the Mail Server Port`, mailConfig.port || 587, 'number');
-            await configDB.promptValue('mail.auth.user', `Please enter the Mail Server Username`, mailConfig.auth.user, 'email');
-            await configDB.promptValue('mail.auth.pass', `Please enter the Mail Server Password`, null, 'password');
-            mailConfig = await configDB.fetchConfigValues('mail');
-            // verifyConfig = true;
-        }
+        const hostname = 'mail.' + require('os').hostname();
+        let attempts = promptCallback ? 3 : 1;
+        while(attempts-- > 0) {
+            await localConfig.promptValue('mail.host', `Please enter the Mail Server Host`, mailConfig.host || hostname);
+            await localConfig.promptValue('mail.port', `Please enter the Mail Server Port`, mailConfig.port || 587, 'number');
+            await localConfig.promptValue('mail.auth.user', `Please enter the Mail Server Username`, mailConfig.auth.user, 'email');
+            await localConfig.promptValue('mail.auth.pass', `Please enter the Mail Server Password`, null, 'password');
 
-        try {
-            // if(verifyConfig) {
-            const server = nodemailer.createTransport(smtpTransport(mailConfig));
-            await server.verify();
-            console.info(`Connection to Mail Server '${mailConfig.host}' verified`);
-            // }
-            // await configDB.saveAll();
-
-        } catch (e) {
-            console.error(`Error connecting to ${mailConfig.host}: ${e}`);
-            if(forcePrompt < 3) {
-                console.error(e.message);
-                return await this.configure(forcePrompt + 1);
+            try {
+                console.info(`Connecting to Mail Server '${mailConfig.host}'...`);
+                const server = nodemailer.createTransport(smtpTransport(mailConfig));
+                await server.verify();
+                console.info(`Connection to Mail Server '${mailConfig.host}' verified`);
+                break;
+            } catch (e) {
+                console.error(`Error connecting to ${mailConfig.host}: ${e}`);
             }
-            throw e;
         }
         this.config = mailConfig;
         return mailConfig;

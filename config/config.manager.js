@@ -3,6 +3,7 @@ const { HTTPServer } = require('../http/http.server');
 const { TaskAPI } = require('../task/task.api');
 const { SessionAPI } = require('../session/session.api');
 const { ThemeAPI } = require('../theme/theme.api');
+const { MailServer } = require('../mail/mail.server');
 
 class ConfigManager {
     constructor() {
@@ -45,6 +46,7 @@ class ConfigManager {
             await HTTPServer.configure(promptCallback);
             await TaskAPI.configure(promptCallback);
             await ThemeAPI.configure(promptCallback);
+            await MailServer.configure(promptCallback);
         } catch (e) {
             console.error("Configuration failed: ", e);
             if(!interactive)
