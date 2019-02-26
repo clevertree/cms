@@ -8,6 +8,7 @@ class AdminConfigureTask {
     }
 
     async isActive(database, sessionUser) {
+        return true;
         if(!sessionUser)
             return false;
 
@@ -37,16 +38,12 @@ class AdminConfigureTask {
 
     }
 
-    async renderFormHTML(req, taskID, database, sessionUser) {
-        let message = `Task #${taskID} has been complete`;
+    async renderFormHTML(req, taskName, database, sessionUser) {
         let status = 0;
-        const isActive = await this.isActive(database, sessionUser);
-        if(isActive) {
-            message = `Task #${taskID}: Validate an Administrator Email`;
-        }
+        let message = `Task '${taskName}': Validate an Administrator Email`;
         return `
-            <form action="/:task/:manage" method="POST" class="taskform taskform-admin-configure themed">
-                <input type="hidden" name="taskID" value="${taskID}" />
+            <form action="/:task/${taskName}" method="POST" class="task task-admin-configure themed">
+                <input type="hidden" name="taskName" value="${taskName}" />
                 <fieldset ${!isActive ? 'disabled="disabled"' : null}>
                     <table>
                         <thead>

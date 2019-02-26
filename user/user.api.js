@@ -255,10 +255,10 @@ class UserAPI {
             req.session.setDuration(1000 * 60 * 60 * 24 * 14) // 2 weeks;
         }
 
-        const activeTaskIDs = await TaskAPI.getActiveTaskIDs(req);
+        const activeTasks = await TaskAPI.getActiveTasks(req);
         let activeTaskHTML = '';
-        if(activeTaskIDs.length > 0)
-            activeTaskHTML = `<br/><a href=":task">You have ${activeTaskIDs.length} pending task${activeTaskIDs.length > 1 ? 's' : ''}</a>`;
+        if(activeTasks.length > 0)
+            activeTaskHTML = `<br/><a href=":task">You have ${activeTasks.length} pending task${activeTasks.length > 1 ? 's' : ''}</a>`;
         this.addSessionMessage(req,`<div class='success'>Login Successful: ${user.username}${activeTaskHTML}</div>`);
 
         return user;
