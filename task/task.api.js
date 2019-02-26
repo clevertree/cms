@@ -18,7 +18,7 @@ class TaskAPI {
 
     async configure(promptCallback=null) {
         this.tasks = {};
-        await this.addTask('admin-configure', new (require('../user/task/admin-configure.task').AdminConfigureTask));
+        await this.addTask('admin-configure', require('../user/task/admin-configure.task').AdminConfigureTask);
     }
 
 
@@ -85,8 +85,10 @@ class TaskAPI {
                     if (!taskName) {
                         for(let taskName in this.tasks) {
                             if(this.tasks.hasOwnProperty(taskName)) {
-                                if (await this.tasks[taskName].isActive(database, sessionUser)) {
-                                    taskForms[taskName] = await this.tasks[taskName].renderFormHTML(req, taskName, database, sessionUser);
+                                const taskClass = this.tasks[taskName];
+                                const task = new taskClass(taskName, database);
+                                if (await task.isActive(sessionUser)) {
+                                    taskForms[taskName] = await task.renderFormHTML(req, sessionUser);
                                     taskCount++;
                                 } else {
                                     // inactiveResponseHTML += `\n\t<task-managerform taskName="${taskName}"></task-managerform>`;
@@ -96,7 +98,9 @@ class TaskAPI {
                     } else {
                         if(!this.tasks[taskName])
                             throw new Error("Task not found: " + taskName);
-                        taskForms[taskName] = await this.tasks[taskName].renderFormHTML(req, taskName, database, sessionUser);
+                        const taskClass = this.tasks[taskName];
+                        const task = new taskClass(taskName, database);
+                        taskForms[taskName] = await task.renderFormHTML(req, sessionUser);
                         taskCount++;
                     }
 
@@ -117,9 +121,10 @@ class TaskAPI {
                         throw new Error("Missing required field: taskName");
                     if(!this.tasks[taskName])
                         throw new Error("Task not found: " + taskName);
-                    const task = this.tasks[taskName];
-                    await task.handleFormSubmit(req, database, sessionUser);
-                    const resultTaskForm = await task.renderFormHTML(req, taskName, database, sessionUser);
+                    const taskClass = this.tasks[taskName];
+                    const task = new taskClass(taskName, database);
+                    await task.handleFormSubmit(req, sessionUser);
+                    const resultTaskForm = await task.renderFormHTML(req, sessionUser);
 
                     return res.json({
                         message: `<div class='success'>Task '${taskName}' has been run successfully</div>`,

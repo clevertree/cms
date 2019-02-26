@@ -3,14 +3,14 @@
 const { UserDatabase } = require('../user.database');
 
 class AdminConfigureTask {
-    constructor() {
+    constructor(taskName, database) {
+        this.database = database;
+        this.taskName = taskName;
         this.dbMissingAdmin = {};
     }
 
-    async isActive(database, sessionUser) {
-        return true;
-        if(!sessionUser)
-            return false;
+    async isActive(sessionUser) {
+        return !!sessionUser;
 
         if(typeof this.dbMissingAdmin[database] !== 'undefined') {
             return this.dbMissingAdmin[database];
@@ -34,16 +34,25 @@ class AdminConfigureTask {
         return this.dbMissingAdmin[database];
     }
 
-    async handleFormSubmit(req, database, sessionUser) {
+    async handleFormSubmit(req, sessionUser) {
 
+        const hostname = req.get ? req.get('host') : req.headers.host;
+        console.info("Querying WHOIS for admin email: " + hostname);
+        let dnsAdminEmail = await DNSManager.queryDNSAdmin(hostname);
+        if (dnsAdminEmail) {
+            // dnsAdminEmail.split('@')[0]
+            adminUser = await this.createUser('admin', dnsAdminEmail, null, 'admin');
+            console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
+            // TODO: send email;
+        }
     }
 
-    async renderFormHTML(req, taskName, database, sessionUser) {
+    async renderFormHTML(req, sessionUser) {
         let status = 0;
-        let message = `Task '${taskName}': Validate an Administrator Email`;
+        let message = `Task '${this.taskName}': Validate an Administrator Email`;
         return `
-            <form action="/:task/${taskName}" method="POST" class="task task-admin-configure themed">
-                <input type="hidden" name="taskName" value="${taskName}" />
+            <form action="/:task/${this.taskName}" method="POST" class="task task-admin-configure themed">
+                <input type="hidden" name="taskName" value="${this.taskName}" />
                 <fieldset>
                     <table>
                         <thead>
