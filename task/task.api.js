@@ -58,10 +58,12 @@ class TaskAPI {
 
     async renderTaskManager(taskName, req, res) {
         try {
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserDatabase(database);
-            const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
-
+            const database = await DatabaseManager.selectDatabaseByRequest(req, false);
+            let sessionUser = null;
+            if(database) {
+                const userDB = new UserDatabase(database);
+                sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+            }
             // const task = await this.getTask(taskName);
 
             switch(req.method) {
@@ -135,16 +137,7 @@ class TaskAPI {
                     });
             }
         } catch (error) {
-            console.error(`${req.method} ${req.url}`, error);
-            res.status(400);
-            if(req.method === 'GET') {
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-                );
-            } else {
-                res.json({message: error.stack});
-            }
+            await this.renderError(error, req, res);
         }
     }
 
@@ -206,6 +199,21 @@ class TaskAPI {
     //     }
     //     return sessionHTML;
     // }
+
+    async renderError(error, req, res, asJSON=false) {
+        console.error(`${req.method} ${req.url}`, error);
+        res.status(400);
+        if(error.redirect) {
+            res.redirect(error.redirect);
+        } else if(req.method === 'GET' && !asJSON) {          // Handle GET
+            res.send(
+                await ThemeAPI.get()
+                    .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
+            );
+        } else {
+            res.json({message: error.stack});
+        }
+    }
 }
 
 

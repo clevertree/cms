@@ -45,6 +45,7 @@ class DatabaseManager {
         let attempts = promptCallback ? 3 : 1;
         while(attempts-- > 0) {
             if(promptCallback) {
+                console.info("Configuring Database");
                 await localConfig.promptValue('database.host', `Please enter the Database Host`, dbConfig.host || 'localhost');
                 await localConfig.promptValue('database.user', `Please enter the Database User Name`, dbConfig.user || 'cms_user');
                 await localConfig.promptValue('database.password', `Please enter the Password for Database User '${dbConfig.user}'`, dbConfig.password || 'cms_pass', 'password');
@@ -176,7 +177,7 @@ class DatabaseManager {
     //     return db;
     // }
 
-    async selectDatabaseByRequest(req) {
+    async selectDatabaseByRequest(req, orThrowError=true) {
         if(this.multiDomain && req) {
             // const parse = require('url').parse(req.url);
             let hostname = req.get ? req.get('host') : req.headers.host;
@@ -187,11 +188,20 @@ class DatabaseManager {
                 return this.cacheHostname[hostname];
             const domainDB = this.getDomainDB(this.primaryDatabase);
             const domain = await domainDB.fetchDomainByHostname(hostname);
-            let database;
+            let database = null;
             if(domain) {
                 database = domain.database;
             } else {
-                database = hostname.replace('.', '_') + '_cms';
+                await domainDB.insertDomain(hostname, null);
+            }
+            if(!database) {
+                if(!orThrowError)
+                    return null;
+                // Create domain entry with no database and redirect user
+                throw Object.assign(new Error("Database has not been configured for " + hostname), {
+                    redirect: '/:task/admin-configure'
+                });
+                // database = hostname.replace('.', '_') + '_cms';
             }
             await this.configureDatabase(database, hostname);
             this.cacheHostname[hostname] = database;

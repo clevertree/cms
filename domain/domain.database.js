@@ -53,7 +53,7 @@ class DomainRow {
         return `
 CREATE TABLE ${tableName} (
   \`hostname\` varchar(64) NOT NULL,
-  \`database\` varchar(256) NOT NULL,
+  \`database\` varchar(256) NULL,
   \`ssl\` TEXT DEFAULT NULL,
   \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY \`uk.domain.name\` (\`hostname\`)

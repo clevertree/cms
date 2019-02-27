@@ -10,6 +10,8 @@ class AdminConfigureTask {
     }
 
     async isActive(sessionUser) {
+        if(!this.database)
+            return false;
         // if(!sessionUser)
         //     return false;
         // if(sessionUser.isAdmin())
@@ -35,6 +37,7 @@ class AdminConfigureTask {
                 err ? reject(err) : resolve(records);
             });
         });
+        console.info(result);
         if(result.hostmaster) {
             return result.hostmaster
                 .replace('\\.', '><')
