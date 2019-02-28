@@ -11,7 +11,7 @@ class HTMLTaskFormManagerElement extends HTMLElement {
         super();
         this.state = {
             taskName: null,
-            message: "Loading available tasks...",
+            message: "Loading available taskClass...",
             status: 0,
             taskData: [],
             taskForms: {}

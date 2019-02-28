@@ -4,18 +4,17 @@ const { DNSManager } = require('../../domain/dns.manager');
 const { UserDatabase } = require('../user.database');
 
 class AdminConfigureTask {
-    constructor(taskName, database) {
+    constructor(database) {
         this.database = database;
-        this.taskName = taskName;
+    }
+
+    static getTaskName() {
+        return 'admin-configure';
     }
 
     async isActive(sessionUser) {
         if(!this.database)
             return false;
-        // if(!sessionUser)
-        //     return false;
-        // if(sessionUser.isAdmin())
-        //     return false;
 
         const userDB = new UserDatabase(this.database);
         let adminUser = await userDB.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
@@ -25,30 +24,6 @@ class AdminConfigureTask {
         }
         // console.warn(`Admin User Not Found in ${this.database}`);
         return true;
-    }
-
-    async dnsQueryAdminEmail(req) {
-        const hostname = (req.get ? req.get('host') : req.headers.host).split(':')[0];
-        console.info("Querying WHOIS for admin email: " + hostname);
-
-        const result = await new Promise(function (resolve, reject) {
-            const dns = require('dns');
-            dns.resolveSoa(hostname, function (err, records) {
-                err ? reject(err) : resolve(records);
-            });
-        });
-        console.info(result);
-        if(result.hostmaster) {
-            return result.hostmaster
-                .replace('\\.', '><')
-                .replace(/\./, '@')
-                .replace('><', '.');
-        }
-        return await DNSManager.queryDNSAdmin(hostname);
-        // if(dnsAdminEmail)
-        //     return dnsAdminEmail;
-
-        // return null;
     }
 
     async handleFormSubmit(req, sessionUser=null) {
@@ -67,13 +42,13 @@ class AdminConfigureTask {
     }
 
     async renderFormHTML(req, sessionUser=null) {
+        const taskName = AdminConfigureTask.getTaskName();
         const hostname = (req.get ? req.get('host') : req.headers.host).split(':')[0];
         let status = 0;
-        let message = `Task '${this.taskName}': Create an Administrator Account`;
+        let message = `Task '${taskName}': Create an Administrator Account`;
         let dnsAdminEmail = await this.dnsQueryAdminEmail(req);
         return `
-            <form action="/:task/${this.taskName}" method="POST" class="task task-admin-configure themed">
-                <input type="hidden" name="taskName" value="${this.taskName}" />
+            <form action="/:task/${taskName}" method="POST" class="task task-admin-configure themed">
                 <fieldset>
                     <table>
                         <thead>
@@ -124,6 +99,30 @@ class AdminConfigureTask {
                     </table>
                 </fieldset>
             </form>`;
+    }
+
+    async dnsQueryAdminEmail(req) {
+        const hostname = (req.get ? req.get('host') : req.headers.host).split(':')[0];
+        console.info("Querying WHOIS for admin email: " + hostname);
+
+        const result = await new Promise(function (resolve, reject) {
+            const dns = require('dns');
+            dns.resolveSoa(hostname, function (err, records) {
+                err ? reject(err) : resolve(records);
+            });
+        });
+        console.info(result);
+        if(result.hostmaster) {
+            return result.hostmaster
+                .replace('\\.', '><')
+                .replace(/\./, '@')
+                .replace('><', '.');
+        }
+        return await DNSManager.queryDNSAdmin(hostname);
+        // if(dnsAdminEmail)
+        //     return dnsAdminEmail;
+
+        // return null;
     }
 }
 

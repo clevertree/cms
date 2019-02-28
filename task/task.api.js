@@ -13,12 +13,13 @@ const DIR_TASK = path.resolve(__dirname);
 
 class TaskAPI {
     constructor() {
-        this.tasks = {};
+        this.taskClass = {};
     }
 
     async configure(promptCallback=null) {
-        this.tasks = {};
-        await this.addTask('admin-configure', require('../user/task/admin-configure.task').AdminConfigureTask);
+        this.taskClass = {};
+        await this.addTask(require('../user/task/admin-configure.task').AdminConfigureTask);
+        await this.addTask(require('../database/task/database-configure.task').DatabaseConfigureTask);
     }
 
 
@@ -64,7 +65,7 @@ class TaskAPI {
                 const userDB = new UserDatabase(database);
                 sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
             }
-            // const task = await this.getTask(taskName);
+            // const task = await this.getTaskClass(taskName);
 
             switch(req.method) {
                 case 'GET':
@@ -85,23 +86,14 @@ class TaskAPI {
                     let taskForms = {};
                     let taskCount = 0;
                     if (!taskName) {
-                        for(let taskName in this.tasks) {
-                            if(this.tasks.hasOwnProperty(taskName)) {
-                                const taskClass = this.tasks[taskName];
-                                const task = new taskClass(taskName, database);
-                                if (await task.isActive(sessionUser)) {
-                                    taskForms[taskName] = await task.renderFormHTML(req, sessionUser);
-                                    taskCount++;
-                                } else {
-                                    // inactiveResponseHTML += `\n\t<task-managerform taskName="${taskName}"></task-managerform>`;
-                                }
-                            }
+                        const activeTaskList = await this.getActiveTasks(database, sessionUser);
+                        for(let i=0; i<activeTaskList.length; i++) {
+                            const task = activeTaskList[i];
+                            taskForms[taskName] = await task.renderFormHTML(req, sessionUser);
+                            taskCount++;
                         }
                     } else {
-                        if(!this.tasks[taskName])
-                            throw new Error("Task not found: " + taskName);
-                        const taskClass = this.tasks[taskName];
-                        const task = new taskClass(taskName, database);
+                        const task = this.getTask(taskName, database);
                         taskForms[taskName] = await task.renderFormHTML(req, sessionUser);
                         taskCount++;
                     }
@@ -121,10 +113,7 @@ class TaskAPI {
 
                     if(!taskName)
                         throw new Error("Missing required field: taskName");
-                    if(!this.tasks[taskName])
-                        throw new Error("Task not found: " + taskName);
-                    const taskClass = this.tasks[taskName];
-                    const task = new taskClass(taskName, database);
+                    const task = this.getTask(taskName, database);
                     await task.handleFormSubmit(req, sessionUser);
                     const resultTaskForm = await task.renderFormHTML(req, sessionUser);
 
@@ -142,48 +131,41 @@ class TaskAPI {
     }
 
 
-    async addTask(taskName, taskClass) {
-        if(typeof this.tasks[taskName] !== "undefined")
+    async addTask(taskClass) {
+        let taskName = taskClass.toString();
+        if(taskClass.getTaskName)
+            taskName = taskClass.getTaskName();
+        if(typeof this.taskClass[taskName] !== "undefined")
             throw new Error("Task entry already exists: " + taskName);
-        this.tasks[taskName] = taskClass;
+        this.taskClass[taskName] = taskClass;
     }
 
-    getTask(taskName) {
-        if(typeof this.tasks[taskName] === "undefined")
-            throw new Error("Task ID not found: " + taskName);
-        return this.tasks[taskName];
+    getTaskClass(taskName) {
+        if(typeof this.taskClass[taskName] === "undefined")
+            throw new Error("Task Name not found: " + taskName);
+        return this.taskClass[taskName];
     }
 
+    getTask(taskName, database) {
+        const task = this.getTaskClass(taskName);
+        return new task(database);
+    }
 
-    // async getTaskIDs() {
-    //     const taskNames = [];
-    //     this.tasks.forEach((task, taskName) => taskNames.push(taskName));
-    //     return taskNames;
-    // }
+    getTasks() { return Object.values(this.taskClass); }
 
-    async getActiveTaskIDs(req) {
-        if (!req.session || !req.session.userID)
-            return [];
-// TODO: REFACTOR!
-        if(typeof req.session.activeTaskIDs === 'undefined') {
-            const activeTaskIDs = [];
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserDatabase(database);
-            const sessionUser = await userDB.fetchSessionUser(req);
-            for (let i = 0; i < this.tasks.length; i++) {
-                const task = this.tasks[i];
-                if (await task.isActive(database, sessionUser))
-                    activeTaskIDs.push(i);
+    async getActiveTasks(database, sessionUser=null) {
+        const activeTasks = [];
+        for(const taskName in this.taskClass) {
+            if(this.taskClass.hasOwnProperty(taskName)) {
+                const task = this.getTask(taskName, database);
+                if(await task.isActive(sessionUser)) {
+                    activeTasks.push(task);
+                }
             }
-            req.session.activeTaskIDs = activeTaskIDs;
         }
-        return req.session.activeTaskIDs;
+        return activeTasks;
     }
 
-    async getActiveTasks(req) {
-        const activeTasks = await this.getActiveTaskIDs(req);
-        return activeTasks.map(taskName => this.getTask(taskName));
-    }
 
     // async getSessionHTML(req) {
     //     let sessionHTML = '';
