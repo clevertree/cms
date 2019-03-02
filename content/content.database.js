@@ -196,12 +196,11 @@ class ContentRow {
 CREATE TABLE ${tableName} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`user_id\` int(11) DEFAULT NULL,
-  \`parent_id\` int(11) DEFAULT NULL,
   \`path\` varchar(64) DEFAULT NULL,
   \`title\` varchar(256) DEFAULT NULL,
   \`content\` text DEFAULT NULL,
   \`data\` TEXT DEFAULT NULL,
-  \`status\` SET('published') DEFAULT '',
+  \`theme\` varchar(64) DEFAULT NULL,
   \`created\` datetime DEFAULT current_timestamp(),
   \`updated\` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (\`id\`),

@@ -7,14 +7,35 @@ class DNSManager {
     }
 
 
-    async queryDNSAdmin(hostname) {
+    async queryHostAdminEmailAddresses(hostname) {
+        const emailAddresses = [];
+        console.info("Querying WHOIS for admin email: " + hostname);
+
+        const result = await new Promise(function (resolve, reject) {
+            const dns = require('dns');
+            dns.resolveSoa(hostname, function (err, records) {
+                if(err)
+                    console.error(`Hostname SOA failed for ${hostname}: `, err);
+                resolve(records);
+            });
+        });
+        if(result && result.hostmaster) {
+            console.info(result);
+            emailAddresses.push(result.hostmaster
+                .replace('\\.', '><')
+                .replace(/\./, '@')
+                .replace('><', '.'));
+        }
+
+
+
         // hostname  = 'clevertree.net';
         const data = await this.queryWHOISData(hostname);
         // Admin Email: ari.asulin@gmail.com
         let regEmail = /admin.*\s+([-.\w]+@(?:[\w-]+\.)+[\w-]{2,20})/i;
         let matches = regEmail.exec(data);
         if(matches)
-            return matches[1];
+            emailAddresses.push(matches[1]);
 
         let regRedirect = /^Admin Email: Select Contact Domain Holder link at (.*)$/m;
         matches = regRedirect.exec(data);
@@ -23,11 +44,12 @@ class DNSManager {
             const redirectResponse = await this.getURLContent(redirectURL);
             matches = regEmail.exec(redirectResponse);
             if(matches)
-                return matches[1];
-            throw new Error("Redirect URL detected, but captcha might be required:\n" + redirectURL);
+                emailAddresses.push(matches[1]);
+            else
+                console.warn("Redirect URL detected, but captcha might be required:\n" + redirectURL);
         }
 
-        return null;
+        return emailAddresses;
         // throw new Error("No admin email found in WHOIS Information for: " + hostname);
     }
 

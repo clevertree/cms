@@ -1,7 +1,8 @@
 // TODO: approve all drafts
 
-const { DNSManager } = require('../../domain/dns.manager');
+// const { DNSManager } = require('../../domain/dns.manager');
 const { UserDatabase } = require('../user.database');
+const { UserAPI } = require('../user.api');
 
 class AdminConfigureTask {
     constructor(database) {
@@ -12,7 +13,7 @@ class AdminConfigureTask {
         return 'admin-configure';
     }
 
-    async isActive(sessionUser) {
+    async isActive(req, sessionUser=null) {
         if(!this.database)
             return false;
 
@@ -26,27 +27,39 @@ class AdminConfigureTask {
         return true;
     }
 
-    async handleFormSubmit(req, sessionUser=null) {
-        if(!(await this.isActive(sessionUser)))
-            throw new Error("This task is not active");
-
-        let dnsAdminEmail = await this.dnsQueryAdminEmail(req);
-        if(!dnsAdminEmail)
-            throw new Error("Administrator Email could not be found");
-
-        const userDB = new UserDatabase(this.database);
-        // const adminUser = await userDB.createUser('admin', dnsAdminEmail, null, 'admin');
-        console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
-        // TODO: don't create admin account until user completes validation
-        // TODO: send email;
-    }
-
     async renderFormHTML(req, sessionUser=null) {
         const taskName = AdminConfigureTask.getTaskName();
         const hostname = (req.get ? req.get('host') : req.headers.host).split(':')[0];
         let status = 0;
         let message = `Task '${taskName}': Create an Administrator Account`;
-        let dnsAdminEmail = await this.dnsQueryAdminEmail(req);
+
+        let dnsAdminEmails = await UserAPI.queryAdminEmailAddresses(this.database, hostname);
+        // const isAdmin = sessionUser && sessionUser.isAdmin();
+
+        switch(req.method) {
+            case 'POST':
+
+                if(!(await this.isActive(req, sessionUser)))
+                    throw new Error("This task is not active");
+
+                if(!dnsAdminEmails || dnsAdminEmails.length === 0)
+                    throw new Error("Administrator Email could not be found");
+                if(!req.body.admin_email)
+                    throw new Error("Field is required: admin_email");
+                const selectedAdminEmail = req.body.admin_email;
+                if(dnsAdminEmails.indexOf(selectedAdminEmail) === -1)
+                    throw new Error("Invalid Admin Email");
+
+                const userDB = new UserDatabase(this.database);
+                // const adminUser = await userDB.createUser('admin', dnsAdminEmail, null, 'admin');
+                console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
+                // TODO: don't create admin account until user completes validation
+                // TODO: send email;
+
+                break;
+        }
+
+        // let dnsAdminEmail = await DNSManager.queryHostAdminEmailAddresses(hostname);
         return `
             <form action="/:task/${taskName}" method="POST" class="task task-admin-configure themed">
                 <fieldset>
@@ -66,10 +79,10 @@ class AdminConfigureTask {
                                         field to the administrator's email address who's responsible for managing <strong>${hostname}</strong>. 
                                     </p>
                                     <p>
-                                        Step #2. Submit this form to send an email validation request to <strong>${dnsAdminEmail}</strong>.
+                                        Step #2. Select an admin email address and submit this form to send a request to create the admin account.
                                     </p>
                                     <p>
-                                        Step #3. Check the email sent to ${dnsAdminEmail} for instructions on creating an admin account for ${hostname}. 
+                                        Step #3. Check the email sent to the selected email address for instructions on creating an administrator account for ${hostname}. 
                                     </p>
                                 </td>
                             </tr>
@@ -78,7 +91,11 @@ class AdminConfigureTask {
                             <tr>
                                 <td class="label">Admin Email</td>
                                 <td>
-                                    <input type="email" name="email" value="${dnsAdminEmail || "No Email Found"}" disabled/>
+                                    <select name="admin_email" required>
+                                        ${dnsAdminEmails.map(dnsAdminEmail => 
+                                            `<option value="${dnsAdminEmail}">${dnsAdminEmail}</option>`
+                                        ).join('')}
+                                    </select>
                                 </td>
                             </tr>
                             <tr>
@@ -101,29 +118,6 @@ class AdminConfigureTask {
             </form>`;
     }
 
-    async dnsQueryAdminEmail(req) {
-        const hostname = (req.get ? req.get('host') : req.headers.host).split(':')[0];
-        console.info("Querying WHOIS for admin email: " + hostname);
-
-        const result = await new Promise(function (resolve, reject) {
-            const dns = require('dns');
-            dns.resolveSoa(hostname, function (err, records) {
-                err ? reject(err) : resolve(records);
-            });
-        });
-        console.info(result);
-        if(result.hostmaster) {
-            return result.hostmaster
-                .replace('\\.', '><')
-                .replace(/\./, '@')
-                .replace('><', '.');
-        }
-        return await DNSManager.queryDNSAdmin(hostname);
-        // if(dnsAdminEmail)
-        //     return dnsAdminEmail;
-
-        // return null;
-    }
 }
 
 exports.AdminConfigureTask = AdminConfigureTask;

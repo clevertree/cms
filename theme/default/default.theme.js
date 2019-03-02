@@ -45,15 +45,18 @@ class DefaultTheme {
 
         // Menu data
         renderData.menu = [];
+        renderData.site = {baseURL: '/'};
         if(DatabaseManager.isAvailable) {
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const articleDB = new ContentDatabase(database);
-            renderData.menu = await articleDB.queryMenuData(req, true);
+            const database = await DatabaseManager.selectDatabaseByRequest(req, false);
+            if(database) {
+                const articleDB = new ContentDatabase(database);
+                renderData.menu = await articleDB.queryMenuData(req, true);
 
-            const configDB = new ConfigDatabase(database);
-            const configList = await configDB.selectAllConfigValues();
-            const configValues = configDB.parseConfigValues(configList);
-            renderData.site = configValues.site; // TODO: cache site values per host;
+                const configDB = new ConfigDatabase(database);
+                const configList = await configDB.selectAllConfigValues();
+                const configValues = configDB.parseConfigValues(configList);
+                renderData.site = configValues.site; // TODO: cache site values per host;
+            }
         }
 
         if(!req.session || !req.session.userID) { // If not logged in

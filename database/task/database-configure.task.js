@@ -1,8 +1,9 @@
-// TODO: approve all drafts
-
+const { DatabaseManager } = require("../database.manager");
+const { UserAPI } = require("../../user/user.api");
 
 class DatabaseConfigureTask {
     constructor(database) {
+        // Null domain means domain hasn't been configured yet
         this.database = database;
     }
 
@@ -10,21 +11,28 @@ class DatabaseConfigureTask {
         return 'database-configure';
     }
 
-    async isActive(sessionUser=null) {
+    async isActive(req, sessionUser=null) {
         if(this.database)
             return false;
-        // TODO: check if database is missing in domain entry.
+
+        let hostname = DatabaseManager.getHostnameFromRequest(req);
+
+        const domainDB = DatabaseManager.getPrimaryDomainDB();
+        const domain = await domainDB.fetchDomainByHostname(hostname);
+        if(!domain)
+            throw new Error("Domain entry missing. Shouldn't happen");
+        if(domain && domain.database)
+            throw new Error("Domain database entry wasn't missing. Shouldn't happen");
+
+        // TODO: check to see if database exists
+        const databaseResult = await DatabaseManager.queryAsync(`SHOW DATABASES LIKE \`${this.database}\``);
+
         // TODO: task also applies to database connection problems
         // console.warn(`Database User Not Found in ${this.database}`);
         return true;
     }
 
-    async handleFormSubmit(req, sessionUser=null) {
-        if(!(await this.isActive(sessionUser)))
-            throw new Error("This task is not active");
 
-
-    }
 
     async renderFormHTML(req, sessionUser=null) {
         const taskName = DatabaseConfigureTask.getTaskName();
@@ -34,9 +42,26 @@ class DatabaseConfigureTask {
 
         const defaultDatabaseName = hostname.replace('.', '_') + '_cms';
 
-        const isAdmin = sessionUser && sessionUser.isAdmin();
-        const hostmaster_email = 'hostmaster@email';
-        // TODO: select from admins, notify by default method.
+        // const isAdmin = sessionUser && sessionUser.isAdmin();
+
+        let dnsAdminEmails = await UserAPI.queryAdminEmailAddresses(null, hostname);
+
+        switch(req.method) {
+            case 'POST':
+                if(!(await this.isActive(req, sessionUser)))
+                    throw new Error("This task is not active");
+
+                if(!dnsAdminEmails || dnsAdminEmails.length === 0)
+                    throw new Error("Administrator Email could not be found");
+                if(!req.body.admin_email)
+                    throw new Error("Field is required: admin_email");
+                const selectedAdminEmail = req.body.admin_email;
+                if(dnsAdminEmails.indexOf(selectedAdminEmail) === -1)
+                    throw new Error("Invalid Admin Email");
+
+
+                break;
+        }
 
         return `
             <form action="/:task/${taskName}" method="POST" class="task task-database-configure themed">
@@ -54,7 +79,7 @@ class DatabaseConfigureTask {
                                     <p>
                                         The database for ${hostname} has not yet been configured.  
                                         Please use this form to configure the domain database.
-                                        ${isAdmin ? `` : `A validation email will be sent to the hostmaster of this server. Please have the hostmaster complete the last step according to the email's instructions`}
+                                        A validation email will be sent to the hostmaster of this server. Please have the hostmaster complete the last step according to the email's instructions.
                                     </p>
                                 </td>
                             </tr>
@@ -63,7 +88,7 @@ class DatabaseConfigureTask {
                             <tr>
                                 <td class="label">Database Name</td>
                                 <td>
-                                    <input type="text" name="database" value="${defaultDatabaseName}" ${isAdmin ? `` : `disabled`}/>
+                                    <input type="text" name="database" value="${defaultDatabaseName}" disabled/>
                                 </td>
                             </tr>
                             <tr>
@@ -72,20 +97,22 @@ class DatabaseConfigureTask {
                                     <input type="hostname" name="hostname" value="${hostname || "No Hostname Found"}" disabled/>
                                 </td>
                             </tr>
-                            ${isAdmin ? `` : `<tr>
+                            <tr>
                                 <td class="label">Hostmaster Email</td>
                                 <td>
-                                    <input type="email" name="hostmaster_email" value="${hostmaster_email}" disabled/>
+                                    <select name="admin_email" required>
+                                        ${dnsAdminEmails.map(dnsAdminEmail => 
+                                            `<option value="${dnsAdminEmail}">${dnsAdminEmail}</option>`
+                                        ).join('')}
+                                    </select>
                                 </td>
-                            </tr>`}
+                            </tr>
                         </tbody>
                         <tfoot>
                             <tr><td colspan="2"><hr/></td></tr>
                             <tr>
                                 <td colspan="2" style="text-align: right;">
-                                    ${isAdmin 
-                                        ? `<button type="submit">Create Database</button>` 
-                                        : `<button type="submit">Send Validation Email</button>`}
+                                    <button type="submit">Send Validation Email</button>
                                 </td>
                             </tr>
                         </tfoot>

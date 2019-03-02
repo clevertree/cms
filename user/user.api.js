@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 const path = require('path');
 
+const { DNSManager } = require('../domain/dns.manager');
+
 // const { LocalConfig } = require('../config/local.config');
 // const { ConfigManager } = require('../config/config.manager');
 const { DatabaseManager } = require('../database/database.manager');
@@ -85,6 +87,8 @@ class UserAPI {
         HTTPServer.renderStaticFile(staticFile, req, res, next);
     }
 
+
+    /** Session **/
     addSessionMessage(req, message) {
         if(typeof req.session.messages === 'undefined')
             req.session.messages = [];
@@ -237,11 +241,11 @@ class UserAPI {
 
         const database = await DatabaseManager.selectDatabaseByRequest(req);
         const userDB = new UserDatabase(database);
-        const user = await userDB.fetchUserByID(userID, 'u.*');
-        if(!user)
+        const sessionUser = await userDB.fetchUserByID(userID, 'u.*');
+        if(!sessionUser)
             throw new Error("User not found: " + userID);
-        const encryptedPassword = user.password;
-        delete user.password;
+        const encryptedPassword = sessionUser.password;
+        delete sessionUser.password;
 
         const matches = await bcrypt.compare(password, encryptedPassword);
         if(matches !== true)
@@ -249,19 +253,19 @@ class UserAPI {
 
         // sets a cookie with the user's info
         req.session.reset();
-        req.session.userID = user.id;
+        req.session.userID = sessionUser.id;
 
         if(saveSession) {
             req.session.setDuration(1000 * 60 * 60 * 24 * 14) // 2 weeks;
         }
 
-        const activeTaskList = await TaskAPI.getActiveTasks(req);
+        const activeTaskList = await TaskAPI.getActiveTasks(req, database, sessionUser);
         let activeTaskHTML = '';
         if(activeTaskList.length > 0)
             activeTaskHTML = `<br/><a href=":task">You have ${activeTaskList.length} available task${activeTaskList.length > 1 ? 's' : ''}</a>`;
-        this.addSessionMessage(req,`<div class='success'>Login Successful: ${user.username}${activeTaskHTML}</div>`);
+        this.addSessionMessage(req,`<div class='success'>Login Successful: ${sessionUser.username}${activeTaskHTML}</div>`);
 
-        return user;
+        return sessionUser;
     }
 
 
@@ -639,6 +643,19 @@ class UserAPI {
             }
         }
         return sessionHTML;
+    }
+
+    async queryAdminEmailAddresses(database=null, hostname=null) {
+        let dnsAdminEmails = hostname ? await DNSManager.queryHostAdminEmailAddresses(hostname) : [];
+        if(database) {
+            const userDB = new UserDatabase(database);
+            let adminUsers = await userDB.selectUsers("FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
+            for(let i=0; i<adminUsers.length; i++) {
+                dnsAdminEmails.push(adminUsers[i].email);
+            }
+        }
+        dnsAdminEmails = dnsAdminEmails.filter((value, i, self) => self.indexOf(value) === i)
+        return dnsAdminEmails;
     }
 
     static sanitizeInput(input, type=null) {

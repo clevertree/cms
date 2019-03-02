@@ -27,7 +27,7 @@ class DatabaseManager {
     // getArticleDB(database=null)    { return new (require('../article/article.database').ContentDatabase)(database); }
     // getUserDB(database=null)       { return new (require('../user/user.database').UserDatabase)(database); }
     // getConfigDB(database=null)     { return new (require('../config/config.database').ConfigDatabase)(database); }
-    getDomainDB(database=null)     { return new (require('../domain/domain.database').DomainDatabase)(database); }
+    getPrimaryDomainDB()       { return new (require('../domain/domain.database').DomainDatabase)(this.primaryDatabase); }
 
     async configure(promptCallback=null) {
         if(this.db) {
@@ -117,7 +117,7 @@ class DatabaseManager {
         }
 
         // Configure Domain
-        const domainDB = this.getDomainDB(this.primaryDatabase);
+        const domainDB = this.getPrimaryDomainDB();
         if(this.primaryDatabase === database)
             await domainDB.configure();
         const domain = await domainDB.fetchDomainByHostname(hostname);
@@ -177,16 +177,21 @@ class DatabaseManager {
     //     return db;
     // }
 
-    async selectDatabaseByRequest(req, orThrowError=true) {
-        if(this.multiDomain && req) {
+    getHostnameFromRequest(req) {
+        let hostname = req.get ? req.get('host') : req.headers.host;
+        if(!hostname)
+            throw new Error("Host name is required for multi-domain serving");
+        hostname = hostname.split(':')[0];
+        return hostname;
+    }
+
+    async selectDatabaseByHost(hostname, orThrowError=true) {
+        if(this.multiDomain && hostname) {
             // const parse = require('url').parse(req.url);
-            let hostname = req.get ? req.get('host') : req.headers.host;
-            if(!hostname)
-                throw new Error("Host name is required for multi-domain serving");
-            hostname = hostname.split(':')[0];
+
             if(typeof this.cacheHostname[hostname] !== "undefined")
                 return this.cacheHostname[hostname];
-            const domainDB = this.getDomainDB(this.primaryDatabase);
+            const domainDB = this.getPrimaryDomainDB();
             const domain = await domainDB.fetchDomainByHostname(hostname);
             let database = null;
             if(domain) {
@@ -199,7 +204,7 @@ class DatabaseManager {
                     return null;
                 // Create domain entry with no database and redirect user
                 throw Object.assign(new Error("Database has not been configured for " + hostname), {
-                    redirect: '/:task/admin-configure'
+                    redirect: '/:task/database-configure'
                 });
                 // database = hostname.replace('.', '_') + '_cms';
             }
@@ -209,6 +214,12 @@ class DatabaseManager {
         } else {
             return this.primaryDatabase;
         }
+
+    }
+
+    async selectDatabaseByRequest(req, orThrowError=true) {
+        let hostname = this.getHostnameFromRequest(req);
+        return await this.selectDatabaseByHost(hostname, orThrowError);
     }
 
 

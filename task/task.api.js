@@ -73,7 +73,7 @@ class TaskAPI {
                         await ThemeAPI.get()
                             .render(req, `<section>
         <script src="/:task/:client/task-manager.element.js"></script>
-        <task-manager ${taskName ? `taskName="${taskName}` : ''}></task-manager>
+        <task-manager ${taskName ? `taskName="${taskName}"` : ''}></task-manager>
     </section>`)
                     );
                     break;
@@ -86,7 +86,7 @@ class TaskAPI {
                     let taskForms = {};
                     let taskCount = 0;
                     if (!taskName) {
-                        const activeTaskList = await this.getActiveTasks(database, sessionUser);
+                        const activeTaskList = await this.getActiveTasks(req, database, sessionUser);
                         for(let i=0; i<activeTaskList.length; i++) {
                             const task = activeTaskList[i];
                             taskForms[taskName] = await task.renderFormHTML(req, sessionUser);
@@ -114,8 +114,8 @@ class TaskAPI {
                     if(!taskName)
                         throw new Error("Missing required field: taskName");
                     const task = this.getTask(taskName, database);
-                    await task.handleFormSubmit(req, sessionUser);
-                    const resultTaskForm = await task.renderFormHTML(req, sessionUser);
+                    // await task.handleFormSubmit(req, sessionUser);
+                    const resultTaskForm = await task.renderFormHTML(req, sessionUser); // Task should handle POST
 
                     return res.json({
                         message: `<div class='success'>Task '${taskName}' has been run successfully</div>`,
@@ -153,12 +153,12 @@ class TaskAPI {
 
     getTasks() { return Object.values(this.taskClass); }
 
-    async getActiveTasks(database, sessionUser=null) {
+    async getActiveTasks(req, database, sessionUser=null) {
         const activeTasks = [];
         for(const taskName in this.taskClass) {
             if(this.taskClass.hasOwnProperty(taskName)) {
                 const task = this.getTask(taskName, database);
-                if(await task.isActive(sessionUser)) {
+                if(await task.isActive(req, sessionUser)) {
                     activeTasks.push(task);
                 }
             }

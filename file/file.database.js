@@ -3,6 +3,7 @@
 // const ejs = require('ejs');
 // const express = require('express');
 
+// TODO server files via content table
 const { DatabaseManager } = require('../database/database.manager');
 
 // Init

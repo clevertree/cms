@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 
+const { UserAPI } = require('./user.api');
 const { DatabaseManager } = require('../database/database.manager');
 // const { LocalConfig } = require('../config/local.config');
 const { ConfigDatabase } = require("../config/config.database");
@@ -60,7 +61,7 @@ class UserDatabase  {
             // Find admin user by DNS info
             if(!adminUser && false) {
                 console.info("Querying WHOIS for admin email: " + hostname);
-                let dnsAdminEmail = await DNSManager.queryDNSAdmin(hostname);
+                let dnsAdminEmail = await UserAPI.queryAdminEmailAddresses(hostname);
                 if (dnsAdminEmail) {
                     // dnsAdminEmail.split('@')[0]
                     adminUser = await this.createUser('admin', dnsAdminEmail, null, 'admin');
