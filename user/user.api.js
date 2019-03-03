@@ -446,35 +446,43 @@ class UserAPI {
             if(this.resetPasswordRequests[uuid] !== user.id)
                 throw new Error("Validation UUID Mismatch: " + uuid);
 
-            if(req.method === 'GET') {
-                // Render Editor Form
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `
+            switch(req.method) {
+                case 'GET':
+                    // Render Editor Form
+                    res.send(
+                        await ThemeAPI.get()
+                            .render(req, `
 <script src="/:user/:client/user-resetpassword.element.js"></script>
-<user-resetpasswordform uuid="${uuid}" src="${user.url}" username="${user.username}"></user-resetpasswordform>`)
-                );
+<user-resetpasswordform uuid="${uuid}" src="${user.url}"></user-resetpasswordform>`)
+                    );
+                    break;
 
-            } else {
-                // Handle Form (POST) Request
-                // console.log("Reset Request", req.body);
+                case 'OPTIONS':
+                    const response = {user};
+                    // response.profileConfig = await this.fetchProfileConfig(database);
+                    res.json(response);
+                    break;
 
-                const affectedRows = await this.updatePassword(req,
-                    user.id,
-                    null,
-                    req.body.password_new,
-                    req.body.password_confirm);
+                case 'POST':
+                    // Handle Form (POST) Request
+                    // console.log("Reset Request", req.body);
 
-                if(!affectedRows)
-                    throw new Error("Password not updated");
-                delete this.resetPasswordRequests[uuid];
-                return res.json({
-                    redirect: `/:user/:login?userID=${user.username}`,
-                    message: `Recovery email sent successfully to ${user.email}. <br/>Redirecting...`,
-                    user
-                });
+                    const affectedRows = await this.updatePassword(req,
+                        user.id,
+                        null,
+                        req.body.password_new,
+                        req.body.password_confirm);
 
+                    if(!affectedRows)
+                        throw new Error("Password not updated");
+                    delete this.resetPasswordRequests[uuid];
+                    return res.json({
+                        redirect: `/:user/:login?userID=${user.username}`,
+                        message: `Password has been changed successfully. <br/>Redirecting...`,
+                        user
+                    });
             }
+
         } catch (error) {
             console.error(error);
             res.status(400).json({message: "Error: " + error.message, error: error.stack});

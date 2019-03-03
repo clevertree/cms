@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
-            console.log("RENDER", this.state);
+            // console.log("RENDER", this.state);
             this.innerHTML =
                 `
                  <table class="user themed">
