@@ -69,13 +69,10 @@ class TaskAPI {
 
             switch(req.method) {
                 case 'GET':
-                    res.send(
-                        await ThemeAPI.get()
-                            .render(req, `<section>
+                    await ThemeAPI.send(req, res, `<section>
         <script src="/:task/:client/task-manager.element.js"></script>
         <task-manager ${taskName ? `taskName="${taskName}"` : ''}></task-manager>
-    </section>`)
-                    );
+    </section>`);
                     break;
 
                 case 'OPTIONS':
@@ -188,10 +185,7 @@ class TaskAPI {
         if(error.redirect) {
             res.redirect(error.redirect);
         } else if(req.method === 'GET' && !asJSON) {          // Handle GET
-            res.send(
-                await ThemeAPI.get()
-                    .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-            );
+            await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
             res.json({message: error.stack});
         }

@@ -66,6 +66,16 @@ class ThemeAPI {
         }
     }
 
+    async send(req, res, content) {
+        return res.send(
+            await this.render(req, content)
+        );
+    }
+
+    async render(req, content) {
+        const theme = this.get(content.theme || 'default');
+        return await theme.render(req, content);
+    }
 
     get(themeName='default') {
         if(typeof this.themes[themeName] !== 'undefined')

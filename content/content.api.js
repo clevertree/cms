@@ -69,7 +69,7 @@ class ContentApi {
             if(contentRevision.content_id !== content.id)
                 throw new Error("Revision does not belong to content");
 
-            content.content = contentRevision.content;
+            content.data = contentRevision.data;
             content.title = contentRevision.title;
             return contentRevision;
         }
@@ -86,10 +86,7 @@ class ContentApi {
 
             await this.checkForRevisionContent(req, content);
 
-            res.send(
-                await ThemeAPI.get(content.theme)
-                    .render(req, content)
-            );
+            await ThemeAPI.send(req, res, content);
         } catch (error) {
             await this.renderError(error, req, res);
         }
@@ -135,10 +132,7 @@ class ContentApi {
                 res.json(response);
 
             } else {
-                res.send(
-                    await ThemeAPI.get(content.theme)
-                        .render(req, content)
-                );
+                await ThemeAPI.send(req, res, content);
             }
         } catch (error) {
             await this.renderError(error, req, res, asJSON);
@@ -160,9 +154,7 @@ class ContentApi {
             switch(req.method) {
                 case 'GET':
                     // Render Editor
-                    res.send(
-                        await ThemeAPI.get(content.theme)
-                            .render(req, `<section style="max-width: 1600px;">
+                    await ThemeAPI.send(req, res, `<section style="max-width: 1600px;">
                 <script src="/:content/:client/content-editor.element.js"></script>
                 <content-editor id="${req.params.id}"></content-editor>
             </section>
@@ -170,11 +162,10 @@ class ContentApi {
                 <h1 style="text-align: center;">Preview</h1>
                 <hr/>
                 <div class="content-preview-content">
-                    ${content.content}
+                    ${content.data}
                 </div>
             </section>
-    `)
-                    );
+    `);
                     break;
                 case 'OPTIONS':
 
@@ -215,7 +206,7 @@ class ContentApi {
                             const affectedRows = await contentDB.updateContent(
                                 content.id,
                                 req.body.title,
-                                req.body.content,
+                                req.body.data,
                                 req.body.path,
                                 sessionUser.id,
                                 req.body.theme,
@@ -226,7 +217,7 @@ class ContentApi {
                             insertContentRevisionID = await contentDB.insertContentRevision(
                                 content.id,
                                 req.body.title,
-                                req.body.content,
+                                req.body.data,
                                 sessionUser.id
                             );
 
@@ -242,7 +233,7 @@ class ContentApi {
                             insertContentRevisionID = await contentDB.insertContentRevision(
                                 content.id,
                                 req.body.title,
-                                req.body.content,
+                                req.body.data,
                                 sessionUser.id
                             );
                             revision = await contentDB.fetchContentRevisionByID(insertContentRevisionID);
@@ -273,13 +264,11 @@ class ContentApi {
             switch(req.method) {
                 case 'GET':
                     // Render Editor
-                res.send(
-                    await ThemeAPI.get(content.theme)
-                        .render(req, `<section style="max-width: 1600px;">
-                <script src="/:content/:client/content-delete.element.js"></script>
-                <content-delete id="${req.params.id}"></content-editor>
-            </section>`)
-                );
+                await ThemeAPI.send(req, res,
+    `<section style="max-width: 1600px;">
+    <script src="/:content/:client/content-delete.element.js"></script>
+    <content-delete id="${req.params.id}"></content-editor>
+</section>`);
                     break;
 
                 case 'OPTIONS':
@@ -332,14 +321,12 @@ class ContentApi {
 
             if(req.method === 'GET') {          // Handle GET
                 // Render Editor
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `<section>
-                <script src="/:content/:client/content-add.element.js"></script>
-                <content-addform></content-addform>
-            </section>
+                await ThemeAPI.send(req, res,
+`<section>
+    <script src="/:content/:client/content-add.element.js"></script>
+    <content-addform></content-addform>
+</section>
 `)
-                );
 
             } else {
                 if(!req.session || !req.session.userID)
@@ -352,7 +339,7 @@ class ContentApi {
                 // Handle POST
                 const insertID = await contentDB.insertContent(
                     req.body.title,
-                    req.body.content,
+                    req.body.data,
                     req.body.path,
                     sessionUser.id,
                     req.body.parent_id ? parseInt(req.body.parent_id) : null,
@@ -375,16 +362,14 @@ class ContentApi {
         try {
 
             if (req.method === 'GET') {
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `<section>
-                <script src="/:content/:client/content-browser.element.js"></script>
-                <content-browser></content-browser>
-                <script src="/:content/:client/content-add.element.js"></script>
-                <content-addform></content-addform>
-            </section>
-`)
-                );
+                await ThemeAPI.send(req, res, `
+<section>
+    <script src="/:content/:client/content-browser.element.js"></script>
+    <content-browser></content-browser>
+    <script src="/:content/:client/content-add.element.js"></script>
+    <content-addform></content-addform>
+</section>
+`);
 
             } else {
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
@@ -393,7 +378,7 @@ class ContentApi {
                 // Handle POST
                 let whereSQL = '1', values = null;
                 if(req.body.search) {
-                    whereSQL = 'a.title LIKE ? OR a.content LIKE ? OR a.path LIKE ? OR a.id = ?';
+                    whereSQL = 'a.title LIKE ? OR a.data LIKE ? OR a.path LIKE ? OR a.id = ?';
                     values = ['%'+req.body.search+'%', '%'+req.body.search+'%', '%'+req.body.search+'%', parseInt(req.body.search)];
                 }
                 const content = await contentDB.selectContent(whereSQL, values);
@@ -415,10 +400,7 @@ class ContentApi {
         if(error.redirect) {
             res.redirect(error.redirect);
         } else if(req.method === 'GET' && !asJSON) {          // Handle GET
-            res.send(
-                await ThemeAPI.get()
-                    .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-            );
+            await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
             res.json({message: error.stack});
         }

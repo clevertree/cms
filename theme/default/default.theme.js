@@ -1,7 +1,7 @@
 // const fs = require('fs');
 const path = require('path');
 const ejs = require('ejs');
-// const { ContentDatabase } = require('../../article/article.database');
+// const { ContentDatabase } = require('../../content/content.database');
 const { UserAPI } = require('../../user/user.api');
 const { ContentDatabase } = require('../../content/content.database');
 const { DatabaseManager } = require('../../database/database.manager');
@@ -21,9 +21,9 @@ class DefaultTheme {
         return DIR_CLIENT_ASSETS;
     }
 
-    async render(req, article) {
-        if(typeof article === "string")
-            article = {content: article};
+    async render(req, content) {
+        if(typeof content === "string")
+            content = {data: content};
 
         // const configDB = new ConfigDatabase(database);
 
@@ -32,13 +32,13 @@ class DefaultTheme {
         let prependHTML = await UserAPI.getSessionHTML(req);
         // prependHTML += await TaskAPI.getSessionHTML(req);
         if(prependHTML)
-            article.content = prependHTML + article.content;
+            content.data = prependHTML + content.data;
 
         // Relative path to root
         // const slashCount = req.path.split('/').length-1;
         // renderData.baseHRef = slashCount > 1 ? "../".repeat(slashCount-1) : null;
         const renderData = {
-            article,
+            content,
             site: {}
         };
 
@@ -49,13 +49,27 @@ class DefaultTheme {
         if(DatabaseManager.isAvailable) {
             const database = await DatabaseManager.selectDatabaseByRequest(req, false);
             if(database) {
-                const articleDB = new ContentDatabase(database);
-                renderData.menu = await articleDB.queryMenuData(req, true);
+                const contentDB = new ContentDatabase(database);
+                renderData.menu = await contentDB.queryMenuData(req, true);
 
                 const configDB = new ConfigDatabase(database);
                 const configList = await configDB.selectAllConfigValues();
                 const configValues = configDB.parseConfigValues(configList);
-                renderData.site = configValues.site; // TODO: cache site values per host;
+                renderData.site = configValues.site; // TODO: select only site.* values;
+
+                const fetchContent = async (path) => {
+                    const content = await contentDB.fetchContentByPath(path);
+                    if(!content)
+                        throw new Error("Theme content not available: " + path);
+                    return content.data;
+                };
+                // content.themeHeader = 'omg';
+                if(renderData.site.themeHeader)
+                    content.themeHeader = await fetchContent(renderData.site.themeHeader);
+                if(renderData.site.themeFooter)
+                    content.themeFooter = await fetchContent(renderData.site.themeFooter);
+                if(renderData.site.themeMenu)
+                    content.themeMenu = await fetchContent(renderData.site.themeMenu);
             }
         }
 
@@ -81,9 +95,9 @@ class DefaultTheme {
                 title: 'Menu',
                 subMenu: submenu
             });
-            if(article.id) {
+            if(content.id) {
                 submenu.push({
-                    path: `/:content/${article.id}/:edit`,
+                    path: `/:content/${content.id}/:edit`,
                     title: 'Edit This Page\'s Content',
                 });
             }

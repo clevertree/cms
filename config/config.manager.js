@@ -14,6 +14,9 @@ class ConfigManager {
         this.setConfigSetting('site.contact', () => 'admin@' + hostname.toLowerCase(), 'email');
         this.setConfigSetting('site.keywords', () => 'cms, ' + hostname.toLowerCase());
         this.setConfigSetting('site.baseURL', () => '/');
+        this.setConfigSetting('site.themeHeader', () => null);
+        this.setConfigSetting('site.themeFooter', () => null);
+        this.setConfigSetting('site.themeMenu', () => null);
         // this.setConfigSetting('site.customFooter', () => '/');
 
         this.setConfigSetting('user.profile', () => JSON.stringify([

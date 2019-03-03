@@ -84,15 +84,11 @@ class ConfigAPI {
 
             switch(req.method) {
                 case 'GET':
-                    res.send(
-                        await ThemeAPI.get()
-                            .render(req, `
-<section>
+                    await ThemeAPI.send(req, res,
+`<section>
     <script src="/:config/:client/config-editor.element.js"></script>
     <config-editor></config-editor>
-</section>
-`)
-                    );
+</section>`);
                     break;
 
                 case 'OPTIONS':
@@ -135,10 +131,7 @@ class ConfigAPI {
         console.error(`${req.method} ${req.url}`, error);
         res.status(400);
         if(req.method === 'GET' && !asJSON) {          // Handle GET
-            res.send(
-                await ThemeAPI.get()
-                    .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-            );
+            await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
             res.json({message: error.stack});
         }

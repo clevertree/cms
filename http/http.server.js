@@ -84,7 +84,7 @@ class HTTPServer {
         const { DatabaseAPI } = require('../database/database.api');
         const { UserAPI } = require('../user/user.api');
         const { ContentAPI } = require('../content/content.api');
-        const { FileAPI } = require('../file/file.api');
+        // const { FileAPI } = require('../file/file.api');
         const { ConfigAPI } = require('../config/config.api');
         const { TaskAPI } = require('../task/task.api');
         const { ThemeAPI } = require('../theme/theme.api');
@@ -94,7 +94,7 @@ class HTTPServer {
         router.use(DatabaseAPI.getMiddleware());
         router.use(UserAPI.getMiddleware());
         router.use(ContentAPI.getMiddleware());
-        router.use(FileAPI.getMiddleware());
+        // router.use(FileAPI.getMiddleware());
         router.use(ConfigAPI.getMiddleware());
         router.use(TaskAPI.getMiddleware());
         router.use(ThemeAPI.getMiddleware());

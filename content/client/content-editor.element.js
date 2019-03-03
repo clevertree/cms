@@ -68,8 +68,8 @@ class HTMLContentEditorFormElement extends HTMLElement {
     onKeyUp(e) {
         const form = e.target.form; // querySelector('form.user-login-form');
         const request = this.getFormData(form);
-        this.renderPreview(request.content);
-        this.state.content.content = request.content;
+        this.renderPreview(request.data);
+        this.state.content.data = request.data;
     }
 
     onChange(e) {
@@ -195,19 +195,6 @@ class HTMLContentEditorFormElement extends HTMLElement {
                             </td>
                         </tr>
                         <tr>
-                            <td class="label">Parent</td>
-                            <td>
-                                <select name="parent_id" onchange="this.form.parent_id.value = this.value;" class="contentform-select-parent">
-                                    <option value="">Select Parent</option>
-                                ${this.state.parentList.map(content => `
-                                    <option value="${content.id}" ${this.state.content.parent_id === content.id ? 'selected="selected"' : null}>
-                                        ${content.title} ${content.path ? `(${content.path})` : null}
-                                    </option>
-                                `)}
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
                             <td class="label">Theme</td>
                             <td>
                                 <select name="theme">
@@ -219,7 +206,7 @@ class HTMLContentEditorFormElement extends HTMLElement {
                             <td class="label">Content</td>
                             <td>
                                 <textarea class="editor-plain editor-wysiwyg-target" name="content"
-                                    >${this.state.content.content || ''}</textarea>
+                                    >${this.state.content.data || ''}</textarea>
                             </td>
                         </tr>
                         <tr>
@@ -283,8 +270,8 @@ class HTMLContentEditorFormElement extends HTMLElement {
     }
 
     renderWYSIWYGEditor() {
-        if(this.state.content.content)
-            this.renderPreview(this.state.content.content);
+        if(this.state.content.data)
+            this.renderPreview(this.state.content.data);
 
         // console.log("RENDER", this.state);
         switch(this.state.editor) {

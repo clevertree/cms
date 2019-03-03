@@ -77,16 +77,12 @@ class DatabaseAPI {
         try {
 
             if (req.method === 'GET') {
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `
+                await ThemeAPI.send(req, res, `
 <section>
     <script src="/database/form/databaseform-manage.element.js"></script>
     <databaseform-manage></databaseform-manage>
 </section>
-`)
-                );
-
+`);
             } else {
                 // Handle POST
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
@@ -122,10 +118,7 @@ class DatabaseAPI {
             console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             if(req.method === 'GET') {
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-                );
+                await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
             } else {
                 res.json({message: error.stack});
             }
@@ -136,18 +129,14 @@ class DatabaseAPI {
         try {
 
             if (req.method === 'GET') {
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, {
+                await ThemeAPI.send(req, res, {
                             title: `Connect to Database`,
-                            content: `
-<section>
+                            content:
+`<section>
     <script src="/database/form/databaseform-connect.element.js"></script>
     <databaseform-connect></databaseform-connect>
-</section>
-`
-                        })
-                );
+</section>`
+                        });
 
             } else {
                 // Handle POST

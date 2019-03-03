@@ -219,7 +219,7 @@ class DatabaseManager {
                 });
                 // database = hostname.replace('.', '_') + '_cms';
             }
-            // await this.configureDatabase(database, hostname); // Must be done manually!
+            await this.configureDatabase(database, hostname); // Once configured manually, databases can be auto configured from then on.
             this.cacheHostname[hostname] = database;
             return database;
         } else {

@@ -77,16 +77,12 @@ class DomainAPI {
         try {
 
             if (req.method === 'GET') {
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `
+                await ThemeAPI.send(req, res, `
 <section>
     <script src="/domain/form/domainform-editor.element.js"></script>
     <domainform-editor></domainform-editor>
 </section>
-`)
-                );
-
+`);
             } else {
                 // Handle POST
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
@@ -122,10 +118,7 @@ class DomainAPI {
             console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             if(req.method === 'GET') {
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-                );
+                await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
             } else {
                 res.json({message: error.stack});
             }

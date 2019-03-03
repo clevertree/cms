@@ -2,23 +2,23 @@
 <html>
     <head>
         <base href="<%=site.baseURL;%>">
-        <title><%=article.title || site.name%></title>
+        <title><%=content.title || site.name%></title>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <meta name="keywords" CONTENT="<%=article.keywords || site.keywords || ""%>">
+        <meta name="keywords" CONTENT="<%=content.keywords || site.keywords || ""%>">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link href=":theme/default/:client/default.theme.css" rel="stylesheet" />
         <script src=":theme/default/:client/default.theme.client.js"></script>
     </head>
     <body class='theme-default'>
-<%- site.customHeader || include('header.partial.ejs') %>
+<%- content.themeHeader || include('header.partial.ejs') %>
 
 
         <article>
-            <%-article.content%>
+            <%-content.data%>
         </article>
 
 
-<%- site.customFooter || include('footer.partial.ejs') %>
+<%- content.themeFooter || include('footer.partial.ejs') %>
     </body>
 </html>

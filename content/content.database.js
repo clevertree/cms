@@ -38,7 +38,7 @@ class ContentDatabase {
 
     /** Content **/
 
-    async selectContent(whereSQL, values, selectSQL='a.*, null as content') {
+    async selectContent(whereSQL, values, selectSQL='a.*, NULL as data') {
         let SQL = `
           SELECT ${selectSQL}
           FROM ${this.table.content} a
@@ -47,7 +47,7 @@ class ContentDatabase {
         const results = await DatabaseManager.queryAsync(SQL, values);
         return results ? results.map(result => new ContentRow(result)) : null;
     }
-    async fetchContent(whereSQL, values, selectSQL='a.*, null as content') {
+    async fetchContent(whereSQL, values, selectSQL='a.*, NULL as data') {
         const content = await this.selectContent(whereSQL, values, selectSQL);
         return content[0] || null;
     }
@@ -64,15 +64,15 @@ class ContentDatabase {
     //     return await this.selectContent(whereSQL, flags, selectSQL);
     // }
 
-    async insertContent(title, content, path, user_id, theme, data) {
+    async insertContent(title, data, path, user_id, theme) {
         let set = {};
         if(title) set.title = title;
-        if(content) set.content = content;
+        if(data) set.data = data;
         if(path) set.path = path[0] === '/' ? path : '/' + path;
         if(user_id !== null) set.user_id = user_id;
         // if(parent_id !== null) set.parent_id = parent_id;
         if(theme) set.theme = theme;
-        if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
+        // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
           INSERT INTO ${this.table.content}
           SET ?
@@ -81,14 +81,14 @@ class ContentDatabase {
         return results.insertId;
     }
 
-    async updateContent(id, title, content, path, user_id, theme, data) {
+    async updateContent(id, title, data, path, user_id, theme) {
         let set = {};
         if(title) set.title = title;
-        if(content) set.content = content;
+        if(data) set.data = data;
         if(path) set.path = path;
         if(user_id !== null) set.user_id = user_id;
         if(theme) set.theme = theme;
-        if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
+        // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
           UPDATE ${this.table.content} a
           SET ?, updated = UTC_TIMESTAMP()
@@ -173,18 +173,18 @@ class ContentDatabase {
         return revisions[0];
     }
 
-    async fetchContentRevisionsByContentID(contentID, limit=20, selectSQL = '*, NULL as content') {
+    async fetchContentRevisionsByContentID(contentID, limit=20, selectSQL = '*, NULL as data') {
         return await this.selectContentRevision(`ah.content_id = ? ORDER BY ah.id DESC LIMIT ${limit}`,
             [contentID], selectSQL);
     }
 
     // Inserting revision without updating content === draft
-    async insertContentRevision(content_id, title, content, user_id) {
+    async insertContentRevision(content_id, title, data, user_id) {
         let SQL = `
           INSERT INTO ${this.table.content_revision}
           SET ?
         `;
-        const results = await DatabaseManager.queryAsync(SQL, {content_id, user_id, title, content});
+        const results = await DatabaseManager.queryAsync(SQL, {content_id, user_id, title, data});
         return results.insertId;
     }
 
@@ -195,18 +195,14 @@ class ContentRow {
         return `
 CREATE TABLE ${tableName} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
-  \`user_id\` int(11) DEFAULT NULL,
-  \`path\` varchar(96) DEFAULT NULL,
-  \`title\` varchar(96) DEFAULT NULL,
-  \`content\` text DEFAULT NULL,
-  \`data\` TEXT DEFAULT NULL,
+  \`path\` varchar(96) NOT NULL,
+  \`title\` varchar(96) NOT NULL,
+  \`data\` text DEFAULT NULL,
   \`theme\` varchar(64) DEFAULT NULL,
   \`created\` datetime DEFAULT current_timestamp(),
   \`updated\` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (\`id\`),
-  UNIQUE KEY \`uk:content.path\` (\`path\`),
-  KEY \`fk:content.user_id\` (\`user_id\`),
-  CONSTRAINT \`fk:content.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
+  UNIQUE KEY \`uk:content.path\` (\`path\`)
 ) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8;
 `
     }
@@ -225,16 +221,14 @@ class ContentRevisionRow {
 CREATE TABLE ${tableName} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`content_id\` int(11) NOT NULL,
-  \`user_id\` int(11) NOT NULL,
   \`title\` varchar(96) DEFAULT NULL,
-  \`content\` TEXT,
+  \`data\` TEXT,
   \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (\`id\`),
   KEY \`idx:content_revision.content_id\` (\`content_id\` ASC),
   KEY \`idx:content_revision.user_id\` (\`user_id\` ASC),
 
-  CONSTRAINT \`fk:content_revision.content_id\` FOREIGN KEY (\`content_id\`) REFERENCES \`content\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT \`fk:content_revision.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT \`fk:content_revision.content_id\` FOREIGN KEY (\`content_id\`) REFERENCES \`content\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 `
     }

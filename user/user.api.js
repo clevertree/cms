@@ -288,12 +288,9 @@ class UserAPI {
             if(req.method === 'GET') {
                 const userID = UserAPI.sanitizeInput(req.query.userID || null, 'email');
                 // Render Editor Form
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `
+                await ThemeAPI.send(req, res, `
 <script src="/:user/:client/user-login.element.js"></script>
-<user-loginform${userID ? ` userID='${userID}'` : ''}></user-loginform>`)
-                );
+<user-loginform${userID ? ` userID='${userID}'` : ''}></user-loginform>`);
 
             } else {
                 // Handle Form (POST) Request
@@ -316,12 +313,9 @@ class UserAPI {
         try {
             if(req.method === 'GET') {
                 // Render Editor Form
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `
+                await ThemeAPI.send(req, res, `
 <script src="/:user/:client/user-logout.element.js"></script>
-<user-logoutform></user-logoutform>`)
-                );
+<user-logoutform></user-logoutform>`);
 
             } else {
                 // Handle Form (POST) Request
@@ -343,12 +337,9 @@ class UserAPI {
         try {
             if(req.method === 'GET') {
                 // Render Editor Form
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `
+                await ThemeAPI.send(req, res, `
 <script src="/:user/:client/user-register.element.js"></script>
-<user-registerform></user-registerform>`)
-                );
+<user-registerform></user-registerform>`);
 
             } else {
                 // Handle Form (POST) Request
@@ -399,12 +390,9 @@ class UserAPI {
 
             if(req.method === 'GET') {
                 // Render Editor Form
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `
+                await ThemeAPI.send(req, res, `
 <script src="/:user/:client/user-forgotpassword.element.js"></script>
-<user-forgotpasswordform src="${user.url}"></user-forgotpasswordform>`)
-                );
+<user-forgotpasswordform src="${user.url}"></user-forgotpasswordform>`);
 
             } else {
                 // Handle Form (POST) Request
@@ -449,12 +437,9 @@ class UserAPI {
             switch(req.method) {
                 case 'GET':
                     // Render Editor Form
-                    res.send(
-                        await ThemeAPI.get()
-                            .render(req, `
+                    await ThemeAPI.send(req, res, `
 <script src="/:user/:client/user-resetpassword.element.js"></script>
-<user-resetpasswordform uuid="${uuid}" src="${user.url}"></user-resetpasswordform>`)
-                    );
+<user-resetpasswordform uuid="${uuid}" src="${user.url}"></user-resetpasswordform>`);
                     break;
 
                 case 'OPTIONS':
@@ -502,23 +487,17 @@ class UserAPI {
             switch(req.method) {
                 case 'GET':
                     if(type === 'edit') {
-                        res.send(
-                            await ThemeAPI.get()
-                                .render(req, `
+                        await ThemeAPI.send(req, res, `
 <script src="/:user/:client/user-updateprofile.element.js"></script>
 <user-updateprofileform src="${user.url}"></user-updateprofileform>
 <script src="/:user/:client/user-updatepassword.element.js"></script>
 <user-updatepasswordform src="${user.url}"></user-updatepasswordform>
 <script src="/:user/:client/user-updateflags.element.js"></script>
-<user-updateflagsform src="${user.url}"></user-updateflagsform>`)
-                        );
+<user-updateflagsform src="${user.url}"></user-updateflagsform>`);
                     } else {
-                        res.send(
-                            await ThemeAPI.get()
-                                .render(req, `
+                        await ThemeAPI.send(req, res, `
 <script src="/:user/:client/user-${type}.element.js"></script>
-<user-${type}form src="${user.url}"></user-${type}form>`)
-                        );
+<user-${type}form src="${user.url}"></user-${type}form>`);
                     }
                     break;
 
@@ -601,15 +580,12 @@ class UserAPI {
         try {
 
             if (req.method === 'GET') {
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `
+                await ThemeAPI.send(req, res, `
 <section>
     <script src="/:user/:client/user-browser.element.js"></script>
     <user-browser></user-browser>
 </section>
-`)
-                );
+`);
             // <script src="/:user/:client/user-add.element.js"></script>
             // <user-addform></user-addform>
 
@@ -633,10 +609,7 @@ class UserAPI {
             console.error(`${req.method} ${req.url}`, error);
             res.status(400);
             if(req.method === 'GET') {
-                res.send(
-                    await ThemeAPI.get()
-                        .render(req, `<section class='error'><pre>${error.stack}</pre></section>`)
-                );
+                await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
             } else {
                 res.json({message: error.stack});
             }
