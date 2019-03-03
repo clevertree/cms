@@ -63,6 +63,7 @@ class AdminConfigureTask {
         return `
             <form action="/:task/${taskName}" method="POST" class="task task-admin-configure themed">
                 <fieldset>
+                    <legend>Task '${taskName}'</legend>
                     <table>
                         <thead>
                             <td colspan="2">

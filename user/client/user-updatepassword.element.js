@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 password_new: null,
                 password_confirm: null,
             };
-            // this.state = {id:-1, changepasswords:[]};
+            // this.state = {id:-1, resetpasswords:[]};
         }
 
         setState(newState) {

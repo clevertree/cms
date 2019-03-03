@@ -12,6 +12,8 @@ class MailServer {
         this.config = null;
     }
 
+    getDefaultSender() { return this.config && this.config.auth ? this.config.auth.user : null; }
+
     async configure(promptCallback=null) {
         console.info("Configuring Mail Client");
         const localConfig = new LocalConfig(promptCallback);
@@ -44,6 +46,7 @@ class MailServer {
         }
         // return mailConfig;
     }
+
 
     async sendMail(data) {
         if(!this.config)

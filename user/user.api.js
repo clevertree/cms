@@ -18,7 +18,7 @@ const { HTTPServer } = require('../http/http.server');
 // const { DNSManager } = require('../service/domain/dns.manager');
 const { ThemeAPI } = require('../theme/theme.api');
 const { TaskAPI } = require('../task/task.api');
-const { ResetPasswordEmail } = require("./mail/resetpassword.class");
+const { ResetPasswordMail } = require("./mail/resetpassword.mail");
 
 const DIR_USER = path.resolve(__dirname);
 
@@ -57,7 +57,7 @@ class UserAPI {
         router.all('/[:]user/:userID(\\w+)/[:]profile',              async (req, res, next) => await this.handleUpdateRequest('updateprofile', req.params.userID, req, res, next));
         router.all('/[:]user/:userID(\\w+)/[:]flags',                async (req, res, next) => await this.handleUpdateRequest('updateflags', req.params.userID, req, res, next));
         router.all('/[:]user/:userID(\\w+)/[:]password',             async (req, res, next) => await this.handleUpdateRequest('updatepassword', req.params.userID, req, res, next));
-        router.all('/[:]user/:userID(\\w+)/[:]changepassword/:uuid', async (req, res) => await this.handleResetPassword(req.params.userID, req.params.uuid, req, res));
+        router.all('/[:]user/:userID(\\w+)/[:]resetpassword/:uuid', async (req, res) => await this.handleResetPassword(req.params.userID, req.params.uuid, req, res));
         router.all('/[:]user/[:]login',                              async (req, res) => await this.handleLoginRequest(req, res));
         // router.all('/[:]user/session',                               async (req, res) => await this.handleSessionLoginRequest(req, res));
         router.all('/[:]user/[:]logout',                             async (req, res) => await this.handleLogoutRequest(req, res));
@@ -372,6 +372,22 @@ class UserAPI {
         }
     }
 
+    async sendResetPasswordRequestEmail(req, user) {
+
+        const uuid = uuidv4();
+        const recoveryUrl = req.protocol + '://' + req.get('host') + `/:user/${user.id}/:resetpassword/${uuid}`;
+
+        this.resetPasswordRequests[uuid] = user.id;
+        setTimeout(() => delete this.resetPasswordRequests[uuid], 1000 * 60 * 60); // Delete after 1 hour
+
+        let to = `${user.profile && user.profile.name ? user.profile.name : user.username} <${user.email}>`;
+
+        const mail = new ResetPasswordMail(recoveryUrl, to);
+        await mail.send();
+
+        return recoveryUrl;
+    }
+
     async handleForgotPassword(req, res, next) {
         try {
             const userID = UserAPI.sanitizeInput(req.query.userID || null);
@@ -396,16 +412,7 @@ class UserAPI {
                 if(!req.body.userID)
                     throw new Error("userID is required");
 
-                const uuid = uuidv4();
-                const recoveryUrl = req.protocol + '://' + req.get('host') + `/:user/${user.id}/:changepassword/${uuid}`;
-
-                this.resetPasswordRequests[uuid] = user.id;
-                setTimeout(() => delete this.resetPasswordRequests[uuid], 1000 * 60 * 60); // Delete after 1 hour
-
-                let to = `${user.profile && user.profile.name ? user.profile.name : user.username} <${user.email}>`;
-
-                const mail = new ResetPasswordEmail(recoveryUrl, to);
-                await mail.send();
+                await this.sendResetPasswordRequestEmail(req, user);
 
                 return res.json({
                     redirect: `/:user/:login`,
@@ -444,8 +451,8 @@ class UserAPI {
                 res.send(
                     await ThemeAPI.get()
                         .render(req, `
-<script src="/:user/:client/user-changepassword.element.js"></script>
-<user-changepasswordform uuid="${uuid}" src="${user.url}" username="${user.username}"></user-changepasswordform>`)
+<script src="/:user/:client/user-resetpassword.element.js"></script>
+<user-resetpasswordform uuid="${uuid}" src="${user.url}" username="${user.username}"></user-resetpasswordform>`)
                 );
 
             } else {

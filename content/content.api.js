@@ -129,7 +129,7 @@ class ContentApi {
                 if(contentRevision)
                     response.revision = contentRevision;
                 if(req.query.getAll) {
-                    response.parentList = await contentDB.selectContent("a.path IS NOT NULL", null, "id, parent_id, path, title");
+                    response.parentList = await contentDB.selectContent("a.path IS NOT NULL", null, "id, path, title");
                 }
 
                 res.json(response);
@@ -199,7 +199,7 @@ class ContentApi {
                         contentRevision = await contentDB.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentDB.fetchContentRevisionsByContentID(content.id))[0];
                     if(contentRevision)
                         response.revision = contentRevision;
-                    response.parentList = await contentDB.selectContent("a.path IS NOT NULL", null, "id, parent_id, path, title");
+                    response.parentList = await contentDB.selectContent("a.path IS NOT NULL", null, "id, path, title");
 
                     res.json(response);
 
@@ -218,7 +218,6 @@ class ContentApi {
                                 req.body.content,
                                 req.body.path,
                                 sessionUser.id,
-                                req.body.parent_id ? parseInt(req.body.parent_id) : null,
                                 req.body.theme,
                                 req.body.flags
                             );

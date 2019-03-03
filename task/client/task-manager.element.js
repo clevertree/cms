@@ -73,7 +73,7 @@ class HTMLTaskFormManagerElement extends HTMLElement {
 
     requestFormData() {
         // const form = this.querySelector('form');
-        const action = '/:task' + (this.state.taskName ? '/' + this.state.taskName : '');
+        const action = '/:task' + (this.state.taskName ? '/' + this.state.taskName : '') + document.location.search;
         const xhr = new XMLHttpRequest();
         xhr.onload = () => {
             const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};

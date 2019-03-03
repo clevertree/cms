@@ -125,7 +125,13 @@ class DatabaseManager {
             await domainDB.insertDomain(hostname, database);
             console.log(`Created domain entry: ${hostname} => ${database}`);
         } else {
-            console.info(`Found domain entry: ${hostname} => ${database}`);
+            if(!domain.database) {
+                await domainDB.updateDomain(hostname, database);
+                console.info(`Updated domain entry: ${hostname} => ${database}`);
+
+            } else {
+                console.info(`Found domain entry: ${hostname} => ${database}`);
+            }
         }
 
 
@@ -185,7 +191,7 @@ class DatabaseManager {
         return hostname;
     }
 
-    async selectDatabaseByHost(hostname, orThrowError=true) {
+    async selectDatabaseByHost(hostname) {
         if(this.multiDomain && hostname) {
             // const parse = require('url').parse(req.url);
 
@@ -199,16 +205,21 @@ class DatabaseManager {
             } else {
                 await domainDB.insertDomain(hostname, null);
             }
+            if(database) {
+                const databaseResult = await this.queryAsync(`SHOW DATABASES LIKE '${database}'`);
+                if(databaseResult.length === 0) {
+                    console.warn(`Database entry for ${hostname} does not correspond with an existing database: ${database}`);
+                    database = null;
+                }
+            }
             if(!database) {
-                if(!orThrowError)
-                    return null;
                 // Create domain entry with no database and redirect user
                 throw Object.assign(new Error("Database has not been configured for " + hostname), {
                     redirect: '/:task/database-configure'
                 });
                 // database = hostname.replace('.', '_') + '_cms';
             }
-            await this.configureDatabase(database, hostname);
+            // await this.configureDatabase(database, hostname); // Must be done manually!
             this.cacheHostname[hostname] = database;
             return database;
         } else {
@@ -218,8 +229,17 @@ class DatabaseManager {
     }
 
     async selectDatabaseByRequest(req, orThrowError=true) {
-        let hostname = this.getHostnameFromRequest(req);
-        return await this.selectDatabaseByHost(hostname, orThrowError);
+        if(orThrowError) {
+            let hostname = this.getHostnameFromRequest(req);
+            return await this.selectDatabaseByHost(hostname);
+        }
+        try {
+            let hostname = this.getHostnameFromRequest(req);
+            return await this.selectDatabaseByHost(hostname);
+        } catch (e) {
+            console.warn("Database not available: ", e);
+            return null;
+        }
     }
 
 

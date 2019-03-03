@@ -46,6 +46,17 @@ class DomainDatabase  {
         const results = await DatabaseManager.queryAsync(SQL, {hostname, database});
         return results.insertId;
     }
+
+    async updateDomain(hostname, database) {
+        console.log(this, this.table.domain);
+        let SQL = `
+          UPDATE ${this.table.domain}
+          SET \`database\` = ? where \`hostname\` = ?
+          LIMIT 1;
+        `;
+        const results = await DatabaseManager.queryAsync(SQL, [database, hostname]);
+        return results.affectedRows;
+    }
 }
 
 class DomainRow {

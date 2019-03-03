@@ -64,13 +64,13 @@ class ContentDatabase {
     //     return await this.selectContent(whereSQL, flags, selectSQL);
     // }
 
-    async insertContent(title, content, path, user_id, parent_id, theme, data) {
+    async insertContent(title, content, path, user_id, theme, data) {
         let set = {};
         if(title) set.title = title;
         if(content) set.content = content;
         if(path) set.path = path[0] === '/' ? path : '/' + path;
         if(user_id !== null) set.user_id = user_id;
-        if(parent_id !== null) set.parent_id = parent_id;
+        // if(parent_id !== null) set.parent_id = parent_id;
         if(theme) set.theme = theme;
         if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
@@ -81,13 +81,12 @@ class ContentDatabase {
         return results.insertId;
     }
 
-    async updateContent(id, title, content, path, user_id, parent_id, theme, data) {
+    async updateContent(id, title, content, path, user_id, theme, data) {
         let set = {};
         if(title) set.title = title;
         if(content) set.content = content;
         if(path) set.path = path;
         if(user_id !== null) set.user_id = user_id;
-        if(parent_id !== null) set.parent_id = parent_id;
         if(theme) set.theme = theme;
         if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
@@ -112,7 +111,7 @@ class ContentDatabase {
 
     async queryMenuData(req) {
         let SQL = `
-          SELECT a.id, a.parent_id, a.path, a.title
+          SELECT a.id, a.path, a.title
           FROM ${this.table.content} a
           WHERE a.path IS NOT NULL
 `;
@@ -125,17 +124,18 @@ class ContentDatabase {
 
         for(let i=0; i<menuEntries.length; i++) {
             let menuEntry = menuEntries[i];
-            if(menuEntry.parent_id === null) { // parent_id === null indicates top level menu
+            // if(menuEntry.parent_id === null) { // parent_id === null indicates top level menu
                 mainMenu.push(menuEntry);
-            }
-            for(let j=0; j<menuEntries.length; j++) {
-                let menuEntry2 = menuEntries[j];
-                if(menuEntry.id === menuEntry2.parent_id) {
-                    if(typeof menuEntry.subMenu === "undefined")
-                        menuEntry.subMenu = [];
-                    menuEntry.subMenu.push(menuEntry2);
-                }
-            }
+                continue;
+            // }
+            // for(let j=0; j<menuEntries.length; j++) {
+            //     let menuEntry2 = menuEntries[j];
+            //     if(menuEntry.id === menuEntry2.parent_id) {
+            //         if(typeof menuEntry.subMenu === "undefined")
+            //             menuEntry.subMenu = [];
+            //         menuEntry.subMenu.push(menuEntry2);
+            //     }
+            // }
         }
 
         return mainMenu;

@@ -28,15 +28,13 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('change', e => this.onChange(e));
             this.addEventListener('submit', e => this.onSubmit(e));
 
-            this.state.userID = this.getAttribute('userID');
-            if(!this.state.userID)
-                this.setState({message: "Error: userID is required", status: 400});
-            this.state.uuid = this.getAttribute('uuid');
-            if(!this.state.uuid)
-                this.setState({message: "Error: UUID is required", status: 400});
-            this.state.username = this.getAttribute('username');
-
-            this.render();
+            const src = this.getAttribute('src');
+            if(src) {
+                this.setState({src});
+                this.requestFormData();
+            } else {
+                this.setState({message: "attribute src=':/user/[userID]' required", status: 400});
+            }
         }
 
         onSuccess(e, response) {
@@ -78,6 +76,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
+            console.log("STATE", this.state);
+
             this.innerHTML =
                 `
                 <form action="/:user/${this.state.userID}/:resetpassword/${this.state.uuid}" method="POST" class="user user-resetpasswordform themed">

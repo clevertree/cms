@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 
-const { UserAPI } = require('./user.api');
 const { DatabaseManager } = require('../database/database.manager');
 // const { LocalConfig } = require('../config/local.config');
 const { ConfigDatabase } = require("../config/config.database");
@@ -10,6 +9,8 @@ const { ConfigDatabase } = require("../config/config.database");
 // const { ConfigManager } = require('../config/config.manager');
 
 class UserDatabase  {
+    get UserAPI() { return require('./user.api').UserAPI; }
+
     constructor(dbName, debug=false) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
         this.table = {
@@ -32,8 +33,8 @@ class UserDatabase  {
 
             if (adminUser) {
                 console.info("Admin user found: " + adminUser.id);
-                let changePassword = await promptCallback(`Would you like to change the admin password (Username: ${adminUser.username}) [y or n]?`, false, 'boolean');
-                if(changePassword) {
+                let resetpassword = await promptCallback(`Would you like to change the admin password (Username: ${adminUser.username}) [y or n]?`, false, 'boolean');
+                if(resetpassword) {
                     for (let i = 0; i < 4; i++) {
                         let adminPassword = await promptCallback(`Please enter a new password for ${adminUser.username}`, "", 'password');
                         let adminPassword2 = await promptCallback(`Please re-enter the new password for ${adminUser.username}`, "", 'password');
@@ -61,7 +62,7 @@ class UserDatabase  {
             // Find admin user by DNS info
             if(!adminUser && false) {
                 console.info("Querying WHOIS for admin email: " + hostname);
-                let dnsAdminEmail = await UserAPI.queryAdminEmailAddresses(hostname);
+                let dnsAdminEmail = await this.UserAPI.queryAdminEmailAddresses(hostname);
                 if (dnsAdminEmail) {
                     // dnsAdminEmail.split('@')[0]
                     adminUser = await this.createUser('admin', dnsAdminEmail, null, 'admin');

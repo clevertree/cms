@@ -89,6 +89,10 @@ table.task td.label:after {
     content: ':'
 }
 
+table.task td > p {
+    text-align: justify;
+    text-indent: 8px;
+}
 
 
 /** Task List **/
