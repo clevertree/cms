@@ -25,11 +25,10 @@ class TaskAPI {
 
     getMiddleware() {
         // Configure Routes
-        const bodyParser = require('body-parser');
 
         const router = express.Router();
-        router.use(bodyParser.urlencoded({ extended: true }));
-        router.use(bodyParser.json());
+        router.use(express.urlencoded({ extended: true }));
+        router.use(express.json());
         router.use(SessionAPI.getMiddleware());
 
         // Handle Task requests

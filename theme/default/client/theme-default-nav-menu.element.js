@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         render() {
             const menu = this.buildMenu();
-            console.log("RENDER", this.state, menu);
+//             console.log("RENDER", this.state, menu);
             this.innerHTML =
                 `
                 <ul class="nav-menu">

@@ -55,13 +55,12 @@ class ThemeAPI {
 
     getMiddleware() {
         const express = require('express');
-        const bodyParser = require('body-parser');
 
 
         // API Routes
         const router = express.Router();
-        router.use(bodyParser.urlencoded({ extended: true }));
-        router.use(bodyParser.json());
+        router.use(express.urlencoded({ extended: true }));
+        router.use(express.json());
         router.use(this.SessionAPI.getMiddleware());
 
         router.all('/[:]theme/:themeName(\\w+)',                        async (req, res, next) => await this.handleThemeRequest('edit', req.params.themeName, req, res, next));

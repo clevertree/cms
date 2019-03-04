@@ -13,22 +13,29 @@ class HTMLContentFormAddElement extends HTMLElement {
             message: "Add new content",
             status: 0,
             processing: false,
-            content: [null]
+            content: [null],
+            currentUploads: [],
         };
     }
 
     setState(newState) {
-            for(let i=0; i<arguments.length; i++)
-               Object.assign(this.state, arguments[i]);
-            this.render();
-        }
+        for(let i=0; i<arguments.length; i++)
+           Object.assign(this.state, arguments[i]);
+        this.render();
+    }
 
 
     connectedCallback() {
         this.addEventListener('change', e => this.onChange(e));
         this.addEventListener('submit', e => this.onSubmit(e));
+        document.addEventListener('/:content/:upload', e => this.onFileUpload(e));
 
         this.render();
+        this.requestFormData();
+    }
+
+    onFileUpload(e) {
+        this.setState({currentUploads: e.detail})
     }
 
     onSuccess(e, response) {
@@ -38,7 +45,16 @@ class HTMLContentFormAddElement extends HTMLElement {
     onError(e, response) {}
 
     onChange(e) {
-        const form = e.target.form || e.target;
+        this.updateFormData();
+    }
+    updateFormData() {
+        const formData = this.getFormData();
+        let i=0;
+        do {
+            // TODO: autofill
+            // const title =
+        }
+        while(++i);
         console.log(this.getFormData());
     }
 
@@ -66,6 +82,18 @@ class HTMLContentFormAddElement extends HTMLElement {
         this.setState({processing: true});
     }
 
+    requestFormData() {
+        const form = this.querySelector('form');
+        const xhr = new XMLHttpRequest();
+        xhr.onload = () => {
+            const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+            this.setState({processing: false}, response);
+        };
+        xhr.responseType = 'json';
+        xhr.open ('OPTIONS', form.getAttribute('action'), true);
+        xhr.send ();
+        this.setState({processing: true});
+    }
 
     getFormData(form) {
         form = form || this.querySelector('form');
@@ -77,9 +105,7 @@ class HTMLContentFormAddElement extends HTMLElement {
     render() {
         const formData = this.getFormData();
 
-
-        // TODO: multiple file upload
-        // console.log("RENDER", this.state);
+        console.log("RENDER", this.state);
         this.innerHTML =
             `<form action="/:content/:add" method="POST" class="content content-addform themed">
             <fieldset>
@@ -94,20 +120,32 @@ class HTMLContentFormAddElement extends HTMLElement {
                         <tr>
                             <th>Title</th>
                             <th>Path</th>
-                            <th>Upload content (optional)</th>
+                            <th>Content</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.state.content.map(content => `
+                        ${this.state.content.map((content, i) => `
                         <tr>
                             <td>
-                                <input type="text" name="title" placeholder="New Content Title" value="${formData.title || ''}" required/>
+                                <input type="text" name="content[${i}][title]" placeholder="New Content Title" value="${formData[`content[${i}][title]`] || ''}" required/>
                             </td>
                             <td>
-                                <input type="text" name="path" placeholder="/new/content/path" value="${formData.path || ''}" required/>
+                                <input type="text" name="content[${i}][path]" placeholder="/new/content/path" value="${formData[`content[${i}][path]`] || ''}" required/>
                             </td>
                             <td>
-                                <input type="file" name="data" style="max-width: 200px;" />
+                                <select name="content[${i}][data]" style="max-width: 140px;">
+                                    <option value="">Empty (Default)</option>
+                                    <optgroup label="Uploaded Files">
+                                    ${this.state.currentUploads.map((upload, i) => 
+                                        `<option value="uploaded:${upload.name}"${
+                                            formData[`content[${i}][data]`] === `uploaded:${upload.name}` ? ' selected="selected"' : ''
+                                            }>${upload.name} (${this.readableByteSize(upload.size)})</option>`
+                                    )}
+                                    </optgroup>
+                                    <optgroup label="Existing Content">
+                                    
+                                    </optgroup>
+                                </select>
                             </td>
                         </tr>
                         `).join('')}
@@ -125,5 +163,14 @@ class HTMLContentFormAddElement extends HTMLElement {
         </form>`;
     }
 
+    readableByteSize(bytes) {
+        if(Math.abs(bytes) < 1024)
+            return bytes + ' B';
+        const units = ['kB','MB','GB','TB','PB','EB','ZB','YB'];
+        let u = -1;
+        do { bytes /= 1024; ++u; }
+        while(Math.abs(bytes) >= 1024 && u < units.length - 1);
+        return bytes.toFixed(1)+' '+units[u];
+    }
 }
 customElements.define('content-addform', HTMLContentFormAddElement);

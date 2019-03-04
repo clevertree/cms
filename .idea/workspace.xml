@@ -2,19 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/content/client/content-upload.element.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/file/file.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/config.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/local.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/local.config.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content/client/content-add.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/content-add.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/client/content-upload.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/content-upload.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content/content.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/content.api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/database.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/database.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/database.manager.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/database.manager.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/domain/domain.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/domain/domain.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/task/task.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/task/task.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/theme/default/client/default.theme.css" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/client/default.theme.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/client/theme-default-nav-menu.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/client/theme-default-nav-menu.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/theme.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/theme/theme.api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/user.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.api.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -25,11 +22,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/content/content.api.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="735">
-              <caret line="399" column="106" selection-start-line="399" selection-start-column="106" selection-end-line="399" selection-end-column="106" />
+            <state relative-caret-position="697">
+              <caret line="354" column="31" lean-forward="true" selection-start-line="354" selection-start-column="31" selection-end-line="354" selection-end-column="31" />
             </state>
           </provider>
         </entry>
@@ -37,8 +34,27 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/content/client/content-upload.element.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="798">
-              <caret line="42" column="56" selection-start-line="42" selection-start-column="56" selection-end-line="42" selection-end-column="56" />
+            <state relative-caret-position="285">
+              <caret line="15" selection-start-line="15" selection-end-line="16" />
+              <folding>
+                <element signature="n#style#0;n#tr#2;n#thead#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#iframe#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#1;n#!!top" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/content/client/content-add.element.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="401">
+              <caret line="53" column="29" selection-start-line="53" selection-start-column="29" selection-end-line="53" selection-end-column="29" />
+              <folding>
+                <element signature="n#style#0;n#select#0;n#td#2;n#tr#0;n#!!top" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -54,19 +70,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>database</find>
-      <find>renderError</find>
-      <find>handleLogin</find>
-      <find>a.path</find>
-      <find>a.</find>
-      <find>parent_id</find>
-      <find>content</find>
-      <find>Log Out</find>
-      <find>.content</find>
-      <find>FileManager</find>
-      <find>async renderError</find>
-      <find>console.error(`${req.method</find>
-      <find>const fs</find>
       <find>is required for</find>
       <find>getHostnameFromRequest</find>
       <find>selectDatabaseByRequest</find>
@@ -84,11 +87,21 @@
       <find>requestForm</find>
       <find>requestFormData</find>
       <find>case 'O</find>
+      <find>delete</find>
+      <find>originalFile</find>
+      <find>selectAll</find>
+      <find>onSuccess</find>
+      <find>const express</find>
+      <find>console.error(`${req.method} ${req.url} ${error.message}`);</find>
+      <find>const bodyParser</find>
+      <find>bodyParser.urlencoded</find>
+      <find>bodyParser.json</find>
+      <find>fs.</find>
+      <find>fs.unlik</find>
+      <find>fs.unlink</find>
+      <find>temporary fil</find>
     </findStrings>
     <replaceStrings>
-      <replace>:content/:client/content.css</replace>
-      <replace>themeName</replace>
-      <replace>/:task/:client</replace>
       <replace>task</replace>
       <replace>taskName</replace>
       <replace>.element.js</replace>
@@ -115,6 +128,9 @@
       <replace>} else if(req.method === 'GET' &amp;&amp; !json) {</replace>
       <replace>this</replace>
       <replace>Upload</replace>
+      <replace>console.error(`${req.method} ${req.url} ${error.message}`);</replace>
+      <replace>express.urlencoded</replace>
+      <replace>express.json</replace>
       <replace>files</replace>
     </replaceStrings>
     <dirStrings>
@@ -158,7 +174,6 @@
         <option value="$PROJECT_DIR$/theme/default/template/nav.partial.ejs" />
         <option value="$PROJECT_DIR$/theme/default/template/header.partial.ejs" />
         <option value="$PROJECT_DIR$/user/mail/createadmin.mail.js" />
-        <option value="$PROJECT_DIR$/theme/theme.api.js" />
         <option value="$PROJECT_DIR$/domain/dns.manager.js" />
         <option value="$PROJECT_DIR$/content/content.database.js" />
         <option value="$PROJECT_DIR$/domain/domain.database.js" />
@@ -168,17 +183,18 @@
         <option value="$PROJECT_DIR$/content/client/content-editor.element.js" />
         <option value="$PROJECT_DIR$/theme/default/client/theme-default-nav-menu.element.js" />
         <option value="$PROJECT_DIR$/file/file.manager.js" />
-        <option value="$PROJECT_DIR$/domain/domain.api.js" />
-        <option value="$PROJECT_DIR$/database/database.api.js" />
         <option value="$PROJECT_DIR$/config/local.config.js" />
-        <option value="$PROJECT_DIR$/content/client/content-add.element.js" />
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/database/database.manager.js" />
-        <option value="$PROJECT_DIR$/content/client/content-upload.element.js" />
-        <option value="$PROJECT_DIR$/user/user.api.js" />
         <option value="$PROJECT_DIR$/config/config.api.js" />
+        <option value="$PROJECT_DIR$/database/database.api.js" />
+        <option value="$PROJECT_DIR$/domain/domain.api.js" />
         <option value="$PROJECT_DIR$/task/task.api.js" />
+        <option value="$PROJECT_DIR$/theme/theme.api.js" />
+        <option value="$PROJECT_DIR$/user/user.api.js" />
+        <option value="$PROJECT_DIR$/content/client/content-upload.element.js" />
         <option value="$PROJECT_DIR$/content/content.api.js" />
+        <option value="$PROJECT_DIR$/content/client/content-add.element.js" />
       </list>
     </option>
   </component>
@@ -433,12 +449,12 @@
       <workItem from="1551546896488" duration="14991000" />
       <workItem from="1551584087258" duration="3888000" />
       <workItem from="1551623490262" duration="2686000" />
-      <workItem from="1551645716238" duration="30195000" />
+      <workItem from="1551645716238" duration="39371000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="283732000" />
+    <option name="totallyTimeSpent" value="292908000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -514,13 +530,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/mail/mail.server.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="14" column="64" selection-start-line="14" selection-start-column="64" selection-end-line="14" selection-end-column="64" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/content/client/content.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="608">
@@ -721,20 +730,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/database/database.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2472">
-          <caret line="141" column="52" selection-start-line="141" selection-start-column="52" selection-end-line="141" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/theme/theme.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret selection-end-line="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/config/local.config.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="38">
@@ -742,34 +737,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/domain/domain.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1427">
-          <caret line="115" lean-forward="true" selection-start-line="115" selection-end-line="115" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/user/client/user-register.element.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1197">
           <caret line="63" selection-start-line="56" selection-end-line="63" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/content-browser.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-35">
-          <caret line="68" column="58" selection-start-line="68" selection-start-column="45" selection-end-line="68" selection-end-column="58" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/content-add.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1788">
-          <caret line="124" column="15" selection-start-line="124" selection-start-column="15" selection-end-line="124" selection-end-column="15" />
-          <folding>
-            <element signature="n#style#0;n#input#0;n#td#2;n#tr#0;n#!!top" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -836,38 +807,86 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/user.api.js">
+    <entry file="file://$PROJECT_DIR$/content/client/content-browser.element.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="678">
-          <caret line="494" column="16" selection-start-line="494" selection-start-column="16" selection-end-line="494" selection-end-column="16" />
+        <state relative-caret-position="1681">
+          <caret line="162" selection-start-line="162" selection-end-line="163" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/config/config.api.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="845">
-          <caret line="94" column="16" selection-start-line="94" selection-start-column="16" selection-end-line="94" selection-end-column="16" />
+        <state relative-caret-position="659">
+          <caret line="78" column="55" selection-start-line="78" selection-start-column="55" selection-end-line="78" selection-end-column="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/database/database.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="15" selection-start-line="15" selection-end-line="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/domain/domain.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="570">
+          <caret line="30" selection-start-line="30" selection-end-line="30" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/task/task.api.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="687">
-          <caret line="78" column="16" selection-start-line="78" selection-start-column="16" selection-end-line="78" selection-end-column="16" />
+        <state relative-caret-position="513">
+          <caret line="27" selection-start-line="27" selection-end-line="27" />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/theme/theme.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="659">
+          <caret line="57" selection-start-line="57" selection-end-line="57" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/user.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="668">
+          <caret line="44" selection-start-line="44" selection-end-line="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="http://localhost:8080/:content/:client/content-upload.element.js">
+      <provider selected="true" editor-type-id="httpFileEditor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/content/client/content-upload.element.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="798">
-          <caret line="42" column="56" selection-start-line="42" selection-start-column="56" selection-end-line="42" selection-end-column="56" />
+        <state relative-caret-position="285">
+          <caret line="15" selection-start-line="15" selection-end-line="16" />
+          <folding>
+            <element signature="n#style#0;n#tr#2;n#thead#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#iframe#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#1;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/content/content.api.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="735">
-          <caret line="399" column="106" selection-start-line="399" selection-start-column="106" selection-end-line="399" selection-end-column="106" />
+        <state relative-caret-position="697">
+          <caret line="354" column="31" lean-forward="true" selection-start-line="354" selection-start-column="31" selection-end-line="354" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/content-add.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="401">
+          <caret line="53" column="29" selection-start-line="53" selection-start-column="29" selection-end-line="53" selection-end-column="29" />
+          <folding>
+            <element signature="n#style#0;n#select#0;n#td#2;n#tr#0;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

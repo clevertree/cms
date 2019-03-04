@@ -19,9 +19,8 @@ class ConfigAPI {
     getMiddleware() {
         // Configure Routes
         const router = express.Router();
-        const bodyParser = require('body-parser');
-        router.use(bodyParser.urlencoded({ extended: true }));
-        router.use(bodyParser.json());
+        router.use(express.urlencoded({ extended: true }));
+        router.use(express.json());
         router.use(SessionAPI.getMiddleware());
 
         // Handle Config requests

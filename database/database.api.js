@@ -13,9 +13,8 @@ class DatabaseAPI {
     getMiddleware() {
         // Configure Routes
         let router = express.Router();
-        const bodyParser = require('body-parser');
-        router.use(bodyParser.urlencoded({ extended: true }));
-        router.use(bodyParser.json());
+        router.use(express.urlencoded({ extended: true }));
+        router.use(express.json());
         router.use(SessionAPI.getMiddleware());
 
         // Handle Database requests
@@ -24,8 +23,8 @@ class DatabaseAPI {
         router.all('/[:]database/[:]connect',                 async (req, res) => await this.renderDatabaseConnectForm(req, res));
 
         const routerMissingDB = express.Router();
-        routerMissingDB.use(bodyParser.urlencoded({ extended: true }));
-        routerMissingDB.use(bodyParser.json());
+        routerMissingDB.use(express.urlencoded({ extended: true }));
+        routerMissingDB.use(express.json());
         routerMissingDB.use(async (req, res) => await this.renderDatabaseConnectForm(req, res));
 
 

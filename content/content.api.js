@@ -1,5 +1,6 @@
 // const formidableMiddleware = require('express-formidable');
 const path = require('path');
+const fs = require('fs');
 
 const multiparty = require('multiparty');
 
@@ -20,10 +21,10 @@ class ContentApi {
 
     getMiddleware() {
         const express = require('express');
-        const bodyParser = require('body-parser');
+        // const bodyParser = require('body-parser');
 
         const router = express.Router();
-        const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
+        const PM = [express.urlencoded({ extended: true }), express.json()];
         const SM = SessionAPI.getMiddleware();
         // const FM = multiparty.multipartyExpress();
         // Handle Content requests
@@ -327,49 +328,65 @@ class ContentApi {
             if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
 
-            if(req.method === 'GET') {          // Handle GET
-                // Render Editor
-                await ThemeAPI.send(req, res,
+            const currentUploads = req.session.uploads || [];
+
+            switch(req.method) {
+                case 'GET':
+                    // Render Editor
+                    return await ThemeAPI.send(req, res,
 `<section>
     <script src="/:content/:client/content-add.element.js"></script>
     <content-addform></content-addform>
     <script src="/:content/:client/content-upload.element.js"></script>
     <content-uploadform></content-uploadform>
 </section>
-`)
+`);
 
-            } else {
-                if(!req.session || !req.session.userID)
-                    throw new Error("Must be logged in");
-                const sessionUser = await userDB.fetchUserByID(req.session.userID);
-                if(!sessionUser || !sessionUser.isAdmin())
-                    throw new Error("Not authorized");
-                // TODO: submit articles for approval
+                default:
+                case 'OPTIONS':
+                    // const currentCount = req.session.uploads ? req.session.uploads.length : 0;
 
-                // Handle POST
-                const insertID = await contentDB.insertContent(
-                    req.body.title,
-                    req.body.data,
-                    req.body.path,
-                    // sessionUser.id,
-                    // req.body.parent_id ? parseInt(req.body.parent_id) : null,
-                    req.body.theme
-                );
-                const content = await contentDB.fetchContentByID(insertID);
+                    return res.json({
+                        // message: `${currentCount} temporary file${currentCount !== 1 ? 's' : ''} uploaded`,
+                        currentUploads: currentUploads
+                            .map(uploadEntry => { return {
+                                name: uploadEntry.originalFilename,
+                                size: uploadEntry.size
+                            }})
+                    });
 
-                const insertContentRevisionID = await contentDB.insertContentRevision(
-                    content.id,
-                    req.body.title,
-                    req.body.data,
-                    sessionUser.id
-                );
-                return res.json({
-                    redirect: content.url + '/:edit',
-                    message: "Content created successfully. Redirecting...",
-                    insertID,
-                    insertContentRevisionID,
-                    content
-                });
+                case 'POST':
+                    if(!req.session || !req.session.userID)
+                        throw new Error("Must be logged in");
+                    const sessionUser = await userDB.fetchUserByID(req.session.userID);
+                    if(!sessionUser || !sessionUser.isAdmin())
+                        throw new Error("Not authorized");
+                    // TODO: submit articles for approval
+
+                    // Handle POST
+                    const insertID = await contentDB.insertContent(
+                        req.body.title,
+                        req.body.data,
+                        req.body.path,
+                        // sessionUser.id,
+                        // req.body.parent_id ? parseInt(req.body.parent_id) : null,
+                        req.body.theme
+                    );
+                    const content = await contentDB.fetchContentByID(insertID);
+
+                    const insertContentRevisionID = await contentDB.insertContentRevision(
+                        content.id,
+                        req.body.title,
+                        req.body.data,
+                        sessionUser.id
+                    );
+                    return res.json({
+                        redirect: content.url + '/:edit',
+                        message: "Content created successfully. Redirecting...",
+                        insertID,
+                        insertContentRevisionID,
+                        content
+                    });
             }
         } catch (error) {
             await this.renderError(error, req, res);
@@ -397,44 +414,69 @@ class ContentApi {
                     const currentCount = req.session.uploads ? req.session.uploads.length : 0;
 
                     return res.json({
-                        message: `${currentCount} temporary file${currentCount !== 1 ? 's' : ''} available`,
+                        message: `${currentCount} temporary file${currentCount !== 1 ? 's' : ''} uploaded`,
                         currentUploads: req.session.uploads
+                            .map(uploadEntry => { return {
+                                name: uploadEntry.originalFilename,
+                                size: uploadEntry.size
+                            }})
                     });
 
                 case 'POST':
                     if(!req.session)
                         throw new Error("Session is not available");
 
-                    const { files, fields } = await this.parseFileUploads(req);
-                    if(!files)
-                        throw new Error("Uploads not available");
-
-                    const uploadCount = Object.values(files).length;
-                    if(uploadCount === 0)
-                        throw new Error("No files were uploaded");
-
-
                     if(typeof req.session.uploads === "undefined")
                         req.session.uploads = [];
                     const currentUploads = req.session.uploads;
-                    for(let i=0; i<files.length; i++) {
-                        const uploadEntry = {
-                            originalFilename: files[i].originalFilename,
-                            path: files[i].path,
-                            size: files[i].size,
-                        };
-                        const pos = currentUploads.findIndex(searchUploadEntry => searchUploadEntry.originalFilename === uploadEntry.originalFilename);
-                        if(pos >= 0) {
-                            currentUploads[pos] = uploadEntry;
-                        } else {
-                            currentUploads.push(uploadEntry)
+                    let message = '';
+                    if(Object.values(req.body).length > 0) {
+                        let deletePositions = req.body.delete;
+                        if(deletePositions) {
+                            deletePositions = deletePositions.map(p => parseInt(p));
+                            deletePositions.sort((a,b) => b-a);
+                            for (let i=0; i<deletePositions.length; i++) {
+                                const deletedFile = currentUploads.splice(deletePositions[i], 1)[0];
+                                await this.unlinkFile(deletedFile.path);
+                            }
                         }
+                        message += `${deletePositions.length} temporary file${deletePositions.length !== 1 ? 's' : ''} deleted. `;
+                        // Handle JSON Form
+                    } else {
+                        // Handle File Upload Form
+                        const { files, fields } = await this.parseFileUploads(req);
+                        if(!files || !fields) {
+                            throw new Error("Uploads not available");
+
+                        }
+                        const uploadCount = Object.values(files).length;
+
+                        if(uploadCount === 0)
+                            throw new Error("No files were uploaded");
+                        for(let i=0; i<files.length; i++) {
+                            const uploadEntry = {
+                                originalFilename: files[i].originalFilename,
+                                path: files[i].path,
+                                size: files[i].size,
+                            };
+                            const pos = currentUploads.findIndex(searchUploadEntry => searchUploadEntry.originalFilename === uploadEntry.originalFilename);
+                            if(pos >= 0) {
+                                currentUploads[pos] = uploadEntry;
+                            } else {
+                                currentUploads.push(uploadEntry)
+                            }
+                        }
+                        message += `${uploadCount} temporary file${uploadCount !== 1 ? 's' : ''} uploaded. `;
                     }
 
+
                     return res.json({
-                        message: `${uploadCount} temporary file${uploadCount !== 1 ? 's' : ''} uploaded successfully. Redirecting...`,
-                        files: files,
+                        message: message,
                         currentUploads: req.session.uploads
+                            .map(uploadEntry => { return {
+                                name: uploadEntry.originalFilename,
+                                size: uploadEntry.size
+                            }})
                     });
             }
         } catch (error) {
@@ -533,8 +575,16 @@ class ContentApi {
         });
     }
 
+    unlinkFile(filePath) {
+        return new Promise( ( resolve, reject ) => {
+            fs.unlink(filePath, (err) => {
+                err ? reject (err) : resolve ();
+            });
+        });
+    }
+
     async renderError(error, req, res, json=null) {
-        console.error(`${req.method} ${req.url} ${error.message}`);
+        console.error(`${req.method} ${req.url} ${error.message}`, error);
         res.status(400);
         if(error.redirect) {
             res.redirect(error.redirect);

@@ -42,14 +42,12 @@ class UserAPI {
         // }
         sessionConfig.cookieName = 'session';
 
-        const bodyParser = require('body-parser');
-
         const router = express.Router();
         // TODO: handle session_save login
         // router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
         // API Routes
-        router.use(bodyParser.urlencoded({ extended: true }));
-        router.use(bodyParser.json());
+        router.use(express.urlencoded({ extended: true }));
+        router.use(express.json());
         router.use(SessionAPI.getMiddleware());
 
         router.all('/[:]user/:userID(\\w+)',                         async (req, res, next) => await this.handleUpdateRequest('profile', req.params.userID, req, res, next));
