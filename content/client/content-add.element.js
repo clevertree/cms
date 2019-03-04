@@ -72,6 +72,7 @@ class HTMLContentFormAddElement extends HTMLElement {
     render() {
         const formData = this.getFormData();
 
+        // TODO: multiple file upload 
         // console.log("RENDER", this.state);
         this.innerHTML =
             `<form action="/:content/:add" method="POST" class="content content-addform themed">

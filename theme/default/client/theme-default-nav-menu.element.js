@@ -117,11 +117,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     title: 'Log Out',
                 });
             }
+            menuSubMenu.push('<hr/>');
 
-            menuSubMenu.push({
-                path: '/:content',
-                title: 'Site Index'
-            });
             menuSubMenu.push({
                 path: '/:user',
                 title: 'Browse Users'
@@ -131,93 +128,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 title: `Browse Tasks`
             });
             menuSubMenu.push({
+                path: '/:content',
+                title: 'Site Index'
+            });
+            menuSubMenu.push({
                 path: '/:config',
                 title: 'Configure Site'
             });
 
 
             return menu;
-            // if (!this.state || !this.state.userID) { // If not logged in
-            //     menu.push({
-            //         path: '/:user/:login',
-            //         title: 'Log In',
-            //         subMenu: [{
-            //             path: '/:user/:register',
-            //             title: 'Register'
-            //         }, "<hr/>", {
-            //             path: '/:task',
-            //             title: `Browse Tasks`
-            //         }, "<hr/>", {
-            //             path: '/:content',
-            //             title: 'Browse Content'
-            //         }]
-            //     })
-            // } else { // If Logged In
-            //     const submenu = [];
-            //     menu.push({
-            //         path: `/:user/${this.state.userID}`,
-            //         title: 'Menu',
-            //         subMenu: submenu
-            //     });
-            //     if (content.id) {
-            //         submenu.push({
-            //             path: `/:content/${content.id}/:edit`,
-            //             title: 'Edit This Page\'s Content',
-            //         });
-            //     }
-            //     submenu.push({
-            //         path: '/:content',
-            //         title: 'Site Index'
-            //     }, "<hr/>", {
-            //         path: '/:task',
-            //         title: `Browse Tasks`
-            //     }, {
-            //         path: '/:config',
-            //         title: 'Configure Site'
-            //     }, "<hr/>", {
-            //         path: '/:file',
-            //         title: 'Browse Files'
-            //     }, "<hr/>", {
-            //         path: '/:user',
-            //         title: 'Browse Users'
-            //     }, {
-            //         path: `/:user/${this.state.userID}`,
-            //         title: 'My Profile',
-            //     }, {
-            //         path: `/:user/${this.state.userID}/:edit`,
-            //         title: 'Edit Profile',
-            //     }, {
-            //         path: `/:user/:logout`,
-            //         title: 'Log Out',
-            //     });
-            // }
-
-            // return `
-            // <nav>
-            //     <ul class="nav-menu">
-            //         ${menu.map(menuItem => `
-            //         <li>
-            //             <a href="${menuItem.path}">${menuItem.title}</a>
-            //             ${menuItem.subMenu && menuItem.subMenu.length === 0 ? `` : `
-            //             <ul class="nav-submenu">
-            //                 ${menuItem.subMenu.map(subMenuItem => {
-            //     if(typeof subMenuItem === "string")
-            //         return subMenuItem;
-            //
-            //     return `<li><a href="${subMenuItem.path}">${subMenuItem.title}</a></li>`;
-            // }).join('')}
-            //             </ul>
-            //             `}
-            //         </li>
-            //         `).join('')}
-            //     </ul>
-            // </nav>
-// `
         }
         
         render() {
             const menu = this.buildMenu();
-//             console.log("RENDER", this.state, menu);
+            console.log("RENDER", this.state, menu);
             this.innerHTML =
                 `
                 <ul class="nav-menu">

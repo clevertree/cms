@@ -1,6 +1,6 @@
 const path = require('path');
 
-const { FileManager } = require('../file/file.manager');
+// const { FileManager } = require('../file/file.manager');
 // const { ConfigManager } = require('./config.manager');promptCallback
 
 const BASE_DIR = path.resolve(path.dirname(__dirname));
@@ -40,8 +40,8 @@ class LocalConfig {
     async getAll() {
         if(!this.config) {
             const configPath = path.resolve(BASE_DIR + '/.config.json');
-            if (await FileManager.accessAsync(configPath)) {
-                const configJSON = await FileManager.readFileAsync(configPath, "utf8");
+            if (await this.accessAsync(configPath)) {
+                const configJSON = await this.readFileAsync(configPath, "utf8");
                 this.config = JSON.parse(configJSON);
             } else {
                 console.info("No config file found: " + configPath);
@@ -56,14 +56,14 @@ class LocalConfig {
         let newConfigJSON = JSON.stringify(this.config, null, 4);
         let oldConfigJSON = '';
         try {
-            oldConfigJSON = await FileManager.readFileAsync(configPath, "utf8");
+            oldConfigJSON = await this.readFileAsync(configPath, "utf8");
         } catch (e) {
             console.error(e.message);
         }
         if(newConfigJSON === oldConfigJSON)
             return false;
         // console.info("Config file updated: " + configPath);
-        await FileManager.writeFileAsync(configPath, newConfigJSON, 'utf8');
+        await this.writeFileAsync(configPath, newConfigJSON, 'utf8');
         return true;
     }
 
@@ -90,6 +90,32 @@ class LocalConfig {
     }
 
 
+    accessAsync (path) {
+        return new Promise((resolve, reject) => {
+            fs.access(path, fs.constants.F_OK, (err) => {
+                resolve(!err);
+            })
+        })
+    }
+
+
+    readFileAsync (path, opts = 'utf8') {
+        return new Promise((resolve, reject) => {
+            fs.readFile(path, opts, (err, data) => {
+                if (err) reject(err);
+                else resolve(data);
+            })
+        })
+    }
+
+    writeFileAsync (path, data, opts = 'utf8') {
+        return new Promise((resolve, reject) => {
+            fs.writeFile(path, data, opts, (err) => {
+                if (err) reject(err);
+                else resolve();
+            })
+        })
+    }
 
 }
 
