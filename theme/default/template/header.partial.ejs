@@ -2,8 +2,10 @@
             <div class="logo-container">
                 <div class="logo"></div>
                 <a href="" class="logo-text">
-                    <%=site.name%>
+                    <%=title%>
                 </a>
             </div>
-<%- content.themeMenu || include('nav.partial.ejs') %>
+            <nav>
+                <theme-default-nav-menu><%-htmlMenu%></theme-default-nav-menu>
+            </nav>
         </header>

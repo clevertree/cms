@@ -13,7 +13,7 @@ class HTMLContentBrowserElement extends HTMLElement {
             message: "Browsing Content",
             status: 0,
             processing: false,
-            content: []
+            contentList: []
         };
         this.keyTimeout = null;
         // this.state = {id:-1, flags:[]};
@@ -153,7 +153,7 @@ class HTMLContentBrowserElement extends HTMLElement {
     renderResults() {
         const resultsElement = this.querySelector('tbody.results');
         let classOdd = '';
-        resultsElement.innerHTML = this.state.content.map(content => `
+        resultsElement.innerHTML = this.state.contentList.map(content => `
             <tr class="results ${classOdd=classOdd===''?'odd':''}">
                 <td><a href=":content/${content.id}">${content.id}</a></td>
                 <td style="text-align: left;"><a href="${content.path||`:content/${content.id}/:edit`}">${content.path||''}</a></td>

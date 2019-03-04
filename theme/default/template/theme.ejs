@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <base href="<%=site.baseURL;%>">
-        <title><%=content.title || site.name%></title>
+        <base href="<%=baseURL;%>">
+        <title><%=title%></title>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <meta name="keywords" CONTENT="<%=content.keywords || site.keywords || ""%>">
+        <meta name="keywords" CONTENT="<%=keywords || ""%>">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link href=":theme/default/:client/default.theme.css" rel="stylesheet" />
-        <script src=":theme/default/:client/default.theme.client.js"></script>
+        <script src=":theme/default/:client/theme-default-nav-menu.element.js"></script>
     </head>
     <body class='theme-default'>
-<%- content.themeHeader || include('header.partial.ejs') %>
+<%- htmlHeader || include('header.partial.ejs') %>
 
 
         <article>
-            <%-content.data%>
+            <%-data%>
         </article>
 
 
-<%- content.themeFooter || include('footer.partial.ejs') %>
+<%- htmlFooter || include('footer.partial.ejs') %>
     </body>
 </html>

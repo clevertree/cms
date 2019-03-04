@@ -44,7 +44,8 @@ document.addEventListener('DOMContentLoaded', function() {
         requestFormData() {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
-                this.setState({processing: false}, xhr.response);
+                const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+                this.setState({processing: false}, response);
             };
             xhr.responseType = 'json';
             xhr.open ('OPTIONS', this.state.src, true);

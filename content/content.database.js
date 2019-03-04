@@ -38,29 +38,35 @@ class ContentDatabase {
 
     /** Content **/
 
-    async selectContent(whereSQL, values, selectSQL='a.*, NULL as data') {
+    async selectContent(whereSQL, values, selectSQL='c.*, NULL as data') {
         let SQL = `
           SELECT ${selectSQL}
-          FROM ${this.table.content} a
+          FROM ${this.table.content} c
           WHERE ${whereSQL}`;
 
         const results = await DatabaseManager.queryAsync(SQL, values);
         return results ? results.map(result => new ContentRow(result)) : null;
     }
-    async fetchContent(whereSQL, values, selectSQL='a.*, NULL as data') {
+    async fetchContent(whereSQL, values, selectSQL='c.*, NULL as data') {
         const content = await this.selectContent(whereSQL, values, selectSQL);
         return content[0] || null;
     }
 
     async fetchContentByPath(renderPath) {
         renderPath = renderPath.split('?')[0];
-        return await this.fetchContent('a.path = ? LIMIT 1', renderPath, 'a.*'); }
-    async fetchContentByID(contentID) { return await this.fetchContent('a.id = ? LIMIT 1', contentID, 'a.*'); }
+        return await this.fetchContent('c.path = ? LIMIT 1', renderPath, 'c.*'); }
+    async fetchContentByID(contentID) { return await this.fetchContent('c.id = ? LIMIT 1', contentID, 'c.*'); }
 
+    async getData(path) {
+        const content = await this.fetchContentByPath(path);
+        if(!content)
+            throw new Error("Content path not found: " + path);
+        return content.data;
+    }
     // async fetchContentByFlag(flags, selectSQL = 'id, parent_id, path, title, flags') {
     //     if(!Array.isArray(flags))
     //         flags = flags.split(',');
-    //     const whereSQL = flags.map(flag => 'FIND_IN_SET(?, a.flags)').join(' OR ');
+    //     const whereSQL = flags.map(flag => 'FIND_IN_SET(?, c.flags)').join(' OR ');
     //     return await this.selectContent(whereSQL, flags, selectSQL);
     // }
 
@@ -90,9 +96,9 @@ class ContentDatabase {
         if(theme) set.theme = theme;
         // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
-          UPDATE ${this.table.content} a
+          UPDATE ${this.table.content} c
           SET ?, updated = UTC_TIMESTAMP()
-          WHERE a.id = ?
+          WHERE c.id = ?
         `;
         const results = await DatabaseManager.queryAsync(SQL, [set, id]);
         return results.affectedRows;
@@ -111,13 +117,13 @@ class ContentDatabase {
 
     async queryMenuData(req) {
         let SQL = `
-          SELECT a.id, a.path, a.title
-          FROM ${this.table.content} a
-          WHERE a.path IS NOT NULL
+          SELECT c.id, c.path, c.title
+          FROM ${this.table.content} c
+          WHERE c.path IS NOT NULL
 `;
         let menuEntries = await DatabaseManager.queryAsync(SQL);
-        if(!menuEntries || menuEntries.length === 0)
-            throw new Error("No menu items found");
+        // if(!menuEntries || menuEntries.length === 0)
+        //     throw new Error("No menu items found");
 
         const mainMenu = [];
         // menuEntries = menuEntries.map(menuEntry => Object.assign({}, menuEntry));
@@ -143,10 +149,10 @@ class ContentDatabase {
 
     /** Content Revision **/
 
-    async selectContentRevision(whereSQL, values, selectSQL='ah.*') {
+    async selectContentRevision(whereSQL, values, selectSQL='cr.*') {
         let SQL = `
           SELECT ${selectSQL}
-          FROM ${this.table.content_revision} ah
+          FROM ${this.table.content_revision} cr
           WHERE ${whereSQL}
           `;
 
@@ -157,24 +163,24 @@ class ContentDatabase {
     // async fetchContentRevisionByDate(contentID, revisionDate) {
     //     if(["string", "number"].indexOf(typeof revisionDate) !== -1)
     //         revisionDate = new Date(revisionDate);
-    //     const revisions = await this.selectContentRevision('*', 'ah.content_id = ? AND ah.created = ? LIMIT 1',
+    //     const revisions = await this.selectContentRevision('*', 'cr.content_id = ? AND cr.created = ? LIMIT 1',
     //         [contentID, revisionDate]);
     //     return revisions[0];
     // }
 
     async fetchContentRevisionByID(id, selectSQL = '*') {
-        const revisions = await this.selectContentRevision(`ah.id = ?`,
+        const revisions = await this.selectContentRevision(`cr.id = ?`,
             [id], selectSQL);
         return revisions[0];
     }
     async fetchContentRevisionByDate(created, selectSQL = '*') {
-        const revisions = await this.selectContentRevision(`ah.created = ?`,
+        const revisions = await this.selectContentRevision(`cr.created = ?`,
             [created], selectSQL);
         return revisions[0];
     }
 
     async fetchContentRevisionsByContentID(contentID, limit=20, selectSQL = '*, NULL as data') {
-        return await this.selectContentRevision(`ah.content_id = ? ORDER BY ah.id DESC LIMIT ${limit}`,
+        return await this.selectContentRevision(`cr.content_id = ? ORDER BY cr.id DESC LIMIT ${limit}`,
             [contentID], selectSQL);
     }
 

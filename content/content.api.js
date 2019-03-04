@@ -33,7 +33,7 @@ class ContentApi {
         router.all('/[:]content/:id/[:]edit',                   SM, PM, async (req, res) => await this.renderContentEditorByID(req, res));
         router.all('/[:]content/:id/[:]delete',                 SM, PM, async (req, res) => await this.renderContentDeleteByID(req, res));
         router.all('/[:]content/[:]add',                        SM, PM, async (req, res) => await this.renderContentAdd(req, res));
-        router.all(['/[:]content', '/[:]content/[:]list'],      SM, PM, async (req, res) => await this.renderContentBrowser(req, res));
+        router.all(['/[:]content', '/[:]content/[:]browse'],    SM, PM, async (req, res) => await this.renderContentBrowser(req, res));
 
 
         // User Asset files
@@ -381,11 +381,11 @@ class ContentApi {
                     whereSQL = 'a.title LIKE ? OR a.data LIKE ? OR a.path LIKE ? OR a.id = ?';
                     values = ['%'+req.body.search+'%', '%'+req.body.search+'%', '%'+req.body.search+'%', parseInt(req.body.search)];
                 }
-                const content = await contentDB.selectContent(whereSQL, values);
+                const contentList = await contentDB.selectContent(whereSQL, values, 'id, path, title');
 
                 return res.json({
-                    message: `${content.length} page${content.length !== 1 ? 's' : ''} queried successfully`,
-                    content
+                    message: `${contentList.length} content entr${contentList.length !== 1 ? 'ies' : 'y'} queried successfully`,
+                    contentList
                 });
             }
         } catch (error) {
