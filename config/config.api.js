@@ -91,6 +91,7 @@ class ConfigAPI {
 </section>`);
                     break;
 
+                default:
                 case 'OPTIONS':
 
                     return res.json({
@@ -127,15 +128,19 @@ class ConfigAPI {
     }
 
 
-    async renderError(error, req, res, asJSON=false) {
-        console.error(`${req.method} ${req.url}`, error);
+    async renderError(error, req, res, json=null) {
+        console.error(`${req.method} ${req.url} ${error.message}`);
         res.status(400);
         if(error.redirect) {
             res.redirect(error.redirect);
-        } else if(req.method === 'GET' && !asJSON) {          // Handle GET
+        } else if(req.method === 'GET' && !json) {
             await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
-            res.json({message: error.stack});
+            res.json(Object.assign({}, {
+                message: `${req.method} ${req.url} ${error.message}`,
+                error: error.stack,
+                code: error.code,
+            }, json));
         }
     }
 }

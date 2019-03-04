@@ -197,6 +197,7 @@ class DatabaseManager {
 
             if(typeof this.cacheHostname[hostname] !== "undefined")
                 return this.cacheHostname[hostname];
+
             const domainDB = this.getPrimaryDomainDB();
             const domain = await domainDB.fetchDomainByHostname(hostname);
             let database = null;
@@ -212,12 +213,13 @@ class DatabaseManager {
                     database = null;
                 }
             }
+            if(!database && hostname === 'localhost')
+                database = this.primaryDatabase;
             if(!database) {
-                // Create domain entry with no database and redirect user
+                // Redirect user
                 throw Object.assign(new Error("Database has not been configured for " + hostname), {
                     redirect: '/:task/database-configure'
                 });
-                // database = hostname.replace('.', '_') + '_cms';
             }
             await this.configureDatabase(database, hostname); // Once configured manually, databases can be auto configured from then on.
             this.cacheHostname[hostname] = database;

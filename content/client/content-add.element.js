@@ -13,6 +13,7 @@ class HTMLContentFormAddElement extends HTMLElement {
             message: "Add new content",
             status: 0,
             processing: false,
+            content: [null]
         };
     }
 
@@ -24,8 +25,7 @@ class HTMLContentFormAddElement extends HTMLElement {
 
 
     connectedCallback() {
-        // this.addEventListener('change', this.onEvent);
-        // this.addEventListener('keyup', this.onEvent);
+        this.addEventListener('change', e => this.onChange(e));
         this.addEventListener('submit', e => this.onSubmit(e));
 
         this.render();
@@ -36,6 +36,11 @@ class HTMLContentFormAddElement extends HTMLElement {
             setTimeout(() => window.location.href = response.redirect, 2000);
     }
     onError(e, response) {}
+
+    onChange(e) {
+        const form = e.target.form || e.target;
+        console.log(this.getFormData());
+    }
 
     onSubmit(e) {
         if(e) e.preventDefault();
@@ -72,7 +77,8 @@ class HTMLContentFormAddElement extends HTMLElement {
     render() {
         const formData = this.getFormData();
 
-        // TODO: multiple file upload 
+
+        // TODO: multiple file upload
         // console.log("RENDER", this.state);
         this.innerHTML =
             `<form action="/:content/:add" method="POST" class="content content-addform themed">
@@ -84,31 +90,33 @@ class HTMLContentFormAddElement extends HTMLElement {
                                 ${this.state.message}
                             </div>
                         </tr>
-                        <tr><td colspan="2"><hr/></td></tr>
+                        <tr><td colspan="3"><hr/></td></tr>
+                        <tr>
+                            <th>Title</th>
+                            <th>Path</th>
+                            <th>Upload content (optional)</th>
+                        </tr>
                     </thead>
                     <tbody>
+                        ${this.state.content.map(content => `
                         <tr>
-                            <th style="width: 65px;"></th>
-                            <th></th>
-                        </tr>
-                        <tr>
-                            <td class="label">Title</td>
                             <td>
                                 <input type="text" name="title" placeholder="New Content Title" value="${formData.title || ''}" required/>
                             </td>
-                        </tr>
-                        <tr>
-                            <td class="label">Path</td>
                             <td>
                                 <input type="text" name="path" placeholder="/new/content/path" value="${formData.path || ''}" required/>
                             </td>
+                            <td>
+                                <input type="file" name="data" style="max-width: 200px;" />
+                            </td>
                         </tr>
+                        `).join('')}
                     </tbody>
                     <tfoot>
-                        <tr><td colspan="2"><hr/></td></tr>
+                        <tr><td colspan="3"><hr/></td></tr>
                         <tr>
-                            <td colspan="2" style="text-align: right;">
-                                <button type="submit">Add New Page</button>
+                            <td colspan="3" style="text-align: right;">
+                                <button type="submit">Add New Page${this.state.content.length > 0 ? 's' : ''}</button>
                             </td>
                         </tr>
                     </tfoot>            

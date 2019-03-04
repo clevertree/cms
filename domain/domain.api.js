@@ -64,12 +64,7 @@ class DomainAPI {
                 domainList,
             });
         } catch (error) {
-            console.error(`${req.method} ${req.url}`, error);
-            res.status(400);
-            return res.json({
-                message: `<div class='error'>${error.message || error}</div>`,
-                error: error.stack
-            });
+            await this.renderError(error, req, res, {});
         }
     }
 
@@ -115,15 +110,27 @@ class DomainAPI {
                 });
             }
         } catch (error) {
-            console.error(`${req.method} ${req.url}`, error);
-            res.status(400);
-            if(req.method === 'GET') {
-                await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
-            } else {
-                res.json({message: error.stack});
-            }
+            await this.renderError(error, req, res);
         }
     }
+
+
+    async renderError(error, req, res, json=null) {
+        console.error(`${req.method} ${req.url} ${error.message}`);
+        res.status(400);
+        if(error.redirect) {
+            res.redirect(error.redirect);
+        } else if(req.method === 'GET' && !json) {
+            await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
+        } else {
+            res.json(Object.assign({}, {
+                message: `${req.method} ${req.url} ${error.message}`,
+                error: error.stack,
+                code: error.code,
+            }, json));
+        }
+    }
+
 }
 
 

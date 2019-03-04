@@ -75,6 +75,7 @@ class TaskAPI {
     </section>`);
                     break;
 
+                default:
                 case 'OPTIONS':
                     // if(!sessionUser)
                     //     throw new Error("Must be logged in");
@@ -182,15 +183,15 @@ class TaskAPI {
     // }
 
     async renderError(error, req, res, json=null) {
-        console.error(`${req.method} ${req.url}`, error);
+        console.error(`${req.method} ${req.url} ${error.message}`);
         res.status(400);
         if(error.redirect) {
             res.redirect(error.redirect);
-        } else if(req.method === 'GET' && !json) {          // Handle GET
+        } else if(req.method === 'GET' && !json) {
             await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
             res.json(Object.assign({}, {
-                message: "Error: " + error.message,
+                message: `${req.method} ${req.url} ${error.message}`,
                 error: error.stack,
                 code: error.code,
             }, json));

@@ -1,4 +1,7 @@
+// const formidableMiddleware = require('express-formidable');
 const path = require('path');
+
+const multiparty = require('multiparty');
 
 const { HTTPServer } = require('../http/http.server');
 const { DatabaseManager } = require('../database/database.manager');
@@ -22,6 +25,7 @@ class ContentApi {
         const router = express.Router();
         const PM = [bodyParser.urlencoded({ extended: true }), bodyParser.json()];
         const SM = SessionAPI.getMiddleware();
+        // const FM = multiparty.multipartyExpress();
         // Handle Content requests
         router.get(['/[\\w/_-]+', '/'],                         SM, async (req, res, next) => await this.renderContentByPath(req, res,next));
 
@@ -33,6 +37,7 @@ class ContentApi {
         router.all('/[:]content/:id/[:]edit',                   SM, PM, async (req, res) => await this.renderContentEditorByID(req, res));
         router.all('/[:]content/:id/[:]delete',                 SM, PM, async (req, res) => await this.renderContentDeleteByID(req, res));
         router.all('/[:]content/[:]add',                        SM, PM, async (req, res) => await this.renderContentAdd(req, res));
+        router.all('/[:]content/[:]upload',                     SM, PM, async (req, res) => await this.renderContentUpload(req, res));
         router.all(['/[:]content', '/[:]content/[:]list'],      SM, PM, async (req, res) => await this.renderContentList(req, res));
 
 
@@ -135,7 +140,7 @@ class ContentApi {
                 await ThemeAPI.send(req, res, content);
             }
         } catch (error) {
-            await this.renderError(error, req, res, asJSON);
+            await this.renderError(error, req, res, asJSON ? {} : null);
         }
     }
 
@@ -167,6 +172,8 @@ class ContentApi {
             </section>
     `);
                     break;
+
+                default:
                 case 'OPTIONS':
 
                     let contentRevision = await this.checkForRevisionContent(req, content);
@@ -271,6 +278,7 @@ class ContentApi {
 </section>`);
                     break;
 
+                default:
                 case 'OPTIONS':
                     const response = {
                         message: `Delete content ID ${content.id}?`,
@@ -325,6 +333,8 @@ class ContentApi {
 `<section>
     <script src="/:content/:client/content-add.element.js"></script>
     <content-addform></content-addform>
+    <script src="/:content/:client/content-upload.element.js"></script>
+    <content-uploadform></content-uploadform>
 </section>
 `)
 
@@ -366,6 +376,73 @@ class ContentApi {
         }
     }
 
+    async renderContentUpload(req, res) {
+        try {
+            // const database = await DatabaseManager.selectDatabaseByRequest(req);
+            // const contentDB = new ContentDatabase(database);
+            // const userDB = new UserDatabase(database);
+            switch(req.method) {
+                case 'GET':
+                    // Render Editor
+                    await ThemeAPI.send(req, res,
+                        `<section>
+        <script src="/:content/:client/content-upload.element.js"></script>
+        <content-uploadform></content-uploadform>
+    </section>
+    `)
+                    break;
+
+                default:
+                case 'OPTIONS':
+                    const currentCount = req.session.uploads ? req.session.uploads.length : 0;
+
+                    return res.json({
+                        message: `${currentCount} temporary file${currentCount !== 1 ? 's' : ''} available`,
+                        currentUploads: req.session.uploads
+                    });
+
+                case 'POST':
+                    if(!req.session)
+                        throw new Error("Session is not available");
+
+                    const { files, fields } = await this.parseFileUploads(req);
+                    if(!files)
+                        throw new Error("Uploads not available");
+
+                    const uploadCount = Object.values(files).length;
+                    if(uploadCount === 0)
+                        throw new Error("No files were uploaded");
+
+
+                    if(typeof req.session.uploads === "undefined")
+                        req.session.uploads = [];
+                    const currentUploads = req.session.uploads;
+                    for(let i=0; i<files.length; i++) {
+                        const uploadEntry = {
+                            originalFilename: files[i].originalFilename,
+                            path: files[i].path,
+                            size: files[i].size,
+                        };
+                        const pos = currentUploads.findIndex(searchUploadEntry => searchUploadEntry.originalFilename === uploadEntry.originalFilename);
+                        if(pos >= 0) {
+                            currentUploads[pos] = uploadEntry;
+                        } else {
+                            currentUploads.push(uploadEntry)
+                        }
+                    }
+
+                    return res.json({
+                        message: `${uploadCount} temporary file${uploadCount !== 1 ? 's' : ''} uploaded successfully. Redirecting...`,
+                        files: files,
+                        currentUploads: req.session.uploads
+                    });
+            }
+        } catch (error) {
+            await this.renderError(error, req, res);
+        }
+
+    }
+
     async renderContentList(req, res) {
         try {
 
@@ -376,6 +453,9 @@ class ContentApi {
     <content-browser></content-browser>
     <script src="/:content/:client/content-add.element.js"></script>
     <content-addform></content-addform>
+    <script src="/:content/:client/content-upload.element.js"></script>
+    <content-uploadform></content-uploadform>
+
 </section>
 `);
 
@@ -413,15 +493,59 @@ class ContentApi {
 
     }
 
-    async renderError(error, req, res, asJSON=false) {
-        console.error(`${req.method} ${req.url}`, error);
+    async parseFileUploads(req) {
+        return new Promise( ( resolve, reject ) => {
+            var form = new multiparty.Form();
+
+            form.parse(req, function(err, fields, files) {
+                resolve ({fields, files: files && files.files ? files.files : null});
+                // res.writeHead(200, {'content-type': 'text/plain'});
+                // res.write('received upload:\n\n');
+                // res.end(util.inspect({fields: fields, files: files}));
+            });
+        });
+    }
+
+    calculateFileHash(filePath) {
+        return new Promise( ( resolve, reject ) => {
+            fs.createReadStream(filePath).
+            pipe(crypto.createHash('sha1').setEncoding('hex')).
+            on('finish', function () {
+                resolve (this.read()) //the hash
+            })
+                .on('error', reject);
+        });
+    }
+
+    readFileContent(filePath, options=null) {
+        return new Promise( ( resolve, reject ) => {
+            fs.readFile(filePath, options, (err, contents) => {
+                err ? reject (err) : resolve (contents);
+            });
+        });
+    }
+
+    readFileStats(filePath) {
+        return new Promise( ( resolve, reject ) => {
+            fs.stat(filePath, (err, stats) => {
+                err ? reject (err) : resolve (stats);
+            });
+        });
+    }
+
+    async renderError(error, req, res, json=null) {
+        console.error(`${req.method} ${req.url} ${error.message}`);
         res.status(400);
         if(error.redirect) {
             res.redirect(error.redirect);
-        } else if(req.method === 'GET' && !asJSON) {          // Handle GET
+        } else if(req.method === 'GET' && !json) {
             await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
-            res.json({message: error.stack});
+            res.json(Object.assign({}, {
+                message: `${req.method} ${req.url} ${error.message}`,
+                error: error.stack,
+                code: error.code,
+            }, json));
         }
     }
 }

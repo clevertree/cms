@@ -30,7 +30,7 @@
     "cookie-parser": "^1.4.3",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
-    "express-formidable": "^1.2.0",
+    "multiparty": "^4.2.1",
     "greenlock": "^2.6.7",
     "jodit": "^3.2.34",
     "mailparser": "^2.4.3",
