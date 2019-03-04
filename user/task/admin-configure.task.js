@@ -1,8 +1,16 @@
-// TODO: approve all drafts
+const uuidv4 = require('uuid/v4');
 
-// const { DNSManager } = require('../../domain/dns.manager');
-const { UserDatabase } = require('../user.database');
-const { UserAPI } = require('../user.api');
+// const { DatabaseManager } = require("../../database/database.manager");
+const { UserAPI } = require("../../user/user.api");
+const { UserDatabase } = require("../../user/user.database");
+const { CreateAdminMail } = require('../mail/createadmin.mail');
+const adminRequests = {
+    '51639466-c8de-47e9-845f-5ac31fabe00f': {
+        adminEmail: 'ari.asulin@gmail.com',
+        hostname: 'paradigmthreat.org',
+    }
+};
+
 
 class AdminConfigureTask {
     constructor(database) {
@@ -31,40 +39,89 @@ class AdminConfigureTask {
         const taskName = AdminConfigureTask.getTaskName();
         const hostname = (req.get ? req.get('host') : req.headers.host).split(':')[0];
         let status = 0;
-        let message = `Task '${taskName}': Create an Administrator Account`;
+        let message = `Create an Administrator Account`;
+        let isActive = await this.isActive(req, sessionUser);
 
-        let dnsAdminEmails = await UserAPI.queryAdminEmailAddresses(this.database, hostname);
         // const isAdmin = sessionUser && sessionUser.isAdmin();
 
-        switch(req.method) {
-            case 'POST':
+        let requestUUID = null, selectedAdminEmail = null, requestData = {}, dnsAdminEmails = [];
+        try {
+            if (!isActive)
+                throw new Error("This task is not active");
 
-                if(!(await this.isActive(req, sessionUser)))
-                    throw new Error("This task is not active");
+            dnsAdminEmails = await UserAPI.queryAdminEmailAddresses(null, hostname);
 
-                if(!dnsAdminEmails || dnsAdminEmails.length === 0)
-                    throw new Error("Administrator Email could not be found");
-                if(!req.body.admin_email)
-                    throw new Error("Field is required: admin_email");
-                const selectedAdminEmail = req.body.admin_email;
-                if(dnsAdminEmails.indexOf(selectedAdminEmail) === -1)
-                    throw new Error("Invalid Admin Email");
+            if (typeof req.query.uuid !== "undefined") {
+                requestUUID = req.query.uuid;
+                if (typeof adminRequests[requestUUID] === "undefined")
+                    throw new Error("Request UUID is invalid");
+                requestData = adminRequests[requestUUID];
+            }
 
-                const userDB = new UserDatabase(this.database);
-                // const adminUser = await userDB.createUser('admin', dnsAdminEmail, null, 'admin');
-                console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
-                // TODO: don't create admin account until user completes validation
-                // TODO: send email;
+            switch (req.method) {
+                case 'POST':
 
-                break;
+                    if (!dnsAdminEmails || dnsAdminEmails.length === 0)
+                        throw new Error("Administrator Email could not be found");
+
+                    if (req.body.uuid) {
+                        requestUUID = req.body.uuid;
+                        if (typeof adminRequests[requestUUID] === "undefined")
+                            throw new Error("Request UUID is invalid");
+                        requestData = adminRequests[requestUUID];
+                        delete adminRequests[requestUUID];
+
+                        const userDB = new UserDatabase(this.database);
+                        const adminUser = await userDB.createUser(req.body.username || 'admin', requestData.adminEmail, req.body.password, 'admin');
+
+                        // await UserAPI.sendResetPasswordRequestEmail(req, adminUser);
+
+                        status = 200;
+                        message = `
+                        An administrator account has been created under the email ${adminUser.email}. <br/>
+                        You may now log in and administrate <em>${hostname}</em>. <br/>`;
+                        isActive = false;
+                        break;
+                    }
+
+                    // Initial Post
+                    if (!req.body.admin_email)
+                        throw new Error("Field is required: admin_email");
+                    selectedAdminEmail = req.body.admin_email;
+                    if (dnsAdminEmails.indexOf(selectedAdminEmail) === -1)
+                        throw new Error("Invalid Admin Email");
+
+                    const uuid = uuidv4();
+                    const requestURL = req.protocol + '://' + req.get('host') + `/:task/admin-configure/?uuid=${uuid}`;
+
+                    adminRequests[uuid] = {
+                        adminEmail: selectedAdminEmail,
+                        hostname
+                    };
+
+                    setTimeout(function () {
+                        delete adminRequests[uuid];
+                    }, 1000 * 60 * 60);
+                    const email = new CreateAdminMail(requestURL, `Administrator <${selectedAdminEmail}>`, hostname);
+                    await email.send();
+
+                    status = 200;
+                    message = `A request to create an admin account for ${hostname} has been sent to ${selectedAdminEmail}`;
+
+                    break;
+            }
+        } catch (e) {
+            isActive = false;
+            console.error(e);
+            status = 400;
+            message = `Administrator for ${hostname} could not be configured. <br/><code>${e}</code>`;
         }
-
-        // let dnsAdminEmail = await DNSManager.queryHostAdminEmailAddresses(hostname);
         return `
-            <form action="/:task/${taskName}" method="POST" class="task task-admin-configure themed">
-                <fieldset>
+            <form action="/:task/${taskName}" method="POST" class="task task-database-configure themed">
+                ${requestUUID ? `<input type="hidden" name="uuid" value="${requestUUID||''}">` : ``}
+                <fieldset ${isActive ? `disabled` : ``}>
                     <legend>Task '${taskName}'</legend>
-                    <table>
+                    <table class="task">
                         <thead>
                             <td colspan="2">
                                 <div class="${status === 200 ? 'success' : (!status ? 'message' : 'error')} status-${status}">
@@ -75,42 +132,65 @@ class AdminConfigureTask {
                             <tr>
                                 <td colspan="2">
                                     <p>
-                                        Step #1. <a href="https://www.linode.com/docs/platform/manager/dns-manager/#add-a-domain-zone">Change</a> 
-                                        your domain's DNS <a href="https://support.rackspace.com/how-to/what-is-an-soa-record/">SOA Email</a> 
-                                        field to the administrator's email address who's responsible for managing <strong>${hostname}</strong>. 
+                                        <strong>${hostname}</strong> does not have an administrator account.  
+                                    ${requestUUID ? `
+                                        Please use this form to configure the <strong>administrator</strong>.
+                                    ` : `
+                                        Please use this form send an account creation request.
+                                        A <strong>validation email</strong> will be sent to the <strong>hostmaster</strong> of this server. 
                                     </p>
                                     <p>
-                                        Step #2. Select an admin email address and submit this form to send a request to create the admin account.
-                                    </p>
-                                    <p>
-                                        Step #3. Check the email sent to the selected email address for instructions on creating an administrator account for ${hostname}. 
+                                        Please have the hostmaster complete the last step according to the email's instructions.
+                                    ` }
                                     </p>
                                 </td>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="label">Admin Email</td>
-                                <td>
-                                    <select name="admin_email" required>
-                                        ${dnsAdminEmails.map(dnsAdminEmail => 
-                                            `<option value="${dnsAdminEmail}">${dnsAdminEmail}</option>`
-                                        ).join('')}
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
                                 <td class="label">Hostname</td>
                                 <td>
                                     <input type="hostname" name="hostname" value="${hostname || "No Hostname Found"}" disabled/>
                                 </td>
                             </tr>
+                            <tr>
+                                <td class="label">Administrator Email</td>
+                                <td>
+                                    ${requestUUID ? `
+                                    <input type="email" name="admin_email" value="${requestData.adminEmail}" disabled/>
+                                    ` : `
+                                    <select name="admin_email" required>
+                                        ${dnsAdminEmails.map(dnsAdminEmail =>
+                                            `<option value="${dnsAdminEmail}">${dnsAdminEmail}</option>`
+                                        ).join('')}
+                                    </select>
+                                    `}
+                                </td>
+                            </tr>
+                            ${requestUUID ? `
+                            <tr>
+                                <td class="label">Administrator Username</td>
+                                <td>
+                                    <input type="text" name="username" value="admin" required/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label">Administrator Password</td>
+                                <td>
+                                    <input type="password" name="password" value="" required/>
+                                </td>
+                            </tr>
+                            ` : `` }
                         </tbody>
                         <tfoot>
                             <tr><td colspan="2"><hr/></td></tr>
                             <tr>
                                 <td colspan="2" style="text-align: right;">
+                                    ${requestUUID ? `
+                                    <button type="submit">Create Administrator</button>
+                                    ` : `
                                     <button type="submit">Send Validation Email</button>
+                                    `}
                                 </td>
                             </tr>
                         </tfoot>
@@ -118,6 +198,7 @@ class AdminConfigureTask {
                 </fieldset>
             </form>`;
     }
+
 
 }
 

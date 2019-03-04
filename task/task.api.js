@@ -83,11 +83,13 @@ class TaskAPI {
                     let taskForms = {};
                     let taskCount = 0;
                     if (!taskName) {
-                        const activeTaskList = await this.getActiveTasks(req, database, sessionUser);
-                        for(let i=0; i<activeTaskList.length; i++) {
-                            const task = activeTaskList[i];
-                            taskForms[taskName] = await task.renderFormHTML(req, sessionUser);
-                            taskCount++;
+                        const activeTasks = await this.getActiveTasks(req, database, sessionUser);
+                        for(let taskName in activeTasks) {
+                            if(activeTasks.hasOwnProperty(taskName)) {
+                                const task = activeTasks[taskName];
+                                taskForms[taskName] = await task.renderFormHTML(req, sessionUser);
+                                taskCount++;
+                            }
                         }
                     } else {
                         const task = this.getTask(taskName, database);
@@ -117,7 +119,7 @@ class TaskAPI {
                     return res.json({
                         message: `<div class='success'>Task '${taskName}' has been run successfully</div>`,
                         result: {
-                            taskName,
+                            updatedTaskName: taskName,
                             taskForm: resultTaskForm
                         }
                     });
@@ -151,12 +153,12 @@ class TaskAPI {
     getTasks() { return Object.values(this.taskClass); }
 
     async getActiveTasks(req, database, sessionUser=null) {
-        const activeTasks = [];
+        const activeTasks = {};
         for(const taskName in this.taskClass) {
             if(this.taskClass.hasOwnProperty(taskName)) {
                 const task = this.getTask(taskName, database);
                 if(await task.isActive(req, sessionUser)) {
-                    activeTasks.push(task);
+                    activeTasks[taskName] = task;
                 }
             }
         }

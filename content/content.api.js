@@ -33,7 +33,7 @@ class ContentApi {
         router.all('/[:]content/:id/[:]edit',                   SM, PM, async (req, res) => await this.renderContentEditorByID(req, res));
         router.all('/[:]content/:id/[:]delete',                 SM, PM, async (req, res) => await this.renderContentDeleteByID(req, res));
         router.all('/[:]content/[:]add',                        SM, PM, async (req, res) => await this.renderContentAdd(req, res));
-        router.all(['/[:]content', '/[:]content/[:]browse'],    SM, PM, async (req, res) => await this.renderContentBrowser(req, res));
+        router.all(['/[:]content', '/[:]content/[:]list'],    SM, PM, async (req, res) => await this.renderContentBrowser(req, res));
 
 
         // User Asset files

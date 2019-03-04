@@ -51,6 +51,7 @@ class DatabaseConfigureTask {
         const hostname = (req.get ? req.get('host') : req.headers.host).split(':')[0];
         let status = 0;
         let message = `Configure Database for ${hostname}`;
+        let isActive = await this.isActive(req, sessionUser);
 
         const defaultDatabaseName = hostname.replace('.', '_') + '_cms';
 
@@ -58,7 +59,7 @@ class DatabaseConfigureTask {
 
         let requestUUID = null, selectedAdminEmail = null, requestData = {}, dnsAdminEmails = [];
         try {
-            if (!(await this.isActive(req, sessionUser)))
+            if (!isActive)
                 throw new Error("This task is not active");
 
             dnsAdminEmails = await UserAPI.queryAdminEmailAddresses(null, hostname);
@@ -78,9 +79,10 @@ class DatabaseConfigureTask {
 
                     if (req.body.uuid) {
                         requestUUID = req.body.uuid;
-                        if (typeof configureRequests[req.body.uuid] === "undefined")
+                        if (typeof configureRequests[requestUUID] === "undefined")
                             throw new Error("Request UUID is invalid");
-                        requestData = configureRequests[req.body.uuid];
+                        requestData = configureRequests[requestUUID];
+                        delete configureRequests[requestUUID];
 
                         // if(!req.body.password)
                         //     throw new Error("Field is required: password");
@@ -91,16 +93,16 @@ class DatabaseConfigureTask {
 
                         await DatabaseManager.configureDatabase(database, hostname, null);
                         const userDB = new UserDatabase(database);
-                        const adminUser = await userDB.createUser('admin', requestData.adminEmail, null, 'admin');
+                        const adminUser = await userDB.createUser(req.body.username || 'admin', requestData.adminEmail, req.body.password, 'admin');
 
-                        await UserAPI.sendResetPasswordRequestEmail(req, adminUser);
+                        // await UserAPI.sendResetPasswordRequestEmail(req, adminUser);
 
                         status = 200;
                         message = `
                         Database ${database} has been successfully configured. <br/>
                         An administrator account has been created under the email ${adminUser.email}. <br/>
-                        Please follow the instructions provided in the email to complete the administrator account registration. <br/>
-`;
+                        You may now log in and administrate <em>${hostname}</em>. <br/>`;
+                        isActive = false;
                         break;
                     }
 
@@ -131,6 +133,7 @@ class DatabaseConfigureTask {
                     break;
             }
         } catch (e) {
+            isActive = false;
             console.error(e);
             status = 400;
             message = `Database for ${hostname} could not be configured. <br/><code>${e}</code>`;
@@ -138,7 +141,7 @@ class DatabaseConfigureTask {
         return `
             <form action="/:task/${taskName}" method="POST" class="task task-database-configure themed">
                 ${requestUUID ? `<input type="hidden" name="uuid" value="${requestUUID||''}">` : ``}
-                <fieldset>
+                <fieldset ${isActive ? `disabled` : ``}>
                     <legend>Task '${taskName}'</legend>
                     <table class="task">
                         <thead>
@@ -199,6 +202,12 @@ class DatabaseConfigureTask {
                                 <td class="label">Administrator Username</td>
                                 <td>
                                     <input type="text" name="username" value="admin" required/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label">Administrator Password</td>
+                                <td>
+                                    <input type="password" name="password" value="" required/>
                                 </td>
                             </tr>
                             ` : `` }

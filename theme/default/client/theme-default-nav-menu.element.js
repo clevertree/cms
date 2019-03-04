@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
-                src: '/:content/:browse',
+                src: '/:content/:list',
                 userID: null,
                 menu: []
             };
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return menuEntry;
                 });
             }
-            console.log(menu, rootPaths, this.state.contentList);
+//             console.log(menu, rootPaths, this.state.contentList);
             const menuSubMenu = [];
             menu.push({
                 title: 'Menu',
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         render() {
             const menu = this.buildMenu();
-            console.log("RENDER", this.state, menu);
+//             console.log("RENDER", this.state, menu);
             this.innerHTML =
                 `
                 <ul class="nav-menu">

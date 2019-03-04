@@ -41,9 +41,12 @@ class HTMLTaskFormManagerElement extends HTMLElement {
 
     onSuccess(e, response) {
         if(response.result) {
-            this.state.taskForms[response.result.taskName] = response.result.taskForm;
+            if(!response.result.updatedTaskName)
+                throw new Error("Invalid updatedTaskName: " + response.result.updatedTaskName);
+            this.state.taskForms[response.result.updatedTaskName] = response.result.taskForm;
             this.render();
         }
+
         console.log(response);
         if(response.redirect) {
             this.setState({processing: true});
@@ -119,7 +122,7 @@ class HTMLTaskFormManagerElement extends HTMLElement {
         let searchField = this.querySelector('input#search');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
-            `<form action="#" class="task task-editor themed">
+            `<form action="#" class="task task-editor themed" ${this.state.taskName ? 'style="display: none"' : ''}>
                 <fieldset>
                     <table class="task">
                         <thead>

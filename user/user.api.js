@@ -259,7 +259,8 @@ class UserAPI {
             req.session.setDuration(1000 * 60 * 60 * 24 * 14) // 2 weeks;
         }
 
-        const activeTaskList = await TaskAPI.getActiveTasks(req, database, sessionUser);
+        const activeTasks = await TaskAPI.getActiveTasks(req, database, sessionUser);
+        const activeTaskList = Object.values(activeTasks);
         let activeTaskHTML = '';
         if(activeTaskList.length > 0)
             activeTaskHTML = `<br/><a href=":task">You have ${activeTaskList.length} available task${activeTaskList.length > 1 ? 's' : ''}</a>`;
