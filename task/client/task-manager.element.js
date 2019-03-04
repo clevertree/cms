@@ -138,13 +138,14 @@ class HTMLTaskFormManagerElement extends HTMLElement {
                     </table>
                 </fieldset>
             </form>
-            <ul class="results"></ul>
+            <ul class="results"><li><div class="message">Loading Available Tasks...</div></li></ul>
 `;
         searchField = this.querySelector('input#search');
         searchField.focus();
         if(selectionStart)
             searchField.selectionStart = selectionStart;
-        this.renderResults();
+        if(Object.values(this.state.taskForms).length > 0)
+            this.renderResults();
     }
 
     renderResults() {

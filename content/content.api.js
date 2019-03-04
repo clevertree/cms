@@ -126,7 +126,7 @@ class ContentApi {
                 if(contentRevision)
                     response.revision = contentRevision;
                 if(req.query.getAll) {
-                    response.parentList = await contentDB.selectContent("a.path IS NOT NULL", null, "id, path, title");
+                    response.parentList = await contentDB.selectContent("c.path IS NOT NULL", null, "id, path, title");
                 }
 
                 res.json(response);
@@ -190,7 +190,7 @@ class ContentApi {
                         contentRevision = await contentDB.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentDB.fetchContentRevisionsByContentID(content.id))[0];
                     if(contentRevision)
                         response.revision = contentRevision;
-                    response.parentList = await contentDB.selectContent("a.path IS NOT NULL", null, "id, path, title");
+                    response.parentList = await contentDB.selectContent("c.path IS NOT NULL", null, "id, path, title");
 
                     res.json(response);
 
@@ -341,15 +341,23 @@ class ContentApi {
                     req.body.title,
                     req.body.data,
                     req.body.path,
-                    sessionUser.id,
-                    req.body.parent_id ? parseInt(req.body.parent_id) : null,
+                    // sessionUser.id,
+                    // req.body.parent_id ? parseInt(req.body.parent_id) : null,
                     req.body.theme
                 );
                 const content = await contentDB.fetchContentByID(insertID);
+
+                const insertContentRevisionID = await contentDB.insertContentRevision(
+                    content.id,
+                    req.body.title,
+                    req.body.data,
+                    sessionUser.id
+                );
                 return res.json({
                     redirect: content.url + '/:edit',
                     message: "Content created successfully. Redirecting...",
                     insertID,
+                    insertContentRevisionID,
                     content
                 });
             }
@@ -390,7 +398,7 @@ class ContentApi {
             let whereSQL = '1', values = null;
             const search = req.body ? req.body.search : (req.query ? req.query.search : null);
             if(search) {
-                whereSQL = 'a.title LIKE ? OR a.data LIKE ? OR a.path LIKE ? OR a.id = ?';
+                whereSQL = 'c.title LIKE ? OR c.data LIKE ? OR c.path LIKE ? OR c.id = ?';
                 values = ['%'+search+'%', '%'+search+'%', '%'+search+'%', parseInt(search)];
             }
             const contentList = await contentDB.selectContent(whereSQL, values, 'id, path, title');

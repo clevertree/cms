@@ -130,7 +130,9 @@ class ConfigAPI {
     async renderError(error, req, res, asJSON=false) {
         console.error(`${req.method} ${req.url}`, error);
         res.status(400);
-        if(req.method === 'GET' && !asJSON) {          // Handle GET
+        if(error.redirect) {
+            res.redirect(error.redirect);
+        } else if(req.method === 'GET' && !asJSON) {          // Handle GET
             await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
             res.json({message: error.stack});

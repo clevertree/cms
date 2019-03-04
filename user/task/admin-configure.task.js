@@ -78,12 +78,9 @@ class AdminConfigureTask {
 
                         status = 200;
                         message = `
-                        An administrator account has been created under the email ${adminUser.email}. <br/>
-                        You may now log in and administrate <em>${hostname}</em>. <br/>`;
+                        An administrator account has been created under the email <a href="${adminUser.url}">${adminUser.email}</a>. <br/>
+                        You may now <a href="/:user/:login?userID=${adminUser.username}">log in</a> and administrate <em>${hostname}</em>. <br/>`;
                         isActive = false;
-
-                        // TODO: this doesn't work
-                        message += `Redirecting to Login... <script>setTimeout(function() { document.location.href = '/:user/:login?userID=${adminUser.username}'}, 3000);</script>`;
                         break;
                     }
 

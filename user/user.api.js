@@ -223,12 +223,6 @@ class UserAPI {
         return user;
     }
 
-    async configureAdmin(database, hostname) {
-        const userDB = new UserDatabase(database);
-
-        return adminUser;
-
-    }
 
     async login(req, userID, password, saveSession=false) {
         if(!userID)
@@ -286,6 +280,7 @@ class UserAPI {
 
     async handleLoginRequest(req, res, next) {
         try {
+            await DatabaseManager.selectDatabaseByRequest(req);
             if(req.method === 'GET') {
                 const userID = UserAPI.sanitizeInput(req.query.userID || null, 'email');
                 // Render Editor Form
@@ -305,8 +300,7 @@ class UserAPI {
                 });
             }
         } catch (error) {
-            console.error(error);
-            res.status(400).json({message: "Error: " + error.message, error: error.stack});
+            await this.renderError(error, req, res);
         }
     }
 
@@ -329,13 +323,13 @@ class UserAPI {
                 });
             }
         } catch (error) {
-            console.error(error);
-            res.status(400).json({message: "Error: " + error.message, error: error.stack});
+            await this.renderError(error, req, res);
         }
     }
 
     async handleRegisterRequest(req, res) {
         try {
+            await DatabaseManager.selectDatabaseByRequest(req);
             if(req.method === 'GET') {
                 // Render Editor Form
                 await ThemeAPI.send(req, res, `
@@ -354,11 +348,7 @@ class UserAPI {
                 });
             }
         } catch (error) {
-            console.error(error);
-            res.status(400).json({
-                message: "Error: " + error.message,
-                error: error.stack,
-                code: error.code,
+            await this.renderError(error, req, res, {
                 duplicateRegistration: error.code === "ER_DUP_ENTRY"
             });
         }
@@ -413,8 +403,7 @@ class UserAPI {
 
             }
         } catch (error) {
-            console.error(error);
-            res.status(400).json({message: "Error: " + error.message, error: error.stack});
+            await this.renderError(error, req, res);
         }
     }
 
@@ -470,8 +459,7 @@ class UserAPI {
             }
 
         } catch (error) {
-            console.error(error);
-            res.status(400).json({message: "Error: " + error.message, error: error.stack});
+            await this.renderError(error, req, res);
         }
     }
 
@@ -572,8 +560,7 @@ class UserAPI {
                     });
             }
         } catch (error) {
-            console.error(error);
-            res.status(400).json({message: "Error: " + error.message, error: error.stack});
+            await this.renderError(error, req, res);
         }
     }
 
@@ -607,13 +594,7 @@ class UserAPI {
                 });
             }
         } catch (error) {
-            console.error(`${req.method} ${req.url}`, error);
-            res.status(400);
-            if(req.method === 'GET') {
-                await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
-            } else {
-                res.json({message: error.stack});
-            }
+            await this.renderError(error, req, res);
         }
 
     }
@@ -645,6 +626,22 @@ class UserAPI {
         }
         dnsAdminEmails = dnsAdminEmails.filter((value, i, self) => self.indexOf(value) === i)
         return dnsAdminEmails;
+    }
+
+    async renderError(error, req, res, json=null) {
+        console.error(`${req.method} ${req.url}`, error);
+        res.status(400);
+        if(error.redirect) {
+            res.redirect(error.redirect);
+        } else if(req.method === 'GET' && !json) {          // Handle GET
+            await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
+        } else {
+            res.json(Object.assign({}, {
+                message: "Error: " + error.message,
+                error: error.stack,
+                code: error.code,
+            }, json));
+        }
     }
 
     static sanitizeInput(input, type=null) {

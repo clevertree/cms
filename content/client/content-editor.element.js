@@ -92,14 +92,14 @@ class HTMLContentEditorFormElement extends HTMLElement {
             case 'parent_id':
                 this.state.content[e.target.name] = e.target.value;
                 break;
-            case 'content':
+            case 'data':
                 if(typeof html_beautify !== "undefined")
                     e.target.value = html_beautify(e.target.value);
                 this.state.content[e.target.name] = e.target.value;
                 this.renderPreview(e.target.value);
                 break;
         }
-
+        // TODO: warn user about unsaved data
     }
 
 
@@ -205,7 +205,7 @@ class HTMLContentEditorFormElement extends HTMLElement {
                         <tr>
                             <td class="label">Content</td>
                             <td>
-                                <textarea class="editor-plain editor-wysiwyg-target" name="content"
+                                <textarea class="editor-plain editor-wysiwyg-target" name="data"
                                     >${this.state.content.data || ''}</textarea>
                             </td>
                         </tr>
