@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
             super();
             this.state = {
                 src: '/:content/:browse',
+                userID: null,
                 menu: []
             };
             // this.state = {id:-1, flags:[]};
@@ -27,6 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // this.addEventListener('change', e => this.onChange(e));
             // this.addEventListener('submit', e => this.onSubmit(e));
 
+            const userID = this.getAttribute('userID');
+            if(userID)
+                this.setState({userID});
             this.render();
             this.requestFormData();
         }
@@ -58,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 menu = rootPaths.map(rootPath => {
-                    const menuEntry = {path: rootPath, content: null, subMenu: []};
+                    const menuEntry = {title:null, path: rootPath, content: null, subMenu: []};
                     for (let i = 0; i < this.state.contentList.length; i++) {
                         const contentEntry = this.state.contentList[i];
                         if (!contentEntry.path)
@@ -71,12 +75,69 @@ document.addEventListener('DOMContentLoaded', function() {
                                 menuEntry.subMenu.push(contentEntry);
                         }
                     }
+                    if(menuEntry.content)
+                        menuEntry.title = menuEntry.content.title;
+                    else
+                        menuEntry.title = menuEntry.path.replace('/', '').replace(/[_-]+/g, ' ').replace(/^([a-z])|\s+([a-z])/g, function ($1) {
+                            return $1.toUpperCase();
+                        });
                     return menuEntry;
                 });
             }
             console.log(menu, rootPaths, this.state.contentList);
+            const menuSubMenu = [];
+            menu.push({
+                title: 'Menu',
+                path: '#',
+                subMenu: menuSubMenu
+            });
+
+            if(!this.state.userID) {
+                menuSubMenu.push({
+                    path: '/:user/:login',
+                    title: 'Log In',
+                });
+                menuSubMenu.push({
+                    path: '/:user/:register',
+                    title: 'Register'
+                });
+
+            } else {
+
+                menuSubMenu.push({
+                    path: `/:user/${this.state.userID}`,
+                    title: 'My Profile',
+                });
+                menuSubMenu.push({
+                    path: `/:user/${this.state.userID}/:edit`,
+                    title: 'Edit Profile',
+                });
+                menuSubMenu.push({
+                    path: `/:user/:logout`,
+                    title: 'Log Out',
+                });
+            }
+
+            menuSubMenu.push({
+                path: '/:content',
+                title: 'Site Index'
+            });
+            menuSubMenu.push({
+                path: '/:user',
+                title: 'Browse Users'
+            });
+            menuSubMenu.push({
+                path: '/:task',
+                title: `Browse Tasks`
+            });
+            menuSubMenu.push({
+                path: '/:config',
+                title: 'Configure Site'
+            });
+
+
             return menu;
-            // if (!req.session || !req.session.userID) { // If not logged in
+            // if (!this.state || !this.state.userID) { // If not logged in
             //     menu.push({
             //         path: '/:user/:login',
             //         title: 'Log In',
@@ -94,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // } else { // If Logged In
             //     const submenu = [];
             //     menu.push({
-            //         path: `/:user/${req.session.userID}`,
+            //         path: `/:user/${this.state.userID}`,
             //         title: 'Menu',
             //         subMenu: submenu
             //     });
@@ -120,10 +181,10 @@ document.addEventListener('DOMContentLoaded', function() {
             //         path: '/:user',
             //         title: 'Browse Users'
             //     }, {
-            //         path: `/:user/${req.session.userID}`,
+            //         path: `/:user/${this.state.userID}`,
             //         title: 'My Profile',
             //     }, {
-            //         path: `/:user/${req.session.userID}/:edit`,
+            //         path: `/:user/${this.state.userID}/:edit`,
             //         title: 'Edit Profile',
             //     }, {
             //         path: `/:user/:logout`,
@@ -162,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <ul class="nav-menu">
                     ${menu.map(menuItem => `
                     <li>
-                        <a href="${menuItem.path}">${menuItem.content.title}</a>
+                        <a href="${menuItem.path}">${menuItem.title}</a>
                         ${menuItem.subMenu && menuItem.subMenu.length === 0 ? `` : `
                         <ul class="nav-submenu">
                             ${menuItem.subMenu.map(subMenuItem => {
