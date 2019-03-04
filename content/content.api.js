@@ -27,13 +27,13 @@ class ContentApi {
 
         router.get('/[:]content/:id/[:]json',                   SM, async (req, res, next) => await this.renderContentByID(true, req, res, next));
         router.get(['/[:]content/:id/view', '/[:]content/:id'], SM, async (req, res, next) => await this.renderContentByID(false, req, res, next));
-        router.get('/[:]content/[:]sync',                       SM, async (req, res) => await this.renderContentBrowser(req, res));
+        router.get('/[:]content/[:]json',                       SM, async (req, res) => await this.renderContentListJSON(req, res));
         // TODO: sync
 
         router.all('/[:]content/:id/[:]edit',                   SM, PM, async (req, res) => await this.renderContentEditorByID(req, res));
         router.all('/[:]content/:id/[:]delete',                 SM, PM, async (req, res) => await this.renderContentDeleteByID(req, res));
         router.all('/[:]content/[:]add',                        SM, PM, async (req, res) => await this.renderContentAdd(req, res));
-        router.all(['/[:]content', '/[:]content/[:]list'],    SM, PM, async (req, res) => await this.renderContentBrowser(req, res));
+        router.all(['/[:]content', '/[:]content/[:]list'],      SM, PM, async (req, res) => await this.renderContentList(req, res));
 
 
         // User Asset files
@@ -358,7 +358,7 @@ class ContentApi {
         }
     }
 
-    async renderContentBrowser(req, res) {
+    async renderContentList(req, res) {
         try {
 
             if (req.method === 'GET') {
@@ -372,22 +372,33 @@ class ContentApi {
 `);
 
             } else {
-                const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const contentDB = new ContentDatabase(database);
-
-                // Handle POST
-                let whereSQL = '1', values = null;
-                if(req.body.search) {
-                    whereSQL = 'a.title LIKE ? OR a.data LIKE ? OR a.path LIKE ? OR a.id = ?';
-                    values = ['%'+req.body.search+'%', '%'+req.body.search+'%', '%'+req.body.search+'%', parseInt(req.body.search)];
-                }
-                const contentList = await contentDB.selectContent(whereSQL, values, 'id, path, title');
-
-                return res.json({
-                    message: `${contentList.length} content entr${contentList.length !== 1 ? 'ies' : 'y'} queried successfully`,
-                    contentList
-                });
+                return await this.renderContentListJSON(req, res);
             }
+        } catch (error) {
+            await this.renderError(error, req, res);
+        }
+
+    }
+
+    async renderContentListJSON(req, res) {
+        try {
+
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const contentDB = new ContentDatabase(database);
+
+            // Handle POST
+            let whereSQL = '1', values = null;
+            const search = req.body ? req.body.search : (req.query ? req.query.search : null);
+            if(search) {
+                whereSQL = 'a.title LIKE ? OR a.data LIKE ? OR a.path LIKE ? OR a.id = ?';
+                values = ['%'+search+'%', '%'+search+'%', '%'+search+'%', parseInt(search)];
+            }
+            const contentList = await contentDB.selectContent(whereSQL, values, 'id, path, title');
+
+            return res.json({
+                message: `${contentList.length} content entr${contentList.length !== 1 ? 'ies' : 'y'} queried successfully`,
+                contentList
+            });
         } catch (error) {
             await this.renderError(error, req, res);
         }

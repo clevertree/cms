@@ -9,7 +9,7 @@ class DNSManager {
 
     async queryHostAdminEmailAddresses(hostname) {
         const emailAddresses = [];
-        console.info("Querying WHOIS for admin email: " + hostname);
+        console.info("Querying SOA for admin email: " + hostname);
 
         const result = await new Promise(function (resolve, reject) {
             const dns = require('dns');
@@ -20,7 +20,7 @@ class DNSManager {
             });
         });
         if(result && result.hostmaster) {
-            console.info(result);
+            console.info("SOA Result: ", result);
             emailAddresses.push(result.hostmaster
                 .replace('\\.', '><')
                 .replace(/\./, '@')
@@ -30,25 +30,29 @@ class DNSManager {
 
 
         // hostname  = 'clevertree.net';
-        const data = await this.queryWHOISData(hostname);
-        // Admin Email: ari.asulin@gmail.com
-        let regEmail = /admin.*\s+([-.\w]+@(?:[\w-]+\.)+[\w-]{2,20})/i;
-        let matches = regEmail.exec(data);
-        if(matches)
-            emailAddresses.push(matches[1]);
-
-        let regRedirect = /^Admin Email: Select Contact Domain Holder link at (.*)$/m;
-        matches = regRedirect.exec(data);
-        if(matches){
-            const redirectURL = matches[1];
-            const redirectResponse = await this.getURLContent(redirectURL);
-            matches = regEmail.exec(redirectResponse);
-            if(matches)
+        try {
+            console.info("Querying WHOIS for admin email: " + hostname);
+            const data = await this.queryWHOISData(hostname);
+            // Admin Email: ari.asulin@gmail.com
+            let regEmail = /admin.*\s+([-.\w]+@(?:[\w-]+\.)+[\w-]{2,20})/i;
+            let matches = regEmail.exec(data);
+            if (matches)
                 emailAddresses.push(matches[1]);
-            else
-                console.warn("Redirect URL detected, but captcha might be required:\n" + redirectURL);
-        }
 
+            let regRedirect = /^Admin Email: Select Contact Domain Holder link at (.*)$/m;
+            matches = regRedirect.exec(data);
+            if (matches) {
+                const redirectURL = matches[1];
+                const redirectResponse = await this.getURLContent(redirectURL);
+                matches = regEmail.exec(redirectResponse);
+                if (matches)
+                    emailAddresses.push(matches[1]);
+                else
+                    console.warn("Redirect URL detected, but captcha might be required:\n" + redirectURL);
+            }
+        } catch (e) {
+            console.warn(e.message);
+        }
         return emailAddresses;
         // throw new Error("No admin email found in WHOIS Information for: " + hostname);
     }
@@ -58,7 +62,7 @@ class DNSManager {
             whois.lookup(hostname, {
                 // "server":  "",   // this can be a string ("host:port") or an object with host and port as its keys; leaving it empty makes lookup rely on servers.json
                 "follow":  2,    // number of times to follow redirects
-                // "timeout": 2,    // socket timeout, excluding this doesn't override any default timeout value
+                "timeout": 4000,    // socket timeout, excluding this doesn't override any default timeout value
                 // "verbose": true, // setting this to true returns an array of responses from all servers
                 // "bind": null,     // bind the socket to a local IP address
                 // "proxy": {       // (optional) SOCKS Proxy

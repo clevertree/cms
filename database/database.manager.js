@@ -237,7 +237,7 @@ class DatabaseManager {
             let hostname = this.getHostnameFromRequest(req);
             return await this.selectDatabaseByHost(hostname);
         } catch (e) {
-            console.warn("Database not available: ", e);
+            console.warn(req.url, e.message);
             return null;
         }
     }

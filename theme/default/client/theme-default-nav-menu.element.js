@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
-                src: '/:content/:list',
+                src: '/:content/:json',
                 userID: null,
                 menu: []
             };
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.setState({processing: false}, response);
             };
             xhr.responseType = 'json';
-            xhr.open ('OPTIONS', this.state.src, true);
+            xhr.open ('GET', this.state.src, true);
             xhr.send ();
             this.setState({processing: true});
         }

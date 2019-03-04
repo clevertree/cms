@@ -84,6 +84,7 @@ class ThemeAPI {
             title: require('os').hostname(),
             data: null,
             baseURL: '/',
+            keywords: null,
             session: req.session || {},
             htmlHeader: null,
             htmlFooter: null,

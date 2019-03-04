@@ -70,12 +70,12 @@ class ContentDatabase {
     //     return await this.selectContent(whereSQL, flags, selectSQL);
     // }
 
-    async insertContent(title, data, path, user_id, theme) {
+    async insertContent(title, data, path, theme) {
         let set = {};
         if(title) set.title = title;
         if(data) set.data = data;
         if(path) set.path = path[0] === '/' ? path : '/' + path;
-        if(user_id !== null) set.user_id = user_id;
+        // if(user_id !== null) set.user_id = user_id;
         // if(parent_id !== null) set.parent_id = parent_id;
         if(theme) set.theme = theme;
         // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
@@ -87,12 +87,12 @@ class ContentDatabase {
         return results.insertId;
     }
 
-    async updateContent(id, title, data, path, user_id, theme) {
+    async updateContent(id, title, data, path, theme) {
         let set = {};
         if(title) set.title = title;
         if(data) set.data = data;
         if(path) set.path = path;
-        if(user_id !== null) set.user_id = user_id;
+        // if(user_id !== null) set.user_id = user_id;
         if(theme) set.theme = theme;
         // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
@@ -227,6 +227,7 @@ class ContentRevisionRow {
 CREATE TABLE ${tableName} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`content_id\` int(11) NOT NULL,
+  \`user_id\` int(11) NOT NULL,
   \`title\` varchar(96) DEFAULT NULL,
   \`data\` TEXT,
   \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -234,7 +235,8 @@ CREATE TABLE ${tableName} (
   KEY \`idx:content_revision.content_id\` (\`content_id\` ASC),
   KEY \`idx:content_revision.user_id\` (\`user_id\` ASC),
 
-  CONSTRAINT \`fk:content_revision.content_id\` FOREIGN KEY (\`content_id\`) REFERENCES \`content\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT \`fk:content_revision.content_id\` FOREIGN KEY (\`content_id\`) REFERENCES \`content\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT \`fk:content_revision.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 `
     }

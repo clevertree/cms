@@ -5,7 +5,7 @@ const { UserAPI } = require("../../user/user.api");
 const { UserDatabase } = require("../../user/user.database");
 const { CreateAdminMail } = require('../mail/createadmin.mail');
 const adminRequests = {
-    '51639466-c8de-47e9-845f-5ac31fabe00f': {
+    '3a001463-7fa3-4399-bb18-f31f4d510dd0': {
         adminEmail: 'ari.asulin@gmail.com',
         hostname: 'paradigmthreat.org',
     }
@@ -81,6 +81,9 @@ class AdminConfigureTask {
                         An administrator account has been created under the email ${adminUser.email}. <br/>
                         You may now log in and administrate <em>${hostname}</em>. <br/>`;
                         isActive = false;
+
+                        // TODO: this doesn't work
+                        message += `Redirecting to Login... <script>setTimeout(function() { document.location.href = '/:user/:login?userID=${adminUser.username}'}, 3000);</script>`;
                         break;
                     }
 
@@ -119,7 +122,7 @@ class AdminConfigureTask {
         return `
             <form action="/:task/${taskName}" method="POST" class="task task-database-configure themed">
                 ${requestUUID ? `<input type="hidden" name="uuid" value="${requestUUID||''}">` : ``}
-                <fieldset ${isActive ? `disabled` : ``}>
+                <fieldset ${!isActive ? `disabled` : ``}>
                     <legend>Task '${taskName}'</legend>
                     <table class="task">
                         <thead>

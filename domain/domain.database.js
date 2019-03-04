@@ -48,7 +48,7 @@ class DomainDatabase  {
     }
 
     async updateDomain(hostname, database) {
-        console.log(this, this.table.domain);
+        // console.log(this, this.table.domain);
         let SQL = `
           UPDATE ${this.table.domain}
           SET \`database\` = ? where \`hostname\` = ?
