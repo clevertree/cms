@@ -8,7 +8,7 @@ const { ConfigDatabase } = require("../config/config.database");
 
 // const { ConfigManager } = require('../config/config.manager');
 
-class UserDatabase  {
+class UserTable  {
     get UserAPI() { return require('./user.api').UserAPI; }
 
     constructor(dbName, debug=false) {
@@ -23,7 +23,7 @@ class UserDatabase  {
         // const localConfig = new LocalConfig(config, !config);
 
         // Configure tables
-        await DatabaseManager.configureTable(this.table.user,            UserRow.getTableSQL(this.table.user));
+        await DatabaseManager.configureTable(this.table, this.getTableSQL());
 
         // Find admin user
         let adminUser = await this.fetchUser("u.username = 'admin' OR FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
@@ -106,7 +106,7 @@ class UserDatabase  {
     async selectUsers(whereSQL, values, selectSQL='u.*,null as password') {
         let SQL = `
           SELECT ${selectSQL}
-          FROM ${this.table.user} u
+          FROM ${this.table} u
           WHERE ${whereSQL}
           `;
 
@@ -159,7 +159,7 @@ class UserDatabase  {
             password = await bcrypt.hash(password, salt);
         }
         let SQL = `
-          INSERT INTO ${this.table.user} SET ?`;
+          INSERT INTO ${this.table} SET ?`;
         await DatabaseManager.queryAsync(SQL, {
             username,
             email,
@@ -181,7 +181,7 @@ class UserDatabase  {
         if(email)   set.email = email;
         if(profile) set.profile = JSON.stringify(profile);
         if(flags)   set.flags = Array.isArray(flags) ? flags.join(',') : flags;
-        let SQL = `UPDATE ${this.table.user} SET ? WHERE id = ?`;
+        let SQL = `UPDATE ${this.table} SET ? WHERE id = ?`;
 
         return (await DatabaseManager.queryAsync(SQL, [set, userID]))
             .affectedRows;
@@ -207,13 +207,9 @@ class UserDatabase  {
         return await this.updateUser(updateUser.id, null, null, null, newFlags);
     }
 
-
-}
-
-class UserRow {
-    static getTableSQL(tableName) {
+    getTableSQL() {
         return `
-CREATE TABLE ${tableName} (
+CREATE TABLE ${this.table} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`email\` varchar(64) NOT NULL,
   \`username\` varchar(64) NOT NULL,
@@ -229,6 +225,10 @@ CREATE TABLE ${tableName} (
     }
 
 
+}
+
+class UserRow {
+
     constructor(row) {
         Object.assign(this, row);
         this.profile = this.profile ? JSON.parse(this.profile) : {};
@@ -242,5 +242,5 @@ CREATE TABLE ${tableName} (
 }
 
 
-module.exports = {UserRow, UserDatabase};
+module.exports = {UserRow, UserTable};
 

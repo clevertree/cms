@@ -1,20 +1,16 @@
 const { DatabaseManager } = require('../database/database.manager');
 
 // Init
-class ContentDatabase {
+class ContentTable {
     constructor(dbName, debug=false) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
-        this.table = {
-            content:            tablePrefix + '`content`',
-            content_revision:   tablePrefix + '`content_revision`',
-        };
+        this.table = tablePrefix + '`content`';
         this.debug = debug;
     }
 
     async configure(promptCallback=null, hostname=null) {
         // Check for tables
-        await DatabaseManager.configureTable(this.table.content,             ContentRow.getTableSQL(this.table.content));
-        await DatabaseManager.configureTable(this.table.content_revision,    ContentRevisionRow.getTableSQL(this.table.content_revision));
+        await DatabaseManager.configureTable(this.table, this.getTableSQL());
 
         // Insert home page
         let homeContent = await this.fetchContentByPath("/");
@@ -41,7 +37,7 @@ class ContentDatabase {
     async selectContent(whereSQL, values, selectSQL='c.*, NULL as data') {
         let SQL = `
           SELECT ${selectSQL}
-          FROM ${this.table.content} c
+          FROM ${this.table} c
           WHERE ${whereSQL}`;
 
         const results = await DatabaseManager.queryAsync(SQL, values);
@@ -52,15 +48,18 @@ class ContentDatabase {
         return content[0] || null;
     }
 
-    async fetchContentByPath(renderPath) {
+    async fetchContentByPath(renderPath, selectSQL='c.*, NULL as data') {
         renderPath = renderPath.split('?')[0];
-        return await this.fetchContent('c.path = ? LIMIT 1', renderPath, 'c.*'); }
-    async fetchContentByID(contentID) { return await this.fetchContent('c.id = ? LIMIT 1', contentID, 'c.*'); }
+        return await this.fetchContent('c.path = ? LIMIT 1', renderPath, selectSQL);
+    }
+    async fetchContentByID(contentID, selectSQL='c.*, NULL as data') {
+        return await this.fetchContent('c.id = ? LIMIT 1', contentID, selectSQL);
+    }
 
-    async getData(path) {
-        const content = await this.fetchContentByPath(path);
+    async fetchData(contentID) {
+        const content = await this.fetchContentByID(contentID, 'c.data');
         if(!content)
-            throw new Error("Content path not found: " + path);
+            throw new Error("Content ID not found: " + contentID);
         return content.data;
     }
     // async fetchContentByFlag(flags, selectSQL = 'id, parent_id, path, title, flags') {
@@ -80,7 +79,7 @@ class ContentDatabase {
         if(theme) set.theme = theme;
         // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
-          INSERT INTO ${this.table.content}
+          INSERT INTO ${this.table}
           SET ?
         `;
         const results = await DatabaseManager.queryAsync(SQL, set);
@@ -96,7 +95,7 @@ class ContentDatabase {
         if(theme) set.theme = theme;
         // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
-          UPDATE ${this.table.content} c
+          UPDATE ${this.table} c
           SET ?, updated = UTC_TIMESTAMP()
           WHERE c.id = ?
         `;
@@ -106,7 +105,7 @@ class ContentDatabase {
 
     async deleteContent(id) {
         let SQL = `
-          DELETE FROM ${this.table.content}
+          DELETE FROM ${this.table}
           WHERE id = ?
         `;
         const results = await DatabaseManager.queryAsync(SQL, [id]);
@@ -118,7 +117,7 @@ class ContentDatabase {
     async queryMenuData(req) {
         let SQL = `
           SELECT c.id, c.path, c.title
-          FROM ${this.table.content} c
+          FROM ${this.table} c
           WHERE c.path IS NOT NULL
 `;
         let menuEntries = await DatabaseManager.queryAsync(SQL);
@@ -147,63 +146,15 @@ class ContentDatabase {
         return mainMenu;
     }
 
-    /** Content Revision **/
+    /** Table Schema **/
 
-    async selectContentRevision(whereSQL, values, selectSQL='cr.*') {
-        let SQL = `
-          SELECT ${selectSQL}
-          FROM ${this.table.content_revision} cr
-          WHERE ${whereSQL}
-          `;
-
-        const results = await DatabaseManager.queryAsync(SQL, values);
-        return results.map(result => new ContentRevisionRow(result))
-    }
-
-    // async fetchContentRevisionByDate(contentID, revisionDate) {
-    //     if(["string", "number"].indexOf(typeof revisionDate) !== -1)
-    //         revisionDate = new Date(revisionDate);
-    //     const revisions = await this.selectContentRevision('*', 'cr.content_id = ? AND cr.created = ? LIMIT 1',
-    //         [contentID, revisionDate]);
-    //     return revisions[0];
-    // }
-
-    async fetchContentRevisionByID(id, selectSQL = '*') {
-        const revisions = await this.selectContentRevision(`cr.id = ?`,
-            [id], selectSQL);
-        return revisions[0];
-    }
-    async fetchContentRevisionByDate(created, selectSQL = '*') {
-        const revisions = await this.selectContentRevision(`cr.created = ?`,
-            [created], selectSQL);
-        return revisions[0];
-    }
-
-    async fetchContentRevisionsByContentID(contentID, limit=20, selectSQL = '*, NULL as data') {
-        return await this.selectContentRevision(`cr.content_id = ? ORDER BY cr.id DESC LIMIT ${limit}`,
-            [contentID], selectSQL);
-    }
-
-    // Inserting revision without updating content === draft
-    async insertContentRevision(content_id, title, data, user_id) {
-        let SQL = `
-          INSERT INTO ${this.table.content_revision}
-          SET ?
-        `;
-        const results = await DatabaseManager.queryAsync(SQL, {content_id, user_id, title, data});
-        return results.insertId;
-    }
-
-}
-
-class ContentRow {
-    static getTableSQL(tableName) {
+    getTableSQL() {
         return `
-CREATE TABLE ${tableName} (
+CREATE TABLE ${this.table} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`path\` varchar(96) NOT NULL,
   \`title\` varchar(96) NOT NULL,
-  \`data\` text DEFAULT NULL,
+  \`data\` varbinary(65536) DEFAULT NULL,
   \`theme\` varchar(64) DEFAULT NULL,
   \`created\` datetime DEFAULT current_timestamp(),
   \`updated\` datetime DEFAULT current_timestamp(),
@@ -213,6 +164,10 @@ CREATE TABLE ${tableName} (
 `
     }
 
+}
+
+class ContentRow {
+
     constructor(row) {
         Object.assign(this, row);
     }
@@ -221,31 +176,5 @@ CREATE TABLE ${tableName} (
     // hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
 }
 
-class ContentRevisionRow {
-    static getTableSQL(tableName) {
-        return `
-CREATE TABLE ${tableName} (
-  \`id\` int(11) NOT NULL AUTO_INCREMENT,
-  \`content_id\` int(11) NOT NULL,
-  \`user_id\` int(11) NOT NULL,
-  \`title\` varchar(96) DEFAULT NULL,
-  \`data\` TEXT,
-  \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (\`id\`),
-  KEY \`idx:content_revision.content_id\` (\`content_id\` ASC),
-  KEY \`idx:content_revision.user_id\` (\`user_id\` ASC),
-
-  CONSTRAINT \`fk:content_revision.content_id\` FOREIGN KEY (\`content_id\`) REFERENCES \`content\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT \`fk:content_revision.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-`
-    }
-
-    constructor(row) {
-        Object.assign(this, row);
-    }
-
-}
-
-module.exports = {ContentDatabase, ContentRow, ContentRevisionRow};
+module.exports = {ContentTable, ContentRow};
 

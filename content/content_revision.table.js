@@ -1,0 +1,96 @@
+const { DatabaseManager } = require('../database/database.manager');
+
+// Init
+class ContentRevisionTable {
+    constructor(dbName, debug=false) {
+        const tablePrefix = dbName ? `\`${dbName}\`.` : '';
+        this.table = tablePrefix + '`content_revision`';
+        this.debug = debug;
+    }
+
+    async configure(promptCallback=null, hostname=null) {
+        // Check for tables
+        await DatabaseManager.configureTable(this.table, this.getTableSQL());
+    }
+
+    /** Content Revision **/
+
+    async selectContentRevision(whereSQL, values, selectSQL='cr.*') {
+        let SQL = `
+          SELECT ${selectSQL}
+          FROM ${this.table} cr
+          WHERE ${whereSQL}
+          `;
+
+        const results = await DatabaseManager.queryAsync(SQL, values);
+        return results.map(result => new ContentRevisionRow(result))
+    }
+
+    // async fetchContentRevisionByDate(contentID, revisionDate) {
+    //     if(["string", "number"].indexOf(typeof revisionDate) !== -1)
+    //         revisionDate = new Date(revisionDate);
+    //     const revisions = await this.selectContentRevision('*', 'cr.content_id = ? AND cr.created = ? LIMIT 1',
+    //         [contentID, revisionDate]);
+    //     return revisions[0];
+    // }
+
+    async fetchContentRevisionByID(id, selectSQL = '*') {
+        const revisions = await this.selectContentRevision(`cr.id = ?`,
+            [id], selectSQL);
+        return revisions[0];
+    }
+    async fetchContentRevisionByDate(created, selectSQL = '*') {
+        const revisions = await this.selectContentRevision(`cr.created = ?`,
+            [created], selectSQL);
+        return revisions[0];
+    }
+
+    async fetchContentRevisionsByContentID(contentID, limit=20, selectSQL = '*, NULL as data') {
+        return await this.selectContentRevision(`cr.content_id = ? ORDER BY cr.id DESC LIMIT ${limit}`,
+            [contentID], selectSQL);
+    }
+
+    // Inserting revision without updating content === draft
+    async insertContentRevision(content_id, title, data, user_id) {
+        let SQL = `
+          INSERT INTO ${this.table}
+          SET ?
+        `;
+        const results = await DatabaseManager.queryAsync(SQL, {content_id, user_id, title, data});
+        return results.insertId;
+    }
+
+    /** Table Schema **/
+
+    getTableSQL() {
+        return `
+CREATE TABLE ${this.table} (
+  \`id\` int(11) NOT NULL AUTO_INCREMENT,
+  \`content_id\` int(11) NOT NULL,
+  \`user_id\` int(11) NOT NULL,
+  \`title\` varchar(96) DEFAULT NULL,
+  \`data\` varbinary(65536) DEFAULT NULL,
+  \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (\`id\`),
+  KEY \`idx:content_revision.content_id\` (\`content_id\` ASC),
+  KEY \`idx:content_revision.user_id\` (\`user_id\` ASC),
+
+  CONSTRAINT \`fk:content_revision.content_id\` FOREIGN KEY (\`content_id\`) REFERENCES \`content\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT \`fk:content_revision.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+`
+    }
+
+}
+
+
+class ContentRevisionRow {
+
+    constructor(row) {
+        Object.assign(this, row);
+    }
+
+}
+
+module.exports = {ContentRevisionTable, ContentRevisionRow};
+

@@ -5,7 +5,7 @@ const { HTTPServer } = require('../http/http.server');
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeAPI } = require('../theme/theme.api');
 const { ConfigDatabase } = require("./config.database");
-const { UserDatabase } = require("../user/user.database");
+const { UserTable } = require("../user/user.table");
 const { UserAPI } = require('../user/user.api');
 const { SessionAPI } = require('../session/session.api');
 
@@ -51,7 +51,7 @@ class ConfigAPI {
     async renderConfigJSON(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserDatabase(database);
+            const userDB = new UserTable(database);
             const configDB = new ConfigDatabase(database);
             const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
             if(!sessionUser || !sessionUser.isAdmin())
@@ -74,7 +74,7 @@ class ConfigAPI {
     async renderConfigEditor(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserDatabase(database);
+            const userDB = new UserTable(database);
             const configDB = new ConfigDatabase(database);
             const configList = await configDB.selectAllConfigValues();
             const configValues = configDB.parseConfigValues(configList);

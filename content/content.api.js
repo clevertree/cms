@@ -1,14 +1,16 @@
 // const formidableMiddleware = require('express-formidable');
 const path = require('path');
-const fs = require('fs');
+// const fs = require('fs');
+const fsPromises = require('fs').promises;
 
 const multiparty = require('multiparty');
 
 const { HTTPServer } = require('../http/http.server');
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeAPI } = require('../theme/theme.api');
-const { ContentDatabase } = require("./content.database");
-const { UserDatabase } = require("../user/user.database");
+const { ContentTable } = require("./content.table");
+const { ContentRevisionTable } = require("./content_revision.table");
+const { UserTable } = require("../user/user.table");
 const { UserAPI } = require('../user/user.api');
 const { SessionAPI } = require('../session/session.api');
 
@@ -65,10 +67,10 @@ class ContentApi {
 
     async checkForRevisionContent(req, content) {
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const contentDB = new ContentDatabase(database);
+        const contentRevisionDB = new ContentRevisionTable(database);
         if(typeof req.query.r !== 'undefined') {
             const contentRevisionID = parseInt(req.query.r);
-            const contentRevision = await contentDB.fetchContentRevisionByID(contentRevisionID);
+            const contentRevision = await contentRevisionDB.fetchContentRevisionByID(contentRevisionID);
             if(!contentRevision)
                 throw new Error("Content Revision ID not found: " + contentRevisionID);
 
@@ -85,7 +87,7 @@ class ContentApi {
     async renderContentByPath(req, res, next) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const contentDB = new ContentDatabase(database);
+            const contentDB = new ContentTable(database);
             const content = await contentDB.fetchContentByPath(req.url);
             if(!content)
                 return next();
@@ -102,7 +104,8 @@ class ContentApi {
     async renderContentByID(asJSON, req, res, next) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const contentDB = new ContentDatabase(database);
+            const contentDB = new ContentTable(database);
+            const contentRevisionDB = new ContentRevisionTable(database);
             const content = await contentDB.fetchContentByID(req.params.id);
             if(!content)
                 return next();
@@ -118,16 +121,16 @@ class ContentApi {
                 };
                 if(req.session && req.session.userID) {
                     const database = await DatabaseManager.selectDatabaseByRequest(req);
-                    const userDB = new UserDatabase(database);
+                    const userDB = new UserTable(database);
                     const sessionUser = await userDB.fetchUserByID(req.session.userID);
                     if (sessionUser.isAdmin() || sessionUser.id === content.user_id)
                         response.editable = true;
                 }
                 if(req.query.getAll || req.query.getHistory) {
-                    response.history = await contentDB.fetchContentRevisionsByContentID(content.id);
-                    // response.revision = await contentDB.fetchContentRevisionByID(content.id, req.query.getRevision || null);
+                    response.history = await contentRevisionDB.fetchContentRevisionsByContentID(content.id);
+                    // response.revision = await contentRevisionDB.fetchContentRevisionByID(content.id, req.query.getRevision || null);
                     if(!contentRevision && response.history.length > 0) // Fetch latest revision? sloppy
-                        contentRevision = await contentDB.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentDB.fetchContentRevisionsByContentID(content.id))[0];
+                        contentRevision = await contentRevisionDB.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentRevisionDB.fetchContentRevisionsByContentID(content.id))[0];
                 }
                 if(contentRevision)
                     response.revision = contentRevision;
@@ -148,8 +151,9 @@ class ContentApi {
     async renderContentEditorByID(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const contentDB = new ContentDatabase(database);
-            const userDB = new UserDatabase(database);
+            const contentDB = new ContentTable(database);
+            const contentRevisionDB = new ContentRevisionTable(database);
+            const userDB = new UserTable(database);
 
             if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
@@ -187,18 +191,21 @@ class ContentApi {
                     };
                     if(req.session && req.session.userID) {
                         const database = await DatabaseManager.selectDatabaseByRequest(req);
-                        const userDB = new UserDatabase(database);
+                        const userDB = new UserTable(database);
                         const sessionUser = await userDB.fetchUserByID(req.session.userID);
                         if (sessionUser.isAdmin() || sessionUser.id === content.user_id)
                             response.editable = true;
                     }
-                    response.history = await contentDB.fetchContentRevisionsByContentID(content.id);
-                    // response.revision = await contentDB.fetchContentRevisionByID(content.id, req.query.getRevision || null);
+                    response.history = await contentRevisionDB.fetchContentRevisionsByContentID(content.id);
+                    // response.revision = await contentRevisionDB.fetchContentRevisionByID(content.id, req.query.getRevision || null);
                     if(!contentRevision && response.history.length > 0) // Fetch latest revision? sloppy
-                        contentRevision = await contentDB.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentDB.fetchContentRevisionsByContentID(content.id))[0];
+                        contentRevision = await contentRevisionDB.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentRevisionDB.fetchContentRevisionsByContentID(content.id))[0];
                     if(contentRevision)
                         response.revision = contentRevision;
                     response.parentList = await contentDB.selectContent("c.path IS NOT NULL", null, "id, path, title");
+
+
+                    content.data = contentDB.fetchData(content.id);
 
                     res.json(response);
 
@@ -222,7 +229,7 @@ class ContentApi {
                             );
                             content = await contentDB.fetchContentByID(req.params.id);
 
-                            insertContentRevisionID = await contentDB.insertContentRevision(
+                            insertContentRevisionID = await contentRevisionDB.insertContentRevision(
                                 content.id,
                                 req.body.title,
                                 req.body.data,
@@ -238,13 +245,13 @@ class ContentApi {
                             });
 
                         case 'draft':
-                            insertContentRevisionID = await contentDB.insertContentRevision(
+                            insertContentRevisionID = await contentRevisionDB.insertContentRevision(
                                 content.id,
                                 req.body.title,
                                 req.body.data,
                                 sessionUser.id
                             );
-                            revision = await contentDB.fetchContentRevisionByID(insertContentRevisionID);
+                            revision = await contentRevisionDB.fetchContentRevisionByID(insertContentRevisionID);
                             return res.json({
                                 redirect: content.url + '?r=' + revision.id,
                                 message: "Draft saved successfully",
@@ -262,8 +269,8 @@ class ContentApi {
     async renderContentDeleteByID(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const contentDB = new ContentDatabase(database);
-            const userDB = new UserDatabase(database);
+            const contentDB = new ContentTable(database);
+            const userDB = new UserTable(database);
 
 
             let content = await contentDB.fetchContentByID(req.params.id);
@@ -288,7 +295,7 @@ class ContentApi {
                     };
                     if(req.session && req.session.userID) {
                         const database = await DatabaseManager.selectDatabaseByRequest(req);
-                        const userDB = new UserDatabase(database);
+                        const userDB = new UserTable(database);
                         const sessionUser = await userDB.fetchUserByID(req.session.userID);
                         if (sessionUser.isAdmin() || sessionUser.id === content.user_id)
                             response.editable = true;
@@ -323,8 +330,9 @@ class ContentApi {
     async renderContentAdd(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const contentDB = new ContentDatabase(database);
-            const userDB = new UserDatabase(database);
+            const contentDB = new ContentTable(database);
+            const contentRevisionDB = new ContentRevisionTable(database);
+            const userDB = new UserTable(database);
             if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
             const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
@@ -381,7 +389,7 @@ class ContentApi {
                     );
                     const content = await contentDB.fetchContentByID(insertID);
 
-                    const insertContentRevisionID = await contentDB.insertContentRevision(
+                    const insertContentRevisionID = await contentRevisionDB.insertContentRevision(
                         content.id,
                         req.body.title,
                         req.body.data,
@@ -403,8 +411,8 @@ class ContentApi {
     async renderContentUpload(req, res) {
         try {
             // const database = await DatabaseManager.selectDatabaseByRequest(req);
-            // const contentDB = new ContentDatabase(database);
-            // const userDB = new UserDatabase(database);
+            // const contentDB = new ContentTable(database);
+            // const userDB = new UserTable(database);
             if(!req.session)
                 throw new Error("Session is not available");
 
@@ -446,7 +454,7 @@ class ContentApi {
                             deletePositions.sort((a,b) => b-a);
                             for (let i=0; i<deletePositions.length; i++) {
                                 const deletedFile = currentUploads.splice(deletePositions[i], 1)[0];
-                                await this.unlinkFile(deletedFile.path);
+                                await fsPromises.unlink(deletedFile.path);
                             }
                         }
                         message += `${deletePositions.length} temporary file${deletePositions.length !== 1 ? 's' : ''} deleted. `;
@@ -530,7 +538,7 @@ class ContentApi {
         try {
 
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const contentDB = new ContentDatabase(database);
+            const contentDB = new ContentTable(database);
 
             // Handle POST
             let whereSQL = '1', values = null;
@@ -551,6 +559,63 @@ class ContentApi {
 
     }
 
+    // TODO: render static data
+    async renderStaticFile(filePath, req, res, next) {
+        const ext = path.extname(filePath);
+
+        if(!await fsPromises.exists(filePath))
+            return next();
+
+        const stats = await fsPromises.stat(filePath);
+
+
+        //check if if-modified-since header is the same as the mtime of the file
+        if (req.headers["if-modified-since"]) {
+            //Get the if-modified-since header from the request
+            const reqModDate = new Date(req.headers["if-modified-since"]);
+            if (reqModDate.getTime() === stats.mtime.getTime()) {
+                //Yes: then send a 304 header without image data (will be loaded by cache)
+                res.writeHead(304, {
+                    "Last-Modified": stats.mtime.toUTCString()
+                });
+
+                res.end();
+                return true;
+            }
+        }
+
+        try {
+            const data = await fsPromises.readFile(filePath);
+            // if the file is found, set Content-type and send data
+            // TODO: if-modified-since
+            // res.setHeader("Expires", new Date(Date.now() + 1000 * 60 * 60 * 24).toUTCString()); // Static files deserve long term caching
+
+            const newETAG = etag(data);
+
+            //check if if-modified-since header is the same as the mtime of the file
+            if (req.headers["if-none-match"]) {
+                //Get the if-modified-since header from the request
+                const oldETAG = req.headers["if-none-match"];
+                if (oldETAG === newETAG) {
+                    //Yes: then send a 304 header without image data (will be loaded by cache)
+                    res.writeHead(304, {
+                        "Last-Modified": stats.mtime.toUTCString()
+                    });
+
+                    res.end();
+                    return true;
+                }
+            }
+
+            res.setHeader('Content-type', this.getMimeType(ext) || 'text/plain' );
+            res.setHeader('ETag', newETAG);
+            res.end(data);
+        } catch (err) {
+            res.statusCode = 500;
+            res.end(`Error reading file: ${err}.`);
+        }
+    }
+
     async parseFileUploads(req) {
         return new Promise( ( resolve, reject ) => {
             var form = new multiparty.Form();
@@ -564,40 +629,6 @@ class ContentApi {
         });
     }
 
-    calculateFileHash(filePath) {
-        return new Promise( ( resolve, reject ) => {
-            fs.createReadStream(filePath).
-            pipe(crypto.createHash('sha1').setEncoding('hex')).
-            on('finish', function () {
-                resolve (this.read()) //the hash
-            })
-                .on('error', reject);
-        });
-    }
-
-    readFileContent(filePath, options=null) {
-        return new Promise( ( resolve, reject ) => {
-            fs.readFile(filePath, options, (err, contents) => {
-                err ? reject (err) : resolve (contents);
-            });
-        });
-    }
-
-    readFileStats(filePath) {
-        return new Promise( ( resolve, reject ) => {
-            fs.stat(filePath, (err, stats) => {
-                err ? reject (err) : resolve (stats);
-            });
-        });
-    }
-
-    unlinkFile(filePath) {
-        return new Promise( ( resolve, reject ) => {
-            fs.unlink(filePath, (err) => {
-                err ? reject (err) : resolve ();
-            });
-        });
-    }
 
     async renderError(error, req, res, json=null) {
         console.error(`${req.method} ${req.url} ${error.message}`, error);
@@ -614,8 +645,29 @@ class ContentApi {
             }, json));
         }
     }
+
+    getMimeType(ext) {
+        if(typeof mapMimeTypes[ext] !== 'undefined')
+            return mapMimeTypes[ext];
+        return null;
+    }
 }
 
 
 module.exports = {ContentAPI: new ContentApi()};
 
+// maps file extention to MIME TYPE
+const mapMimeTypes = {
+    '.ico': 'image/x-icon',
+    '.html': 'text/html',
+    '.js': 'text/javascript',
+    '.json': 'application/json',
+    '.css': 'text/css',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.wav': 'audio/wav',
+    '.mp3': 'audio/mpeg',
+    '.svg': 'image/svg+xml',
+    '.pdf': 'application/pdf',
+    '.doc': 'application/msword'
+};

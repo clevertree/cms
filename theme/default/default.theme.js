@@ -1,7 +1,7 @@
 // const fs = require('fs');
 const path = require('path');
 const ejs = require('ejs');
-// const { ContentDatabase } = require('../../content/content.database');
+// const { ContentTable } = require('../../content/content.database');
 
 const DIR_TEMPLATE = path.resolve(__dirname + '/template');
 const DIR_CLIENT_ASSETS = path.resolve(__dirname + '/client');

@@ -192,7 +192,7 @@ class HTTPServer {
     renderStaticFile(filePath, req, res, next) {
         const ext = path.extname(filePath);
 
-        fs.exists(filePath, function (exist) {
+        fs.exists(filePath, (exist) => {
             if(!exist) {
                 return next();
                 // // if the file is not found, return 404
@@ -201,7 +201,7 @@ class HTTPServer {
                 // return;
             }
 
-            fs.stat(filePath, function(err, stats) {
+            fs.stat(filePath, (err, stats) => {
 
 
                 //check if if-modified-since header is the same as the mtime of the file
@@ -220,7 +220,7 @@ class HTTPServer {
                 }
 
 
-                fs.readFile(filePath, function(err, data){
+                fs.readFile(filePath, (err, data) => {
                     if(err){
                         res.statusCode = 500;
                         res.end(`Error reading file: ${err}.`);
@@ -246,7 +246,7 @@ class HTTPServer {
                             }
                         }
 
-                        res.setHeader('Content-type', mapMimeTypes[ext] || 'text/plain' );
+                        res.setHeader('Content-type', this.getMimeType(ext) || 'text/plain' );
                         res.setHeader('ETag', newETAG);
                         res.end(data);
                     }
@@ -254,6 +254,12 @@ class HTTPServer {
             });
 
         });
+    }
+
+    getMimeType(ext) {
+        if(typeof mapMimeTypes[ext] !== 'undefined')
+            return mapMimeTypes[ext];
+        return null;
     }
 
 }

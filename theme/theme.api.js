@@ -3,8 +3,8 @@ const {promisify} = require('util');
 const path = require('path');
 
 
-// const { UserDatabase } = require('../user/user.database');
-// const { ContentDatabase } = require('../content/content.database');
+// const { UserTable } = require('../user/user.database');
+// const { ContentTable } = require('../content/content.database');
 // const { DatabaseManager } = require('../database/database.manager');
 // const { TaskAPI } = require('../task/task.api');
 const { ConfigDatabase } = require("../config/config.database");
@@ -109,11 +109,11 @@ class ThemeAPI {
         if(this.DatabaseManager.isAvailable) {
             const database = await this.DatabaseManager.selectDatabaseByRequest(req, false);
             if(database) {
-                // const contentDB = new ContentDatabase(database);
+                // const contentDB = new ContentTable(database);
                 // renderData.menu = await contentDB.queryMenuData(req, true);
 
                 // if(req.session && req.session.userID ) {
-                //     const userDB = new UserDatabase(database);
+                //     const userDB = new UserTable(database);
                 //     content.sessionUser = userDB.fetchUserByID(req.session.userID);
                 // }
 

@@ -3,8 +3,8 @@ const express = require('express');
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeAPI } = require('../theme/theme.api');
 const { DomainDatabase } = require("./domain.database");
-// const { ContentDatabase } = require("../article/article.database");
-const { UserDatabase } = require("../user/user.database");
+// const { ContentTable } = require("../article/article.database");
+const { UserTable } = require("../user/user.table");
 const { UserAPI } = require('../user/user.api');
 const { SessionAPI } = require('../service/session/session.api');
 
@@ -42,7 +42,7 @@ class DomainAPI {
     async renderDomainJSON(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserDatabase(database);
+            const userDB = new UserTable(database);
             const domainDB = new DomainDatabase(database);
             const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
             if(!sessionUser || !sessionUser.isAdmin())
@@ -80,7 +80,7 @@ class DomainAPI {
             } else {
                 // Handle POST
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = new UserDatabase(database);
+                const userDB = new UserTable(database);
                 const domainDB = new DomainDatabase(database);
 
                 const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;

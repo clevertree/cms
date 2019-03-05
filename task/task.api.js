@@ -5,7 +5,7 @@ const { HTTPServer } = require('../http/http.server');
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeAPI } = require('../theme/theme.api');
 // const { UserAPI } = require('../../user/user.api');
-const { UserDatabase } = require("../user/user.database");
+const { UserTable } = require("../user/user.table");
 const { SessionAPI } = require('../session/session.api');
 // TODO: approve all drafts
 
@@ -61,7 +61,7 @@ class TaskAPI {
             const database = await DatabaseManager.selectDatabaseByRequest(req, false);
             let sessionUser = null;
             if(database) {
-                const userDB = new UserDatabase(database);
+                const userDB = new UserTable(database);
                 sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
             }
             // const task = await this.getTaskClass(taskName);

@@ -5,8 +5,8 @@ const { LocalConfig } = require('../config/local.config');
 // const { FileManager } = require('../service/file/file.manager');
 // const { UserAPI } = require('../user/user.api');
 
-// const { ContentDatabase } = require('../article/article.database');
-// const { UserDatabase } = require('../user/user.database');
+// const { ContentTable } = require('../article/article.database');
+// const { UserTable } = require('../user/user.database');
 // const { ConfigDatabase } = require('../config/config.database');
 
 // const BASE_DIR = path.resolve(path.dirname(__dirname));
@@ -24,8 +24,8 @@ class DatabaseManager {
     get isConnected() { return !!this.db;}
     get isAvailable() { return !!this.primaryDatabase;}
 
-    // getArticleDB(database=null)    { return new (require('../article/article.database').ContentDatabase)(database); }
-    // getUserDB(database=null)       { return new (require('../user/user.database').UserDatabase)(database); }
+    // getArticleDB(database=null)    { return new (require('../article/article.database').ContentTable)(database); }
+    // getUserDB(database=null)       { return new (require('../user/user.database').UserTable)(database); }
     // getConfigDB(database=null)     { return new (require('../config/config.database').ConfigDatabase)(database); }
     getPrimaryDomainDB()       { return new (require('../domain/domain.database').DomainDatabase)(this.primaryDatabase); }
 
@@ -106,8 +106,9 @@ class DatabaseManager {
 
         // Configure Tables
         const tableClasses = [
-            require('../user/user.database').UserDatabase,
-            require('../content/content.database').ContentDatabase,
+            require('../user/user.table').UserTable,
+            require('../content/content.table').ContentTable,
+            require('../content/content_revision.table').ContentRevisionTable,
             require('../config/config.database').ConfigDatabase,
         ];
 

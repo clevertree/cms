@@ -2,7 +2,7 @@ const uuidv4 = require('uuid/v4');
 
 const { DatabaseManager } = require("../database.manager");
 const { UserAPI } = require("../../user/user.api");
-const { UserDatabase } = require("../../user/user.database");
+const { UserTable } = require("../../user/user.table");
 const { ConfigureDatabaseMail } = require('../mail/configuredatabase.mail');
 const configureRequests = {
     '3a001463-7fa3-4399-bb18-f31f4d510dd0': {
@@ -92,7 +92,7 @@ class DatabaseConfigureTask {
                         const database = req.body.database;
 
                         await DatabaseManager.configureDatabase(database, hostname, null);
-                        const userDB = new UserDatabase(database);
+                        const userDB = new UserTable(database);
                         const adminUser = await userDB.createUser(req.body.username || 'admin', requestData.adminEmail, req.body.password, 'admin');
 
                         // await UserAPI.sendResetPasswordRequestEmail(req, adminUser);

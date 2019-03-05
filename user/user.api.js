@@ -9,8 +9,8 @@ const { DNSManager } = require('../domain/dns.manager');
 // const { LocalConfig } = require('../config/local.config');
 // const { ConfigManager } = require('../config/config.manager');
 const { DatabaseManager } = require('../database/database.manager');
-// const { ContentDatabase } = require("../article/article.database");
-const { UserDatabase } = require('./user.database');
+// const { ContentTable } = require("../article/article.database");
+const { UserTable } = require('./user.table');
 const { ConfigDatabase } = require("../config/config.database");
 const { SessionAPI } = require('../session/session.api');
 const { HTTPServer } = require('../http/http.server');
@@ -116,7 +116,7 @@ class UserAPI {
             throw new Error("Invalid Profile");
 
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = new UserDatabase(database);
+        const userDB = new UserTable(database);
         const user = await userDB.fetchUserByID(userID);
         if(!user)
             throw new Error("User not found: " + userID);
@@ -140,7 +140,7 @@ class UserAPI {
 
     async updateFlags(req, userID, flags) {
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = new UserDatabase(database);
+        const userDB = new UserTable(database);
         if(!userID)
             throw new Error("Invalid User ID");
         const user = await userDB.fetchUserByID(userID);
@@ -168,7 +168,7 @@ class UserAPI {
         if(!userID)
             throw new Error("Invalid User ID");
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = new UserDatabase(database);
+        const userDB = new UserTable(database);
         const user = await userDB.fetchUserByID(userID, 'u.*');
         if(!user)
             throw new Error("User not found: " + userID);
@@ -214,7 +214,7 @@ class UserAPI {
             throw new Error("Confirm & Password do not match");
 
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = new UserDatabase(database);
+        const userDB = new UserTable(database);
         const user = await userDB.createUser(username, email, password);
 
         await this.login(req, user.id, password);
@@ -232,7 +232,7 @@ class UserAPI {
             throw new Error("Password is required");
 
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = new UserDatabase(database);
+        const userDB = new UserTable(database);
         const sessionUser = await userDB.fetchUserByID(userID, 'u.*');
         if(!sessionUser)
             throw new Error("User not found: " + userID);
@@ -265,7 +265,7 @@ class UserAPI {
 
     async logout(req, res) {
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = new UserDatabase(database);
+        const userDB = new UserTable(database);
         if(req.session.user_session) {
             await userDB.deleteUserSessionByID(req.session.user_session);
         }
@@ -372,7 +372,7 @@ class UserAPI {
         try {
             const userID = UserAPI.sanitizeInput(req.query.userID || null);
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserDatabase(database);
+            const userDB = new UserTable(database);
             const user = await userDB.fetchUserByID(userID, 'u.*');
             if(!user)
                 return next();
@@ -409,7 +409,7 @@ class UserAPI {
         try {
 
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserDatabase(database);
+            const userDB = new UserTable(database);
             const user = await userDB.fetchUserByID(userID);
             if(!user)
                 throw new Error("User was not found: " + userID);
@@ -466,7 +466,7 @@ class UserAPI {
         try {
             userID = UserAPI.sanitizeInput(userID);
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserDatabase(database);
+            const userDB = new UserTable(database);
             let user = await userDB.fetchUserByID(userID, 'u.*');
             if(!user)
                 return next();
@@ -579,7 +579,7 @@ class UserAPI {
 
             } else {
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = new UserDatabase(database);
+                const userDB = new UserTable(database);
                 // Handle POST
                 let whereSQL = '1', values = null;
                 if(req.body.search) {
@@ -618,7 +618,7 @@ class UserAPI {
     async queryAdminEmailAddresses(database=null, hostname=null) {
         let dnsAdminEmails = hostname ? await DNSManager.queryHostAdminEmailAddresses(hostname) : [];
         if(database) {
-            const userDB = new UserDatabase(database);
+            const userDB = new UserTable(database);
             let adminUsers = await userDB.selectUsers("FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
             for(let i=0; i<adminUsers.length; i++) {
                 dnsAdminEmails.push(adminUsers[i].email);

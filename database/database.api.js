@@ -2,7 +2,7 @@ const express = require('express');
 
 const { DatabaseManager } = require('./database.manager');
 const { UserAPI } = require('../user/user.api');
-const { UserDatabase } = require('../user/user.database');
+const { UserTable } = require('../user/user.table');
 const { ThemeAPI } = require('../theme/theme.api');
 const { SessionAPI } = require('../session/session.api');
 class DatabaseAPI {
@@ -42,7 +42,7 @@ class DatabaseAPI {
     async renderDatabaseJSON(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserDatabase(database);
+            const userDB = new UserTable(database);
             const databaseDB = DatabaseManager.getDatabaseDB(database);
             const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
             if(!sessionUser || !sessionUser.isAdmin())
@@ -80,7 +80,7 @@ class DatabaseAPI {
             } else {
                 // Handle POST
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = new UserDatabase(database);
+                const userDB = new UserTable(database);
                 const databaseDB = DatabaseManager.getDatabaseDB(database);
 
                 const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
