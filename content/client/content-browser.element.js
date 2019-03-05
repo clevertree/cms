@@ -34,7 +34,7 @@ class HTMLContentBrowserElement extends HTMLElement {
     }
 
     onSuccess(e, response) {
-        console.log(response);
+        // console.log(response);
         if(response.redirect) {
             this.setState({processing: true});
             setTimeout(() => window.location.href = response.redirect, 3000);
@@ -79,8 +79,8 @@ class HTMLContentBrowserElement extends HTMLElement {
     // }
 
     onSubmit(e) {
-        e.preventDefault();
-        const form = e.target;
+        if(e) e.preventDefault();
+        const form = this.querySelector('form');
         const formValues = Array.prototype.filter
             .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
             .map((input, i) => input.name + '=' + input.value)
@@ -112,6 +112,7 @@ class HTMLContentBrowserElement extends HTMLElement {
         this.innerHTML =
             `<form action="/:content/:list" method="POST" class="content content-browser themed">
             <fieldset>
+                <legend>Search Content</legend>
                 <table class="content">
                     <thead>
                         <tr>

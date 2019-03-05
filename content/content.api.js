@@ -368,7 +368,7 @@ class ContentApi {
                 case 'POST':
                     if(!sessionUser || !sessionUser.isAdmin())
                         throw new Error("Not authorized");
-                    // TODO: submit articles for approval
+                    // TODO: submit articles for approval?
 
                     // Handle POST
                     const insertID = await contentDB.insertContent(

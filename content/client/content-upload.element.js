@@ -129,6 +129,7 @@ class HTMLContentFormUploadElement extends HTMLElement {
         <iframe name="content-uploadform-iframe" onload="this.dispatchEvent(new CustomEvent('iframe-loaded', {bubbles: true}))" style="display: none;"></iframe>
         <form action="/:content/:upload" target="content-uploadform-iframe" onchange="this.submit()" method="POST" class="content content-uploadform themed" enctype="multipart/form-data">
             <fieldset>
+                <legend>Upload Temporary Files</legend>
                 <table class="content">
                     <thead>
                         <tr>
@@ -156,6 +157,7 @@ class HTMLContentFormUploadElement extends HTMLElement {
         </form>
         <form action="/:content/:upload" method="POST" class="content content-uploadform-manage themed" enctype="application/x-www-form-urlencoded">
             <fieldset>
+                <legend>Manage Uploaded Temporary Files</legend>
                 <table class="content">
                     <thead>
                         <tr><td colspan="3"><hr/></td></tr>

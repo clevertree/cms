@@ -2,31 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/client/config-editor.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/client/config-editor.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content/client/content-add.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/content-add.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content-browser.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/content-browser.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content-delete.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/content-delete.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content-editor.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/content-editor.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content/client/content-upload.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/content-upload.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content/content.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/content.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/database.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/database.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/form/databaseform-connect.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/form/databaseform-connect.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/form/databaseform-manage.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/form/databaseform-manage.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/domain.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/domain/domain.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/task/client/task-manager.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/task/client/task-manager.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/task/task.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/task/task.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-browser.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-browser.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-forgotpassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-forgotpassword.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-login.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-login.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-logout.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-logout.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-register.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-register.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-resetpassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-resetpassword.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-updateflags.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-updateflags.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-updatepassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-updatepassword.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-updateprofile.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-updateprofile.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/user.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.api.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -36,11 +14,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/content/content.api.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1387">
-              <caret line="352" lean-forward="true" selection-start-line="352" selection-end-line="352" />
+            <state relative-caret-position="602">
+              <caret line="370" column="58" selection-start-line="370" selection-start-column="58" selection-end-line="370" selection-end-column="58" />
             </state>
           </provider>
         </entry>
@@ -66,8 +44,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/content/client/content-upload.element.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1377">
-              <caret line="173" column="70" selection-start-line="173" selection-start-column="70" selection-end-line="173" selection-end-column="70" />
+            <state relative-caret-position="579">
+              <caret line="131" selection-start-line="131" selection-end-line="132" />
               <folding>
                 <element signature="n#style#0;n#iframe#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#td#1;n#tr#1;n#tbody#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
@@ -79,11 +57,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/content/client/content-add.element.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="166" column="41" lean-forward="true" selection-start-line="166" selection-start-column="41" selection-end-line="166" selection-end-column="41" />
+            <state relative-caret-position="648">
+              <caret line="184" column="39" selection-start-line="184" selection-start-column="39" selection-end-line="184" selection-end-column="39" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/content/content.database.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="668">
+              <caret line="85" column="46" selection-start-line="85" selection-start-column="46" selection-end-line="85" selection-end-column="46" />
             </state>
           </provider>
         </entry>
@@ -149,9 +136,9 @@
       <find>currentUploads</find>
       <find>content/:upload</find>
       <find>deletePositions.map</find>
-      <find>delete</find>
       <find>const sessionU</find>
       <find>editable</find>
+      <find>delete</find>
     </findStrings>
     <replaceStrings>
       <replace>delete</replace>
@@ -244,9 +231,9 @@
         <option value="$PROJECT_DIR$/user/client/user-register.element.js" />
         <option value="$PROJECT_DIR$/user/client/user-browser.element.js" />
         <option value="$PROJECT_DIR$/user/user.api.js" />
+        <option value="$PROJECT_DIR$/content/content.api.js" />
         <option value="$PROJECT_DIR$/content/client/content-upload.element.js" />
         <option value="$PROJECT_DIR$/content/client/content-add.element.js" />
-        <option value="$PROJECT_DIR$/content/content.api.js" />
       </list>
     </option>
   </component>
@@ -395,12 +382,12 @@
       <workItem from="1551546896488" duration="14991000" />
       <workItem from="1551584087258" duration="3888000" />
       <workItem from="1551623490262" duration="2686000" />
-      <workItem from="1551645716238" duration="48791000" />
+      <workItem from="1551645716238" duration="49216000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="302328000" />
+    <option name="totallyTimeSpent" value="302753000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -477,6 +464,12 @@
           <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="104" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/content/content.api.js</url>
+          <line>373</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="105" />
+        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog>
@@ -533,13 +526,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
           <caret line="15" column="62" lean-forward="true" selection-start-line="15" selection-start-column="62" selection-end-line="15" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/content/content.database.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1586">
-          <caret line="229" column="11" selection-start-line="229" selection-start-column="4" selection-end-line="229" selection-end-column="11" />
         </state>
       </provider>
     </entry>
@@ -808,20 +794,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/content-upload.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1377">
-          <caret line="173" column="70" selection-start-line="173" selection-start-column="70" selection-end-line="173" selection-end-column="70" />
-          <folding>
-            <element signature="n#style#0;n#iframe#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#1;n#tbody#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#tr#1;n#thead#0;n#table#0;n#fieldset#0;n#form#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#0;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#1;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/user/user.api.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="668">
@@ -836,17 +808,38 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/content-add.element.js">
+    <entry file="file://$PROJECT_DIR$/content/content.api.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="166" column="41" lean-forward="true" selection-start-line="166" selection-start-column="41" selection-end-line="166" selection-end-column="41" />
+        <state relative-caret-position="602">
+          <caret line="370" column="58" selection-start-line="370" selection-start-column="58" selection-end-line="370" selection-end-column="58" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/content/content.api.js">
+    <entry file="file://$PROJECT_DIR$/content/client/content-upload.element.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1387">
-          <caret line="352" lean-forward="true" selection-start-line="352" selection-end-line="352" />
+        <state relative-caret-position="579">
+          <caret line="131" selection-start-line="131" selection-end-line="132" />
+          <folding>
+            <element signature="n#style#0;n#iframe#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#1;n#tr#1;n#tbody#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#tr#1;n#thead#0;n#table#0;n#fieldset#0;n#form#1;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#0;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#1;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/content.database.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="668">
+          <caret line="85" column="46" selection-start-line="85" selection-start-column="46" selection-end-line="85" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/content-add.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="648">
+          <caret line="184" column="39" selection-start-line="184" selection-start-column="39" selection-end-line="184" selection-end-column="39" />
         </state>
       </provider>
     </entry>

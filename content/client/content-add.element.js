@@ -178,10 +178,11 @@ class HTMLContentFormAddElement extends HTMLElement {
 
     render() {
 
-        console.log("RENDER", this.state);
+        // console.log("RENDER", this.state);
         this.innerHTML =
             `<form action="/:content/:add" method="POST" class="content content-addform themed">
             <fieldset>
+                <legend>Add New Content</legend>
                 <table class="content">
                     <thead>
                         <tr>
