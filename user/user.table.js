@@ -13,9 +13,7 @@ class UserTable  {
 
     constructor(dbName, debug=false) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
-        this.table = {
-            user: tablePrefix + '`user`'
-        };
+        this.table = tablePrefix + '`user`';
         this.debug = debug;
     }
 

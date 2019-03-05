@@ -10,6 +10,7 @@ const { DNSManager } = require('../domain/dns.manager');
 // const { ConfigManager } = require('../config/config.manager');
 const { DatabaseManager } = require('../database/database.manager');
 // const { ContentTable } = require("../article/article.database");
+// const { ContentAPI } = require('../content/content.api');
 const { UserTable } = require('./user.table');
 const { ConfigDatabase } = require("../config/config.database");
 const { SessionAPI } = require('../session/session.api');
@@ -23,6 +24,8 @@ const { ResetPasswordMail } = require("./mail/resetpassword.mail");
 const DIR_USER = path.resolve(__dirname);
 
 class UserAPI {
+    get ContentAPI() { return require('../content/content.api').ContentAPI; }
+
     constructor() {
         this.resetPasswordRequests = {
             'aa196dc0-f51f-4a79-a858-53c3b3b03097': 101
@@ -82,7 +85,7 @@ class UserAPI {
         const assetPath = req.url.substr(routePrefix.length);
 
         const staticFile = path.resolve(DIR_USER + '/client/' + assetPath);
-        HTTPServer.renderStaticFile(staticFile, req, res, next);
+        await this.ContentAPI.renderStaticFile(req, res, next, staticFile);
     }
 
 

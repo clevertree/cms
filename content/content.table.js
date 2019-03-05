@@ -56,10 +56,12 @@ class ContentTable {
         return await this.fetchContent('c.id = ? LIMIT 1', contentID, selectSQL);
     }
 
-    async fetchData(contentID) {
+    async fetchData(contentID, asString='UTF8') {
         const content = await this.fetchContentByID(contentID, 'c.data');
         if(!content)
             throw new Error("Content ID not found: " + contentID);
+        if(asString)
+            return content.data.toString(asString);
         return content.data;
     }
     // async fetchContentByFlag(flags, selectSQL = 'id, parent_id, path, title, flags') {

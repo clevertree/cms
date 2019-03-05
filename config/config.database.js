@@ -4,16 +4,14 @@ class ConfigDatabase  {
     constructor(database, debug=false) {
         const tablePrefix = database ? `\`${database}\`.` : '';
         this.database = database;
-        this.table = {
-            config: tablePrefix + '`config`'
-        };
+        this.table = tablePrefix + '`config`';
         this.debug = debug;
     }
 
 
     async configure(promptCallback=null) {
         // Configure tables
-        await DatabaseManager.configureTable(this.table.config, ConfigRow.getTableSQL(this.table.config));
+        await DatabaseManager.configureTable(this.table, this.getTableSQL());
     }
 
     /** Config Table **/
@@ -42,7 +40,7 @@ class ConfigDatabase  {
     async selectConfigValues(whereSQL, values) {
         let SQL = `
           SELECT c.*
-          FROM ${this.table.config} c
+          FROM ${this.table} c
           WHERE ${whereSQL}
           `;
 
@@ -74,7 +72,7 @@ class ConfigDatabase  {
     }
 
     async updateConfigValue(name, value, type=null) {
-        let SQL = `REPLACE INTO ${this.table.config} SET ?;`;
+        let SQL = `REPLACE INTO ${this.table} SET ?;`;
         const result = await DatabaseManager.queryAsync(SQL, {name, value, type});
         return result.affectedRows;
     }
@@ -137,13 +135,9 @@ class ConfigDatabase  {
     //     else
     //         rl.output.write(stringToWrite);
     // };
-}
-
-// TODO: remove 'type' from database. It should be gotten elsewhare
-class ConfigRow {
-    static getTableSQL(tableName) {
+    getTableSQL() {
         return `
-CREATE TABLE ${tableName} (
+CREATE TABLE ${this.table} (
   \`name\` varchar(64) NOT NULL,
   \`value\` TEXT DEFAULT NULL,
   \`type\` varchar(64) DEFAULT NULL,
@@ -152,7 +146,11 @@ CREATE TABLE ${tableName} (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 `
     }
-    
+
+}
+
+// TODO: remove 'type' from database. It should be gotten elsewhare
+class ConfigRow {
     constructor(row) {
         Object.assign(this, row);
         if(this.updated)

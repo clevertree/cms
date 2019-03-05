@@ -6,14 +6,12 @@ class DomainDatabase  {
     constructor(dbName, debug=false) {
         if(!dbName)
             throw new Error("Database name is required");
-        this.table = {
-            domain: `\`${dbName}\`\.domain`
-        };
+        this.table = `\`${dbName}\`\.domain`;
     }
 
-    async configure() {
+    async configure(promptCallback=null) {
         // Configure tables
-        await DatabaseManager.configureTable(this.table.domain,            DomainRow.getTableSQL(this.table.domain));
+        await DatabaseManager.configureTable(this.table,            this.getTableSQL());
 
     }
 
@@ -22,7 +20,7 @@ class DomainDatabase  {
     async selectDomains(whereSQL, values, selectSQL='d.*') {
         let SQL = `
           SELECT ${selectSQL}
-          FROM ${this.table.domain} d
+          FROM ${this.table} d
           WHERE ${whereSQL}
           `;
 
@@ -40,7 +38,7 @@ class DomainDatabase  {
 
     async insertDomain(hostname, database) {
         let SQL = `
-          INSERT INTO ${this.table.domain}
+          INSERT INTO ${this.table}
           SET ?
         `;
         const results = await DatabaseManager.queryAsync(SQL, {hostname, database});
@@ -48,21 +46,19 @@ class DomainDatabase  {
     }
 
     async updateDomain(hostname, database) {
-        // console.log(this, this.table.domain);
+        // console.log(this, this.table);
         let SQL = `
-          UPDATE ${this.table.domain}
+          UPDATE ${this.table}
           SET \`database\` = ? where \`hostname\` = ?
           LIMIT 1;
         `;
         const results = await DatabaseManager.queryAsync(SQL, [database, hostname]);
         return results.affectedRows;
     }
-}
 
-class DomainRow {
-    static getTableSQL(tableName) {
+    getTableSQL() {
         return `
-CREATE TABLE ${tableName} (
+CREATE TABLE ${this.table} (
   \`hostname\` varchar(64) NOT NULL,
   \`database\` varchar(256) NULL,
   \`ssl\` TEXT DEFAULT NULL,
@@ -73,6 +69,9 @@ CREATE TABLE ${tableName} (
     }
 
 
+}
+
+class DomainRow {
     constructor(row) {
         Object.assign(this, row);
     }

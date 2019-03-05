@@ -2,6 +2,7 @@
 const path = require('path');
 // const fs = require('fs');
 const fsPromises = require('fs').promises;
+const etag = require('etag');
 
 const multiparty = require('multiparty');
 
@@ -62,7 +63,7 @@ class ContentApi {
         const assetPath = req.url.substr(routePrefix.length);
 
         const staticFile = path.resolve(DIR_CONTENT + '/client/' + assetPath);
-        HTTPServer.renderStaticFile(staticFile, req, res, next);
+        await this.renderStaticFile(req, res, next, staticFile);
     }
 
     async checkForRevisionContent(req, content) {
@@ -204,8 +205,14 @@ class ContentApi {
                         response.revision = contentRevision;
                     response.parentList = await contentDB.selectContent("c.path IS NOT NULL", null, "id, path, title");
 
-
-                    content.data = contentDB.fetchData(content.id);
+                    content.mimeType = this.getMimeType(path.extname(content.path) || '');
+                    if(editableMimeTypes.indexOf(content.mimeType) !== -1) {
+                        content.data = await contentDB.fetchData(content.id, 'UTF8');
+                        content.isBinary = false;
+                    } else {
+                        content.data = '[binary file]';
+                        content.isBinary = true;
+                    }
 
                     res.json(response);
 
@@ -559,14 +566,43 @@ class ContentApi {
 
     }
 
+    async renderData(req, res, data, mimeType, lastModified) {
+        const newETAG = etag(data);
+
+        //check if if-modified-since header is the same as the mtime of the file
+        if (req.headers["if-none-match"]) {
+            //Get the if-modified-since header from the request
+            const oldETAG = req.headers["if-none-match"];
+            if (oldETAG === newETAG) {
+                res.writeHead(304, {"Last-Modified": lastModified.toUTCString()});
+                res.end();
+                return true;
+            }
+        }
+
+        res.setHeader('Last-Modified', lastModified.toUTCString());
+        res.setHeader('Content-type', mimeType );
+        res.setHeader('ETag', newETAG);
+        res.end(data);
+
+    }
+
     // TODO: render static data
-    async renderStaticFile(filePath, req, res, next) {
+    async renderStaticFile(req, res, next, filePath) {
         const ext = path.extname(filePath);
 
-        if(!await fsPromises.exists(filePath))
-            return next();
+        let stats = null;
+        try {
+            stats = await fsPromises.stat(filePath);
+        } catch (e) {
+            if(e.code === 'ENOENT')
+                return next();
+            throw e;
+        }
 
-        const stats = await fsPromises.stat(filePath);
+        // if(!await fsPromises.exist(filePath))
+        //     return next();
+
 
 
         //check if if-modified-since header is the same as the mtime of the file
@@ -574,11 +610,7 @@ class ContentApi {
             //Get the if-modified-since header from the request
             const reqModDate = new Date(req.headers["if-modified-since"]);
             if (reqModDate.getTime() === stats.mtime.getTime()) {
-                //Yes: then send a 304 header without image data (will be loaded by cache)
-                res.writeHead(304, {
-                    "Last-Modified": stats.mtime.toUTCString()
-                });
-
+                res.writeHead(304, {"Last-Modified": stats.mtime.toUTCString()});
                 res.end();
                 return true;
             }
@@ -586,30 +618,9 @@ class ContentApi {
 
         try {
             const data = await fsPromises.readFile(filePath);
+            await this.renderData(req, res, data, this.getMimeType(ext), stats.mtime);
             // if the file is found, set Content-type and send data
-            // TODO: if-modified-since
             // res.setHeader("Expires", new Date(Date.now() + 1000 * 60 * 60 * 24).toUTCString()); // Static files deserve long term caching
-
-            const newETAG = etag(data);
-
-            //check if if-modified-since header is the same as the mtime of the file
-            if (req.headers["if-none-match"]) {
-                //Get the if-modified-since header from the request
-                const oldETAG = req.headers["if-none-match"];
-                if (oldETAG === newETAG) {
-                    //Yes: then send a 304 header without image data (will be loaded by cache)
-                    res.writeHead(304, {
-                        "Last-Modified": stats.mtime.toUTCString()
-                    });
-
-                    res.end();
-                    return true;
-                }
-            }
-
-            res.setHeader('Content-type', this.getMimeType(ext) || 'text/plain' );
-            res.setHeader('ETag', newETAG);
-            res.end(data);
         } catch (err) {
             res.statusCode = 500;
             res.end(`Error reading file: ${err}.`);
@@ -658,8 +669,10 @@ module.exports = {ContentAPI: new ContentApi()};
 
 // maps file extention to MIME TYPE
 const mapMimeTypes = {
-    '.ico': 'image/x-icon',
+    '': 'text/html',
+    '.htm': 'text/html',
     '.html': 'text/html',
+    '.ico': 'image/x-icon',
     '.js': 'text/javascript',
     '.json': 'application/json',
     '.css': 'text/css',
@@ -669,5 +682,19 @@ const mapMimeTypes = {
     '.mp3': 'audio/mpeg',
     '.svg': 'image/svg+xml',
     '.pdf': 'application/pdf',
-    '.doc': 'application/msword'
+    '.doc': 'application/msword',
+    '.xml': 'application/xml'
 };
+
+const editableMimeTypes = [
+    'image/x-icon',
+    'text/html',
+    'text/javascript',
+    'application/json',
+    'text/css',
+    'image/svg+xml',
+    'application/pdf',
+    'application/msword',
+    'application/xml'
+];
+

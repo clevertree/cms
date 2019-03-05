@@ -346,9 +346,12 @@ class HTMLContentEditorFormElement extends HTMLElement {
                     'https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js',
                     'https://rawgit.com/RickStrahl/jquery-resizable/master/dist/jquery-resizable.min.js',
 
-                    'node_modules/trumbowyg/dist/trumbowyg.min.js',
-                    'node_modules/trumbowyg/dist/plugins/cleanpaste/trumbowyg.cleanpaste.min.js',
-                    'node_modules/trumbowyg/dist/plugins/pasteimage/trumbowyg.pasteimage.min.js'
+                    'https://rawcdn.githack.com/Alex-D/Trumbowyg/v2.12.0/dist/trumbowyg.min.js',
+                    'https://rawcdn.githack.com/Alex-D/Trumbowyg/v2.12.0/dist/plugins/cleanpaste/trumbowyg.cleanpaste.min.js',
+                    'https://rawcdn.githack.com/Alex-D/Trumbowyg/v2.12.0/dist/plugins/pasteimage/trumbowyg.pasteimage.min.js',
+                    // 'node_modules/trumbowyg/dist/trumbowyg.min.js',
+                    // 'node_modules/trumbowyg/dist/plugins/cleanpaste/trumbowyg.cleanpaste.min.js',
+                    // 'node_modules/trumbowyg/dist/plugins/pasteimage/trumbowyg.pasteimage.min.js'
                 ], () => {
                     const target = jQuery('.editor-wysiwyg-target');
                     target.trumbowyg();
@@ -366,7 +369,8 @@ class HTMLContentEditorFormElement extends HTMLElement {
                 });
 
                 [
-                    'node_modules/trumbowyg/dist/ui/trumbowyg.min.css'
+                    'https://rawcdn.githack.com/Alex-D/Trumbowyg/v2.12.0/dist/ui/trumbowyg.min.css',
+                    // 'node_modules/trumbowyg/dist/ui/trumbowyg.min.css'
                 ].forEach(INCLUDE_CSS => {
                     if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
                         document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
@@ -458,14 +462,16 @@ class HTMLContentEditorFormElement extends HTMLElement {
                 this.removeWYSIWYGEditor = null;
 
                 [
-                    'node_modules/jodit/build/jodit.min.css',
+                    location.protocol + '//cdnjs.cloudflare.com/ajax/libs/jodit/3.1.39/jodit.min.css',
+                    // 'node_modules/jodit/build/jodit.min.css',
                 ].forEach(INCLUDE_CSS => {
                     if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
                         document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
                 });
 
                 this.loadScripts([
-                    'node_modules/jodit/build/jodit.min.js',
+                    location.protocol + '//cdnjs.cloudflare.com/ajax/libs/jodit/3.1.39/jodit.min.js',
+                    // 'node_modules/jodit/build/jodit.min.js',
                 ], () => {
                     var editor = new Jodit('.editor-wysiwyg-target', {
                         enableDragAndDropFileToEditor: true,

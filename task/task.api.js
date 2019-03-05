@@ -5,6 +5,7 @@ const { HTTPServer } = require('../http/http.server');
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeAPI } = require('../theme/theme.api');
 // const { UserAPI } = require('../../user/user.api');
+// const { ContentAPI } = require('../content/content.api');
 const { UserTable } = require("../user/user.table");
 const { SessionAPI } = require('../session/session.api');
 // TODO: approve all drafts
@@ -12,6 +13,7 @@ const { SessionAPI } = require('../session/session.api');
 const DIR_TASK = path.resolve(__dirname);
 
 class TaskAPI {
+    get ContentAPI() { return require('../content/content.api').ContentAPI; }
     constructor() {
         this.taskClass = {};
     }
@@ -52,7 +54,7 @@ class TaskAPI {
         const assetPath = req.url.substr(routePrefix.length);
 
         const staticFile = path.resolve(DIR_TASK + '/client/' + assetPath);
-        HTTPServer.renderStaticFile(staticFile, req, res, next);
+        await this.ContentAPI.renderStaticFile(req, res, next, staticFile);
     }
 
 

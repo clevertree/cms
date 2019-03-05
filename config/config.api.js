@@ -6,12 +6,14 @@ const { DatabaseManager } = require('../database/database.manager');
 const { ThemeAPI } = require('../theme/theme.api');
 const { ConfigDatabase } = require("./config.database");
 const { UserTable } = require("../user/user.table");
+// const { ContentAPI } = require('../content/content.api');
 const { UserAPI } = require('../user/user.api');
 const { SessionAPI } = require('../session/session.api');
 
 const DIR_CONFIG = path.resolve(__dirname);
 
 class ConfigAPI {
+    get ContentAPI() { return require('../content/content.api').ContentAPI; }
     constructor() {
     }
 
@@ -45,7 +47,7 @@ class ConfigAPI {
         const assetPath = req.url.substr(routePrefix.length);
 
         const staticFile = path.resolve(DIR_CONFIG + '/client/' + assetPath);
-        HTTPServer.renderStaticFile(staticFile, req, res, next);
+        await this.ContentAPI.renderStaticFile(req, res, next, staticFile);
     }
 
     async renderConfigJSON(req, res) {

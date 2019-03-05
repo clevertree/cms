@@ -16,7 +16,7 @@ const THEME_DIR = path.resolve(__dirname);
 class ThemeAPI {
     get UserAPI() { return require('../user/user.api').UserAPI; }
     get DatabaseManager() { return require('../database/database.manager').DatabaseManager; }
-    get HTTPServer() { return require('../http/http.server').HTTPServer; }
+    get ContentAPI() { return require('../content/content.api').ContentAPI; }
     get SessionAPI() { return require('../session/session.api').SessionAPI; }
 
     constructor() {
@@ -158,7 +158,7 @@ class ThemeAPI {
         const assetPath = req.url.substr(routePrefix.length);
 
         const staticFile = path.resolve(this.themes[themeName].path + '/client/' + assetPath);
-        this.HTTPServer.renderStaticFile(staticFile, req, res, next);
+        await this.ContentAPI.renderStaticFile(req, res, next, staticFile);
 
     }
 }
