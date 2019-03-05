@@ -290,7 +290,8 @@ class HTMLContentEditorFormElement extends HTMLElement {
                 this.removeWYSIWYGEditor = null;
 
                 this.loadScripts([
-                    'node_modules/pell/dist/pell.min.js',
+                    'https://www.cssscript.com/demo/minimalist-wysiwyg-editor-pell-js/dist/pell.js'
+                    // 'node_modules/pell/dist/pell.min.js',
                 ], () => {
                     const target = document.querySelector('.editor-wysiwyg-target');
                     const pellContainer = document.createElement('div');
@@ -329,7 +330,7 @@ class HTMLContentEditorFormElement extends HTMLElement {
                 });
 
                 [
-                    'node_modules/pell/dist/pell.min.css',
+                    'https://www.cssscript.com/demo/minimalist-wysiwyg-editor-pell-js/dist/pell.css'
                 ].forEach(INCLUDE_CSS => {
                     if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
                         document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
