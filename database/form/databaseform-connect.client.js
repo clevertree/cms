@@ -53,10 +53,16 @@ document.addEventListener('DOMContentLoaded', function() {
             // form.username.value = (form.username.value || '').replace(/[^\w.]/g, '');
         }
 
+
         onSubmit(e) {
             e.preventDefault();
             const form = e.target;
-            const request = this.getFormData(form);
+            const formValues = Array.prototype.filter
+                .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
+                .map((input, i) => input.name + '=' + input.value)
+                .join('&');
+            const method = form.getAttribute('method');
+            const action = form.getAttribute('action');
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
@@ -68,17 +74,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.onError(e, response);
                 }
             };
-            xhr.open(this.state.method, this.state.action, true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.open(method, action, true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhr.responseType = 'json';
-            xhr.send(JSON.stringify(request));
+            xhr.send(formValues);
             this.setState({processing: true});
-        }
-
-        getFormData(form) {
-            const formData = {};
-            new FormData(form).forEach((value, key) => formData[key] = value);
-            return formData;
         }
 
         render() {

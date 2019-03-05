@@ -47,9 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if(this.state.duplicateRegistration) {
                 this.state.duplicateRegistration = false;
                 if(confirm("This user account already exists. Would you like to attempt logging in?")) {
-                    const formData = this.getFormData();
-                    console.log(formData);
-                    document.location.href = ':user/:login?userID=' + (formData.username || formData.email);
+                    document.location.href = ':user/:login?userID=' + (this.state.username || this.state.email);
                 }
             }
         }
@@ -62,10 +60,14 @@ document.addEventListener('DOMContentLoaded', function() {
             form.username.value = (form.username.value || '').replace(/[^\w.]/g, '');
         }
 
+
         onSubmit(e) {
             e.preventDefault();
             const form = e.target;
-            const request = this.getFormData(form);
+            const formValues = Array.prototype.filter
+                .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
+                .map((input, i) => input.name + '=' + input.value)
+                .join('&');
             const method = form.getAttribute('method');
             const action = form.getAttribute('action');
 
@@ -80,21 +82,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             };
             xhr.open(method, action, true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhr.responseType = 'json';
-            xhr.send(JSON.stringify(request));
+            xhr.send(formValues);
             this.setState({processing: true});
         }
 
-        getFormData(form=null) {
-            form = form || this.querySelector('form');
-            const formData = {};
-            new FormData(form).forEach((value, key) => formData[key] = value);
-            return formData;
-        }
-
         render() {
-            const formData = this.getFormData();
             // console.log(formData);
             const hostname = document.location.host.split(':')[0];
             this.innerHTML =
@@ -117,26 +111,26 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr>
                                     <td class="label">Email</td>
                                     <td>
-                                        <input type="email" name="email" value="${formData.email||''}" required />
+                                        <input type="email" name="email" value="${this.state.email||''}" required />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Username</td>
                                     <td style="position: relative;">
-                                        <input type="text" name="username" value="${formData.username||''}" required /> 
+                                        <input type="text" name="username" value="${this.state.username||''}" required /> 
                                         <div style="position: absolute; right: 30px; top: 7px; color: grey;">@${hostname}</div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Password</td>
                                     <td>
-                                        <input type="password" name="password" value="${formData.password||''}" autocomplete="off" required />
+                                        <input type="password" name="password" value="${this.state.password||''}" autocomplete="off" required />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Confirm</td>
                                     <td>
-                                        <input type="password" name="password_confirm" value="${formData.password_confirm||''}" autocomplete="off" required/>
+                                        <input type="password" name="password_confirm" value="${this.state.password_confirm||''}" autocomplete="off" required/>
                                     </td>
                                 </tr>
                             </tbody>

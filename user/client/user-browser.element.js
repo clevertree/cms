@@ -41,70 +41,40 @@ class HTMLUserFormBrowserElement extends HTMLElement {
         switch(e.target.name) {
             case 'search':
                 clearTimeout(this.keyTimeout);
-                this.keyTimeout = setTimeout(e => this.submit(), 500);
+                this.keyTimeout = setTimeout(e => this.onSubmit(), 500);
                 break;
         }
     }
 
-    // requestFormData() {
-    //     const xhr = new XMLHttpRequest();
-    //     xhr.onload = () => {
-    //         this.setState({processing: false});
-    //         // console.info(xhr.response);
-    //         if(!xhr.response || !xhr.response.user)
-    //             throw new Error("Invalid Response");
-    //         this.setState(xhr.response);
-    //         // this.state = xhr.response.user;
-    //         // this.render();
-    //     };
-    //     xhr.responseType = 'json';
-    //     xhr.open ("GET", `:user/${this.state.user.id}/:json?getAll=true&getRevision=${new Date(this.state.revisionDate).getTime()}`, true);
-    //     // xhr.setRequestHeader("Accept", "application/json");
-    //     xhr.send ();
-    //     this.setState({processing: true});
-    // }
 
     onSubmit(e) {
-        if(e)
-            e.preventDefault();
+        if(e) e.preventDefault();
         const form = this.querySelector('form');
-        this.setState({processing: true});
-        const formData = this.getFormData();
+        const formValues = Array.prototype.filter
+            .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
+            .map((input, i) => input.name + '=' + input.value)
+            .join('&');
+        const method = form.getAttribute('method');
+        const action = form.getAttribute('action');
 
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
-            this.setState({processing: false});
-            // console.log(e, xhr.response);
-            const response = xhr.response && typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-            response.status = xhr.status;
+            const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+            this.setState({processing: false, status: xhr.status}, response);
             if(xhr.status === 200) {
                 this.onSuccess(e, response);
             } else {
                 this.onError(e, response);
             }
-            this.setState(response);
         };
-        xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        // xhr.setRequestHeader("Accept", "application/json");
+        xhr.open(method, action, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.responseType = 'json';
-        xhr.send(JSON.stringify(formData));
+        xhr.send(formValues);
         this.setState({processing: true});
     }
 
-    getFormData() {
-        const form = this.querySelector('form');
-        const formData = {};
-        if(form) {
-            new FormData(form).forEach(function (value, key) {
-                formData[key] = value;
-            });
-        }
-        return formData;
-    }
-
     render() {
-        const formData = this.getFormData();
         console.log("RENDER", this.state);
         let searchField = this.querySelector('input[name=search]');
         const selectionStart = searchField ? searchField.selectionStart : null;
@@ -115,7 +85,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
                     <thead>
                         <tr>
                             <td colspan="5">
-                                <input type="text" name="search" placeholder="Search Users" value="${formData.search||''}"/>
+                                <input type="text" name="search" placeholder="Search Users" value="${this.state.search||''}"/>
                             </td>
                         </tr>
                         <tr><td colspan="5"><hr/></td></tr>

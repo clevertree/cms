@@ -54,7 +54,10 @@ document.addEventListener('DOMContentLoaded', function() {
         onSubmit(e) {
             e.preventDefault();
             const form = e.target;
-            const request = this.getFormData(form);
+            const formValues = Array.prototype.filter
+                .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
+                .map((input, i) => input.name + '=' + input.value)
+                .join('&');
             const method = form.getAttribute('method');
             const action = form.getAttribute('action');
 
@@ -69,22 +72,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             };
             xhr.open(method, action, true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhr.responseType = 'json';
-            xhr.send(JSON.stringify(request));
+            xhr.send(formValues);
             this.setState({processing: true});
         }
 
-        getFormData(form=null) {
-            form = form || this.querySelector('form');
-            const formData = {};
-            new FormData(form).forEach((value, key) => formData[key] = value);
-            return formData;
-        }
 
         render() {
-            const formData = this.getFormData();
-            const userID = formData.userID || this.state.userID || null;
+            const userID = this.state.userID || null;
             // console.log("STATE", this.state);
             this.innerHTML =
                 `
@@ -112,13 +108,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr>
                                     <td class="label">Password</td>
                                     <td>
-                                        <input type="password" name="password" value="${formData.password || ''}" required />
+                                        <input type="password" name="password" value="${this.state.password || ''}" required />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Stay Logged In</td>
                                     <td>
-                                        <input type="checkbox" name="session_save" ${formData.session_save || this.state.session_save ? 'checked="checked"' : ''} value="1"/>
+                                        <input type="checkbox" name="session_save" ${this.state.session_save ? 'checked="checked"' : ''} value="1"/>
                                         <div style="float: right">
                                             <a href=":user/:forgotpassword${userID ? '?userID=' + userID : ''}">Forgot Password?</a>
                                         </div>

@@ -151,7 +151,7 @@ class DatabaseAPI {
             await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
             res.json(Object.assign({}, {
-                message: `${req.method} ${req.url} ${error.message}`,
+                message: error.message,
                 error: error.stack,
                 code: error.code,
             }, json));

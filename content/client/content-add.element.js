@@ -13,7 +13,8 @@ class HTMLContentFormAddElement extends HTMLElement {
             message: "Add new content",
             status: 0,
             processing: false,
-            content: [null],
+            editable: false,
+            content: [{}],
             currentUploads: [],
         };
     }
@@ -35,7 +36,44 @@ class HTMLContentFormAddElement extends HTMLElement {
     }
 
     onFileUpload(e) {
-        this.setState({currentUploads: e.detail})
+        this.setState(e.detail, {status: 200});
+        console.log("FILE UPLOAD ", e.detail);
+        if(!this.state.newUploads || this.state.newUploads.length === 0)
+            return;
+        const form = this.querySelector('form');
+        let i=0;
+        do {
+            if (!form.elements[`content[${i}][title]`])
+                break;
+
+            const dataValue = form.elements[`content[${i}][data]`].value;
+            for(let j=0; j<this.state.newUploads.length; j++) {
+                if('temp:' + this.state.newUploads[j].name === dataValue) {
+                    this.state.newUploads.splice(j, 1);
+                    break;
+                }
+            }
+        }
+        while(++i);
+
+        const lastContent = this.state.content[this.state.content.length-1];
+        if(!lastContent.title && !lastContent.path && !lastContent.data)
+            this.state.content.splice(this.state.content.length-1, 1);
+        for(let j=0; j<this.state.newUploads.length; j++) {
+            this.state.content.push({
+                title: null,
+                path: null,
+                data: 'temp:' + this.state.newUploads[j].name,
+            });
+        }
+        this.state.newUploads = [];
+        this.state.content.push({
+            title: null,
+            path: null,
+            data: null,
+        });
+        this.render();
+        this.updateFormData();
     }
 
     onSuccess(e, response) {
@@ -48,27 +86,69 @@ class HTMLContentFormAddElement extends HTMLElement {
         this.updateFormData();
     }
     updateFormData() {
-        const formData = this.getFormData();
+        const form = this.querySelector('form');
         let i=0;
         do {
+            if(!form.elements[`content[${i}][title]`])
+                break;
+
+            if(!this.state.content[i])
+                this.state.content[i] = {};
+            const content = this.state.content[i];
+            content.title = form.elements[`content[${i}][title]`].value;
+            content.path = form.elements[`content[${i}][path]`].value;
+            content.data = form.elements[`content[${i}][data]`].value;
+            if(content.data && content.data.startsWith('temp:')) {
+                const tempFile = content.data.substr(5);
+                if(!content.title) {
+                    content.title = tempFile.split('.')[0]
+                        .replace(/[_-]+/g, ' ').replace(/^([a-z])|\s+([a-z])/g, function ($1) {
+                            return $1.toUpperCase();
+                        });
+                }
+                if(!content.path) {
+                    content.path = '/upload/' + tempFile.replace(' ', '_').toLowerCase();
+                }
+            }
+            if(content.title && !content.path) {
+                content.path = '/' + content.title
+                    .replace(/\s+/g, '/')
+                    .replace(/[^\w/]+/g, '')
+                    .replace('//', '/')
+                    .toLowerCase();
+            }
             // TODO: autofill
             // const title =
         }
         while(++i);
-        console.log(this.getFormData());
+
+        const lastContent = this.state.content[this.state.content.length-1];
+        if(lastContent.title || lastContent.path)
+            this.state.content.push({
+                title: null,
+                path: null,
+                data: null,
+            });
+        // console.log(this.state.content);
+
+        this.render();
     }
 
+
     onSubmit(e) {
-        if(e) e.preventDefault();
-        const form = e ? e.target : this.querySelector('form');
-        const request = this.getFormData(form);
+        e.preventDefault();
+        const form = e.target;
+        const formValues = Array.prototype.filter
+            .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
+            .map((input, i) => input.name + '=' + input.value)
+            .join('&');
         const method = form.getAttribute('method');
         const action = form.getAttribute('action');
 
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
             const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-            this.setState({status: xhr.status, processing: false}, response);
+            this.setState({processing: false, status: xhr.status}, response);
             if(xhr.status === 200) {
                 this.onSuccess(e, response);
             } else {
@@ -76,9 +156,9 @@ class HTMLContentFormAddElement extends HTMLElement {
             }
         };
         xhr.open(method, action, true);
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.responseType = 'json';
-        xhr.send(JSON.stringify(request));
+        xhr.send(formValues);
         this.setState({processing: true});
     }
 
@@ -87,7 +167,8 @@ class HTMLContentFormAddElement extends HTMLElement {
         const xhr = new XMLHttpRequest();
         xhr.onload = () => {
             const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-            this.setState({processing: false}, response);
+            this.setState({processing: false, status: xhr.status}, response);
+            this.updateFormData();
         };
         xhr.responseType = 'json';
         xhr.open ('OPTIONS', form.getAttribute('action'), true);
@@ -95,15 +176,7 @@ class HTMLContentFormAddElement extends HTMLElement {
         this.setState({processing: true});
     }
 
-    getFormData(form) {
-        form = form || this.querySelector('form');
-        const formData = {};
-        new FormData(form).forEach((value, key) => formData[key] = value);
-        return formData;
-    }
-
     render() {
-        const formData = this.getFormData();
 
         console.log("RENDER", this.state);
         this.innerHTML =
@@ -127,18 +200,18 @@ class HTMLContentFormAddElement extends HTMLElement {
                         ${this.state.content.map((content, i) => `
                         <tr>
                             <td>
-                                <input type="text" name="content[${i}][title]" placeholder="New Content Title" value="${formData[`content[${i}][title]`] || ''}" required/>
+                                <input type="text" name="content[${i}][title]" placeholder="New Content Title" value="${content.title||''}"/>
                             </td>
                             <td>
-                                <input type="text" name="content[${i}][path]" placeholder="/new/content/path" value="${formData[`content[${i}][path]`] || ''}" required/>
+                                <input type="text" name="content[${i}][path]" placeholder="/new/content/path" value="${content.path||''}"/>
                             </td>
                             <td>
                                 <select name="content[${i}][data]" style="max-width: 140px;">
                                     <option value="">Empty (Default)</option>
                                     <optgroup label="Uploaded Files">
                                     ${this.state.currentUploads.map((upload, i) => 
-                                        `<option value="uploaded:${upload.name}"${
-                                            formData[`content[${i}][data]`] === `uploaded:${upload.name}` ? ' selected="selected"' : ''
+                                        `<option value="temp:${upload.name}"${
+                                            content.data === `temp:${upload.name}` ? ' selected="selected"' : ''
                                             }>${upload.name} (${this.readableByteSize(upload.size)})</option>`
                                     )}
                                     </optgroup>
@@ -154,7 +227,7 @@ class HTMLContentFormAddElement extends HTMLElement {
                         <tr><td colspan="3"><hr/></td></tr>
                         <tr>
                             <td colspan="3" style="text-align: right;">
-                                <button type="submit">Add New Page${this.state.content.length > 0 ? 's' : ''}</button>
+                                <button type="submit" ${this.state.processing || !this.state.editable ? 'disabled="disabled"' : ''}>Add New Page${this.state.content.length > 0 ? 's' : ''}</button>
                             </td>
                         </tr>
                     </tfoot>            

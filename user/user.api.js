@@ -584,7 +584,7 @@ class UserAPI {
                 let whereSQL = '1', values = null;
                 if(req.body.search) {
                     whereSQL = 'u.username LIKE ? OR u.email LIKE ? OR u.id = ?';
-                    values = ['%'+req.body.search+'%', '%'+req.body.search+'%', parseInt(req.body.search)];
+                    values = ['%'+req.body.search+'%', '%'+req.body.search+'%', parseInt(req.body.search) || -1];
                 }
                 const users = await userDB.selectUsers(whereSQL, values, 'id, email, username, created, flags');
 
@@ -637,7 +637,7 @@ class UserAPI {
             await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
             res.json(Object.assign({}, {
-                message: `${req.method} ${req.url} ${error.message}`,
+                message: error.message,
                 error: error.stack,
                 code: error.code,
             }, json));

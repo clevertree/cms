@@ -50,17 +50,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.state[e.target.name] = e.target.value;
         }
 
+
         onSubmit(e) {
-            if(e) e.preventDefault();
-            const form = e ? e.target : this.querySelector('form');
-            const request = this.getFormData(form);
+            e.preventDefault();
+            const form = e.target;
+            const formValues = Array.prototype.filter
+                .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
+                .map((input, i) => input.name + '=' + input.value)
+                .join('&');
             const method = form.getAttribute('method');
             const action = form.getAttribute('action');
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                this.setState({status: xhr.status, processing: false}, response);
+                this.setState({processing: false, status: xhr.status}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(e, response);
                 } else {
@@ -68,17 +72,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             };
             xhr.open(method, action, true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhr.responseType = 'json';
-            xhr.send(JSON.stringify(request));
+            xhr.send(formValues);
             this.setState({processing: true});
-        }
-
-        getFormData(form) {
-            form = form || this.querySelector('form');
-            const formData = {};
-            new FormData(form).forEach((value, key) => formData[key] = value);
-            return formData;
         }
 
         render() {

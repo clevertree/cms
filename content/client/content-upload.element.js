@@ -55,12 +55,12 @@ class HTMLContentFormUploadElement extends HTMLElement {
         if(!iframeContent)
             return;
         const iframeJSON = JSON.parse(iframeContent);
-        console.log("IFrame Response: ", iframeJSON || iframeContent);
+//         console.log("IFrame Response: ", iframeJSON || iframeContent);
         if(iframeJSON && iframeJSON.currentUploads) {
             this.setState(iframeJSON);
             this.dispatchEvent(new CustomEvent('/:content/:upload', {
                 bubbles: true,
-                detail: iframeJSON.currentUploads
+                detail: iframeJSON
             }))
         }
     }
@@ -85,23 +85,23 @@ class HTMLContentFormUploadElement extends HTMLElement {
 
                 break;
         }
-        const formData = this.getFormData();
-        console.log(formData);
     }
 
+
     onSubmit(e) {
-        const form = e ? e.target : this.querySelector('form');
-        if(form.getAttribute('enctype') === 'multipart/form-data')
-            return;
-        if(e) e.preventDefault();
-        const request = this.getFormData(form);
+        e.preventDefault();
+        const form = e.target;
+        const formValues = Array.prototype.filter
+            .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
+            .map((input, i) => input.name + '=' + input.value)
+            .join('&');
         const method = form.getAttribute('method');
         const action = form.getAttribute('action');
 
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
             const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-            this.setState({status: xhr.status, processing: false}, response);
+            this.setState({processing: false, status: xhr.status}, response);
             if(xhr.status === 200) {
                 this.onSuccess(e, response);
             } else {
@@ -111,27 +111,23 @@ class HTMLContentFormUploadElement extends HTMLElement {
         xhr.open(method, action, true);
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.responseType = 'json';
-        xhr.send(request);
+        xhr.send(formValues);
         this.setState({processing: true});
     }
 
 
-    getFormData(form) {
-        form = form || this.querySelector('form');
-        let queryString = '';
-        new FormData(form).forEach((value, key) => queryString = queryString + (queryString ? '&' : '') + key + '=' + value);
-        return queryString;
-    }
-
     render() {
-        const formData = this.getFormData();
+        const formUpload = this.querySelector('form.content-uploadform');
+        const formManage = this.querySelector('form.content-uploadform-manage');
+        const val = (name) => formManage && formManage.elements && formManage.elements[name] ? formManage.elements[name].value : '';
 
 
         // TODO: multiple file upload
 //         console.log("RENDER", this.state, formData);
         this.innerHTML =
             `
-        <form action="/:content/:upload" method="POST" class="content content-uploadform-manage themed" enctype="application/x-www-form-urlencoded">
+        <iframe name="content-uploadform-iframe" onload="this.dispatchEvent(new CustomEvent('iframe-loaded', {bubbles: true}))" style="display: none;"></iframe>
+        <form action="/:content/:upload" target="content-uploadform-iframe" onchange="this.submit()" method="POST" class="content content-uploadform themed" enctype="multipart/form-data">
             <fieldset>
                 <table class="content">
                     <thead>
@@ -140,6 +136,28 @@ class HTMLContentFormUploadElement extends HTMLElement {
                                 ${this.state.message}
                             </div>
                         </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="2"><hr/></td></tr>
+                        <tr>
+                            <td>
+                                <input name="files" type="file" multiple required/>
+                            </td>
+                            <td style="text-align: right;">
+                                <button type="submit">Upload</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr><td colspan="2"><hr/></td></tr>
+                    </tfoot>            
+                </table>
+            </fieldset>
+        </form>
+        <form action="/:content/:upload" method="POST" class="content content-uploadform-manage themed" enctype="application/x-www-form-urlencoded">
+            <fieldset>
+                <table class="content">
+                    <thead>
                         <tr><td colspan="3"><hr/></td></tr>
                         <tr style="text-align: left;">
                             <th>Uploaded File Name</th>
@@ -157,7 +175,7 @@ class HTMLContentFormUploadElement extends HTMLElement {
                             <td>${currentUpload.size || ''}</td>
                             <td>
                                 <label>
-                                    <input type="checkbox" class="delete" name="delete" value="${i}" ${formData[`delete[${i}]`] ? ' checked="checked"' : ''}/>
+                                    <input type="checkbox" class="delete" name="delete[]" value="${i}" ${val(`delete[${i}]`) ? ' checked="checked"' : ''}/>
                                 </label>
                             </td>
                         </tr>
@@ -171,29 +189,6 @@ class HTMLContentFormUploadElement extends HTMLElement {
                             </td>
                         </tr>
                     </tfoot>      
-                </table>
-            </fieldset>
-        </form>
-        <iframe name="content-uploadform-iframe" onload="this.dispatchEvent(new CustomEvent('iframe-loaded', {bubbles: true}))" style="display: none;"></iframe>
-        <form action="/:content/:upload" target="content-uploadform-iframe" method="POST" class="content content-uploadform themed" enctype="multipart/form-data">
-            <fieldset>
-                <table class="content">
-                    <tbody>
-                        <tr><td><hr/></td></tr>
-                        <tr>
-                            <td>
-                                <input name="files" type="file" multiple/>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr><td><hr/></td></tr>
-                        <tr>
-                            <td style="text-align: right;">
-                                <button type="submit">Upload</button>
-                            </td>
-                        </tr>
-                    </tfoot>            
                 </table>
             </fieldset>
         </form>`;

@@ -67,9 +67,8 @@ class HTMLContentEditorFormElement extends HTMLElement {
 
     onKeyUp(e) {
         const form = e.target.form; // querySelector('form.user-login-form');
-        const request = this.getFormData(form);
-        this.renderPreview(request.data);
-        this.state.content.data = request.data;
+        this.renderPreview(form.elements['data'].value);
+        this.state.content.data = form.elements['data'].value;
     }
 
     onChange(e) {
@@ -118,10 +117,16 @@ class HTMLContentEditorFormElement extends HTMLElement {
         this.setState({processing: true});
     }
 
+
     onSubmit(e) {
         e.preventDefault();
         const form = e.target;
-        const request = this.getFormData(form);
+        const formValues = Array.prototype.filter
+            .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
+            .map((input, i) => input.name + '=' + input.value)
+            .join('&');
+        const method = form.getAttribute('method');
+        const action = form.getAttribute('action');
 
         const xhr = new XMLHttpRequest();
         xhr.onload = (e) => {
@@ -133,20 +138,12 @@ class HTMLContentEditorFormElement extends HTMLElement {
                 this.onError(e, response);
             }
         };
-        xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.open(method, action, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.responseType = 'json';
-        xhr.send(JSON.stringify(request));
+        xhr.send(formValues);
         this.setState({processing: true});
     }
-
-    getFormData(form) {
-        form = form || this.querySelector('form');
-        const formData = {};
-        new FormData(form).forEach((value, key) => formData[key] = value);
-        return formData;
-    }
-
 
     renderPreview(html) {
         const previewContent = document.querySelector('.content-preview-content');

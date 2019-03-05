@@ -59,18 +59,19 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(this.state);
         }
 
+
         onSubmit(e) {
             e.preventDefault();
-            const form = e.target; // querySelector('form.user-login-form');
-            this.setState({processing: true});
-            const request = {};
-            new FormData(form).forEach(function (value, key) {
-                request[key] = value;
-            });
+            const form = e.target;
+            const formValues = Array.prototype.filter
+                .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
+                .map((input, i) => input.name + '=' + input.value)
+                .join('&');
+            const method = form.getAttribute('method');
+            const action = form.getAttribute('action');
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
-                console.log(e, xhr.response);
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
                 this.setState({processing: false, status: xhr.status}, response);
                 if(xhr.status === 200) {
@@ -79,24 +80,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.onError(e, response);
                 }
             };
-            xhr.open(form.getAttribute('method'), form.getAttribute('action'), true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.open(method, action, true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhr.responseType = 'json';
-            xhr.send(JSON.stringify(request));
-        }
-
-        requestFormData() {
-            const form = this.querySelector('form');
-            const xhr = new XMLHttpRequest();
-            xhr.onload = () => {
-                this.setState({processing: false}, xhr.response);
-            };
-            xhr.responseType = 'json';
-            xhr.open ('OPTIONS', form.getAttribute('action'), true);
-            xhr.send ();
+            xhr.send(formValues);
             this.setState({processing: true});
         }
-
 
         render() {
             // console.log("STATE", this.state);

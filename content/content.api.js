@@ -327,6 +327,7 @@ class ContentApi {
             const userDB = new UserDatabase(database);
             if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
+            const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
 
             const currentUploads = req.session.uploads || [];
 
@@ -345,8 +346,17 @@ class ContentApi {
                 default:
                 case 'OPTIONS':
                     // const currentCount = req.session.uploads ? req.session.uploads.length : 0;
+                    let editable = sessionUser && sessionUser.isAdmin();
+                    let message = `${currentUploads.length} temporary file${currentUploads.length!== 1 ? 's' : ''} available`;
+                    if(!sessionUser)
+                        message = `Must be logged in to create new content`;
+                    if(!sessionUser.isAdmin())
+                        message = `Only administrators may create new content`;
 
                     return res.json({
+                        editable,
+                        message,
+                        status: editable ? 200 : 400,
                         // message: `${currentCount} temporary file${currentCount !== 1 ? 's' : ''} uploaded`,
                         currentUploads: currentUploads
                             .map(uploadEntry => { return {
@@ -356,9 +366,6 @@ class ContentApi {
                     });
 
                 case 'POST':
-                    if(!req.session || !req.session.userID)
-                        throw new Error("Must be logged in");
-                    const sessionUser = await userDB.fetchUserByID(req.session.userID);
                     if(!sessionUser || !sessionUser.isAdmin())
                         throw new Error("Not authorized");
                     // TODO: submit articles for approval
@@ -398,6 +405,13 @@ class ContentApi {
             // const database = await DatabaseManager.selectDatabaseByRequest(req);
             // const contentDB = new ContentDatabase(database);
             // const userDB = new UserDatabase(database);
+            if(!req.session)
+                throw new Error("Session is not available");
+
+            if(typeof req.session.uploads === "undefined")
+                req.session.uploads = [];
+            let currentCount = req.session.uploads ? req.session.uploads.length : 0;
+
             switch(req.method) {
                 case 'GET':
                     // Render Editor
@@ -411,10 +425,9 @@ class ContentApi {
 
                 default:
                 case 'OPTIONS':
-                    const currentCount = req.session.uploads ? req.session.uploads.length : 0;
 
                     return res.json({
-                        message: `${currentCount} temporary file${currentCount !== 1 ? 's' : ''} uploaded`,
+                        message: `${currentCount} temporary file upload${currentCount !== 1 ? 's' : ''} available`,
                         currentUploads: req.session.uploads
                             .map(uploadEntry => { return {
                                 name: uploadEntry.originalFilename,
@@ -423,13 +436,9 @@ class ContentApi {
                     });
 
                 case 'POST':
-                    if(!req.session)
-                        throw new Error("Session is not available");
-
-                    if(typeof req.session.uploads === "undefined")
-                        req.session.uploads = [];
                     const currentUploads = req.session.uploads;
                     let message = '';
+                    const newUploads = [];
                     if(Object.values(req.body).length > 0) {
                         let deletePositions = req.body.delete;
                         if(deletePositions) {
@@ -459,6 +468,7 @@ class ContentApi {
                                 path: files[i].path,
                                 size: files[i].size,
                             };
+                            newUploads.push(uploadEntry);
                             const pos = currentUploads.findIndex(searchUploadEntry => searchUploadEntry.originalFilename === uploadEntry.originalFilename);
                             if(pos >= 0) {
                                 currentUploads[pos] = uploadEntry;
@@ -466,12 +476,18 @@ class ContentApi {
                                 currentUploads.push(uploadEntry)
                             }
                         }
-                        message += `${uploadCount} temporary file${uploadCount !== 1 ? 's' : ''} uploaded. `;
+                        currentCount = req.session.uploads ? req.session.uploads.length : 0;
+                        message += `${uploadCount} temporary file${uploadCount !== 1 ? 's' : ''} uploaded. ${currentCount} files available.`;
                     }
 
 
                     return res.json({
                         message: message,
+                        newUploads: newUploads
+                            .map(uploadEntry => { return {
+                                name: uploadEntry.originalFilename,
+                                size: uploadEntry.size
+                            }}),
                         currentUploads: req.session.uploads
                             .map(uploadEntry => { return {
                                 name: uploadEntry.originalFilename,
@@ -592,7 +608,7 @@ class ContentApi {
             await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
             res.json(Object.assign({}, {
-                message: `${req.method} ${req.url} ${error.message}`,
+                message: error.message,
                 error: error.stack,
                 code: error.code,
             }, json));
