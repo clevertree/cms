@@ -42,9 +42,9 @@ class DomainAPI {
     async renderDomainJSON(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserTable(database);
-            const domainDB = new DomainDatabase(database);
-            const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+            const userTable = new UserTable(database);
+            const domainTable = new DomainDatabase(database);
+            const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
             if(!sessionUser || !sessionUser.isAdmin())
                 throw new Error("Not authorized");
 
@@ -54,8 +54,8 @@ class DomainAPI {
                 whereSQL = 'd.name LIKE ?';
                 values = ['%'+req.body.search+'%'];
             }
-            const domainList = await domainDB.selectDomains(whereSQL, values);
-            const domain = await domainDB.parseDomainValues(domainList);
+            const domainList = await domainTable.selectDomains(whereSQL, values);
+            const domain = await domainTable.parseDomainValues(domainList);
 
             return res.json({
                 message: `${domainList.length} Domain${domainList.length !== 1 ? 's' : ''} queried successfully`,
@@ -80,17 +80,17 @@ class DomainAPI {
             } else {
                 // Handle POST
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = new UserTable(database);
-                const domainDB = new DomainDatabase(database);
+                const userTable = new UserTable(database);
+                const domainTable = new DomainDatabase(database);
 
-                const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+                const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
                 if(!sessionUser || !sessionUser.isAdmin())
                     throw new Error("Not authorized");
 
                 let domainChanges = req.body, domainUpdateList=[];
                 for(let domainName in domainChanges) {
                     if(domainChanges.hasOwnProperty(domainName)) {
-                        const domainEntry = await domainDB.fetchDomainValue(domainName)
+                        const domainEntry = await domainTable.fetchDomainValue(domainName)
                         if(!domainEntry)
                             throw new Error("Domain entry not found: " + domainName);
                         if(domainChanges[domainName] !== domainEntry)
@@ -98,11 +98,11 @@ class DomainAPI {
                     }
                 }
                 for(let i=0; i<domainUpdateList.length; i++) {
-                    await domainDB.updateDomainValue(domainUpdateList[i][0], domainUpdateList[i][1])
+                    await domainTable.updateDomainValue(domainUpdateList[i][0], domainUpdateList[i][1])
                 }
 
 
-                const domainList = await domainDB.selectDomains('1');
+                const domainList = await domainTable.selectDomains('1');
                 return res.json({
                     message: `<div class='success'>${domainUpdateList.length} Domain${domainUpdateList.length !== 1 ? 's' : ''} updated successfully</div>`,
                     domainList

@@ -119,8 +119,8 @@ class UserAPI {
             throw new Error("Invalid Profile");
 
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = new UserTable(database);
-        const user = await userDB.fetchUserByID(userID);
+        const userTable = new UserTable(database);
+        const user = await userTable.fetchUserByID(userID);
         if(!user)
             throw new Error("User not found: " + userID);
 
@@ -136,17 +136,17 @@ class UserAPI {
             newProfile[profileField.name] = value;
         }
 
-        return await userDB.updateUser(user.id, null, null, newProfile, null);
+        return await userTable.updateUser(user.id, null, null, newProfile, null);
         // console.info("SET PROFILE", user, profile);
         // return user;
     }
 
     async updateFlags(req, userID, flags) {
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = new UserTable(database);
+        const userTable = new UserTable(database);
         if(!userID)
             throw new Error("Invalid User ID");
-        const user = await userDB.fetchUserByID(userID);
+        const user = await userTable.fetchUserByID(userID);
         if(!user)
             throw new Error("User not found: " + userID);
         if(typeof flags === 'string') {
@@ -164,15 +164,15 @@ class UserAPI {
             }
         }
 
-        return await userDB.updateUser(user.id, null, null, null, flags);
+        return await userTable.updateUser(user.id, null, null, null, flags);
     }
 
     async updatePassword(req, userID, password_old, password_new, password_confirm) {
         if(!userID)
             throw new Error("Invalid User ID");
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = new UserTable(database);
-        const user = await userDB.fetchUserByID(userID, 'u.*');
+        const userTable = new UserTable(database);
+        const user = await userTable.fetchUserByID(userID, 'u.*');
         if(!user)
             throw new Error("User not found: " + userID);
         const encryptedPassword = user.password;
@@ -196,7 +196,7 @@ class UserAPI {
                 throw new Error("New password must be different from the old");
         }
 
-        return await userDB.updateUser(user.id, null, password_new, null, null);
+        return await userTable.updateUser(user.id, null, password_new, null, null);
     }
 
     async register(req, username, email, password, password_confirm) {
@@ -217,8 +217,8 @@ class UserAPI {
             throw new Error("Confirm & Password do not match");
 
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = new UserTable(database);
-        const user = await userDB.createUser(username, email, password);
+        const userTable = new UserTable(database);
+        const user = await userTable.createUser(username, email, password);
 
         await this.login(req, user.id, password);
         return user;
@@ -235,8 +235,8 @@ class UserAPI {
             throw new Error("Password is required");
 
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = new UserTable(database);
-        const sessionUser = await userDB.fetchUserByID(userID, 'u.*');
+        const userTable = new UserTable(database);
+        const sessionUser = await userTable.fetchUserByID(userID, 'u.*');
         if(!sessionUser)
             throw new Error("User not found: " + userID);
         const encryptedPassword = sessionUser.password;
@@ -268,9 +268,9 @@ class UserAPI {
 
     async logout(req, res) {
         const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const userDB = new UserTable(database);
+        const userTable = new UserTable(database);
         if(req.session.user_session) {
-            await userDB.deleteUserSessionByID(req.session.user_session);
+            await userTable.deleteUserSessionByID(req.session.user_session);
         }
         req.session.reset();
         res.clearCookie('session_save');
@@ -375,8 +375,8 @@ class UserAPI {
         try {
             const userID = UserAPI.sanitizeInput(req.query.userID || null);
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserTable(database);
-            const user = await userDB.fetchUserByID(userID, 'u.*');
+            const userTable = new UserTable(database);
+            const user = await userTable.fetchUserByID(userID, 'u.*');
             if(!user)
                 return next();
 
@@ -412,8 +412,8 @@ class UserAPI {
         try {
 
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserTable(database);
-            const user = await userDB.fetchUserByID(userID);
+            const userTable = new UserTable(database);
+            const user = await userTable.fetchUserByID(userID);
             if(!user)
                 throw new Error("User was not found: " + userID);
 
@@ -469,12 +469,12 @@ class UserAPI {
         try {
             userID = UserAPI.sanitizeInput(userID);
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserTable(database);
-            let user = await userDB.fetchUserByID(userID, 'u.*');
+            const userTable = new UserTable(database);
+            let user = await userTable.fetchUserByID(userID, 'u.*');
             if(!user)
                 return next();
 
-            // const user = await this.userDB.fetchUserByID(userID);
+            // const user = await this.userTable.fetchUserByID(userID);
             switch(req.method) {
                 case 'GET':
                     if(type === 'edit') {
@@ -496,7 +496,7 @@ class UserAPI {
                 case 'OPTIONS':
                     const response = {user, sessionUser: null, editable: false};
                     if (req.session && req.session.userID) {
-                        const sessionUser = await userDB.fetchUserByID(req.session.userID);
+                        const sessionUser = await userTable.fetchUserByID(req.session.userID);
 
                         switch(type) {
                             case 'updateflags':
@@ -524,7 +524,7 @@ class UserAPI {
                     if(!req.session || !req.session.userID)
                         throw new Error("Must be logged in");
 
-                    const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+                    const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
                     if(!sessionUser)
                         throw new Error("Session User Not Found: " + req.session.userID);
                     if(!sessionUser.isAdmin() && sessionUser.id !== user.id)
@@ -553,7 +553,7 @@ class UserAPI {
                         default:
                             throw new Error("Invalid Profile Request: " + type);
                     }
-                    user = await userDB.fetchUserByID(user.id);
+                    user = await userTable.fetchUserByID(user.id);
 
                     return res.json({
                         redirect: user.url, // `/:user/${user.id}`,
@@ -582,14 +582,14 @@ class UserAPI {
 
             } else {
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userDB = new UserTable(database);
+                const userTable = new UserTable(database);
                 // Handle POST
                 let whereSQL = '1', values = null;
                 if(req.body.search) {
                     whereSQL = 'u.username LIKE ? OR u.email LIKE ? OR u.id = ?';
                     values = ['%'+req.body.search+'%', '%'+req.body.search+'%', parseInt(req.body.search) || -1];
                 }
-                const users = await userDB.selectUsers(whereSQL, values, 'id, email, username, created, flags');
+                const users = await userTable.selectUsers(whereSQL, values, 'id, email, username, created, flags');
 
                 return res.json({
                     message: `${users.length} User${users.length !== 1 ? 's' : ''} queried successfully`,
@@ -621,8 +621,8 @@ class UserAPI {
     async queryAdminEmailAddresses(database=null, hostname=null) {
         let dnsAdminEmails = hostname ? await DNSManager.queryHostAdminEmailAddresses(hostname) : [];
         if(database) {
-            const userDB = new UserTable(database);
-            let adminUsers = await userDB.selectUsers("FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
+            const userTable = new UserTable(database);
+            let adminUsers = await userTable.selectUsers("FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
             for(let i=0; i<adminUsers.length; i++) {
                 dnsAdminEmails.push(adminUsers[i].email);
             }

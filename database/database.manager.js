@@ -118,16 +118,16 @@ class DatabaseManager {
         }
 
         // Configure Domain
-        const domainDB = this.getPrimaryDomainDB();
+        const domainTable = this.getPrimaryDomainDB();
         if(this.primaryDatabase === database)
-            await domainDB.configure();
-        const domain = await domainDB.fetchDomainByHostname(hostname);
+            await domainTable.configure();
+        const domain = await domainTable.fetchDomainByHostname(hostname);
         if(!domain) {
-            await domainDB.insertDomain(hostname, database);
+            await domainTable.insertDomain(hostname, database);
             console.log(`Created domain entry: ${hostname} => ${database}`);
         } else {
             if(!domain.database) {
-                await domainDB.updateDomain(hostname, database);
+                await domainTable.updateDomain(hostname, database);
                 console.info(`Updated domain entry: ${hostname} => ${database}`);
 
             } else {
@@ -199,13 +199,13 @@ class DatabaseManager {
             if(typeof this.cacheHostname[hostname] !== "undefined")
                 return this.cacheHostname[hostname];
 
-            const domainDB = this.getPrimaryDomainDB();
-            const domain = await domainDB.fetchDomainByHostname(hostname);
+            const domainTable = this.getPrimaryDomainDB();
+            const domain = await domainTable.fetchDomainByHostname(hostname);
             let database = null;
             if(domain) {
                 database = domain.database;
             } else {
-                await domainDB.insertDomain(hostname, null);
+                await domainTable.insertDomain(hostname, null);
             }
             if(database) {
                 const databaseResult = await this.queryAsync(`SHOW DATABASES LIKE '${database}'`);

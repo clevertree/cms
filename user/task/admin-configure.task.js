@@ -25,8 +25,8 @@ class AdminConfigureTask {
         if(!this.database)
             return false;
 
-        const userDB = new UserTable(this.database);
-        let adminUser = await userDB.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
+        const userTable = new UserTable(this.database);
+        let adminUser = await userTable.fetchUser("FIND_IN_SET('admin', u.flags) LIMIT 1");
         if(adminUser) {
             // console.log(`Admin User Found [DB: ${this.database}]: `, adminUser);
             return false;
@@ -71,8 +71,8 @@ class AdminConfigureTask {
                         requestData = adminRequests[requestUUID];
                         delete adminRequests[requestUUID];
 
-                        const userDB = new UserTable(this.database);
-                        const adminUser = await userDB.createUser(req.body.username || 'admin', requestData.adminEmail, req.body.password, 'admin');
+                        const userTable = new UserTable(this.database);
+                        const adminUser = await userTable.createUser(req.body.username || 'admin', requestData.adminEmail, req.body.password, 'admin');
 
                         // await UserAPI.sendResetPasswordRequestEmail(req, adminUser);
 

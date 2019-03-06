@@ -53,9 +53,9 @@ class ConfigAPI {
     async renderConfigJSON(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserTable(database);
+            const userTable = new UserTable(database);
             const configDB = new ConfigDatabase(database);
-            const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+            const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
             if(!sessionUser || !sessionUser.isAdmin())
                 throw new Error("Not authorized");
 
@@ -76,12 +76,12 @@ class ConfigAPI {
     async renderConfigEditor(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userDB = new UserTable(database);
+            const userTable = new UserTable(database);
             const configDB = new ConfigDatabase(database);
             const configList = await configDB.selectAllConfigValues();
             const configValues = configDB.parseConfigValues(configList);
 
-            const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+            const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
 
             switch(req.method) {
                 case 'GET':

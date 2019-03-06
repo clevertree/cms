@@ -13,8 +13,7 @@
     <body class='theme-default'>
 <%- htmlHeader || include('header.partial.ejs') %>
 
-
-        <article>
+        <article<%-id ? ` data-content-id="${id}"` : ''%>>
             <%-data%>
         </article>
 

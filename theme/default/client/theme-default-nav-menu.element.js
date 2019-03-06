@@ -84,6 +84,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     return menuEntry;
                 });
             }
+            let contentID = null;
+            const contentArticle = document.body.querySelector('article[data-content-id]');
+            if(contentArticle)
+                contentID = contentArticle.getAttribute('data-content-id');
 //             console.log(menu, rootPaths, this.state.contentList);
             const menuSubMenu = [];
             menu.push({
@@ -91,6 +95,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 path: '#',
                 subMenu: menuSubMenu
             });
+
+            if(contentID) {
+                menuSubMenu.push({
+                    path: `/:content/${contentID}/:edit`,
+                    title: 'Edit Page Content',
+                });
+                menuSubMenu.push('<hr/>');
+            }
 
             if(!this.state.userID) {
                 menuSubMenu.push({

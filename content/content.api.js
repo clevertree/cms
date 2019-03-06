@@ -31,8 +31,8 @@ class ContentApi {
         const SM = SessionAPI.getMiddleware();
         // const FM = multiparty.multipartyExpress();
         // Handle Content requests
-        router.get(['/[\\w/_-]+', '/'],                         SM, async (req, res, next) => await this.renderContentByPath(req, res,next));
-
+        // router.use(                                             SM, async (req, res, next) => await this.renderContentByPath(req, res,next));
+//['/[\\w/_-]+', '/'],
         router.get('/[:]content/:id/[:]json',                   SM, async (req, res, next) => await this.renderContentByID(true, req, res, next));
         router.get(['/[:]content/:id/view', '/[:]content/:id'], SM, async (req, res, next) => await this.renderContentByID(false, req, res, next));
         router.get('/[:]content/[:]json',                       SM, async (req, res) => await this.renderContentListJSON(req, res));
@@ -49,7 +49,15 @@ class ContentApi {
         router.get('/[:]content/[:]client/*',                      async (req, res, next) => await this.handleContentStaticFiles(req, res, next));
 
 
-        return (req, res, next) => {
+        return async (req, res, next) => {
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const contentTable = new ContentTable(database);
+            const content = await contentTable.fetchContentByPath(req.url, '*');
+            if(content) {
+                await this.checkForRevisionContent(req, content);
+                return this.renderContent(req, res, content);
+            }
+
             // if(!req.url.startsWith('/:content'))
             //     return next();
             return router(req, res, next);
@@ -67,47 +75,57 @@ class ContentApi {
     }
 
     async checkForRevisionContent(req, content) {
-        const database = await DatabaseManager.selectDatabaseByRequest(req);
-        const contentRevisionDB = new ContentRevisionTable(database);
         if(typeof req.query.r !== 'undefined') {
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const contentRevisionTable = new ContentRevisionTable(database);
             const contentRevisionID = parseInt(req.query.r);
-            const contentRevision = await contentRevisionDB.fetchContentRevisionByID(contentRevisionID);
+            const contentRevision = await contentRevisionTable.fetchContentRevisionByID(contentRevisionID);
             if(!contentRevision)
                 throw new Error("Content Revision ID not found: " + contentRevisionID);
 
             if(contentRevision.content_id !== content.id)
                 throw new Error("Revision does not belong to content");
 
-            content.data = contentRevision.data;
-            content.title = contentRevision.title;
+            content.data = await contentRevisionTable.fetchRevisionData(contentRevision.id);
+            // content.title = contentRevision.title;
             return contentRevision;
         }
         return null;
     }
 
-    async renderContentByPath(req, res, next) {
-        try {
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const contentDB = new ContentTable(database);
-            const content = await contentDB.fetchContentByPath(req.url);
-            if(!content)
-                return next();
-
-            await this.checkForRevisionContent(req, content);
-
-            await ThemeAPI.send(req, res, content);
-        } catch (error) {
-            await this.renderError(error, req, res);
+    async renderContent(req, res, content) {
+        const mimeType = this.getMimeType(path.extname(content.path) || '');
+        switch(mimeType) {
+            case 'text/html':
+                await ThemeAPI.send(req, res, content);
+                break;
+            default:
+                await this.renderData(req, res, content.data, mimeType, content.updated);
+                break;
         }
     }
+    // async renderContentByPath(req, res, next) {
+    //     // TODO: parse session middleware only if content was found
+    //     try {
+    //         const database = await DatabaseManager.selectDatabaseByRequest(req);
+    //         const contentTable = new ContentTable(database);
+    //         const content = await contentTable.fetchContentByPath(req.url, '*');
+    //         if(!content)
+    //             return next();
+    //
+    //         await this.renderContent(req, res, content);
+    //     } catch (error) {
+    //         await this.renderError(error, req, res);
+    //     }
+    // }
 
 
     async renderContentByID(asJSON, req, res, next) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const contentDB = new ContentTable(database);
-            const contentRevisionDB = new ContentRevisionTable(database);
-            const content = await contentDB.fetchContentByID(req.params.id);
+            const contentTable = new ContentTable(database);
+            const contentRevisionTable = new ContentRevisionTable(database);
+            const content = await contentTable.fetchContentByID(req.params.id);
             if(!content)
                 return next();
 
@@ -122,21 +140,21 @@ class ContentApi {
                 };
                 if(req.session && req.session.userID) {
                     const database = await DatabaseManager.selectDatabaseByRequest(req);
-                    const userDB = new UserTable(database);
-                    const sessionUser = await userDB.fetchUserByID(req.session.userID);
+                    const userTable = new UserTable(database);
+                    const sessionUser = await userTable.fetchUserByID(req.session.userID);
                     if (sessionUser.isAdmin() || sessionUser.id === content.user_id)
                         response.editable = true;
                 }
                 if(req.query.getAll || req.query.getHistory) {
-                    response.history = await contentRevisionDB.fetchContentRevisionsByContentID(content.id);
-                    // response.revision = await contentRevisionDB.fetchContentRevisionByID(content.id, req.query.getRevision || null);
+                    response.history = await contentRevisionTable.fetchContentRevisionsByContentID(content.id);
+                    // response.revision = await contentRevisionTable.fetchContentRevisionByID(content.id, req.query.getRevision || null);
                     if(!contentRevision && response.history.length > 0) // Fetch latest revision? sloppy
-                        contentRevision = await contentRevisionDB.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentRevisionDB.fetchContentRevisionsByContentID(content.id))[0];
+                        contentRevision = await contentRevisionTable.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentRevisionTable.fetchContentRevisionsByContentID(content.id))[0];
                 }
                 if(contentRevision)
                     response.revision = contentRevision;
                 if(req.query.getAll) {
-                    response.parentList = await contentDB.selectContent("c.path IS NOT NULL", null, "id, path, title");
+                    response.parentList = await contentTable.selectContent("c.path IS NOT NULL", null, "id, path, title");
                 }
 
                 res.json(response);
@@ -152,18 +170,25 @@ class ContentApi {
     async renderContentEditorByID(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const contentDB = new ContentTable(database);
-            const contentRevisionDB = new ContentRevisionTable(database);
-            const userDB = new UserTable(database);
+            const contentTable = new ContentTable(database);
+            const contentRevisionTable = new ContentRevisionTable(database);
+            const userTable = new UserTable(database);
 
             if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
-            const sessionUser = await userDB.fetchUserByID(req.session.userID);
+            const sessionUser = await userTable.fetchUserByID(req.session.userID);
 
-            let content = await contentDB.fetchContentByID(req.params.id);
+            let content = await contentTable.fetchContentByID(req.params.id);
 
             switch(req.method) {
                 case 'GET':
+                    let renderedData = null;
+                    const mimeType = this.getMimeType(path.extname(content.path) || '');
+                    switch(mimeType) {
+                        case 'text/html':
+                            renderedData = contentTable.fetchData(content.id, 'UTF8');
+                            break;
+                    }
                     // Render Editor
                     await ThemeAPI.send(req, res, `<section style="max-width: 1600px;">
                 <script src="/:content/:client/content-editor.element.js"></script>
@@ -173,7 +198,9 @@ class ContentApi {
                 <h1 style="text-align: center;">Preview</h1>
                 <hr/>
                 <div class="content-preview-content">
-                    ${content.data}
+                    <article>
+                        ${renderedData}                
+                    </article>
                 </div>
             </section>
     `);
@@ -192,22 +219,22 @@ class ContentApi {
                     };
                     if(req.session && req.session.userID) {
                         const database = await DatabaseManager.selectDatabaseByRequest(req);
-                        const userDB = new UserTable(database);
-                        const sessionUser = await userDB.fetchUserByID(req.session.userID);
+                        const userTable = new UserTable(database);
+                        const sessionUser = await userTable.fetchUserByID(req.session.userID);
                         if (sessionUser.isAdmin() || sessionUser.id === content.user_id)
                             response.editable = true;
                     }
-                    response.history = await contentRevisionDB.fetchContentRevisionsByContentID(content.id);
-                    // response.revision = await contentRevisionDB.fetchContentRevisionByID(content.id, req.query.getRevision || null);
+                    response.history = await contentRevisionTable.fetchContentRevisionsByContentID(content.id);
+                    // response.revision = await contentRevisionTable.fetchContentRevisionByID(content.id, req.query.getRevision || null);
                     if(!contentRevision && response.history.length > 0) // Fetch latest revision? sloppy
-                        contentRevision = await contentRevisionDB.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentRevisionDB.fetchContentRevisionsByContentID(content.id))[0];
+                        contentRevision = await contentRevisionTable.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentRevisionTable.fetchContentRevisionsByContentID(content.id))[0];
                     if(contentRevision)
                         response.revision = contentRevision;
-                    response.parentList = await contentDB.selectContent("c.path IS NOT NULL", null, "id, path, title");
+                    response.parentList = await contentTable.selectContent("c.path IS NOT NULL", null, "id, path, title");
 
                     content.mimeType = this.getMimeType(path.extname(content.path) || '');
                     if(editableMimeTypes.indexOf(content.mimeType) !== -1) {
-                        content.data = await contentDB.fetchData(content.id, 'UTF8');
+                        content.data = await contentTable.fetchData(content.id, 'UTF8');
                         content.isBinary = false;
                     } else {
                         content.data = '[binary file]';
@@ -225,7 +252,7 @@ class ContentApi {
                         case 'publish':
                             if(!sessionUser || !sessionUser.isAdmin())
                                 throw new Error("Not authorized");
-                            const affectedRows = await contentDB.updateContent(
+                            const affectedRows = await contentTable.updateContent(
                                 content.id,
                                 req.body.title,
                                 req.body.data,
@@ -234,9 +261,9 @@ class ContentApi {
                                 req.body.theme,
                                 req.body.flags
                             );
-                            content = await contentDB.fetchContentByID(req.params.id);
+                            content = await contentTable.fetchContentByID(req.params.id);
 
-                            insertContentRevisionID = await contentRevisionDB.insertContentRevision(
+                            insertContentRevisionID = await contentRevisionTable.insertContentRevision(
                                 content.id,
                                 req.body.title,
                                 req.body.data,
@@ -252,13 +279,13 @@ class ContentApi {
                             });
 
                         case 'draft':
-                            insertContentRevisionID = await contentRevisionDB.insertContentRevision(
+                            insertContentRevisionID = await contentRevisionTable.insertContentRevision(
                                 content.id,
                                 req.body.title,
                                 req.body.data,
                                 sessionUser.id
                             );
-                            revision = await contentRevisionDB.fetchContentRevisionByID(insertContentRevisionID);
+                            revision = await contentRevisionTable.fetchContentRevisionByID(insertContentRevisionID);
                             return res.json({
                                 redirect: content.url + '?r=' + revision.id,
                                 message: "Draft saved successfully",
@@ -276,11 +303,11 @@ class ContentApi {
     async renderContentDeleteByID(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const contentDB = new ContentTable(database);
-            const userDB = new UserTable(database);
+            const contentTable = new ContentTable(database);
+            const userTable = new UserTable(database);
 
 
-            let content = await contentDB.fetchContentByID(req.params.id);
+            let content = await contentTable.fetchContentByID(req.params.id);
 
 
             switch(req.method) {
@@ -302,8 +329,8 @@ class ContentApi {
                     };
                     if(req.session && req.session.userID) {
                         const database = await DatabaseManager.selectDatabaseByRequest(req);
-                        const userDB = new UserTable(database);
-                        const sessionUser = await userDB.fetchUserByID(req.session.userID);
+                        const userTable = new UserTable(database);
+                        const sessionUser = await userTable.fetchUserByID(req.session.userID);
                         if (sessionUser.isAdmin() || sessionUser.id === content.user_id)
                             response.editable = true;
                     }
@@ -314,12 +341,12 @@ class ContentApi {
                     // Handle POST
                     if(!req.session || !req.session.userID)
                         throw new Error("Must be logged in");
-                    const sessionUser = await userDB.fetchUserByID(req.session.userID);
+                    const sessionUser = await userTable.fetchUserByID(req.session.userID);
                     if(!sessionUser || !sessionUser.isAdmin())
                         throw new Error("Not authorized");
                     // TODO: recommend articles for deletion
 
-                    const affectedRows = await contentDB.deleteContent(
+                    const affectedRows = await contentTable.deleteContent(
                         content.id
                     );
 
@@ -337,12 +364,12 @@ class ContentApi {
     async renderContentAdd(req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const contentDB = new ContentTable(database);
-            const contentRevisionDB = new ContentRevisionTable(database);
-            const userDB = new UserTable(database);
+            const contentTable = new ContentTable(database);
+            const contentRevisionTable = new ContentRevisionTable(database);
+            const userTable = new UserTable(database);
             if(!req.session || !req.session.userID)
                 throw new Error("Must be logged in");
-            const sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+            const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
 
             const currentUploads = req.session.uploads || [];
 
@@ -381,33 +408,63 @@ class ContentApi {
                     });
 
                 case 'POST':
+                    // Handle POST
                     if(!sessionUser || !sessionUser.isAdmin())
                         throw new Error("Not authorized");
-                    // TODO: submit articles for approval?
+                    // TODO: submit articles for approval? No, it would flood the hostmaster with requests
 
-                    // Handle POST
-                    const insertID = await contentDB.insertContent(
-                        req.body.title,
-                        req.body.data,
-                        req.body.path,
-                        // sessionUser.id,
-                        // req.body.parent_id ? parseInt(req.body.parent_id) : null,
-                        req.body.theme
-                    );
-                    const content = await contentDB.fetchContentByID(insertID);
+                    const insertIDs = [];
+                    for(let i=0; i<req.body.content.length; i++) {
+                        let contentData = req.body.content[i];
+                        if(!contentData.title)
+                            throw new Error("Invalid Title: " + i);
+                        if(!contentData.path)
+                            throw new Error("Invalid Path: " + i)
+                        if(contentData.data) {
+                            const dataMethod = contentData.data.split(':');
+                            contentData.data = null;
+                            switch (dataMethod[0]) {
+                                case 'temp':
+                                    const tempFileName = dataMethod[1];
+                                    const tempFilePos = currentUploads.findIndex(upload => upload.originalFilename === tempFileName);
+                                    if(tempFilePos === -1)
+                                        throw new Error("Temporary file not found: " + tempFileName);
+                                    contentData.data = await fsPromises.readFile(currentUploads[tempFilePos].path);
+                                    currentUploads.splice(tempFilePos, 1);
+                                    break;
+                                default:
+                                    throw new Error("Invalid data upload method: " + dataMethod);
+                            }
+                        }
 
-                    const insertContentRevisionID = await contentRevisionDB.insertContentRevision(
-                        content.id,
-                        req.body.title,
-                        req.body.data,
-                        sessionUser.id
-                    );
+                        const insertID = await contentTable.updateContentWithRevision(
+                            contentData.title,
+                            contentData.data,
+                            contentData.path,
+                            sessionUser.id,
+                            // req.body.parent_id ? parseInt(req.body.parent_id) : null,
+                            contentData.theme
+                        );
+                        insertIDs.push(insertID);
+
+                        // Initial revision shouldn't be created until first edit has been made
+                        // const contentEntry = await contentTable.fetchContentByID(insertID);
+                        //
+                        // const insertRevisionID = await contentRevisionTable.insertContentRevision(
+                        //     contentEntry.id,
+                        //     contentData.title,
+                        //     contentData.data,
+                        //     sessionUser.id
+                        // );
+                        // insertRevisionIDs.push(insertRevisionID);
+                    }
+
+
                     return res.json({
-                        redirect: content.url + '/:edit',
-                        message: "Content created successfully. Redirecting...",
-                        insertID,
-                        insertContentRevisionID,
-                        content
+                        redirect: '/:content',
+                        message: `${insertIDs} Content Entr${insertIDs.length === 1 ? 'y' : 'ies'} created successfully.`,
+                        insertIDs,
+                        // insertRevisionIDs,
                     });
             }
         } catch (error) {
@@ -418,8 +475,8 @@ class ContentApi {
     async renderContentUpload(req, res) {
         try {
             // const database = await DatabaseManager.selectDatabaseByRequest(req);
-            // const contentDB = new ContentTable(database);
-            // const userDB = new UserTable(database);
+            // const contentTable = new ContentTable(database);
+            // const userTable = new UserTable(database);
             if(!req.session)
                 throw new Error("Session is not available");
 
@@ -545,7 +602,7 @@ class ContentApi {
         try {
 
             const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const contentDB = new ContentTable(database);
+            const contentTable = new ContentTable(database);
 
             // Handle POST
             let whereSQL = '1', values = null;
@@ -554,7 +611,7 @@ class ContentApi {
                 whereSQL = 'c.title LIKE ? OR c.data LIKE ? OR c.path LIKE ? OR c.id = ?';
                 values = ['%'+search+'%', '%'+search+'%', '%'+search+'%', parseInt(search)];
             }
-            const contentList = await contentDB.selectContent(whereSQL, values, 'id, path, title');
+            const contentList = await contentTable.selectContent(whereSQL, values, 'id, path, title');
 
             return res.json({
                 message: `${contentList.length} content entr${contentList.length !== 1 ? 'ies' : 'y'} queried successfully`,

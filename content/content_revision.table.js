@@ -15,7 +15,7 @@ class ContentRevisionTable {
 
     /** Content Revision **/
 
-    async selectContentRevision(whereSQL, values, selectSQL='cr.*') {
+    async selectContentRevision(whereSQL, values, selectSQL = '*, NULL as data') {
         let SQL = `
           SELECT ${selectSQL}
           FROM ${this.table} cr
@@ -34,12 +34,12 @@ class ContentRevisionTable {
     //     return revisions[0];
     // }
 
-    async fetchContentRevisionByID(id, selectSQL = '*') {
+    async fetchContentRevisionByID(id, selectSQL = '*, NULL as data') {
         const revisions = await this.selectContentRevision(`cr.id = ?`,
             [id], selectSQL);
         return revisions[0];
     }
-    async fetchContentRevisionByDate(created, selectSQL = '*') {
+    async fetchContentRevisionByDate(created, selectSQL = '*, NULL as data') {
         const revisions = await this.selectContentRevision(`cr.created = ?`,
             [created], selectSQL);
         return revisions[0];
@@ -50,13 +50,21 @@ class ContentRevisionTable {
             [contentID], selectSQL);
     }
 
+    async fetchRevisionData(contentID, asString=null) {
+        const content = await this.fetchContentRevisionByID(contentID, 'cr.data');
+        if(!content)
+            throw new Error("Content ID not found: " + contentID);
+        if(asString)
+            return content.data.toString(asString);
+        return content.data;
+    }
     // Inserting revision without updating content === draft
-    async insertContentRevision(content_id, title, data, user_id) {
+    async insertContentRevision(content_id, data, user_id) {
         let SQL = `
           INSERT INTO ${this.table}
           SET ?
         `;
-        const results = await DatabaseManager.queryAsync(SQL, {content_id, user_id, title, data});
+        const results = await DatabaseManager.queryAsync(SQL, {content_id, user_id, data});
         return results.insertId;
     }
 
@@ -68,7 +76,6 @@ CREATE TABLE ${this.table} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`content_id\` int(11) NOT NULL,
   \`user_id\` int(11) NOT NULL,
-  \`title\` varchar(96) DEFAULT NULL,
   \`data\` varbinary(65536) DEFAULT NULL,
   \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (\`id\`),

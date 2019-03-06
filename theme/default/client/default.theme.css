@@ -71,7 +71,7 @@ body.theme-default {
 /** Anchors **/
 
 .theme-default a {
-    color: #c88200;
+    /* color: #c88200; */
 }
 
 .theme-default a:hover {

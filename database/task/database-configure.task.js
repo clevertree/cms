@@ -27,8 +27,8 @@ class DatabaseConfigureTask {
 
         let hostname = DatabaseManager.getHostnameFromRequest(req);
 
-        const domainDB = DatabaseManager.getPrimaryDomainDB();
-        const domain = await domainDB.fetchDomainByHostname(hostname);
+        const domainTable = DatabaseManager.getPrimaryDomainDB();
+        const domain = await domainTable.fetchDomainByHostname(hostname);
         if(!domain)
             throw new Error("Domain entry missing. Shouldn't happen");
         if(!domain.database)
@@ -92,8 +92,8 @@ class DatabaseConfigureTask {
                         const database = req.body.database;
 
                         await DatabaseManager.configureDatabase(database, hostname, null);
-                        const userDB = new UserTable(database);
-                        const adminUser = await userDB.createUser(req.body.username || 'admin', requestData.adminEmail, req.body.password, 'admin');
+                        const userTable = new UserTable(database);
+                        const adminUser = await userTable.createUser(req.body.username || 'admin', requestData.adminEmail, req.body.password, 'admin');
 
                         // await UserAPI.sendResetPasswordRequestEmail(req, adminUser);
 

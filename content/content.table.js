@@ -2,8 +2,9 @@ const { DatabaseManager } = require('../database/database.manager');
 
 // Init
 class ContentTable {
-    constructor(dbName, debug=false) {
-        const tablePrefix = dbName ? `\`${dbName}\`.` : '';
+    constructor(database, debug=false) {
+        const tablePrefix = database ? `\`${database}\`.` : '';
+        this.database = database;
         this.table = tablePrefix + '`content`';
         this.debug = debug;
     }
@@ -56,7 +57,7 @@ class ContentTable {
         return await this.fetchContent('c.id = ? LIMIT 1', contentID, selectSQL);
     }
 
-    async fetchData(contentID, asString='UTF8') {
+    async fetchData(contentID, asString=null) {
         const content = await this.fetchContentByID(contentID, 'c.data');
         if(!content)
             throw new Error("Content ID not found: " + contentID);
@@ -71,12 +72,52 @@ class ContentTable {
     //     return await this.selectContent(whereSQL, flags, selectSQL);
     // }
 
-    async insertContent(title, data, path, theme) {
+    async updateContentWithRevision(title, data, path, user_id, theme) {
+        const existingContent = await this.fetchContentByPath(path);
+        if(!existingContent) {
+            // Initial revision shouldn't be created until first edit has been made
+            return await this.insertContent(
+                title,
+                data,
+                path,
+                user_id,
+                // req.body.parent_id ? parseInt(req.body.parent_id) : null,
+                theme
+            );
+        }
+
+        const oldData = await this.fetchData(existingContent.id);
+        if(oldData && data.toString() === oldData.toString()) {
+            console.warn(`Old data matched new data. No updates or revisions made to ${existingContent.path}`);
+            return existingContent.id;
+        }
+
+        // Content is being updated, so store old data as a revision.
+        const { ContentRevisionTable } = require('./content_revision.table');
+        const contentRevisionTable = new ContentRevisionTable(this.database);
+        await contentRevisionTable.insertContentRevision(
+            existingContent.id,
+            existingContent.data,
+            existingContent.user_id,
+        );
+        await this.updateContent(
+            existingContent.id,
+            title,
+            data,
+            path,
+            user_id,
+            // req.body.parent_id ? parseInt(req.body.parent_id) : null,
+            theme
+        );
+        return existingContent.id;
+    }
+
+    async insertContent(title, data, path, user_id, theme) {
         let set = {};
         if(title) set.title = title;
         if(data) set.data = data;
         if(path) set.path = path[0] === '/' ? path : '/' + path;
-        // if(user_id !== null) set.user_id = user_id;
+        if(user_id !== null) set.user_id = user_id;
         // if(parent_id !== null) set.parent_id = parent_id;
         if(theme) set.theme = theme;
         // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
@@ -88,12 +129,12 @@ class ContentTable {
         return results.insertId;
     }
 
-    async updateContent(id, title, data, path, theme) {
+    async updateContent(id, title, data, path, user_id, theme) {
         let set = {};
         if(title) set.title = title;
         if(data) set.data = data;
         if(path) set.path = path;
-        // if(user_id !== null) set.user_id = user_id;
+        if(user_id !== null) set.user_id = user_id;
         if(theme) set.theme = theme;
         // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
@@ -156,12 +197,16 @@ CREATE TABLE ${this.table} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`path\` varchar(96) NOT NULL,
   \`title\` varchar(96) NOT NULL,
+  \`user_id\` int(11) DEFAULT NULL,
   \`data\` varbinary(65536) DEFAULT NULL,
   \`theme\` varchar(64) DEFAULT NULL,
   \`created\` datetime DEFAULT current_timestamp(),
   \`updated\` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (\`id\`),
-  UNIQUE KEY \`uk:content.path\` (\`path\`)
+  KEY \`idx:content.user_id\` (\`user_id\` ASC),
+  UNIQUE KEY \`uk:content.path\` (\`path\`),
+  CONSTRAINT \`fk:content.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
+
 ) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8;
 `
     }

@@ -63,8 +63,8 @@ class TaskAPI {
             const database = await DatabaseManager.selectDatabaseByRequest(req, false);
             let sessionUser = null;
             if(database) {
-                const userDB = new UserTable(database);
-                sessionUser = req.session && req.session.userID ? await userDB.fetchUserByID(req.session.userID) : null;
+                const userTable = new UserTable(database);
+                sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
             }
             // const task = await this.getTaskClass(taskName);
 

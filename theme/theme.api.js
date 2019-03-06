@@ -80,6 +80,7 @@ class ThemeAPI {
         if(typeof content === "string")
             content = {data: content};
         content = Object.assign({}, {
+            id: null,
             title: require('os').hostname(),
             data: null,
             baseURL: '/',
@@ -109,12 +110,12 @@ class ThemeAPI {
         if(this.DatabaseManager.isAvailable) {
             const database = await this.DatabaseManager.selectDatabaseByRequest(req, false);
             if(database) {
-                // const contentDB = new ContentTable(database);
-                // renderData.menu = await contentDB.queryMenuData(req, true);
+                // const contentTable = new ContentTable(database);
+                // renderData.menu = await contentTable.queryMenuData(req, true);
 
                 // if(req.session && req.session.userID ) {
-                //     const userDB = new UserTable(database);
-                //     content.sessionUser = userDB.fetchUserByID(req.session.userID);
+                //     const userTable = new UserTable(database);
+                //     content.sessionUser = userTable.fetchUserByID(req.session.userID);
                 // }
 
                 const configDB = new ConfigDatabase(database);

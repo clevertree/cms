@@ -83,7 +83,7 @@ class HTMLContentBrowserElement extends HTMLElement {
         const form = this.querySelector('form');
         const formValues = Array.prototype.filter
             .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
-            .map((input, i) => input.name + '=' + input.value)
+            .map((input, i) => input.name + '=' + encodeURI(input.value))
             .join('&');
         const method = form.getAttribute('method');
         const action = form.getAttribute('action');
@@ -122,7 +122,7 @@ class HTMLContentBrowserElement extends HTMLElement {
                         </tr>
                         <tr><td colspan="5"><hr/></td></tr>
                         <tr style="text-align: left;">
-                            <th>ID</th>
+                            <th style="min-width: 50px;">ID</th>
                             <th>Path</th>
                             <th>Title</th>
                             <th>Edit</th>
@@ -158,8 +158,8 @@ class HTMLContentBrowserElement extends HTMLElement {
         resultsElement.innerHTML = this.state.contentList.map(content => `
             <tr class="results ${classOdd=classOdd===''?'odd':''}">
                 <td><a href=":content/${content.id}">${content.id}</a></td>
-                <td style="text-align: left;"><a href="${content.path||`:content/${content.id}/:edit`}">${content.path||''}</a></td>
-                <td style="text-align: left;"><a href=":content/${content.id}">${content.title}</a></td>
+                <td><a href="${content.path||`:content/${content.id}/:edit`}">${content.path||''}</a></td>
+                <td><a href=":content/${content.id}">${content.title}</a></td>
                 
                 <td><a href=":content/${content.id}/:edit" class="action-edit">&#x270D;</a></td>
                 <td><a href=":content/${content.id}/:delete" class="action-edit">&#x26D4;</a></td>
