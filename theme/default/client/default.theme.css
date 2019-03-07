@@ -80,7 +80,6 @@ body.theme-default {
 
 
 /** Footer **/
-
 .theme-default > footer {
     /* text-align: center; */
     background: linear-gradient(to top, #3d9bea 0%, #6eb4ef 99%);
@@ -90,14 +89,13 @@ body.theme-default {
 
 
 /** Page Sections **/
-
 .theme-default > article > section {
     padding: 0.5em;
     background: #f5e7a8;
 }
 
-.theme-default div.highlight,
-.theme-default > article > section.highlight {
+.theme-default div.themed,
+.theme-default > article > section.themed {
     color: #f5efd5;
     text-shadow: #000 1px 1px 1px;
     background-color: #ab6428ed;
@@ -115,7 +113,6 @@ body.theme-default {
 }
 
 /** Messages **/
-
 .theme-default div.message,
 .theme-default div.success,
 .theme-default div.error {
@@ -138,8 +135,6 @@ body.theme-default {
 
 
 /** Forms **/
-
-
 .theme-default form.themed > fieldset {
     padding: 1em 1em;
     border-radius: 8px;
@@ -191,7 +186,6 @@ body.theme-default {
 
 
 /** Table **/
-
 .theme-default table.themed {
     margin: 0 auto;
     padding: 0.5em;

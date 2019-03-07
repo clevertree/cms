@@ -1,6 +1,9 @@
 // const fs = require('fs');
 const path = require('path');
-const ejs = require('ejs');
+// const ejs = require('ejs');
+const { JSDOM } = require("jsdom");
+var htmlparser = require("htmlparser");
+
 // const { ContentTable } = require('../../content/content.database');
 
 const DIR_TEMPLATE = path.resolve(__dirname + '/template');
@@ -16,6 +19,8 @@ class DefaultTheme {
     }
 
     async render(req, content) {
+
+        // Assemble without ejs?
 
         try {
             const templatePath = path.resolve(DIR_TEMPLATE + '/theme.ejs');

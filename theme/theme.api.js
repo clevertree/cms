@@ -82,7 +82,7 @@ class ThemeAPI {
             session: req.session || {},
             htmlHeader: null,
             htmlFooter: null,
-            htmlMenu: null,
+            // htmlMenu: null,
             htmlSession: await this.UserAPI.getSessionHTML(req),
 
         }, content);

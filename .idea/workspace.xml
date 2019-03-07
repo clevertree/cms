@@ -4,6 +4,22 @@
     <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/content.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/content.api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/client/default.theme.css" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/client/default.theme.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/default.theme.js" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/default.theme.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/template/article/about.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/article/about.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/template/article/coming-soon.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/article/coming-soon.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/template/article/home.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/article/home.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/template/article/login.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/article/login.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/template/article/resources.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/article/resources.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/template/footer.partial.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/footer.partial.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/template/header.partial.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/header.partial.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/template/theme.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/theme.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/theme.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/theme/theme.api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client/user-forgotpassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-forgotpassword.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client/user-resetpassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-resetpassword.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/user.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.api.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -31,40 +47,28 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/content.api.js">
+        <entry file="file://$PROJECT_DIR$/theme/default/default.theme.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="649">
-              <caret line="329" selection-start-line="329" selection-end-line="329" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/theme/default/template/footer.partial.ejs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="209">
-              <caret line="11" column="20" selection-start-line="11" selection-start-column="20" selection-end-line="11" selection-end-column="20" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/theme/default/client/default.theme.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="532">
-              <caret line="28" selection-start-line="28" selection-end-line="28" />
+            <state relative-caret-position="57">
+              <caret line="3" selection-start-line="3" selection-end-line="3" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/README.md">
-          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-            <state split_layout="SPLIT">
-              <first_editor relative-caret-position="798">
-                <caret line="42" selection-start-line="42" selection-end-line="42" />
-              </first_editor>
-              <second_editor />
+        <entry file="file://$PROJECT_DIR$/package.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="608">
+              <caret line="32" column="15" selection-start-line="32" selection-start-column="5" selection-end-line="32" selection-end-column="15" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/theme/default/template/theme.ejs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="152">
+              <caret line="8" column="26" selection-start-line="8" selection-start-column="26" selection-end-line="8" selection-end-column="26" />
             </state>
           </provider>
         </entry>
@@ -81,18 +85,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>client-sessions</find>
-      <find>multer</find>
-      <find>BUMP</find>
-      <find>theme-default-nav-menu</find>
-      <find>.theme-default</find>
-      <find>message</find>
-      <find>image-container</find>
-      <find>box-shadow</find>
-      <find>&lt;section</find>
-      <find>&lt;/section&gt;</find>
-      <find>&lt;section&gt;</find>
-      <find>form</find>
       <find>site.keywo</find>
       <find>tr.odd</find>
       <find>footer</find>
@@ -111,9 +103,20 @@
       <find>.send</find>
       <find>logo-header</find>
       <find>Copy</find>
+      <find>.highlight</find>
+      <find>highlight box-shadow</find>
+      <find>highlight</find>
+      <find>Get Invol</find>
+      <find>htmlMenu</find>
+      <find>ThemeAPI.send(</find>
+      <find>SM</find>
+      <find>UTF8</find>
+      <find>renderContent</find>
+      <find>forgotpas</find>
+      <find>handleForgotPassword</find>
+      <find>mailparser</find>
     </findStrings>
     <replaceStrings>
-      <replace>this.state</replace>
       <replace>c.</replace>
       <replace>} else if(req.method === 'GET' &amp;&amp; !json) {</replace>
       <replace>this</replace>
@@ -143,6 +146,7 @@
       <replace>domainTable</replace>
       <replace>theme-default-nav-menu</replace>
       <replace>200</replace>
+      <replace>themed</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/user</dir>
@@ -155,7 +159,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/user/task/admin-configure.task.js" />
         <option value="$PROJECT_DIR$/database/task/database-configure.task.js" />
         <option value="$PROJECT_DIR$/file/file.manager.js" />
         <option value="$PROJECT_DIR$/config/local.config.js" />
@@ -163,9 +166,7 @@
         <option value="$PROJECT_DIR$/database/form/databaseform-connect.client.js" />
         <option value="$PROJECT_DIR$/database/form/databaseform-manage.client.js" />
         <option value="$PROJECT_DIR$/task/client/task-manager.element.js" />
-        <option value="$PROJECT_DIR$/user/client/user-forgotpassword.element.js" />
         <option value="$PROJECT_DIR$/user/client/user-logout.element.js" />
-        <option value="$PROJECT_DIR$/user/client/user-resetpassword.element.js" />
         <option value="$PROJECT_DIR$/user/client/user-updateflags.element.js" />
         <option value="$PROJECT_DIR$/user/client/user-updatepassword.element.js" />
         <option value="$PROJECT_DIR$/user/client/user-updateprofile.element.js" />
@@ -187,7 +188,6 @@
         <option value="$PROJECT_DIR$/session/session.api.js" />
         <option value="$PROJECT_DIR$/content/client/content-editor.element.js" />
         <option value="$PROJECT_DIR$/user/session/session.api.js" />
-        <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/theme/default/client/default.theme.client.js" />
         <option value="$PROJECT_DIR$/theme/default/client/theme-default-nav-menu.element.js" />
         <option value="$PROJECT_DIR$/theme/default/client/element/theme-default-nav-menu.element.js" />
@@ -195,17 +195,21 @@
         <option value="$PROJECT_DIR$/database/database.api.js" />
         <option value="$PROJECT_DIR$/domain/domain.api.js" />
         <option value="$PROJECT_DIR$/config/config.manager.js" />
-        <option value="$PROJECT_DIR$/theme/default/template/theme.ejs" />
-        <option value="$PROJECT_DIR$/theme/default/template/header.partial.ejs" />
-        <option value="$PROJECT_DIR$/theme/theme.api.js" />
         <option value="$PROJECT_DIR$/config/config.api.js" />
-        <option value="$PROJECT_DIR$/user/user.api.js" />
         <option value="$PROJECT_DIR$/task/task.api.js" />
         <option value="$PROJECT_DIR$/content/client/content-upload.element.js" />
-        <option value="$PROJECT_DIR$/content/content.api.js" />
-        <option value="$PROJECT_DIR$/theme/default/template/footer.partial.ejs" />
-        <option value="$PROJECT_DIR$/theme/default/client/default.theme.css" />
         <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/theme/default/client/default.theme.css" />
+        <option value="$PROJECT_DIR$/theme/default/template/footer.partial.ejs" />
+        <option value="$PROJECT_DIR$/theme/default/template/theme.ejs" />
+        <option value="$PROJECT_DIR$/theme/theme.api.js" />
+        <option value="$PROJECT_DIR$/theme/default/template/header.partial.ejs" />
+        <option value="$PROJECT_DIR$/content/content.api.js" />
+        <option value="$PROJECT_DIR$/user/client/user-forgotpassword.element.js" />
+        <option value="$PROJECT_DIR$/user/user.api.js" />
+        <option value="$PROJECT_DIR$/user/client/user-resetpassword.element.js" />
+        <option value="$PROJECT_DIR$/theme/default/default.theme.js" />
+        <option value="$PROJECT_DIR$/package.json" />
       </list>
     </option>
   </component>
@@ -220,13 +224,23 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="cms" type="b2602c69:ProjectViewProjectNode" />
               <item name="cms" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cms" type="462c0819:PsiDirectoryNode" />
+              <item name="content" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cms" type="462c0819:PsiDirectoryNode" />
+              <item name="content" type="462c0819:PsiDirectoryNode" />
+              <item name="client" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="cms" type="b2602c69:ProjectViewProjectNode" />
@@ -302,12 +316,19 @@
               <item name="cms" type="b2602c69:ProjectViewProjectNode" />
               <item name="cms" type="462c0819:PsiDirectoryNode" />
               <item name="user" type="462c0819:PsiDirectoryNode" />
+              <item name="client" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cms" type="462c0819:PsiDirectoryNode" />
+              <item name="user" type="462c0819:PsiDirectoryNode" />
               <item name="session" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -413,11 +434,12 @@
       <workItem from="1551808723678" duration="16348000" />
       <workItem from="1551885278076" duration="3353000" />
       <workItem from="1551922152721" duration="10117000" />
+      <workItem from="1551970800758" duration="6132000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="333323000" />
+    <option name="totallyTimeSpent" value="339455000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -430,9 +452,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="-2" width="3840" height="2162" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49852362" visible="true" weight="0.124143384" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49852362" visible="true" weight="0.124670535" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="npm" order="2" sideWeight="0.5014764" side_tool="true" weight="0.08039009" />
       <window_info id="Favorites" order="3" sideWeight="0.5014764" side_tool="true" weight="0.124143384" />
@@ -451,7 +472,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Database" order="3" weight="0.32999474" />
-      <window_info anchor="right" id="Debug" order="4" weight="0.2775435" />
+      <window_info anchor="right" id="Debug" order="4" visible="true" weight="0.2775435" />
       <window_info anchor="right" id="Find" order="5" weight="0.3294676" />
     </layout>
   </component>
@@ -493,12 +514,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/content/content.api.js</url>
-          <line>445</line>
+          <line>430</line>
           <option name="timeStamp" value="118" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/content/content.api.js</url>
-          <line>477</line>
+          <line>462</line>
           <option name="timeStamp" value="119" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -516,14 +537,16 @@
       </breakpoints-dialog>
     </breakpoint-manager>
   </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>content.data.toString()</expression-string>
+        <language-id>JavaScript</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
+  </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/database/form/databaseform-connect.client.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1172">
-          <caret line="82" column="8" selection-start-line="82" selection-start-column="8" selection-end-line="82" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/database/form/databaseform-manage.client.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1172">
@@ -538,31 +561,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/user-forgotpassword.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1172">
-          <caret line="79" selection-start-line="79" selection-end-line="79" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/user/client/user-logout.element.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1199">
           <caret line="80" selection-start-line="80" selection-end-line="80" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/user-resetpassword.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1172">
-          <caret line="88" selection-start-line="88" selection-end-line="88" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/user-updateflags.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1172">
-          <caret line="111" selection-start-line="111" selection-end-line="111" />
         </state>
       </provider>
     </entry>
@@ -668,13 +670,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/theme/default/default.theme.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="22" column="12" selection-start-line="22" selection-start-column="12" selection-end-line="22" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/content/client/content-browser.element.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3040">
@@ -723,13 +718,6 @@
     <entry file="file://$PROJECT_DIR$/slideshow/client/slideshow-player.element.js">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="703">
-          <caret line="37" column="5" selection-start-line="37" selection-start-column="5" selection-end-line="37" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/theme/default/client/default.theme.client.js">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -775,48 +763,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/content/content.table.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="437">
-          <caret line="23" column="12" selection-start-line="23" selection-start-column="12" selection-end-line="23" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/theme/default/client/texture/default.background.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/theme/default/template/header.partial.ejs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="4" column="38" selection-start-line="4" selection-start-column="38" selection-end-line="4" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/theme/default/template/theme.ejs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="17" column="7" lean-forward="true" selection-start-line="17" selection-start-column="7" selection-end-line="17" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/theme/theme.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1218">
-          <caret line="131" column="25" selection-start-line="131" selection-start-column="25" selection-end-line="131" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/default/client/texture/default.background.png" />
     <entry file="file://$PROJECT_DIR$/config/config.api.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1598">
           <caret line="138" column="18" selection-start-line="138" selection-start-column="18" selection-end-line="138" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/user.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="678">
-          <caret line="588" column="40" selection-start-line="588" selection-start-column="40" selection-end-line="588" selection-end-column="40" />
         </state>
       </provider>
     </entry>
@@ -834,34 +785,152 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/content/content.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="649">
-          <caret line="329" selection-start-line="329" selection-end-line="329" />
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="437">
+            <caret line="23" column="19" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/theme/default/template/footer.partial.ejs">
+    <entry file="file://$PROJECT_DIR$/theme/default/template/article/about.ejs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="11" column="20" selection-start-line="11" selection-start-column="20" selection-end-line="11" selection-end-column="20" />
+        <state relative-caret-position="1092">
+          <caret line="63" column="8" selection-start-line="63" selection-start-column="8" selection-end-line="63" selection-end-column="8" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/theme/default/client/default.theme.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="532">
-          <caret line="28" selection-start-line="28" selection-end-line="28" />
+        <state relative-caret-position="456">
+          <caret line="69" column="25" selection-start-line="69" selection-start-column="25" selection-end-line="69" selection-end-column="25" />
+          <folding>
+            <element signature="e#44#191#0" />
+            <element signature="e#231#366#0" />
+            <element signature="e#407#624#0" />
+            <element signature="e#666#760#0" />
+            <element signature="e#792#1013#0" />
+            <element signature="e#1041#1138#0" />
+            <element signature="e#1140#1262#0" />
+            <element signature="e#1228#1260#0" />
+            <element signature="e#1263#1396#0" />
+            <element signature="e#1341#1394#0" />
+            <element signature="e#1477#1542#0" />
+            <element signature="e#1756#1933#0" />
+            <element signature="e#1994#2042#0" />
+            <element signature="e#2119#2210#0" />
+            <element signature="e#2256#2420#0" />
+            <element signature="e#2521#2587#0" />
+            <element signature="e#2615#2658#0" />
+            <element signature="e#2686#2734#0" />
+            <element signature="e#2760#2805#0" />
+            <element signature="e#2862#2962#0" />
+            <element signature="e#3010#3195#0" />
+            <element signature="e#3322#3453#0" />
+            <element signature="e#3486#3518#0" />
+            <element signature="e#3563#3656#0" />
+            <element signature="e#3744#3838#0" />
+            <element signature="e#3917#3945#0" />
+            <element signature="e#3991#4109#0" />
+            <element signature="e#4149#4272#0" />
+            <element signature="e#4337#4369#0" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="798">
-            <caret line="42" selection-start-line="42" selection-end-line="42" />
-          </first_editor>
-          <second_editor />
+    <entry file="file://$PROJECT_DIR$/theme/default/template/footer.partial.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="19">
+          <caret line="1" column="24" selection-start-line="1" selection-start-column="24" selection-end-line="1" selection-end-column="24" />
+          <folding>
+            <element signature="n#style#0;n#div#0;n#footer#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#div#0;n#footer#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#1;n#div#0;n#footer#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#2;n#div#0;n#footer#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/default/template/header.partial.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="8" column="17" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/content.table.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="445">
+          <caret line="59" column="10" selection-start-line="59" selection-start-column="10" selection-end-line="59" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/user-forgotpassword.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1710">
+          <caret line="102" column="103" selection-start-line="102" selection-start-column="103" selection-end-line="102" selection-end-column="103" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/content.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1031">
+          <caret line="654" column="89" lean-forward="true" selection-start-line="654" selection-start-column="89" selection-end-line="654" selection-end-column="89" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/theme.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="921">
+          <caret line="117" column="50" selection-start-line="117" selection-start-column="50" selection-end-line="117" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/user.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1003">
+          <caret line="397" selection-start-line="397" selection-end-line="397" />
+          <folding>
+            <element signature="n#!!block;n#handleUpdateRequest#0;n#UserAPI#0" />
+            <element signature="n#!!block;n#handleBrowserRequest#0;n#UserAPI#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/user-updateflags.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="412">
+          <caret line="71" lean-forward="true" selection-start-line="71" selection-end-line="83" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/user-resetpassword.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1064">
+          <caret line="59" column="9" lean-forward="true" selection-start-line="59" selection-start-column="9" selection-end-line="59" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/default/template/theme.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="8" column="26" selection-start-line="8" selection-start-column="26" selection-end-line="8" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/default/default.theme.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="57">
+          <caret line="3" selection-start-line="3" selection-end-line="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="608">
+          <caret line="32" column="15" selection-start-line="32" selection-start-column="5" selection-end-line="32" selection-end-column="15" />
         </state>
       </provider>
     </entry>

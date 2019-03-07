@@ -63,7 +63,7 @@ class UserAPI {
         // router.all('/[:]user/session',                               async (req, res) => await this.handleSessionLoginRequest(req, res));
         router.all('/[:]user/[:]logout',                             async (req, res) => await this.handleLogoutRequest(req, res));
         router.all('/[:]user/[:]register',                           async (req, res) => await this.handleRegisterRequest(req, res));
-        router.all('/[:]user/[:]forgotpassword',                     async (req, res, next) => await this.handleForgotPassword(req, res, next));
+        router.all('/[:]user/[:]forgotpassword',                     async (req, res, next) => await this.handleForgotPassword(req, res));
         router.all('/[:]user(/[:]list)?',                            async (req, res) => await this.handleBrowserRequest(req, res));
 
 
@@ -377,38 +377,41 @@ class UserAPI {
         return recoveryUrl;
     }
 
-    async handleForgotPassword(req, res, next) {
+    async handleForgotPassword(req, res) {
         try {
             const userID = UserAPI.sanitizeInput(req.query.userID || null);
             const database = await DatabaseManager.selectDatabaseByRequest(req);
             const userTable = new UserTable(database);
-            const user = await userTable.fetchUserByID(userID, 'u.*');
-            if(!user)
-                return next();
 
-            if(req.method === 'GET') {
+            switch(req.method) {
+                case 'GET':
                 // Render Editor Form
-                await ThemeAPI.send(req, res, {
-                    title: `Forgot Password`,
-                    data: `
+                    await ThemeAPI.send(req, res, {
+                        title: `Forgot Password`,
+                        data: `
 <script src="/:user/:client/user-forgotpassword.element.js"></script>
-<user-forgotpasswordform src="${user.url}"></user-forgotpasswordform>`});
+<user-forgotpasswordform userID="${userID}"></user-forgotpasswordform>`});
+                    break;
 
-            } else {
-                // Handle Form (POST) Request
-                // console.log("Log in Request", req.body);
-                if(!req.body.userID)
-                    throw new Error("userID is required");
+                default:
+                case 'OPTIONS':
+                    res.json({});
+                    break;
 
-                await this.sendResetPasswordRequestEmail(req, user);
+                case 'POST':
+                        // Handle Form (POST) Request
+                    // console.log("Log in Request", req.body);
+                    if(!req.body.userID)
+                        throw new Error("userID is required");
+                    const user = await userTable.fetchUserByID(req.body.userID, 'u.*');
 
-                return res.json({
-                    redirect: `/:user/:login`,
-                    message: `Recovery email sent successfully to ${user.email}. <br/>Redirecting...`,
-                    user
-                });
+                    await this.sendResetPasswordRequestEmail(req, user);
 
-
+                    return res.json({
+                        redirect: `/:user/:login`,
+                        message: `Recovery email sent successfully to ${user.email}. <br/>Redirecting...`,
+                        user
+                    });
 
             }
         } catch (error) {
@@ -584,31 +587,33 @@ class UserAPI {
     async handleBrowserRequest(req, res) {
         try {
 
-            if (req.method === 'GET') {
-                await ThemeAPI.send(req, res, {
-                    title: `Browse Users`,
-                    data: `
-    <script src="/:user/:client/user-browser.element.js"></script>
-    <user-browser></user-browser>
-`});
-            // <script src="/:user/:client/user-add.element.js"></script>
-            // <user-addform></user-addform>
+            switch(req.method) {
+                case 'GET':
+                    await ThemeAPI.send(req, res, {
+                        title: `Browse Users`,
+                        data: `
+        <script src="/:user/:client/user-browser.element.js"></script>
+        <user-browser></user-browser>
+    `});
+                // <script src="/:user/:client/user-add.element.js"></script>
+                // <user-addform></user-addform>
+                    break;
 
-            } else {
-                const database = await DatabaseManager.selectDatabaseByRequest(req);
-                const userTable = new UserTable(database);
-                // Handle POST
-                let whereSQL = '1', values = null;
-                if(req.body.search) {
-                    whereSQL = 'u.username LIKE ? OR u.email LIKE ? OR u.id = ?';
-                    values = ['%'+req.body.search+'%', '%'+req.body.search+'%', parseInt(req.body.search) || -1];
-                }
-                const users = await userTable.selectUsers(whereSQL, values, 'id, email, username, created, flags');
+                case 'POST':
+                    const database = await DatabaseManager.selectDatabaseByRequest(req);
+                    const userTable = new UserTable(database);
+                    // Handle POST
+                    let whereSQL = '1', values = null;
+                    if(req.body.search) {
+                        whereSQL = 'u.username LIKE ? OR u.email LIKE ? OR u.id = ?';
+                        values = ['%'+req.body.search+'%', '%'+req.body.search+'%', parseInt(req.body.search) || -1];
+                    }
+                    const users = await userTable.selectUsers(whereSQL, values, 'id, email, username, created, flags');
 
-                return res.json({
-                    message: `${users.length} User${users.length !== 1 ? 's' : ''} queried successfully`,
-                    users
-                });
+                    return res.json({
+                        message: `${users.length} User${users.length !== 1 ? 's' : ''} queried successfully`,
+                        users
+                    });
             }
         } catch (error) {
             await this.renderError(error, req, res);

@@ -20,12 +20,15 @@
 * Third Party CMS Integration - Recognize databases from other CMS software like WordPress and Concrete5
 * App - Sync, Backup and Publish Websites via Desktop/Mobile App
 
+## Coming Soon
+* Content Templates
 
 
 ## Installation
 
 ```
-$ cd [cms directory]
+$ git clone https://github.com/clevertree/cms
+$ cd cms;
 $ npm install
 ```
 ## (Optional) Install CMS MySQL User

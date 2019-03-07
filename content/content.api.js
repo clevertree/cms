@@ -55,9 +55,7 @@ class ContentApi {
             const content = await contentTable.fetchContentByPath(req.url, '*');
             if(content) {
                 await this.checkForRevisionContent(req, content);
-                return SM(req, res, () => {
-                    return this.renderContent(req, res, content);
-                });
+                return this.renderContent(req, res, content);
             }
 
             // if(!req.url.startsWith('/:content'))
@@ -95,17 +93,6 @@ class ContentApi {
         return null;
     }
 
-    async renderContent(req, res, content) {
-        const mimeType = this.getMimeType(path.extname(content.path) || '');
-        switch(mimeType) {
-            case 'text/html':
-                await ThemeAPI.send(req, res, content);
-                break;
-            default:
-                await this.renderData(req, res, content.data, mimeType, content.updated);
-                break;
-        }
-    }
     // async renderContentByPath(req, res, next) {
     //     // TODO: parse session middleware only if content was found
     //     try {
@@ -119,9 +106,6 @@ class ContentApi {
     //     } catch (error) {
     //         await this.renderError(error, req, res);
     //     }
-    // }
-
-
     async renderContentByID(asJSON, req, res, next) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
@@ -168,6 +152,7 @@ class ContentApi {
             await this.renderError(error, req, res, asJSON ? {} : null);
         }
     }
+
 
     async renderContentEditorByID(req, res) {
         try {
@@ -643,6 +628,33 @@ class ContentApi {
             await this.renderError(error, req, res);
         }
 
+    }
+
+    // }
+    async renderContent(req, res, content) {
+        const mimeType = this.getMimeType(path.extname(content.path) || '');
+        switch(mimeType) {
+            case 'text/html':
+                content.data = content.data.toString('UTF8');
+                const firstTag = content.data.match(/<([^>]+)/)[1].toLowerCase();
+                switch(firstTag) {
+                    case 'body':
+                    case 'html':
+                        await this.renderData(req, res, content.data, mimeType, content.updated);
+                        break;
+
+                    default:
+                        // Load session if we're using the theme
+                        const SM = SessionAPI.getMiddleware();
+                        SM(req, res, () => {
+                            ThemeAPI.send(req, res, content);
+                        });
+                }
+                break;
+            default:
+                await this.renderData(req, res, content.data, mimeType, content.updated);
+                break;
+        }
     }
 
     async renderData(req, res, data, mimeType, lastModified) {

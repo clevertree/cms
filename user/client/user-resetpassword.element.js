@@ -56,7 +56,19 @@ document.addEventListener('DOMContentLoaded', function() {
         onChange(e) {
             if(e.target.name && typeof this.state[e.target.name] !== 'undefined') // typeof this.state.user.profile[e.target.name] !== 'undefined')
                 this.state[e.target.name] = e.target.value;
-            console.log(this.state);
+            // console.log(this.state);
+        }
+
+        requestFormData() {
+            const form = this.querySelector('form');
+            const xhr = new XMLHttpRequest();
+            xhr.onload = () => {
+                this.setState({processing: false}, xhr.response);
+            };
+            xhr.responseType = 'json';
+            xhr.open ('OPTIONS', form.getAttribute('action'), true);
+            xhr.send ();
+            this.setState({processing: true});
         }
 
 
