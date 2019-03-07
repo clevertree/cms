@@ -192,7 +192,9 @@ class ContentApi {
                             break;
                     }
                     // Render Editor
-                    await ThemeAPI.send(req, res, `
+                    await ThemeAPI.send(req, res, {
+                        title: `Edit Content #${content.id}`,
+                        data: `
                 <script src="/:content/:client/content-editor.element.js"></script>
                 <content-editor id="${req.params.id}"></content-editor>
             
@@ -205,7 +207,7 @@ class ContentApi {
                     </article>
                 </div>
             </section>
-    `);
+    `});
                     break;
 
                 default:
@@ -313,15 +315,26 @@ class ContentApi {
             switch(req.method) {
                 case 'GET':
                     // Render Editor
-                await ThemeAPI.send(req, res,
-    `
+                await ThemeAPI.send(req, res, {
+                    title: `Delete Content #${content.id}`,
+                    data: `
     <script src="/:content/:client/content-delete.element.js"></script>
     <content-delete id="${req.params.id}"></content-editor>
-`);
+`
+                });
                     break;
 
                 default:
                 case 'OPTIONS':
+
+                    if(editableMimeTypes.indexOf(content.mimeType) !== -1) {
+                        content.data = await contentTable.fetchData(content.id, 'UTF8');
+                        content.isBinary = false;
+                    } else {
+                        content.data = '[binary file]';
+                        content.isBinary = true;
+                    }
+
                     const response = {
                         message: `Delete content ID ${content.id}?`,
                         editable: false,
@@ -377,13 +390,15 @@ class ContentApi {
                 case 'GET':
                     // Render Editor
                     return await ThemeAPI.send(req, res,
-`
+                        {
+                            title: `Add New Content`,
+                            data: `
     <script src="/:content/:client/content-add.element.js"></script>
     <content-addform></content-addform>
     <script src="/:content/:client/content-upload.element.js"></script>
     <content-uploadform></content-uploadform>
 
-`);
+`});
 
                 default:
                 case 'OPTIONS':
@@ -487,12 +502,13 @@ class ContentApi {
             switch(req.method) {
                 case 'GET':
                     // Render Editor
-                    await ThemeAPI.send(req, res,
-                        `
+                    await ThemeAPI.send(req, res, {
+                            title: `Upload Content`,
+                            data: `
         <script src="/:content/:client/content-upload.element.js"></script>
         <content-uploadform></content-uploadform>
     
-    `)
+    `})
                     break;
 
                 default:
@@ -518,7 +534,11 @@ class ContentApi {
                             deletePositions.sort((a,b) => b-a);
                             for (let i=0; i<deletePositions.length; i++) {
                                 const deletedFile = currentUploads.splice(deletePositions[i], 1)[0];
-                                await fsPromises.unlink(deletedFile.path);
+                                try {
+                                    await fsPromises.unlink(deletedFile.path);
+                                } catch (e) {
+                                    console.warn(e);
+                                }
                             }
                         }
                         message += `${deletePositions.length} temporary file${deletePositions.length !== 1 ? 's' : ''} deleted. `;
@@ -577,7 +597,9 @@ class ContentApi {
         try {
 
             if (req.method === 'GET') {
-                await ThemeAPI.send(req, res, `
+                await ThemeAPI.send(req, res, {
+                    title: `Site Index`,
+                    data: `
 
     <script src="/:content/:client/content-browser.element.js"></script>
     <content-browser></content-browser>
@@ -587,7 +609,7 @@ class ContentApi {
     <content-uploadform></content-uploadform>
 
 
-`);
+`});
 
             } else {
                 return await this.renderContentListJSON(req, res);

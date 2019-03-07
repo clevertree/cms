@@ -70,10 +70,12 @@ class TaskAPI {
 
             switch(req.method) {
                 case 'GET':
-                    await ThemeAPI.send(req, res, `
+                    await ThemeAPI.send(req, res, {
+                        title: `Task Manager`,
+                        data: `
         <script src="/:task/:client/task-manager.element.js"></script>
         <task-manager ${taskName ? `taskName="${taskName}"` : ''}></task-manager>
-`);
+`});
                     break;
 
                 default:

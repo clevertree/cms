@@ -74,6 +74,7 @@ class ThemeAPI {
             content = {data: content};
         content = Object.assign({}, {
             id: null,
+            path: null,
             title: require('os').hostname(),
             data: null,
             baseURL: '/',

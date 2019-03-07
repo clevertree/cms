@@ -285,9 +285,11 @@ class UserAPI {
             if(req.method === 'GET') {
                 const userID = UserAPI.sanitizeInput(req.query.userID || null, 'email');
                 // Render Editor Form
-                await ThemeAPI.send(req, res, `
+                await ThemeAPI.send(req, res, {
+                    title: `Log in`,
+                    data: `
 <script src="/:user/:client/user-login.element.js"></script>
-<user-loginform${userID ? ` userID='${userID}'` : ''}></user-loginform>`);
+<user-loginform${userID ? ` userID='${userID}'` : ''}></user-loginform>`});
 
             } else {
                 // Handle Form (POST) Request
@@ -309,9 +311,11 @@ class UserAPI {
         try {
             if(req.method === 'GET') {
                 // Render Editor Form
-                await ThemeAPI.send(req, res, `
+                await ThemeAPI.send(req, res, {
+                    title: `Log Out`,
+                    data: `
 <script src="/:user/:client/user-logout.element.js"></script>
-<user-logoutform></user-logoutform>`);
+<user-logoutform></user-logoutform>`});
 
             } else {
                 // Handle Form (POST) Request
@@ -333,9 +337,11 @@ class UserAPI {
             await DatabaseManager.selectDatabaseByRequest(req);
             if(req.method === 'GET') {
                 // Render Editor Form
-                await ThemeAPI.send(req, res, `
+                await ThemeAPI.send(req, res, {
+                    title: `Register`,
+                    data: `
 <script src="/:user/:client/user-register.element.js"></script>
-<user-registerform></user-registerform>`);
+<user-registerform></user-registerform>`});
 
             } else {
                 // Handle Form (POST) Request
@@ -382,9 +388,11 @@ class UserAPI {
 
             if(req.method === 'GET') {
                 // Render Editor Form
-                await ThemeAPI.send(req, res, `
+                await ThemeAPI.send(req, res, {
+                    title: `Forgot Password`,
+                    data: `
 <script src="/:user/:client/user-forgotpassword.element.js"></script>
-<user-forgotpasswordform src="${user.url}"></user-forgotpasswordform>`);
+<user-forgotpasswordform src="${user.url}"></user-forgotpasswordform>`});
 
             } else {
                 // Handle Form (POST) Request
@@ -428,9 +436,11 @@ class UserAPI {
             switch(req.method) {
                 case 'GET':
                     // Render Editor Form
-                    await ThemeAPI.send(req, res, `
+                    await ThemeAPI.send(req, res, {
+                        title: `Reset Password`,
+                        data: `
 <script src="/:user/:client/user-resetpassword.element.js"></script>
-<user-resetpasswordform uuid="${uuid}" src="${user.url}"></user-resetpasswordform>`);
+<user-resetpasswordform uuid="${uuid}" src="${user.url}"></user-resetpasswordform>`});
                     break;
 
                 default:
@@ -478,17 +488,21 @@ class UserAPI {
             switch(req.method) {
                 case 'GET':
                     if(type === 'edit') {
-                        await ThemeAPI.send(req, res, `
+                        await ThemeAPI.send(req, res, {
+                            title: `Update Profile`,
+                            data: `
 <script src="/:user/:client/user-updateprofile.element.js"></script>
 <user-updateprofileform src="${user.url}"></user-updateprofileform>
 <script src="/:user/:client/user-updatepassword.element.js"></script>
 <user-updatepasswordform src="${user.url}"></user-updatepasswordform>
 <script src="/:user/:client/user-updateflags.element.js"></script>
-<user-updateflagsform src="${user.url}"></user-updateflagsform>`);
+<user-updateflagsform src="${user.url}"></user-updateflagsform>`});
                     } else {
-                        await ThemeAPI.send(req, res, `
+                        await ThemeAPI.send(req, res, {
+                            title: `Profile: ${user.username}`,
+                            data: `
 <script src="/:user/:client/user-${type}.element.js"></script>
-<user-${type}form src="${user.url}"></user-${type}form>`);
+<user-${type}form src="${user.url}"></user-${type}form>`});
                     }
                     break;
 
@@ -571,10 +585,12 @@ class UserAPI {
         try {
 
             if (req.method === 'GET') {
-                await ThemeAPI.send(req, res, `
+                await ThemeAPI.send(req, res, {
+                    title: `Browse Users`,
+                    data: `
     <script src="/:user/:client/user-browser.element.js"></script>
     <user-browser></user-browser>
-`);
+`});
             // <script src="/:user/:client/user-add.element.js"></script>
             // <user-addform></user-addform>
 
