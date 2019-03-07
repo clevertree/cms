@@ -8,7 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link href=":theme/default/:client/default.theme.css" rel="stylesheet" />
-        <script src=":theme/default/:client/theme-default-nav-menu.element.js"></script>
+        <script src=":theme/default/:client/element/theme-default-nav-menu.element.js"></script>
     </head>
     <body class='theme-default'>
 <%- htmlHeader || include('header.partial.ejs') %>
@@ -16,7 +16,6 @@
         <article<%-id ? ` data-content-id="${id}"` : ''%>>
             <%-data%>
         </article>
-
 
 <%- htmlFooter || include('footer.partial.ejs') %>
     </body>

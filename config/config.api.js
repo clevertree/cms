@@ -8,7 +8,7 @@ const { ConfigDatabase } = require("./config.database");
 const { UserTable } = require("../user/user.table");
 // const { ContentAPI } = require('../content/content.api');
 const { UserAPI } = require('../user/user.api');
-const { SessionAPI } = require('../session/session.api');
+const { SessionAPI } = require('../user/session/session.api');
 
 const DIR_CONFIG = path.resolve(__dirname);
 
@@ -86,10 +86,10 @@ class ConfigAPI {
             switch(req.method) {
                 case 'GET':
                     await ThemeAPI.send(req, res,
-`<section>
+`
     <script src="/:config/:client/config-editor.element.js"></script>
     <config-editor></config-editor>
-</section>`);
+`);
                     break;
 
                 default:

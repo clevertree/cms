@@ -3,38 +3,36 @@
   <component name="ChangeListManager">
     <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/client/config-editor.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/client/config-editor.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/client/config.css" beforeDir="false" afterPath="$PROJECT_DIR$/config/client/config.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/config.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content-add.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/content-add.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content-browser.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/content-browser.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content-delete.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/content-delete.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/config.manager.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.manager.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content/client/content-editor.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/content-editor.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content-upload.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/content-upload.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/client/content.css" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/content.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content/content.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/content.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/content.table.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/content.table.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/content_revision.table.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/content_revision.table.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/database.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/database.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/database.manager.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/database.manager.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/form/databaseform-connect.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/form/databaseform-connect.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/form/databaseform-manage.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/form/databaseform-manage.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/task/database-configure.task.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/task/database-configure.task.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/domain/domain.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/domain/domain.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/task/client/task-manager.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/task/client/task-manager.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/session/session.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/session/session.api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/task/client/task.css" beforeDir="false" afterPath="$PROJECT_DIR$/task/client/task.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/task/task.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/task/task.api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/article/about.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/article/about.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/article/coming-soon.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/article/coming-soon.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/article/home.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/article/home.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/article/login.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/article/login.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/article/resources.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/article/resources.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/article/service.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/article/service.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/article/whatwedo.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/article/whatwedo.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/client/default.theme.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/client/default.theme.client.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/theme/default/client/default.theme.css" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/client/default.theme.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/theme/default/client/theme-default-nav-menu.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/client/theme-default-nav-menu.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/client/texture/default.background.png" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/client/element/theme-default-nav-menu.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/client/texture/footer.background.png" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/client/texture/footer.background.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/client/texture/header.background.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/client/theme-default-nav-menu.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/client/element/theme-default-nav-menu.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/template/footer.partial.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/footer.partial.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/theme/default/template/header.partial.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/header.partial.ejs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/theme/default/template/theme.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/theme/default/template/theme.ejs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/theme/theme.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/theme/theme.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-browser.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-browser.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-forgotpassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-forgotpassword.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-login.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-login.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-logout.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-logout.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-register.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-register.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-resetpassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-resetpassword.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-updateflags.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-updateflags.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-updatepassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-updatepassword.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-updateprofile.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user-updateprofile.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/task/admin-configure.task.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/task/admin-configure.task.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client/user.css" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/user.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/user.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.api.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -43,78 +41,81 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="cms" />
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/content/content.api.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1396">
-              <caret line="190" selection-start-line="190" selection-end-line="190" />
-              <folding>
-                <element signature="n#style#0;n#section#0;n#!!top" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/theme/default/template/theme.ejs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="418">
-              <caret line="22" column="7" lean-forward="true" selection-start-line="22" selection-start-column="7" selection-end-line="22" selection-end-column="7" />
+            <state relative-caret-position="399">
+              <caret line="21" column="7" lean-forward="true" selection-start-line="21" selection-start-column="7" selection-end-line="21" selection-end-column="7" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/theme/default/client/theme-default-nav-menu.element.js">
+        <entry file="file://$PROJECT_DIR$/theme/default/template/footer.partial.ejs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="895">
-              <caret line="103" column="42" selection-start-line="103" selection-start-column="42" selection-end-line="103" selection-end-column="42" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/theme/default/default.theme.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="418">
-              <caret line="22" column="12" selection-start-line="22" selection-start-column="12" selection-end-line="22" selection-end-column="12" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/theme/theme.api.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1073">
-              <caret line="109" column="16" selection-start-line="109" selection-start-column="16" selection-end-line="109" selection-end-column="16" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="mock://internal/process/next_tick.js">
-          <provider selected="true" editor-type-id="vmFileEditor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/session/session.api.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="608">
-              <caret line="32" lean-forward="true" selection-start-line="32" selection-end-line="32" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/client/content-browser.element.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1605">
-              <caret line="160" column="19" selection-start-line="160" selection-start-column="19" selection-end-line="160" selection-end-column="19" />
+            <state relative-caret-position="57">
+              <caret line="3" column="40" selection-start-line="3" selection-start-column="40" selection-end-line="3" selection-end-column="40" />
               <folding>
-                <element signature="n#style#0;n#th#0;n#tr#2;n#thead#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#0;n#footer#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#0;n#div#0;n#footer#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#span#1;n#div#0;n#footer#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#2;n#div#0;n#footer#0;n#!!top" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/theme/default/template/header.partial.ejs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="190">
+              <caret line="10" column="17" selection-start-line="10" selection-start-column="17" selection-end-line="10" selection-end-column="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/theme/default/client/default.theme.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1805">
+              <caret line="95" selection-start-line="95" selection-end-line="95" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/content/client/content.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1178">
+              <caret line="62" selection-start-line="58" selection-end-line="62" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/config/config.manager.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="247">
+              <caret line="13" column="34" selection-start-line="13" selection-start-column="34" selection-end-line="13" selection-end-column="34" />
             </state>
           </provider>
         </entry>
@@ -122,17 +123,26 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/content/content.table.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="741">
-              <caret line="66" column="5" lean-forward="true" selection-start-line="58" selection-end-line="66" selection-end-column="5" />
+            <state relative-caret-position="437">
+              <caret line="23" column="12" selection-start-line="23" selection-start-column="12" selection-end-line="23" selection-end-column="12" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/content_revision.table.js">
+        <entry file="file://$PROJECT_DIR$/config/config.api.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="988">
-              <caret line="52" column="27" selection-start-line="52" selection-start-column="10" selection-end-line="52" selection-end-column="27" />
+            <state relative-caret-position="750">
+              <caret line="91" selection-start-line="91" selection-end-line="91" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/task/task.api.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="725">
+              <caret line="75" selection-start-line="75" selection-end-line="75" />
             </state>
           </provider>
         </entry>
@@ -143,45 +153,44 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="JavaScript File" />
+        <option value="CSS File" />
       </list>
     </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>path.ext</find>
-      <find>this.table.</find>
-      <find>this.table.config</find>
-      <find>this.table = {</find>
-      <find>this.table.domain</find>
-      <find>ContentAPI</find>
-      <find>{ ContentAPi</find>
-      <find>renderStaticFile</find>
-      <find>renderStaticFile(staticFile, req, res</find>
-      <find>staticFile, req, res, next</find>
-      <find>jodit.min.</find>
-      <find>document.</find>
-      <find>fsPromises.</find>
-      <find>.map((input, i) =&gt; input.name + '=' + input.value)</find>
-      <find>contentData.</find>
-      <find>title</find>
-      <find>_revision</find>
-      <find>node_mod</find>
-      <find>ion.title</find>
-      <find>path.extname</find>
-      <find>res.end(</find>
-      <find>extname</find>
-      <find>selectSQL='cr.*, null as data'</find>
-      <find>fetchData</find>
-      <find>contentDB</find>
-      <find>userDB</find>
-      <find>domainDB</find>
-      <find>&gt;ID&lt;</find>
       <find>Edit Profile</find>
       <find>getMimeType</find>
+      <find>form.elements['</find>
+      <find>&lt;form</find>
+      <find>beauti</find>
+      <find>onChange</find>
+      <find>insertContentRevision</find>
+      <find>1000</find>
+      <find>processing</find>
+      <find>session.api</find>
+      <find>service/session</find>
+      <find>body-parser</find>
+      <find>client-sessions</find>
+      <find>multer</find>
+      <find>BUMP</find>
+      <find>theme-default-nav-menu</find>
+      <find>.theme-default</find>
+      <find>message</find>
+      <find>image-container</find>
+      <find>box-shadow</find>
+      <find>&lt;section</find>
+      <find>&lt;/section&gt;</find>
+      <find>&lt;section&gt;</find>
+      <find>form</find>
+      <find>site.keywo</find>
+      <find>tr.odd</find>
+      <find>footer</find>
+      <find>400</find>
+      <find>logo-text</find>
+      <find>gradient</find>
     </findStrings>
     <replaceStrings>
-      <replace>cr.</replace>
-      <replace>content.site</replace>
       <replace>this.state</replace>
       <replace>c.</replace>
       <replace>} else if(req.method === 'GET' &amp;&amp; !json) {</replace>
@@ -210,6 +219,8 @@
       <replace>contentTable</replace>
       <replace>userTable</replace>
       <replace>domainTable</replace>
+      <replace>theme-default-nav-menu</replace>
+      <replace>200</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/user</dir>
@@ -222,22 +233,11 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/user/mail/resetpassword.mail.js" />
-        <option value="$PROJECT_DIR$/user/user.database.js" />
-        <option value="$PROJECT_DIR$/config/config.manager.js" />
-        <option value="$PROJECT_DIR$/theme/default/default.theme.js" />
-        <option value="$PROJECT_DIR$/user/client/user-profile.element.js" />
-        <option value="$PROJECT_DIR$/theme/default/template/footer.partial.ejs" />
-        <option value="$PROJECT_DIR$/theme/default/template/nav.partial.ejs" />
-        <option value="$PROJECT_DIR$/theme/default/template/header.partial.ejs" />
-        <option value="$PROJECT_DIR$/user/mail/createadmin.mail.js" />
         <option value="$PROJECT_DIR$/domain/dns.manager.js" />
         <option value="$PROJECT_DIR$/user/task/admin-configure.task.js" />
         <option value="$PROJECT_DIR$/database/task/database-configure.task.js" />
         <option value="$PROJECT_DIR$/file/file.manager.js" />
         <option value="$PROJECT_DIR$/config/local.config.js" />
-        <option value="$PROJECT_DIR$/database/database.api.js" />
-        <option value="$PROJECT_DIR$/domain/domain.api.js" />
         <option value="$PROJECT_DIR$/config/client/config-editor.element.js" />
         <option value="$PROJECT_DIR$/database/form/databaseform-connect.client.js" />
         <option value="$PROJECT_DIR$/database/form/databaseform-manage.client.js" />
@@ -260,19 +260,30 @@
         <option value="$PROJECT_DIR$/user/user.table.js" />
         <option value="$PROJECT_DIR$/config/config.database.js" />
         <option value="$PROJECT_DIR$/domain/domain.database.js" />
-        <option value="$PROJECT_DIR$/task/task.api.js" />
-        <option value="$PROJECT_DIR$/config/config.api.js" />
-        <option value="$PROJECT_DIR$/user/user.api.js" />
-        <option value="$PROJECT_DIR$/content/client/content-editor.element.js" />
-        <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/content/client/content-add.element.js" />
         <option value="$PROJECT_DIR$/content/content.table.js" />
         <option value="$PROJECT_DIR$/content/content_revision.table.js" />
         <option value="$PROJECT_DIR$/content/client/content-browser.element.js" />
-        <option value="$PROJECT_DIR$/theme/default/template/theme.ejs" />
-        <option value="$PROJECT_DIR$/theme/default/client/theme-default-nav-menu.element.js" />
+        <option value="$PROJECT_DIR$/session/session.api.js" />
+        <option value="$PROJECT_DIR$/content/client/content-editor.element.js" />
+        <option value="$PROJECT_DIR$/user/session/session.api.js" />
         <option value="$PROJECT_DIR$/theme/theme.api.js" />
+        <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/theme/default/client/default.theme.client.js" />
+        <option value="$PROJECT_DIR$/theme/default/client/theme-default-nav-menu.element.js" />
+        <option value="$PROJECT_DIR$/theme/default/client/element/theme-default-nav-menu.element.js" />
+        <option value="$PROJECT_DIR$/theme/default/client/element/theme-default-nav-menu.css" />
         <option value="$PROJECT_DIR$/content/content.api.js" />
+        <option value="$PROJECT_DIR$/user/user.api.js" />
+        <option value="$PROJECT_DIR$/database/database.api.js" />
+        <option value="$PROJECT_DIR$/domain/domain.api.js" />
+        <option value="$PROJECT_DIR$/config/config.api.js" />
+        <option value="$PROJECT_DIR$/task/task.api.js" />
+        <option value="$PROJECT_DIR$/config/config.manager.js" />
+        <option value="$PROJECT_DIR$/theme/default/template/footer.partial.ejs" />
+        <option value="$PROJECT_DIR$/theme/default/template/header.partial.ejs" />
+        <option value="$PROJECT_DIR$/theme/default/template/theme.ejs" />
+        <option value="$PROJECT_DIR$/theme/default/client/default.theme.css" />
       </list>
     </option>
   </component>
@@ -287,6 +298,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -297,18 +309,18 @@
             <path>
               <item name="cms" type="b2602c69:ProjectViewProjectNode" />
               <item name="cms" type="462c0819:PsiDirectoryNode" />
-              <item name="content" type="462c0819:PsiDirectoryNode" />
+              <item name="mail" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="cms" type="b2602c69:ProjectViewProjectNode" />
               <item name="cms" type="462c0819:PsiDirectoryNode" />
-              <item name="content" type="462c0819:PsiDirectoryNode" />
+              <item name="slideshow" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cms" type="462c0819:PsiDirectoryNode" />
+              <item name="slideshow" type="462c0819:PsiDirectoryNode" />
               <item name="client" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
-              <item name="cms" type="462c0819:PsiDirectoryNode" />
-              <item name="database" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="cms" type="b2602c69:ProjectViewProjectNode" />
@@ -320,6 +332,29 @@
               <item name="cms" type="462c0819:PsiDirectoryNode" />
               <item name="theme" type="462c0819:PsiDirectoryNode" />
               <item name="default" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cms" type="462c0819:PsiDirectoryNode" />
+              <item name="theme" type="462c0819:PsiDirectoryNode" />
+              <item name="default" type="462c0819:PsiDirectoryNode" />
+              <item name="client" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cms" type="462c0819:PsiDirectoryNode" />
+              <item name="theme" type="462c0819:PsiDirectoryNode" />
+              <item name="default" type="462c0819:PsiDirectoryNode" />
+              <item name="client" type="462c0819:PsiDirectoryNode" />
+              <item name="element" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cms" type="462c0819:PsiDirectoryNode" />
+              <item name="theme" type="462c0819:PsiDirectoryNode" />
+              <item name="default" type="462c0819:PsiDirectoryNode" />
+              <item name="client" type="462c0819:PsiDirectoryNode" />
+              <item name="texture" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="cms" type="b2602c69:ProjectViewProjectNode" />
@@ -337,19 +372,19 @@
               <item name="cms" type="b2602c69:ProjectViewProjectNode" />
               <item name="cms" type="462c0819:PsiDirectoryNode" />
               <item name="user" type="462c0819:PsiDirectoryNode" />
-              <item name="client" type="462c0819:PsiDirectoryNode" />
+              <item name="session" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="DatabaseDriversLRU" value="mariadb" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../afoh-site" />
+    <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
@@ -364,11 +399,11 @@
       <recent name="$PROJECT_DIR$/database" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/theme/default/client/element" />
+      <recent name="$PROJECT_DIR$/theme/default/template" />
+      <recent name="$PROJECT_DIR$/user" />
       <recent name="$PROJECT_DIR$/theme/default/client" />
       <recent name="$PROJECT_DIR$/slideshow/client" />
-      <recent name="$PROJECT_DIR$/" />
-      <recent name="$PROJECT_DIR$/service" />
-      <recent name="$PROJECT_DIR$/theme/default/element" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -446,11 +481,13 @@
       <workItem from="1551623490262" duration="2686000" />
       <workItem from="1551645716238" duration="49968000" />
       <workItem from="1551808723678" duration="16348000" />
+      <workItem from="1551885278076" duration="3353000" />
+      <workItem from="1551922152721" duration="5567000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="319853000" />
+    <option name="totallyTimeSpent" value="328773000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -465,10 +502,10 @@
     <frame x="0" y="-2" width="3840" height="2162" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49852362" visible="true" weight="0.12308909" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49852362" visible="true" weight="0.124143384" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="npm" order="2" sideWeight="0.5014764" side_tool="true" weight="0.08039009" />
-      <window_info id="Favorites" order="3" side_tool="true" />
+      <window_info id="Favorites" order="3" sideWeight="0.5014764" side_tool="true" weight="0.124143384" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Run" order="1" weight="0.32923228" />
       <window_info anchor="bottom" id="Cvs" order="2" weight="0.25" />
@@ -483,8 +520,8 @@
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Database" order="3" />
-      <window_info active="true" anchor="right" id="Debug" order="4" visible="true" weight="0.2775435" />
+      <window_info active="true" anchor="right" id="Database" order="3" visible="true" weight="0.32999474" />
+      <window_info anchor="right" id="Debug" order="4" weight="0.2775435" />
       <window_info anchor="right" id="Find" order="5" weight="0.3294676" />
     </layout>
   </component>
@@ -527,20 +564,17 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/content/content.api.js</url>
           <line>430</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="118" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/content/content.api.js</url>
           <line>462</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="119" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/theme/theme.api.js</url>
-          <line>109</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="127" />
+          <url>file://$PROJECT_DIR$/content/client/content-editor.element.js</url>
+          <line>132</line>
+          <option name="timeStamp" value="132" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -553,71 +587,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="http://paradigmthreat.org:8080/:task/:client/task-manager.element.js">
-      <provider selected="true" editor-type-id="httpFileEditor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/domain/dns.manager.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="15" column="62" lean-forward="true" selection-start-line="15" selection-start-column="62" selection-end-line="15" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/database/task/database-configure.task.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="813">
-          <caret line="102" column="106" selection-start-line="102" selection-start-column="106" selection-end-line="102" selection-end-column="106" />
-          <folding>
-            <element signature="n#style#0;n#td#0;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/task/admin-configure.task.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1520">
-          <caret line="80" column="106" selection-start-line="80" selection-start-column="106" selection-end-line="80" selection-end-column="106" />
-          <folding>
-            <element signature="n#style#0;n#td#0;n#tr#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/file/file.manager.js" />
-    <entry file="file://$PROJECT_DIR$/config/local.config.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="38">
-          <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="23" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/file/file.api.js" />
-    <entry file="file://$PROJECT_DIR$/node_modules/multiparty-express/dist/src/index.d.ts" />
-    <entry file="file://$PROJECT_DIR$/node_modules/multiparty-express/dist/src/index.js" />
-    <entry file="file://$PROJECT_DIR$/node_modules/multiparty/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="680">
-          <caret line="89" column="8" selection-start-line="89" selection-start-column="8" selection-end-line="89" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/database/database.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="15" selection-start-line="15" selection-end-line="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/domain/domain.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="570">
-          <caret line="30" selection-start-line="30" selection-end-line="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="http://localhost:8080/:content/:client/content-upload.element.js">
-      <provider selected="true" editor-type-id="httpFileEditor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/config/client/config-editor.element.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1143">
@@ -748,9 +717,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/content/content.table.js">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/database/database.manager.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="659">
@@ -786,90 +752,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/task/task.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="659">
-          <caret line="56" column="14" selection-start-line="56" selection-start-column="14" selection-end-line="56" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config/config.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="659">
-          <caret line="49" column="14" selection-start-line="49" selection-start-column="14" selection-end-line="49" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/user.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="659">
-          <caret line="87" column="46" selection-start-line="87" selection-start-column="46" selection-end-line="87" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="741">
-          <caret line="39" selection-start-line="39" selection-end-line="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/content-editor.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="649">
-          <caret line="293" column="32" selection-start-line="293" selection-start-column="24" selection-end-line="293" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/content/client/content-add.element.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="519">
           <caret line="139" column="30" lean-forward="true" selection-start-line="139" selection-start-column="30" selection-end-line="139" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/content/content_revision.table.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="988">
-          <caret line="52" column="27" selection-start-line="52" selection-start-column="10" selection-end-line="52" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/session/session.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="608">
-          <caret line="32" lean-forward="true" selection-start-line="32" selection-end-line="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/content-browser.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1605">
-          <caret line="160" column="19" selection-start-line="160" selection-start-column="19" selection-end-line="160" selection-end-column="19" />
-          <folding>
-            <element signature="n#style#0;n#th#0;n#tr#2;n#thead#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/content/content.table.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="741">
-          <caret line="66" column="5" lean-forward="true" selection-start-line="58" selection-end-line="66" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/theme/default/template/theme.ejs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="22" column="7" lean-forward="true" selection-start-line="22" selection-start-column="7" selection-end-line="22" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/theme/default/client/theme-default-nav-menu.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="895">
-          <caret line="103" column="42" selection-start-line="103" selection-start-column="42" selection-end-line="103" selection-end-column="42" />
         </state>
       </provider>
     </entry>
@@ -880,20 +766,182 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/content-browser.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3040">
+          <caret line="160" column="19" selection-start-line="160" selection-start-column="19" selection-end-line="160" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/client-sessions/lib/client-sessions.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="659">
+          <caret line="541" column="9" selection-start-line="541" selection-start-column="9" selection-end-line="541" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/express/lib/router/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1339">
+          <caret line="633" lean-forward="true" selection-start-line="633" selection-end-line="633" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/content_revision.table.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1161">
+          <caret line="66" column="46" lean-forward="true" selection-start-line="66" selection-start-column="46" selection-end-line="66" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/content-editor.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="649">
+          <caret line="59" column="73" selection-start-line="59" selection-start-column="73" selection-end-line="59" selection-end-column="73" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/session/session.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="532">
+          <caret line="28" column="8" selection-start-line="28" selection-start-column="8" selection-end-line="28" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/theme/theme.api.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1073">
-          <caret line="109" column="16" selection-start-line="109" selection-start-column="16" selection-end-line="109" selection-end-column="16" />
+        <state relative-caret-position="76">
+          <caret line="4" selection-start-line="4" selection-end-line="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mail/mail.server.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slideshow/client/slideshow-player.element.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="703">
+          <caret line="37" column="5" selection-start-line="37" selection-start-column="5" selection-end-line="37" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/default/client/default.theme.client.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/default/client/element/theme-default-nav-menu.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1446">
+          <caret line="179" column="27" lean-forward="true" selection-start-line="179" selection-start-column="27" selection-end-line="179" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/default/client/element/theme-default-nav-menu.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1216">
+          <caret line="64" column="22" selection-start-line="64" selection-start-column="22" selection-end-line="64" selection-end-column="22" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/content/content.api.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1396">
-          <caret line="190" selection-start-line="190" selection-end-line="190" />
+        <state relative-caret-position="850">
+          <caret line="706" column="101" selection-start-line="706" selection-start-column="101" selection-end-line="706" selection-end-column="101" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/user.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="686">
+          <caret line="610" column="20" selection-start-line="610" selection-start-column="20" selection-end-line="610" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/database/database.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1104">
+          <caret line="122" selection-start-line="122" selection-end-line="122" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/domain/domain.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="743">
+          <caret line="76" selection-start-line="76" selection-end-line="76" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/config.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="750">
+          <caret line="91" selection-start-line="91" selection-end-line="91" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/task/task.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="725">
+          <caret line="75" selection-start-line="75" selection-end-line="75" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/config.manager.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="13" column="34" selection-start-line="13" selection-start-column="34" selection-end-line="13" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/content.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1178">
+          <caret line="62" selection-start-line="58" selection-end-line="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/content.table.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="437">
+          <caret line="23" column="12" selection-start-line="23" selection-start-column="12" selection-end-line="23" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/default/template/footer.partial.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="57">
+          <caret line="3" column="40" selection-start-line="3" selection-start-column="40" selection-end-line="3" selection-end-column="40" />
           <folding>
-            <element signature="n#style#0;n#section#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#footer#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#div#0;n#footer#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#1;n#div#0;n#footer#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#2;n#div#0;n#footer#0;n#!!top" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/default/template/header.partial.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="10" column="17" selection-start-line="10" selection-start-column="17" selection-end-line="10" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/default/client/texture/default.background.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/default/template/theme.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="399">
+          <caret line="21" column="7" lean-forward="true" selection-start-line="21" selection-start-column="7" selection-end-line="21" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/theme/default/client/default.theme.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1805">
+          <caret line="95" selection-start-line="95" selection-end-line="95" />
         </state>
       </provider>
     </entry>

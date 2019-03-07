@@ -9,7 +9,7 @@ table.user a{
 
 form.user {
     max-width: 520px;
-   
+    margin: auto;
 }
 
 form.user > fieldset {

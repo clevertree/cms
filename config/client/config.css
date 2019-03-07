@@ -9,7 +9,7 @@ table.config a{
 
 form.config {
     max-width: 1200px;
-
+    margin: auto;
 }
 
 form.config > fieldset {

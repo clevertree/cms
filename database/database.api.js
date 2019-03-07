@@ -4,7 +4,7 @@ const { DatabaseManager } = require('./database.manager');
 const { UserAPI } = require('../user/user.api');
 const { UserTable } = require('../user/user.table');
 const { ThemeAPI } = require('../theme/theme.api');
-const { SessionAPI } = require('../session/session.api');
+const { SessionAPI } = require('../user/session/session.api');
 class DatabaseAPI {
     constructor() {
     }
@@ -72,10 +72,8 @@ class DatabaseAPI {
 
             if (req.method === 'GET') {
                 await ThemeAPI.send(req, res, `
-<section>
     <script src="/database/form/databaseform-manage.element.js"></script>
     <databaseform-manage></databaseform-manage>
-</section>
 `);
             } else {
                 // Handle POST
@@ -119,11 +117,10 @@ class DatabaseAPI {
             if (req.method === 'GET') {
                 await ThemeAPI.send(req, res, {
                             title: `Connect to Database`,
-                            content:
-`<section>
+                            content: `
     <script src="/database/form/databaseform-connect.element.js"></script>
     <databaseform-connect></databaseform-connect>
-</section>`
+`
                         });
 
             } else {

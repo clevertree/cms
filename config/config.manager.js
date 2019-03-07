@@ -1,7 +1,7 @@
 const { DatabaseManager } = require('../database/database.manager');
 const { HTTPServer } = require('../http/http.server');
 const { TaskAPI } = require('../task/task.api');
-const { SessionAPI } = require('../session/session.api');
+const { SessionAPI } = require('../user/session/session.api');
 const { ThemeAPI } = require('../theme/theme.api');
 const { MailServer } = require('../mail/mail.server');
 
@@ -12,7 +12,7 @@ class ConfigManager {
         // Add Site-specific configuration
         const hostname = require('os').hostname();
         this.setConfigSetting('site.contact', () => 'admin@' + hostname.toLowerCase(), 'email');
-        this.setConfigSetting('site.keywords', () => 'cms, ' + hostname.toLowerCase());
+        // this.setConfigSetting('site.keywords', () => 'cms, ' + hostname.toLowerCase());
         this.setConfigSetting('site.baseURL', () => '/');
         this.setConfigSetting('site.themeHeader', () => null);
         this.setConfigSetting('site.themeFooter', () => null);

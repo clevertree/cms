@@ -57,7 +57,7 @@ class HTMLContentEditorFormElement extends HTMLElement {
         console.log(response);
         if(response.redirect) {
             this.setState({processing: true});
-            setTimeout(() => window.location.href = response.redirect, 1000);
+            setTimeout(() => window.location.href = response.redirect, 1500);
         }
     }
 
@@ -66,7 +66,7 @@ class HTMLContentEditorFormElement extends HTMLElement {
     }
 
     onKeyUp(e) {
-        const form = e.target.form; // querySelector('form.user-login-form');
+        const form = e.target.form || this.querySelector('form.content-editor');
         this.renderPreview(form.elements['data'].value);
         this.state.content.data = form.elements['data'].value;
     }

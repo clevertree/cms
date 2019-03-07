@@ -13,7 +13,7 @@ const { ContentTable } = require("./content.table");
 const { ContentRevisionTable } = require("./content_revision.table");
 const { UserTable } = require("../user/user.table");
 const { UserAPI } = require('../user/user.api');
-const { SessionAPI } = require('../session/session.api');
+const { SessionAPI } = require('../user/session/session.api');
 
 const DIR_CONTENT = path.resolve(__dirname);
 
@@ -55,7 +55,9 @@ class ContentApi {
             const content = await contentTable.fetchContentByPath(req.url, '*');
             if(content) {
                 await this.checkForRevisionContent(req, content);
-                return this.renderContent(req, res, content);
+                return SM(req, res, () => {
+                    return this.renderContent(req, res, content);
+                });
             }
 
             // if(!req.url.startsWith('/:content'))
@@ -190,10 +192,10 @@ class ContentApi {
                             break;
                     }
                     // Render Editor
-                    await ThemeAPI.send(req, res, `<section style="max-width: 1600px;">
+                    await ThemeAPI.send(req, res, `
                 <script src="/:content/:client/content-editor.element.js"></script>
                 <content-editor id="${req.params.id}"></content-editor>
-            </section>
+            
             <section class="content-preview-container">
                 <h1 style="text-align: center;">Preview</h1>
                 <hr/>
@@ -265,7 +267,6 @@ class ContentApi {
 
                             insertContentRevisionID = await contentRevisionTable.insertContentRevision(
                                 content.id,
-                                req.body.title,
                                 req.body.data,
                                 sessionUser.id
                             );
@@ -281,7 +282,6 @@ class ContentApi {
                         case 'draft':
                             insertContentRevisionID = await contentRevisionTable.insertContentRevision(
                                 content.id,
-                                req.body.title,
                                 req.body.data,
                                 sessionUser.id
                             );
@@ -314,10 +314,10 @@ class ContentApi {
                 case 'GET':
                     // Render Editor
                 await ThemeAPI.send(req, res,
-    `<section style="max-width: 1600px;">
+    `
     <script src="/:content/:client/content-delete.element.js"></script>
     <content-delete id="${req.params.id}"></content-editor>
-</section>`);
+`);
                     break;
 
                 default:
@@ -377,12 +377,12 @@ class ContentApi {
                 case 'GET':
                     // Render Editor
                     return await ThemeAPI.send(req, res,
-`<section>
+`
     <script src="/:content/:client/content-add.element.js"></script>
     <content-addform></content-addform>
     <script src="/:content/:client/content-upload.element.js"></script>
     <content-uploadform></content-uploadform>
-</section>
+
 `);
 
                 default:
@@ -488,10 +488,10 @@ class ContentApi {
                 case 'GET':
                     // Render Editor
                     await ThemeAPI.send(req, res,
-                        `<section>
+                        `
         <script src="/:content/:client/content-upload.element.js"></script>
         <content-uploadform></content-uploadform>
-    </section>
+    
     `)
                     break;
 
@@ -578,7 +578,7 @@ class ContentApi {
 
             if (req.method === 'GET') {
                 await ThemeAPI.send(req, res, `
-<section>
+
     <script src="/:content/:client/content-browser.element.js"></script>
     <content-browser></content-browser>
     <script src="/:content/:client/content-add.element.js"></script>
@@ -586,7 +586,7 @@ class ContentApi {
     <script src="/:content/:client/content-upload.element.js"></script>
     <content-uploadform></content-uploadform>
 
-</section>
+
 `);
 
             } else {

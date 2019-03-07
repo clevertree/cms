@@ -2,7 +2,7 @@ const cookieParser = require('cookie-parser');
 const session = require('client-sessions');
 const express = require('express');
 
-const { LocalConfig } = require('../config/local.config');
+const { LocalConfig } = require('../../config/local.config');
 
 class SessionAPI {
     constructor() {
@@ -25,11 +25,18 @@ class SessionAPI {
         await localConfig.saveAll();
     }
 
+    getSessionMiddleware() {
+        return session(this.sessionConfig);
+    }
+
+    getCookieMiddleware() {
+        return cookieParser(this.cookieConfig);
+    }
 
     getMiddleware() {
         const routerSession = express.Router();
-        routerSession.use(session(this.sessionConfig));
-        routerSession.use(cookieParser(this.cookieConfig));
+        routerSession.use(this.getSessionMiddleware());
+        routerSession.use(this.getCookieMiddleware());
 
         return (req, res, next) => {
             return routerSession(req, res, next);

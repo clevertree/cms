@@ -1,6 +1,8 @@
 /** Background Image **/
 body.theme-default {
-    background: #3d9be9 url(texture/default.background.png) no-repeat fixed center;
+    background: #3d9be9;
+    /*background: #3d9be9 url(texture/default.background.png) no-repeat fixed center;*/
+    /* background: #EEC455; */
 }
 
 /** Theme: Default **/
@@ -12,183 +14,98 @@ body.theme-default {
     /* line-height: 20px; */
 }
 
-.theme-default .highlight {
-    color: #f5efd5;
-    text-shadow: #000 1px 1px 1px;
-    /* font-weight: bold; */
-}
-
 /** Header **/
 .theme-default > header {
-    background: url(texture/header.background.png);
+    background: linear-gradient(to bottom, #487bb3 0%, #88a9cc 1%,#487bb3 2%,#1b589b 98%,#022035 100%);
+    /*background: url(texture/header.background.png);*/
     background-size: contain;
     /* padding: 1em; */
 }
 
 .theme-default > header .logo-container {
-    max-width: 490px;
+    max-width: 700px;
     margin: 0px auto;
     padding-top: 10px;
 }
 
 .theme-default > header .logo {
     background: url(logo/logo-header.png) no-repeat;
-    margin: 0px auto;
+    margin-left: 17px;
     background-size: 100% auto;
-    width: 36vw;
-    height: 24vw;
-    /* margin: 0.3em 1em; */
-    /*float: left;*/
-    /* float: right; */
+    width: 182px;
+    height: 112px;
+    float: right;
+    box-shadow: #0008 1px 4px 19px;
 }
 
 .theme-default .logo-text {
-    display: block;
-    font-size: 3em;
-    font-weight: bold;
-    text-align: center;
-    /* margin: 0.3em 1em; */
     text-decoration: none;
     color: rgb(255, 246, 212);
+    text-shadow: #0008 4px 3px 9px;
 }
 
-@media only screen and (min-width: 600px) {
-    .theme-default > header .logo {
-        width: 182px;
-        height: 112px;
-        float: right;
-        margin-left: 17px;
-        box-shadow: #0008 1px 4px 19px;
-        /* height: 22vw; */
+@media only screen and (max-width: 800px) {
+    .theme-default > header .logo-container {
+        max-width: 80vw;
     }
 
     .theme-default .logo-text {
         text-align: center;
-        text-shadow: #0008 4px 3px 9px;
+    }
+}
+@media only screen and (max-width: 500px) {
+    .theme-default > header .logo {
+        float: inherit;
+        margin: auto;
     }
 }
 
-/** Anchors **/
-
-.theme-default a {
-    /* color: #c88200; */
-}
-
-.theme-default a:hover {
-    color: #f5ffa6;
-}
-
-/** Navigation **/
-
-.theme-default nav {
-    /*background-color: #333333;*/
-}
-
-.theme-default ul.nav-menu {
-    list-style-type: none;
+/** Page Width **/
+.theme-default > article > section,
+.theme-default > footer {
     margin: 0 auto;
-    padding: 0;
-    overflow: hidden;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    width: 85%;
+    max-width: 800px;
+    padding: 0.5em;
 }
 
-.theme-default ul.nav-menu > li {
-    display: table-cell;
-}
-
-.theme-default ul.nav-menu > li:hover {
-    background-color: #6190a0;
-    z-index: 2;
-    border-radius: 4px 4px 0px 0;
-}
-
-.theme-default ul.nav-menu > li:hover > ul.nav-submenu > li:hover {
-    background-color: #444;
-    font-weight: bold;
-}
-
-.theme-default ul.nav-menu > li > a,
-.theme-default ul.nav-submenu > li > a {
-    color: white;
-    /* font-weight: bold; */
-    font-size: 18px;
-    display: block;
-    padding: 12px;
-    text-decoration: none;
-}
-
-/** Sub Menu **/
-.theme-default ul.nav-submenu {
-    position: absolute;
-    z-index: 2;
-    background-color: #6190a0;
-    list-style: none;
-    padding: 0 0;
-    text-align: right;
-    border-radius: 0px 0px 4px 4px;
-}
-
-.theme-default ul.nav-submenu > li > a {
-    /* font-weight: bold; */
-    font-size: 14px;
-    display: block;
-    color: white;
-    text-align: left;
-    padding: 0.5em 0.5em 0.5em;
-    text-decoration: none;
-}
-
-.theme-default li:not(:hover) > ul.nav-submenu {
-    display: none;
-}
 
 /** Page Articles **/
 .theme-default > article {
-    padding: 0 0;
     background: #EEC455;
+    padding: 0 0;
+    margin: 0 auto;
+
+}
+.theme-default > article > * {
+    padding: 0.5em;
+
 }
 
+
+/** Footer **/
+
+.theme-default > footer {
+    /* text-align: center; */
+    background: linear-gradient(to top, #3d9bea 0%, #6eb4ef 99%);
+    /* background: url(texture/footer.background.png); */
+    color: #fff6d4;
+}
+
+
+/** Page Sections **/
+
 .theme-default > article > section {
-    max-width: 800px;
-    margin: 0 auto;
     padding: 0.5em;
     background: #f5e7a8;
 }
 
 .theme-default div.highlight,
-.theme-default section.highlight {
+.theme-default > article > section.highlight {
+    color: #f5efd5;
+    text-shadow: #000 1px 1px 1px;
     background-color: #ab6428ed;
 }
 
-.theme-default div.message,
-.theme-default section.message {
-    /* background-color: rgba(111, 171, 102, 0.93); */
-}
-
-/** Page Headings **/
-.theme-default h1.themed,
-.theme-default section > h1 {
-    font-size: 2.5em;
-    margin: 0px 0px 6px 0px;
-    /* color: rgb(0, 101, 169); */
-    font-weight: bold;
-}
-
-.theme-default h2.themed,
-.theme-default section > h2 {
-    font-size: x-large;
-    /*     padding: 0 0.5em; */
-    /* margin-top: 0; */
-}
-
-.theme-default h3.themed,
-.theme-default section > h3 {
-    font-size: larger;
-    margin-left: .5em;
-}
 
 /** Paragraphs **/
 .theme-default p.themed {
@@ -199,116 +116,31 @@ body.theme-default {
     /* font-weight: 300; */
     /* text-shadow: #000 1px 1px 1px; */
 }
-.theme-default p.highlight {
-    background-color: #0003;
-    border-radius: 4px;
-}
 
-.theme-default section > p > img {
-    /* float: right; */
-    max-width: 100%;
-    /* margin-left: 2em; */
-}
+/** Messages **/
 
-/** Custom Text **/
-.theme-default .text-bottom-right {
-    position: absolute;
-    right: 9px;
-    bottom: 2px;
-}
-
-.theme-default .page-quote,
-.theme-default .text-quote {
-    font-size: 1.2em;
-    /* font-weight: bold; */
-    text-align: center;
-    /* padding: 5px 0 12px 0; */
-    transform: scaleY(0.7);
-    color: white;
-}
-
-
-.theme-default div.image-container > img,
-.theme-default div.image-container > a > img {
-    max-width: 90%;
-    max-height: 200px;
-}
-
-.theme-default div.image-container {
-    height: 200px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 10px 0px;
-}
-
-/** Section effects **/
-
-.theme-default .section-photo {
-}
-
-/** Box effects **/
-
-.theme-default .box-shadow {
-    box-shadow: 0px 0px 8px #000;
-    z-index: 1;
-    /* position: relative; */
-    border-radius: 4px;
-}
-
-/** Footer **/
-
-.theme-default > footer {
-    /* text-align: center; */
-    margin: 0 auto;
-    max-width: 800px;
+.theme-default div.message,
+.theme-default div.success,
+.theme-default div.error {
     padding: 0.5em;
-    background: url(texture/footer.background.png);
-    color: #fff6d4;
+    margin: 0.5em;
+    border-radius: 4px;
+}
+.theme-default div.message {
+    color: #000;
+    background: #0002;
+}
+.theme-default div.success {
+    color: #f5fbf2;
+    background: #118c09;
+}
+.theme-default div.error {
+    color: #fee;
+    background: #d25757;
 }
 
-.theme-default > footer a {
-    color: #d4dfff;
-    /* text-decoration: none; */
-    /* text-transform: lowercase; */
-    /* background-color: rgba(81, 81, 81, 0.5); */
-    /* padding: 8px 16px; */
-    /* border-radius: 4px; */
-}
-
-/** Page Article **/
-
-.theme-default .page-view {
-    transition: opacity 0.8s, height 0.5s;
-    opacity: 1;
-    width: 100%;
-}
-
-.theme-default .page-view1:not(.selected) {
-    /* display: none; */
-    opacity: 0;
-    position: absolute;
-    height: 0;
-    overflow: hidden;
-}
-
-
-/** Image **/
-.theme-default img.themed {
-    /* object-position: 50% 0%; */
-    box-shadow: 0px 0px 8px #000;
-    max-width: 80%;
-    max-height: 200px;
-    object-position: center;
-}
 
 /** Forms **/
-
-.theme-default form.themed {
-    padding: 0.5em;
-    margin: 0 auto;
-}
 
 
 .theme-default form.themed > fieldset {
@@ -360,27 +192,6 @@ body.theme-default {
     cursor: not-allowed;
 }
 
-/** Form Messages **/
-
-.theme-default div.message,
-.theme-default div.success,
-.theme-default div.error {
-    padding: 0.5em;
-    margin: 0.5em;
-    border-radius: 4px;
-}
-.theme-default div.message {
-    color: #000;
-    background: #0002;
-}
-.theme-default div.success {
-    color: #f5fbf2;
-    background: #118c09;
-}
-.theme-default div.error {
-    color: #fee;
-    background: #d25757;
-}
 
 /** Table **/
 
@@ -392,8 +203,6 @@ body.theme-default {
     background: #CCC;
 }
 
-.theme-default table.themed > tbody {
-}
 .theme-default table.themed > caption {
     padding: 2px 8px;
     font-weight: bold;
@@ -402,38 +211,7 @@ body.theme-default {
     background: #CCC;
 }
 
-
-/** Flex List **/
-
-.theme-default .flex-list {
-    text-align: center;
-}
-
-@media only screen and (min-width: 600px) {
-    .theme-default .flex-list {
-        display: flex;
-        /* flex-wrap: wrap; */
-        /* justify-content: center; */
-    }
-
-    .theme-default .flex-list > * {
-        display: block;
-        flex-grow: 1;
-        flex-basis: 0;
-        max-width: 400px;
-        padding: 0.5em 1em;
-    }
-}
-
-
-.theme-default .flex-list > * > h2 {
-    margin: 0 0;
-    font-family: "Advent Pro", Helvetica, serif;
-    font-size: 1.4em;
-}
-.theme-default .flex-list > * > p {
-    text-align: justify;
-    text-indent: 8px;
-    padding: 4px 8px;
-    line-height: 20px;
+/** Table Row **/
+.theme-default table.themed > tbody > tr.odd {
+    background-color: #0001;
 }

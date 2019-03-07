@@ -13,7 +13,7 @@ const { DatabaseManager } = require('../database/database.manager');
 // const { ContentAPI } = require('../content/content.api');
 const { UserTable } = require('./user.table');
 const { ConfigDatabase } = require("../config/config.database");
-const { SessionAPI } = require('../session/session.api');
+const { SessionAPI } = require('./session/session.api');
 const { HTTPServer } = require('../http/http.server');
 
 // const { DNSManager } = require('../service/domain/dns.manager');
@@ -572,10 +572,8 @@ class UserAPI {
 
             if (req.method === 'GET') {
                 await ThemeAPI.send(req, res, `
-<section>
     <script src="/:user/:client/user-browser.element.js"></script>
     <user-browser></user-browser>
-</section>
 `);
             // <script src="/:user/:client/user-add.element.js"></script>
             // <user-addform></user-addform>

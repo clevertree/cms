@@ -7,7 +7,7 @@ const { ThemeAPI } = require('../theme/theme.api');
 // const { UserAPI } = require('../../user/user.api');
 // const { ContentAPI } = require('../content/content.api');
 const { UserTable } = require("../user/user.table");
-const { SessionAPI } = require('../session/session.api');
+const { SessionAPI } = require('../user/session/session.api');
 // TODO: approve all drafts
 
 const DIR_TASK = path.resolve(__dirname);
@@ -70,10 +70,10 @@ class TaskAPI {
 
             switch(req.method) {
                 case 'GET':
-                    await ThemeAPI.send(req, res, `<section>
+                    await ThemeAPI.send(req, res, `
         <script src="/:task/:client/task-manager.element.js"></script>
         <task-manager ${taskName ? `taskName="${taskName}"` : ''}></task-manager>
-    </section>`);
+`);
                     break;
 
                 default:

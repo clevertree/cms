@@ -9,7 +9,7 @@ table.content a{
 
 form.content {
     max-width: 1200px;
-
+    margin: auto;
 }
 
 form.content > fieldset {

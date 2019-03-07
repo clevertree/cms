@@ -2,14 +2,7 @@ const fs = require('fs');
 const {promisify} = require('util');
 const path = require('path');
 
-
-// const { UserTable } = require('../user/user.database');
-// const { ContentTable } = require('../content/content.database');
-// const { DatabaseManager } = require('../database/database.manager');
-// const { TaskAPI } = require('../task/task.api');
 const { ConfigDatabase } = require("../config/config.database");
-// const { HTTPServer } = require('../http/http.server');
-// const { SessionAPI } = require('../session/session.api');
 
 const THEME_DIR = path.resolve(__dirname);
 
@@ -17,7 +10,7 @@ class ThemeAPI {
     get UserAPI() { return require('../user/user.api').UserAPI; }
     get DatabaseManager() { return require('../database/database.manager').DatabaseManager; }
     get ContentAPI() { return require('../content/content.api').ContentAPI; }
-    get SessionAPI() { return require('../session/session.api').SessionAPI; }
+    get SessionAPI() { return require('../user/session/session.api').SessionAPI; }
 
     constructor() {
         this.themes = {};

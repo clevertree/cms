@@ -6,7 +6,7 @@ const { DomainDatabase } = require("./domain.database");
 // const { ContentTable } = require("../article/article.database");
 const { UserTable } = require("../user/user.table");
 const { UserAPI } = require('../user/user.api');
-const { SessionAPI } = require('../service/session/session.api');
+const { SessionAPI } = require('../user/session/session.api');
 
 class DomainAPI {
     constructor() {
@@ -72,10 +72,8 @@ class DomainAPI {
 
             if (req.method === 'GET') {
                 await ThemeAPI.send(req, res, `
-<section>
     <script src="/domain/form/domainform-editor.element.js"></script>
     <domainform-editor></domainform-editor>
-</section>
 `);
             } else {
                 // Handle POST

@@ -1,0 +1,67 @@
+
+/** Navigation **/
+
+theme-default-nav-menu nav {
+    /*background-color: #333333;*/
+}
+
+theme-default-nav-menu ul.nav-menu {
+    list-style-type: none;
+    margin: 0 auto;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 85%;
+}
+
+theme-default-nav-menu ul.nav-menu > li {
+    display: table-cell;
+}
+
+theme-default-nav-menu ul.nav-menu > li:hover {
+    background-color: #6190a0;
+    z-index: 2;
+    border-radius: 4px 4px 0px 0;
+}
+
+theme-default-nav-menu ul.nav-menu > li:hover > ul.nav-submenu > li:hover {
+    background-color: #444;
+    font-weight: bold;
+}
+
+theme-default-nav-menu ul.nav-menu > li > a,
+theme-default-nav-menu ul.nav-submenu > li > a {
+    color: white;
+    /* font-weight: bold; */
+    font-size: 18px;
+    display: block;
+    padding: 12px;
+    text-decoration: none;
+}
+
+/** Sub Menu **/
+theme-default-nav-menu ul.nav-submenu {
+    position: absolute;
+    z-index: 2;
+    background-color: #6190a0;
+    list-style: none;
+    padding: 0 0;
+    text-align: right;
+    border-radius: 0px 0px 4px 4px;
+}
+
+theme-default-nav-menu ul.nav-submenu > li > a {
+    /* font-weight: bold; */
+    font-size: 14px;
+    display: block;
+    color: white;
+    text-align: left;
+    padding: 0.5em 0.5em 0.5em;
+    text-decoration: none;
+}
+
+theme-default-nav-menu li:not(:hover) > ul.nav-submenu {
+    display: none;
+}
