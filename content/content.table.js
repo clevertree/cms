@@ -1,4 +1,3 @@
-const { DatabaseManager } = require('../database/database.manager');
 
 // Init
 class ContentTable {
@@ -9,9 +8,16 @@ class ContentTable {
         this.debug = debug;
     }
 
+    /** SQL Query Method **/
+    async queryAsync(SQL, values) {
+        const DatabaseManager = require('../database/database.manager').DatabaseManager;
+        return await DatabaseManager.queryAsync(SQL, values);
+    }
+
+    /** Configure Table **/
     async configure(promptCallback=null, hostname=null) {
         // Check for tables
-        await DatabaseManager.configureTable(this.table, this.getTableSQL());
+        await this.queryAsync(this.getTableSQL());
 
         // Insert home page
         let homeContent = await this.fetchContentByPath("/");
@@ -41,7 +47,7 @@ class ContentTable {
           FROM ${this.table} c
           WHERE ${whereSQL}`;
 
-        const results = await DatabaseManager.queryAsync(SQL, values);
+        const results = await this.queryAsync(SQL, values);
         return results ? results.map(result => new ContentRow(result)) : null;
     }
     async fetchContent(whereSQL, values, selectSQL='c.*, NULL as data') {
@@ -57,14 +63,18 @@ class ContentTable {
         return await this.fetchContent('c.id = ? LIMIT 1', contentID, selectSQL);
     }
 
-    async fetchData(contentID, asString=null) {
+    async fetchContentData(contentID, asString=null) {
         const content = await this.fetchContentByID(contentID, 'c.data');
-        if(!content)
-            throw new Error("Content ID not found: " + contentID);
-        if(asString)
-            return content.data.toString(asString);
-        return content.data;
+        if(!content) return null; // throw new Error("Content ID not found: " + contentID);
+        return asString ? content.data.toString(asString) : content.data;
     }
+    async fetchContentDataByPath(contentPath, asString=null) {
+        const content = await this.fetchContentByPath(contentPath, 'c.data');
+        if(!content) return null; // throw new Error("Content ID not found: " + contentID);
+        return asString ? content.data.toString(asString) : content.data;
+    }
+
+
     // async fetchContentByFlag(flags, selectSQL = 'id, parent_id, path, title, flags') {
     //     if(!Array.isArray(flags))
     //         flags = flags.split(',');
@@ -72,7 +82,7 @@ class ContentTable {
     //     return await this.selectContent(whereSQL, flags, selectSQL);
     // }
 
-    async updateContentWithRevision(title, data, path, user_id, theme) {
+    async updateContentWithRevision(title, data, path, user_id) {
         const existingContent = await this.fetchContentByPath(path);
         if(!existingContent) {
             // Initial revision shouldn't be created until first edit has been made
@@ -81,12 +91,10 @@ class ContentTable {
                 data,
                 path,
                 user_id,
-                // req.body.parent_id ? parseInt(req.body.parent_id) : null,
-                theme
             );
         }
 
-        const oldData = await this.fetchData(existingContent.id);
+        const oldData = await this.fetchContentData(existingContent.id);
         if(oldData && data.toString() === oldData.toString()) {
             console.warn(`Old data matched new data. No updates or revisions made to ${existingContent.path}`);
             return existingContent.id;
@@ -105,44 +113,42 @@ class ContentTable {
             title,
             data,
             path,
-            user_id,
-            // req.body.parent_id ? parseInt(req.body.parent_id) : null,
-            theme
+            user_id
         );
         return existingContent.id;
     }
 
-    async insertContent(title, data, path, user_id, theme) {
+    async insertContent(title, data, path, user_id) {
         let set = {};
         if(title) set.title = title;
         if(data) set.data = data;
         if(path) set.path = path[0] === '/' ? path : '/' + path;
         if(user_id !== null) set.user_id = user_id;
         // if(parent_id !== null) set.parent_id = parent_id;
-        if(theme) set.theme = theme;
+        // if(theme) set.theme = theme;
         // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
           INSERT INTO ${this.table}
           SET ?
         `;
-        const results = await DatabaseManager.queryAsync(SQL, set);
+        const results = await this.queryAsync(SQL, set);
         return results.insertId;
     }
 
-    async updateContent(id, title, data, path, user_id, theme) {
+    async updateContent(id, title, data, path, user_id) {
         let set = {};
         if(title) set.title = title;
         if(data) set.data = data;
         if(path) set.path = path;
         if(user_id !== null) set.user_id = user_id;
-        if(theme) set.theme = theme;
+        // if(theme) set.theme = theme;
         // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `
           UPDATE ${this.table} c
           SET ?, updated = UTC_TIMESTAMP()
           WHERE c.id = ?
         `;
-        const results = await DatabaseManager.queryAsync(SQL, [set, id]);
+        const results = await this.queryAsync(SQL, [set, id]);
         return results.affectedRows;
     }
 
@@ -151,7 +157,7 @@ class ContentTable {
           DELETE FROM ${this.table}
           WHERE id = ?
         `;
-        const results = await DatabaseManager.queryAsync(SQL, [id]);
+        const results = await this.queryAsync(SQL, [id]);
         return results.affectedRows;
     }
 
@@ -163,7 +169,7 @@ class ContentTable {
           FROM ${this.table} c
           WHERE c.path IS NOT NULL
 `;
-        let menuEntries = await DatabaseManager.queryAsync(SQL);
+        let menuEntries = await this.queryAsync(SQL);
         // if(!menuEntries || menuEntries.length === 0)
         //     throw new Error("No menu items found");
 
@@ -193,13 +199,12 @@ class ContentTable {
 
     getTableSQL() {
         return `
-CREATE TABLE ${this.table} (
+CREATE TABLE IF NOT EXISTS ${this.table} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`path\` varchar(96) NOT NULL,
   \`title\` varchar(96) NOT NULL,
   \`user_id\` int(11) DEFAULT NULL,
-  \`data\` varbinary(65536) DEFAULT NULL,
-  \`theme\` varchar(64) DEFAULT NULL,
+  \`data\` varbinary(65536) NOT NULL,
   \`created\` datetime DEFAULT current_timestamp(),
   \`updated\` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (\`id\`),

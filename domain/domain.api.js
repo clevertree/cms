@@ -2,7 +2,7 @@ const express = require('express');
 
 const { DatabaseManager } = require('../database/database.manager');
 const { ThemeAPI } = require('../theme/theme.api');
-const { DomainDatabase } = require("./domain.database");
+const { DomainTable } = require("./domain.table");
 // const { ContentTable } = require("../article/article.database");
 const { UserTable } = require("../user/user.table");
 const { UserAPI } = require('../user/user.api');
@@ -43,7 +43,7 @@ class DomainAPI {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
             const userTable = new UserTable(database);
-            const domainTable = new DomainDatabase(database);
+            const domainTable = new DomainTable(database);
             const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
             if(!sessionUser || !sessionUser.isAdmin())
                 throw new Error("Not authorized");
@@ -79,7 +79,7 @@ class DomainAPI {
                 // Handle POST
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
                 const userTable = new UserTable(database);
-                const domainTable = new DomainDatabase(database);
+                const domainTable = new DomainTable(database);
 
                 const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
                 if(!sessionUser || !sessionUser.isAdmin())

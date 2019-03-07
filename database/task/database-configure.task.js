@@ -35,7 +35,7 @@ class DatabaseConfigureTask {
             return true;
 
         // TODO: check to see if database exists. If the domain entry is missing, then it's active
-        const databaseResult = await DatabaseManager.queryAsync(`SHOW DATABASES LIKE '${domain.database}'`);
+        const databaseResult = await this.queryAsync(`SHOW DATABASES LIKE '${domain.database}'`);
         if(databaseResult.length > 0)
             return false;
 

@@ -173,7 +173,7 @@ class ContentApi {
                     const mimeType = this.getMimeType(path.extname(content.path) || '');
                     switch(mimeType) {
                         case 'text/html':
-                            renderedData = contentTable.fetchData(content.id, 'UTF8');
+                            renderedData = contentTable.fetchContentData(content.id, 'UTF8');
                             break;
                     }
                     // Render Editor
@@ -223,7 +223,7 @@ class ContentApi {
 
                     content.mimeType = this.getMimeType(path.extname(content.path) || '');
                     if(editableMimeTypes.indexOf(content.mimeType) !== -1) {
-                        content.data = await contentTable.fetchData(content.id, 'UTF8');
+                        content.data = await contentTable.fetchContentData(content.id, 'UTF8');
                         content.isBinary = false;
                     } else {
                         content.data = '[binary file]';
@@ -313,7 +313,7 @@ class ContentApi {
                 case 'OPTIONS':
 
                     if(editableMimeTypes.indexOf(content.mimeType) !== -1) {
-                        content.data = await contentTable.fetchData(content.id, 'UTF8');
+                        content.data = await contentTable.fetchContentData(content.id, 'UTF8');
                         content.isBinary = false;
                     } else {
                         content.data = '[binary file]';

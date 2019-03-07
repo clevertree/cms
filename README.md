@@ -13,7 +13,7 @@
 * Automatic SSL - Free, automated SSL via Greenlock
 * Automatic Admin - Request administration access via DNS SOA Email
 * Maximum server performance with minimal overhead
-
+* No CMS-specific tags, prefixes, or support libraries. Content only!
 #### Secondary Goals
 
 * Universal CMS / CMI - Simple SCHEMA that may be used by other CMS software without conflicts

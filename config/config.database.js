@@ -8,11 +8,18 @@ class ConfigDatabase  {
         this.debug = debug;
     }
 
-
-    async configure(promptCallback=null) {
-        // Configure tables
-        await DatabaseManager.configureTable(this.table, this.getTableSQL());
+    /** Configure Table **/
+    async configure(promptCallback=null, hostname=null) {
+        // Check for tables
+        await this.queryAsync(this.getTableSQL());
     }
+
+    /** SQL Query Method **/
+    async queryAsync(SQL, values) {
+        const DatabaseManager = require('../database/database.manager').DatabaseManager;
+        return await DatabaseManager.queryAsync(SQL, values);
+    }
+
 
     /** Config Table **/
 
@@ -44,7 +51,7 @@ class ConfigDatabase  {
           WHERE ${whereSQL}
           `;
 
-        const results = await DatabaseManager.queryAsync(SQL, values);
+        const results = await this.queryAsync(SQL, values);
         return results.map(result => new ConfigRow(result))
     }
     // async searchConfigs(search) {
@@ -73,7 +80,7 @@ class ConfigDatabase  {
 
     async updateConfigValue(name, value, type=null) {
         let SQL = `REPLACE INTO ${this.table} SET ?;`;
-        const result = await DatabaseManager.queryAsync(SQL, {name, value, type});
+        const result = await this.queryAsync(SQL, {name, value, type});
         return result.affectedRows;
     }
 
@@ -137,7 +144,7 @@ class ConfigDatabase  {
     // };
     getTableSQL() {
         return `
-CREATE TABLE ${this.table} (
+CREATE TABLE IF NOT EXISTS ${this.table} (
   \`name\` varchar(64) NOT NULL,
   \`value\` TEXT DEFAULT NULL,
   \`type\` varchar(64) DEFAULT NULL,

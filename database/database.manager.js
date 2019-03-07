@@ -27,7 +27,7 @@ class DatabaseManager {
     // getArticleDB(database=null)    { return new (require('../article/article.database').ContentTable)(database); }
     // getUserDB(database=null)       { return new (require('../user/user.database').UserTable)(database); }
     // getConfigDB(database=null)     { return new (require('../config/config.database').ConfigDatabase)(database); }
-    getPrimaryDomainDB()       { return new (require('../domain/domain.database').DomainDatabase)(this.primaryDatabase); }
+    getPrimaryDomainDB()       { return new (require('../domain/domain.table').DomainTable)(this.primaryDatabase); }
 
     async configure(promptCallback=null) {
         if(this.db) {

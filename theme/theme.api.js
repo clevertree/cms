@@ -3,6 +3,7 @@ const {promisify} = require('util');
 const path = require('path');
 
 const { ConfigDatabase } = require("../config/config.database");
+const { ContentTable } = require("../content/content.table");
 
 const THEME_DIR = path.resolve(__dirname);
 
@@ -10,6 +11,7 @@ class ThemeAPI {
     get UserAPI() { return require('../user/user.api').UserAPI; }
     get DatabaseManager() { return require('../database/database.manager').DatabaseManager; }
     get ContentAPI() { return require('../content/content.api').ContentAPI; }
+    get ContentTable() { return require('../content/content.table').ContentTable; }
     get SessionAPI() { return require('../user/session/session.api').SessionAPI; }
 
     constructor() {
@@ -69,9 +71,20 @@ class ThemeAPI {
     }
 
 
+    // TODO: move to content renderer
     async render(req, content) {
         if(typeof content === "string")
             content = {data: content};
+        let output = content.data;
+
+        let contentTable = null;
+        if(this.DatabaseManager.isAvailable) {
+            const database = await this.DatabaseManager.selectDatabaseByRequest(req, false);
+            if (database) {
+                contentTable = new ContentTable(database);
+            }
+        }
+
         content = Object.assign({}, {
             id: null,
             path: null,
@@ -79,16 +92,68 @@ class ThemeAPI {
             data: null,
             baseURL: '/',
             keywords: null,
-            session: req.session || {},
-            htmlHeader: null,
-            htmlFooter: null,
+            head: null,
+            header: null,
+            footer: null,
             // htmlMenu: null,
-            htmlSession: await this.UserAPI.getSessionHTML(req),
+            // htmlSession: await this.UserAPI.getSessionHTML(req),
 
         }, content);
 
+
+
+        const firstTag = output.match(/<(\w+)/)[1].toLowerCase();
+        if(firstTag === 'html')
+            return output;
+
+        if(!content.header && contentTable)
+            content.header = await contentTable.fetchContentDataByPath('/theme/header');
+
+        if(!content.footer && contentTable)
+            content.footer = await contentTable.fetchContentDataByPath('/theme/footer');
+
+        if(firstTag !== 'body') {
+            if(firstTag !== 'article') {
+                output =
+`        <article>
+${output}
+        </article>`
+            }
+// TODO: detect theme from body?
+            output = `    
+    <body class='theme-default'>
+${content.header||''}${output}${content.footer||''}
+    </body>`
+
+        }
+
+        if(!content.head && contentTable)
+            content.head = await contentTable.fetchContentByPath('/theme/head');
+
+                output = `
+<!DOCTYPE html>
+<html>
+    <head>
+        <base href="${content.baseUrl}">
+        <title>${content.title}</title>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="keywords" CONTENT="${content.keywords}">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        ${req.session && req.session.userID ? `<meta name="userID" content="${req.session.userID}">` : ''}
+        ${content && content.id ? `<meta name="contentID" content="${content.id}">` : ''}
+
+        <link href=":theme/default/:client/default.theme.css" rel="stylesheet" />
+        <script src=":theme/default/:client/element/theme-default-nav-menu.element.js"></script>
+        ${content.head}
+    </head>
+${output}
+</html>`;
+
+        return output;
+
         // let prependHTML = await UserAPI.getSessionHTML(req);
         // prependHTML += await TaskAPI.getSessionHTML(req);
+
 
         // Relative path to root
         // const slashCount = req.path.split('/').length-1;
@@ -101,32 +166,9 @@ class ThemeAPI {
 
         // Menu data
         // renderData.menu = [];
-        if(this.DatabaseManager.isAvailable) {
-            const database = await this.DatabaseManager.selectDatabaseByRequest(req, false);
-            if(database) {
-                // const contentTable = new ContentTable(database);
-                // renderData.menu = await contentTable.queryMenuData(req, true);
-
-                // if(req.session && req.session.userID ) {
-                //     const userTable = new UserTable(database);
-                //     content.sessionUser = userTable.fetchUserByID(req.session.userID);
-                // }
-
-                const configDB = new ConfigDatabase(database);
-                const configList = await configDB.selectAllConfigValues();
-                const configValues = configDB.parseConfigValues(configList);
-                Object.keys(configValues.site).forEach(siteValueName => {
-                    if(configValues.site[siteValueName] && typeof content[siteValueName] === 'undefined')
-                        content[siteValueName] = configValues.site[siteValueName];
-                });
-            }
-        }
         // if(!content.menu)
         //     content.menu = await this.renderMenu(req);
-
-
-        const theme = this.get(content.theme || 'default');
-        return await theme.render(req, content);
+        // const theme = this.get(content.theme || 'default');
     }
 
     async send(req, res, content) {

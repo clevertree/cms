@@ -2,18 +2,26 @@ const { DatabaseManager } = require('../database/database.manager');
 
 // const { ConfigManager } = require('../config/config.manager');
 
-class DomainDatabase  {
+class DomainTable  {
     constructor(dbName, debug=false) {
         if(!dbName)
             throw new Error("Database name is required");
         this.table = `\`${dbName}\`\.domain`;
     }
 
-    async configure(promptCallback=null) {
-        // Configure tables
-        await DatabaseManager.configureTable(this.table,            this.getTableSQL());
 
+    /** Configure Table **/
+    async configure(promptCallback=null, hostname=null) {
+        // Check for tables
+        await this.queryAsync(this.getTableSQL());
     }
+
+    /** SQL Query Method **/
+    async queryAsync(SQL, values) {
+        const DatabaseManager = require('../database/database.manager').DatabaseManager;
+        return await DatabaseManager.queryAsync(SQL, values);
+    }
+
 
     /** Domain Table **/
 
@@ -24,7 +32,7 @@ class DomainDatabase  {
           WHERE ${whereSQL}
           `;
 
-        const results = await DatabaseManager.queryAsync(SQL, values);
+        const results = await this.queryAsync(SQL, values);
         return results.map(result => new DomainRow(result))
     }
     async fetchDomain(whereSQL, values, selectSQL='d.*') {
@@ -41,7 +49,7 @@ class DomainDatabase  {
           INSERT INTO ${this.table}
           SET ?
         `;
-        const results = await DatabaseManager.queryAsync(SQL, {hostname, database});
+        const results = await this.queryAsync(SQL, {hostname, database});
         return results.insertId;
     }
 
@@ -52,13 +60,13 @@ class DomainDatabase  {
           SET \`database\` = ? where \`hostname\` = ?
           LIMIT 1;
         `;
-        const results = await DatabaseManager.queryAsync(SQL, [database, hostname]);
+        const results = await this.queryAsync(SQL, [database, hostname]);
         return results.affectedRows;
     }
 
     getTableSQL() {
         return `
-CREATE TABLE ${this.table} (
+CREATE TABLE IF NOT EXISTS ${this.table} (
   \`hostname\` varchar(64) NOT NULL,
   \`database\` varchar(256) NULL,
   \`ssl\` TEXT DEFAULT NULL,
@@ -78,5 +86,5 @@ class DomainRow {
 }
 
 
-module.exports = {DomainRow, DomainDatabase};
+module.exports = {DomainRow, DomainTable};
 

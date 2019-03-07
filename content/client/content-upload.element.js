@@ -144,6 +144,9 @@ class HTMLContentFormUploadElement extends HTMLElement {
                             <td>
                                 <input name="files" type="file" multiple required/>
                             </td>
+                            <td>
+                                <input name="upload_path" type="text" value="/uploads" required/>
+                            </td>
                             <td style="text-align: right;">
                                 <button type="submit">Upload</button>
                             </td>

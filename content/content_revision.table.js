@@ -8,13 +8,19 @@ class ContentRevisionTable {
         this.debug = debug;
     }
 
+    /** Configure Table **/
     async configure(promptCallback=null, hostname=null) {
         // Check for tables
-        await DatabaseManager.configureTable(this.table, this.getTableSQL());
+        await this.queryAsync(this.getTableSQL());
+    }
+
+    /** SQL Query Method **/
+    async queryAsync(SQL, values) {
+        const DatabaseManager = require('../database/database.manager').DatabaseManager;
+        return await DatabaseManager.queryAsync(SQL, values);
     }
 
     /** Content Revision **/
-
     async selectContentRevision(whereSQL, values, selectSQL = '*, NULL as data') {
         let SQL = `
           SELECT ${selectSQL}
@@ -22,7 +28,7 @@ class ContentRevisionTable {
           WHERE ${whereSQL}
           `;
 
-        const results = await DatabaseManager.queryAsync(SQL, values);
+        const results = await this.queryAsync(SQL, values);
         return results.map(result => new ContentRevisionRow(result))
     }
 
@@ -64,7 +70,7 @@ class ContentRevisionTable {
           INSERT INTO ${this.table}
           SET ?
         `;
-        const results = await DatabaseManager.queryAsync(SQL, {content_id, user_id, data});
+        const results = await this.queryAsync(SQL, {content_id, user_id, data});
         return results.insertId;
     }
 
@@ -72,7 +78,7 @@ class ContentRevisionTable {
 
     getTableSQL() {
         return `
-CREATE TABLE ${this.table} (
+CREATE TABLE IF NOT EXISTS ${this.table} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`content_id\` int(11) NOT NULL,
   \`user_id\` int(11) NOT NULL,

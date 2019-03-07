@@ -17,11 +17,9 @@ class UserTable  {
         this.debug = debug;
     }
 
-    async configure(promptCallback=null) {
-        // const localConfig = new LocalConfig(config, !config);
-
-        // Configure tables
-        await DatabaseManager.configureTable(this.table, this.getTableSQL());
+    async configure(promptCallback=null, hostname=null) {
+        // Check for tables
+        await this.queryAsync(this.getTableSQL());
 
         // Find admin user
         let adminUser = await this.fetchUser("u.username = 'admin' OR FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
@@ -99,6 +97,11 @@ class UserTable  {
         }
     }
 
+    async queryAsync(SQL, values) {
+        const DatabaseManager = require('../database/database.manager').DatabaseManager;
+        return await DatabaseManager.queryAsync(SQL, values);
+    }
+
     /** User Table **/
 
     async selectUsers(whereSQL, values, selectSQL='u.*,null as password') {
@@ -108,7 +111,7 @@ class UserTable  {
           WHERE ${whereSQL}
           `;
 
-        const results = await DatabaseManager.queryAsync(SQL, values);
+        const results = await this.queryAsync(SQL, values);
         return results.map(result => new UserRow(result))
     }
     // async searchUsers(search, selectSQL='u.*,null as password') {
@@ -158,7 +161,7 @@ class UserTable  {
         }
         let SQL = `
           INSERT INTO ${this.table} SET ?`;
-        await DatabaseManager.queryAsync(SQL, {
+        await this.queryAsync(SQL, {
             username,
             email,
             password,
@@ -181,7 +184,7 @@ class UserTable  {
         if(flags)   set.flags = Array.isArray(flags) ? flags.join(',') : flags;
         let SQL = `UPDATE ${this.table} SET ? WHERE id = ?`;
 
-        return (await DatabaseManager.queryAsync(SQL, [set, userID]))
+        return (await this.queryAsync(SQL, [set, userID]))
             .affectedRows;
     }
 
@@ -207,7 +210,7 @@ class UserTable  {
 
     getTableSQL() {
         return `
-CREATE TABLE ${this.table} (
+CREATE TABLE IF NOT EXISTS ${this.table} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`email\` varchar(64) NOT NULL,
   \`username\` varchar(64) NOT NULL,
