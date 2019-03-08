@@ -114,6 +114,7 @@ class HTTPServer {
 
         // var redir = require('redirect-https')();
         const appHTTP = express();
+        appHTTP.locals.pretty = true;
         const appMiddleware = this.getMiddleware();
         this.httpServer = require('http').createServer(appHTTP).listen(this.config.httpPort, () => {
             console.log(`HTTP listening on port ${this.config.httpPort}`);

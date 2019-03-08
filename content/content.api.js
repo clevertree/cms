@@ -8,7 +8,7 @@ const multiparty = require('multiparty');
 
 const { HTTPServer } = require('../http/http.server');
 const { DatabaseManager } = require('../database/database.manager');
-const { ThemeAPI } = require('../theme/theme.api');
+const { ContentRenderer } = require('./content.renderer');
 const { ContentTable } = require("./content.table");
 const { ContentRevisionTable } = require("./content_revision.table");
 const { UserTable } = require("../user/user.table");
@@ -146,7 +146,7 @@ class ContentApi {
                 res.json(response);
 
             } else {
-                await ThemeAPI.send(req, res, content);
+                await ContentRenderer.send(req, res, content);
             }
         } catch (error) {
             await this.renderError(error, req, res, asJSON ? {} : null);
@@ -177,7 +177,7 @@ class ContentApi {
                             break;
                     }
                     // Render Editor
-                    await ThemeAPI.send(req, res, {
+                    await ContentRenderer.send(req, res, {
                         title: `Edit Content #${content.id}`,
                         data: `
                 <script src="/:content/:client/content-editor.element.js"></script>
@@ -300,7 +300,7 @@ class ContentApi {
             switch(req.method) {
                 case 'GET':
                     // Render Editor
-                await ThemeAPI.send(req, res, {
+                await ContentRenderer.send(req, res, {
                     title: `Delete Content #${content.id}`,
                     data: `
     <script src="/:content/:client/content-delete.element.js"></script>
@@ -374,7 +374,7 @@ class ContentApi {
             switch(req.method) {
                 case 'GET':
                     // Render Editor
-                    return await ThemeAPI.send(req, res,
+                    return await ContentRenderer.send(req, res,
                         {
                             title: `Add New Content`,
                             data: `
@@ -487,7 +487,7 @@ class ContentApi {
             switch(req.method) {
                 case 'GET':
                     // Render Editor
-                    await ThemeAPI.send(req, res, {
+                    await ContentRenderer.send(req, res, {
                             title: `Upload Content`,
                             data: `
         <script src="/:content/:client/content-upload.element.js"></script>
@@ -582,7 +582,7 @@ class ContentApi {
         try {
 
             if (req.method === 'GET') {
-                await ThemeAPI.send(req, res, {
+                await ContentRenderer.send(req, res, {
                     title: `Site Index`,
                     data: `
 
@@ -647,7 +647,7 @@ class ContentApi {
                         // Load session if we're using the theme
                         const SM = SessionAPI.getMiddleware();
                         SM(req, res, () => {
-                            ThemeAPI.send(req, res, content);
+                            ContentRenderer.send(req, res, content);
                         });
                 }
                 break;
@@ -738,7 +738,7 @@ class ContentApi {
         if(error.redirect) {
             res.redirect(error.redirect);
         } else if(req.method === 'GET' && !json) {
-            await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
+            await ContentRenderer.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
             res.json(Object.assign({}, {
                 message: error.message,

@@ -35,6 +35,9 @@
     "nodemailer-smtp-transport": "^2.7.4",
     "uuid": "^3.3.2",
     "whois": "^2.9.1",
-    "etag": "^1.8.1"
+    "etag": "^1.8.1",
+    "jsdom": "^13.2.0",
+    "cheerio": "^1.0.0-rc.2",
+    "js-beautify": "^1.9.0"
   }
 }

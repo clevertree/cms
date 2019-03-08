@@ -7,13 +7,15 @@
 
 #### Primary Goals
 
-* Simple HTML-based Content Management with Historic Revisions
+* HTML-based Content Management with Historic Revisions
 * Upload files and create pages to any path
 * Multi-domain hosting - Host limitless domains on a single node instance. 
 * Automatic SSL - Free, automated SSL via Greenlock
 * Automatic Admin - Request administration access via DNS SOA Email
 * Maximum server performance with minimal overhead
 * No CMS-specific tags, prefixes, or support libraries. Content only!
+* Component-based HTML Customization - Theme HTML components like `<head> <body> <header> <footer> <article>`
+ 
 #### Secondary Goals
 
 * Universal CMS / CMI - Simple SCHEMA that may be used by other CMS software without conflicts
