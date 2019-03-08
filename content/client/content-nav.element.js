@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":theme/default/:client/element/theme-default-nav-menu.css");
+    })(":content/:client/content-nav.css");
 });
 
 {
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('theme-default-nav-menu', ThemeDefaultNavMenu);
+    customElements.define('content-nav', ThemeDefaultNavMenu);
 
 }
 

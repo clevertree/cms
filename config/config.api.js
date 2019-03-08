@@ -3,7 +3,7 @@ const path = require('path');
 
 const { HTTPServer } = require('../http/http.server');
 const { DatabaseManager } = require('../database/database.manager');
-const { ThemeAPI } = require('../theme/theme.api');
+const { ContentRenderer } = require('../content/content.renderer');
 const { ConfigDatabase } = require("./config.database");
 const { UserTable } = require("../user/user.table");
 // const { ContentAPI } = require('../content/content.api');
@@ -85,7 +85,7 @@ class ConfigAPI {
 
             switch(req.method) {
                 case 'GET':
-                    await ThemeAPI.send(req, res,{
+                    await ContentRenderer.send(req, res,{
                         title: `Edit Site Config`,
                         data: `
     <script src="/:config/:client/config-editor.element.js"></script>
@@ -136,7 +136,7 @@ class ConfigAPI {
         if(error.redirect) {
             res.redirect(error.redirect);
         } else if(req.method === 'GET' && !json) {
-            await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
+            await ContentRenderer.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
             res.json(Object.assign({}, {
                 message: error.message,

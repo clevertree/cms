@@ -1,3 +1,5 @@
+const path = require('path');
+const fsPromises = require('fs').promises;
 
 // Init
 class ContentTable {
@@ -19,24 +21,43 @@ class ContentTable {
         // Check for tables
         await this.queryAsync(this.getTableSQL());
 
-        // Insert home page
-        let homeContent = await this.fetchContentByPath("/");
-        if(homeContent) {
-            console.info("Home Content Found: " + homeContent.id);
-        } else {
-            hostname = hostname || require('os').hostname();
-            let homeContentTitle = 'Home';
-            let homeContentContent = `
-            <section>
-                <h1 class="themed" id="activities">${hostname}</h1>
-                <p>
-                    Welcome to ${hostname}!
-                </p>
-            </section>
+        let insertID, contentHTML;
+        hostname = hostname || require('os').hostname();
+        if(!await this.fetchContentByPath("/")) {
+            contentHTML = `
+<section>
+    <h1 class="themed">${hostname}</h1>
+    <p>
+        Welcome to ${hostname}!
+    </p>
+</section>
 `;
-            const homeContentID = await this.insertContent(homeContentTitle, homeContentContent, "/");
-            console.info("Home Content Created: " + homeContentID);
+            // contentHTML = contentHTML.replace('${hostname}', hostname);
+            insertID = await this.insertContent('Home', contentHTML, "/");
+            console.info("Home Page Created: ", insertID);
         }
+
+        if(!await this.fetchContentByPath("/site/head")) {
+            contentHTML = await fsPromises.readFile(path.resolve(__dirname + '/default/head'));
+            contentHTML = contentHTML.toString('UTF8').replace('${hostname}', hostname);
+            insertID = await this.insertContent('Site Head', contentHTML, "/site/head");
+            console.info("Site Head Created: ", insertID);
+        }
+
+        if(!await this.fetchContentByPath("/site/header")) {
+            contentHTML = await fsPromises.readFile(path.resolve(__dirname + '/default/header'));
+            contentHTML = contentHTML.toString('UTF8').replace('${hostname}', hostname);
+            insertID = await this.insertContent('Site Header', contentHTML, "/site/header");
+            console.info("Site Header Created: ", insertID);
+        }
+        if(!await this.fetchContentByPath("/site/footer")) {
+            contentHTML = await fsPromises.readFile(path.resolve(__dirname + '/default/footer'));
+            contentHTML = contentHTML.toString('UTF8').replace('${hostname}', hostname);
+            insertID = await this.insertContent('Site Footer', contentHTML, "/site/footer");
+            console.info("Site Footer Created: ", insertID);
+
+        }
+
     }
 
     /** Content **/
@@ -179,8 +200,8 @@ class ContentTable {
         for(let i=0; i<menuEntries.length; i++) {
             let menuEntry = menuEntries[i];
             // if(menuEntry.parent_id === null) { // parent_id === null indicates top level menu
-                mainMenu.push(menuEntry);
-                continue;
+            mainMenu.push(menuEntry);
+            continue;
             // }
             // for(let j=0; j<menuEntries.length; j++) {
             //     let menuEntry2 = menuEntries[j];

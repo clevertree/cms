@@ -33,7 +33,7 @@ class DefaultTheme {
         <meta name="userID" content="<%-session ? session.userID : ''%>">
 
         <link href=":theme/default/:client/default.theme.css" rel="stylesheet" />
-        <script src=":theme/default/:client/element/theme-default-nav-menu.element.js"></script>
+        <script src=":content/:client/content-nav.element.js"></script>
     </head>
     <body class='theme-default'>
 <%- htmlHeader || include('header.partial.ejs') %>

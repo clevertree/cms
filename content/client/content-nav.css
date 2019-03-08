@@ -1,11 +1,11 @@
 
 /** Navigation **/
 
-theme-default-nav-menu nav {
+content-nav nav {
     /*background-color: #333333;*/
 }
 
-theme-default-nav-menu ul.nav-menu {
+content-nav ul.nav-menu {
     list-style-type: none;
     margin: 0 auto;
     padding: 0;
@@ -16,23 +16,23 @@ theme-default-nav-menu ul.nav-menu {
     width: 85%;
 }
 
-theme-default-nav-menu ul.nav-menu > li {
+content-nav ul.nav-menu > li {
     display: table-cell;
 }
 
-theme-default-nav-menu ul.nav-menu > li:hover {
+content-nav ul.nav-menu > li:hover {
     background-color: #6190a0;
     z-index: 2;
     border-radius: 4px 4px 0px 0;
 }
 
-theme-default-nav-menu ul.nav-menu > li:hover > ul.nav-submenu > li:hover {
+content-nav ul.nav-menu > li:hover > ul.nav-submenu > li:hover {
     background-color: #444;
     font-weight: bold;
 }
 
-theme-default-nav-menu ul.nav-menu > li > a,
-theme-default-nav-menu ul.nav-submenu > li > a {
+content-nav ul.nav-menu > li > a,
+content-nav ul.nav-submenu > li > a {
     color: white;
     /* font-weight: bold; */
     font-size: 18px;
@@ -42,7 +42,7 @@ theme-default-nav-menu ul.nav-submenu > li > a {
 }
 
 /** Sub Menu **/
-theme-default-nav-menu ul.nav-submenu {
+content-nav ul.nav-submenu {
     position: absolute;
     z-index: 2;
     background-color: #6190a0;
@@ -52,7 +52,7 @@ theme-default-nav-menu ul.nav-submenu {
     border-radius: 0px 0px 4px 4px;
 }
 
-theme-default-nav-menu ul.nav-submenu > li > a {
+content-nav ul.nav-submenu > li > a {
     /* font-weight: bold; */
     font-size: 14px;
     display: block;
@@ -62,6 +62,6 @@ theme-default-nav-menu ul.nav-submenu > li > a {
     text-decoration: none;
 }
 
-theme-default-nav-menu li:not(:hover) > ul.nav-submenu {
+content-nav li:not(:hover) > ul.nav-submenu {
     display: none;
 }

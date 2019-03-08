@@ -1,7 +1,7 @@
 const express = require('express');
 
 const { DatabaseManager } = require('../database/database.manager');
-const { ThemeAPI } = require('../theme/theme.api');
+const { ContentRenderer } = require('../content/content.renderer');
 const { DomainTable } = require("./domain.table");
 // const { ContentTable } = require("../article/article.database");
 const { UserTable } = require("../user/user.table");
@@ -71,7 +71,7 @@ class DomainAPI {
         try {
 
             if (req.method === 'GET') {
-                await ThemeAPI.send(req, res, `
+                await ContentRenderer.send(req, res, `
     <script src="/domain/form/domainform-editor.element.js"></script>
     <domainform-editor></domainform-editor>
 `);
@@ -118,7 +118,7 @@ class DomainAPI {
         if(error.redirect) {
             res.redirect(error.redirect);
         } else if(req.method === 'GET' && !json) {
-            await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
+            await ContentRenderer.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
             res.json(Object.assign({}, {
                 message: error.message,

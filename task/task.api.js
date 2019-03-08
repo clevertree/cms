@@ -3,7 +3,7 @@ const path = require('path');
 
 const { HTTPServer } = require('../http/http.server');
 const { DatabaseManager } = require('../database/database.manager');
-const { ThemeAPI } = require('../theme/theme.api');
+const { ContentRenderer } = require('../content/content.renderer');
 // const { UserAPI } = require('../../user/user.api');
 // const { ContentAPI } = require('../content/content.api');
 const { UserTable } = require("../user/user.table");
@@ -70,7 +70,7 @@ class TaskAPI {
 
             switch(req.method) {
                 case 'GET':
-                    await ThemeAPI.send(req, res, {
+                    await ContentRenderer.send(req, res, {
                         title: `Task Manager`,
                         data: `
         <script src="/:task/:client/task-manager.element.js"></script>
@@ -191,7 +191,7 @@ class TaskAPI {
         if(error.redirect) {
             res.redirect(error.redirect);
         } else if(req.method === 'GET' && !json) {
-            await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
+            await ContentRenderer.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
             res.json(Object.assign({}, {
                 message: error.message,

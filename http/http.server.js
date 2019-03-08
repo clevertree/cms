@@ -87,7 +87,6 @@ class HTTPServer {
         // const { FileAPI } = require('../file/file.api');
         const { ConfigAPI } = require('../config/config.api');
         const { TaskAPI } = require('../task/task.api');
-        const { ThemeAPI } = require('../theme/theme.api');
 
         const router = express.Router();
         // Routes
@@ -97,7 +96,7 @@ class HTTPServer {
         // router.use(FileAPI.getMiddleware());
         router.use(ConfigAPI.getMiddleware());
         router.use(TaskAPI.getMiddleware());
-        router.use(ThemeAPI.getMiddleware());
+        // router.use(ThemeAPI.getMiddleware());
 
 
         // CMS Asset files
@@ -114,7 +113,7 @@ class HTTPServer {
 
         // var redir = require('redirect-https')();
         const appHTTP = express();
-        appHTTP.locals.pretty = true;
+        // appHTTP.locals.pretty = true;
         const appMiddleware = this.getMiddleware();
         this.httpServer = require('http').createServer(appHTTP).listen(this.config.httpPort, () => {
             console.log(`HTTP listening on port ${this.config.httpPort}`);

@@ -3,7 +3,7 @@ const express = require('express');
 const { DatabaseManager } = require('./database.manager');
 const { UserAPI } = require('../user/user.api');
 const { UserTable } = require('../user/user.table');
-const { ThemeAPI } = require('../theme/theme.api');
+const { ContentRenderer } = require('../content/content.renderer');
 const { SessionAPI } = require('../user/session/session.api');
 class DatabaseAPI {
     constructor() {
@@ -71,7 +71,7 @@ class DatabaseAPI {
         try {
 
             if (req.method === 'GET') {
-                await ThemeAPI.send(req, res, `
+                await ContentRenderer.send(req, res, `
     <script src="/database/form/databaseform-manage.element.js"></script>
     <databaseform-manage></databaseform-manage>
 `);
@@ -115,7 +115,7 @@ class DatabaseAPI {
         try {
 
             if (req.method === 'GET') {
-                await ThemeAPI.send(req, res, {
+                await ContentRenderer.send(req, res, {
                             title: `Connect to Database`,
                             content: `
     <script src="/database/form/databaseform-connect.element.js"></script>
@@ -145,7 +145,7 @@ class DatabaseAPI {
         if(error.redirect) {
             res.redirect(error.redirect);
         } else if(req.method === 'GET' && !json) {
-            await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
+            await ContentRenderer.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
             res.json(Object.assign({}, {
                 message: error.message,

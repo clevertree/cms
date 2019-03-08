@@ -2,7 +2,7 @@ const { DatabaseManager } = require('../database/database.manager');
 const { HTTPServer } = require('../http/http.server');
 const { TaskAPI } = require('../task/task.api');
 const { SessionAPI } = require('../user/session/session.api');
-const { ThemeAPI } = require('../theme/theme.api');
+const { ContentRenderer } = require('../content/content.renderer');
 const { MailServer } = require('../mail/mail.server');
 
 class ConfigManager {
@@ -48,7 +48,7 @@ class ConfigManager {
             await SessionAPI.configure(promptCallback);
             await HTTPServer.configure(promptCallback);
             await TaskAPI.configure(promptCallback);
-            await ThemeAPI.configure(promptCallback);
+            // await ThemeAPI.configure(promptCallback);
             await MailServer.configure(promptCallback);
         } catch (e) {
             console.error("Configuration failed: ", e);

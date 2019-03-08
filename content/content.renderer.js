@@ -42,10 +42,10 @@ class ContentRenderer {
         if(firstTag !== 'html') {
 
             if (!content.header && contentTable)
-                content.header = await contentTable.fetchContentDataByPath('/theme/header');
+                content.header = await contentTable.fetchContentDataByPath('/site/header', 'UTF8');
 
             if (!content.footer && contentTable)
-                content.footer = await contentTable.fetchContentDataByPath('/theme/footer');
+                content.footer = await contentTable.fetchContentDataByPath('/site/footer', 'UTF8');
 
             if (firstTag !== 'body') {
                 if (firstTag !== 'article') {
@@ -54,20 +54,19 @@ class ContentRenderer {
 ${html}
         </article>`
                 }
-// TODO: detect theme from body?
                 html = `    
-    <body class='theme-default'>
+    <body class='themed'>
 ${content.header || ''}${html}${content.footer || ''}
     </body>`
 
             }
 
             if (!content.head && contentTable)
-                content.head = await contentTable.fetchContentByPath('/theme/head');
+                content.head = await contentTable.fetchContentDataByPath('/site/head', 'UTF8');
 
             html = `<!DOCTYPE html>
 <html>
-${content.head || `<head/>`}
+${content.head || ''}
 ${html}
 </html>`;
         }
@@ -82,20 +81,21 @@ ${html}
 //         ${content && content.id ? `<meta name="contentID" content="${content.id}">` : ''}
 //
 //         <link href=":theme/default/:client/default.theme.css" rel="stylesheet" />
-//         <script src=":theme/default/:client/element/theme-default-nav-menu.element.js"></script>
+//         <script src=":content/:client/content-nav.element.js"></script>
 //         ${content.head}
 //     </head>
 // `
 //         let DOM = new JSDOM(html);
         let DOM = cheerio.load(html);
         const head = DOM('head');
-        let headElm = head.find('title');
-        if(content.title && headElm.length === 0)
-            head.append(`<title>${content.title}</title>`);
 
-        headElm = head.find('base');
+        let headElm = head.find('base');
         if(content.baseURL && headElm.length === 0)
-            head.append(`<base href="${content.baseURL}" />`);
+            head.prepend(`<base href="${content.baseURL}" />`);
+
+        headElm = head.find('title');
+        if(content.title && headElm.length === 0)
+            head.prepend(`<title>${content.title}</title>`);
 
         headElm = head.find('meta[name=keywords]');
         if(content.keywords && headElm.length === 0)

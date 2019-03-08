@@ -17,7 +17,7 @@ const { SessionAPI } = require('./session/session.api');
 const { HTTPServer } = require('../http/http.server');
 
 // const { DNSManager } = require('../service/domain/dns.manager');
-const { ThemeAPI } = require('../theme/theme.api');
+const { ContentRenderer } = require('../content/content.renderer');
 const { TaskAPI } = require('../task/task.api');
 const { ResetPasswordMail } = require("./mail/resetpassword.mail");
 
@@ -285,7 +285,7 @@ class UserAPI {
             if(req.method === 'GET') {
                 const userID = UserAPI.sanitizeInput(req.query.userID || null, 'email');
                 // Render Editor Form
-                await ThemeAPI.send(req, res, {
+                await ContentRenderer.send(req, res, {
                     title: `Log in`,
                     data: `
 <script src="/:user/:client/user-login.element.js"></script>
@@ -311,7 +311,7 @@ class UserAPI {
         try {
             if(req.method === 'GET') {
                 // Render Editor Form
-                await ThemeAPI.send(req, res, {
+                await ContentRenderer.send(req, res, {
                     title: `Log Out`,
                     data: `
 <script src="/:user/:client/user-logout.element.js"></script>
@@ -337,7 +337,7 @@ class UserAPI {
             await DatabaseManager.selectDatabaseByRequest(req);
             if(req.method === 'GET') {
                 // Render Editor Form
-                await ThemeAPI.send(req, res, {
+                await ContentRenderer.send(req, res, {
                     title: `Register`,
                     data: `
 <script src="/:user/:client/user-register.element.js"></script>
@@ -386,7 +386,7 @@ class UserAPI {
             switch(req.method) {
                 case 'GET':
                 // Render Editor Form
-                    await ThemeAPI.send(req, res, {
+                    await ContentRenderer.send(req, res, {
                         title: `Forgot Password`,
                         data: `
 <script src="/:user/:client/user-forgotpassword.element.js"></script>
@@ -439,7 +439,7 @@ class UserAPI {
             switch(req.method) {
                 case 'GET':
                     // Render Editor Form
-                    await ThemeAPI.send(req, res, {
+                    await ContentRenderer.send(req, res, {
                         title: `Reset Password`,
                         data: `
 <script src="/:user/:client/user-resetpassword.element.js"></script>
@@ -491,7 +491,7 @@ class UserAPI {
             switch(req.method) {
                 case 'GET':
                     if(type === 'edit') {
-                        await ThemeAPI.send(req, res, {
+                        await ContentRenderer.send(req, res, {
                             title: `Update Profile`,
                             data: `
 <script src="/:user/:client/user-updateprofile.element.js"></script>
@@ -501,7 +501,7 @@ class UserAPI {
 <script src="/:user/:client/user-updateflags.element.js"></script>
 <user-updateflagsform src="${user.url}"></user-updateflagsform>`});
                     } else {
-                        await ThemeAPI.send(req, res, {
+                        await ContentRenderer.send(req, res, {
                             title: `Profile: ${user.username}`,
                             data: `
 <script src="/:user/:client/user-${type}.element.js"></script>
@@ -589,7 +589,7 @@ class UserAPI {
 
             switch(req.method) {
                 case 'GET':
-                    await ThemeAPI.send(req, res, {
+                    await ContentRenderer.send(req, res, {
                         title: `Browse Users`,
                         data: `
         <script src="/:user/:client/user-browser.element.js"></script>
@@ -656,7 +656,7 @@ class UserAPI {
         if(error.redirect) {
             res.redirect(error.redirect);
         } else if(req.method === 'GET' && !json) {
-            await ThemeAPI.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
+            await ContentRenderer.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
         } else {
             res.json(Object.assign({}, {
                 message: error.message,
