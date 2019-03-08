@@ -38,24 +38,31 @@ class ContentTable {
         }
 
         if(!await this.fetchContentByPath("/site/head")) {
-            contentHTML = await fsPromises.readFile(path.resolve(__dirname + '/default/head'));
+            contentHTML = await fsPromises.readFile(path.resolve(__dirname + '/client/default/head'));
             contentHTML = contentHTML.toString('UTF8').replace('${hostname}', hostname);
             insertID = await this.insertContent('Site Head', contentHTML, "/site/head");
             console.info("Site Head Created: ", insertID);
         }
 
         if(!await this.fetchContentByPath("/site/header")) {
-            contentHTML = await fsPromises.readFile(path.resolve(__dirname + '/default/header'));
+            contentHTML = await fsPromises.readFile(path.resolve(__dirname + '/client/default/header'));
             contentHTML = contentHTML.toString('UTF8').replace('${hostname}', hostname);
             insertID = await this.insertContent('Site Header', contentHTML, "/site/header");
             console.info("Site Header Created: ", insertID);
         }
         if(!await this.fetchContentByPath("/site/footer")) {
-            contentHTML = await fsPromises.readFile(path.resolve(__dirname + '/default/footer'));
+            contentHTML = await fsPromises.readFile(path.resolve(__dirname + '/client/default/footer'));
             contentHTML = contentHTML.toString('UTF8').replace('${hostname}', hostname);
             insertID = await this.insertContent('Site Footer', contentHTML, "/site/footer");
             console.info("Site Footer Created: ", insertID);
 
+        }
+
+        if(!await this.fetchContentByPath("/site/theme.css")) {
+            contentHTML = await fsPromises.readFile(path.resolve(__dirname + '/client/default/footer'));
+            contentHTML = contentHTML.toString('UTF8');
+            insertID = await this.insertContent('Site Footer', contentHTML, "/site/theme.css");
+            console.info("Site Theme CSS Created: ", insertID);
         }
 
     }
