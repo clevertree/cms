@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserUpdateProfileFormElement extends HTMLElement{
+    class HTMLUserUpdateProfileElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="${this.state.src}/:profile" method="POST" class="user user-updateprofileform themed">
+                <form action="${this.state.src}/:profile" method="POST" class="user user-updateprofile themed">
                    <fieldset>
                         <legend>Update Profile</legend>
                         <table class="user">
@@ -168,6 +168,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-updateprofileform', HTMLUserUpdateProfileFormElement);
+    customElements.define('user-updateprofile', HTMLUserUpdateProfileElement);
 
 }

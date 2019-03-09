@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserUpdatePasswordFormElement extends HTMLElement{
+    class HTMLUserUpdatepasswordElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
         render() {
             this.innerHTML =
                 `
-               <form action="${this.state.src}/:password" method="POST" class="user user-updatepasswordform themed">
+               <form action="${this.state.src}/:password" method="POST" class="user user-updatepassword themed">
                     <fieldset>
                         <legend>Change Password</legend>
                         <table class="user">
@@ -165,6 +165,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-updatepasswordform', HTMLUserUpdatePasswordFormElement);
+    customElements.define('user-updatepassword', HTMLUserUpdatepasswordElement);
 
 }

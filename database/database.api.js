@@ -71,10 +71,10 @@ class DatabaseAPI {
         try {
 
             if (req.method === 'GET') {
-                await ContentRenderer.send(req, res, `
-    <script src="/database/form/databaseform-manage.element.js"></script>
-    <databaseform-manage></databaseform-manage>
-`);
+                await ContentRenderer.send(req, res, {
+                    title: `Manage Database`,
+                    data: `<databaseform-manage></databaseform-manage>`
+                });
             } else {
                 // Handle POST
                 const database = await DatabaseManager.selectDatabaseByRequest(req);
@@ -116,12 +116,9 @@ class DatabaseAPI {
 
             if (req.method === 'GET') {
                 await ContentRenderer.send(req, res, {
-                            title: `Connect to Database`,
-                            content: `
-    <script src="/database/form/databaseform-connect.element.js"></script>
-    <databaseform-connect></databaseform-connect>
-`
-                        });
+                    title: `Connect to Database`,
+                    content: `<databaseform-connect></databaseform-connect>`
+                });
 
             } else {
                 // Handle POST

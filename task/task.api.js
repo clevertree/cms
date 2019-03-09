@@ -72,10 +72,8 @@ class TaskAPI {
                 case 'GET':
                     await ContentRenderer.send(req, res, {
                         title: `Task Manager`,
-                        data: `
-        <script src="/:task/:client/task-manager.element.js"></script>
-        <task-manager ${taskName ? `taskName="${taskName}"` : ''}></task-manager>
-`});
+                        data: `<task-manager ${taskName ? `taskName="${taskName}"` : ''}></task-manager>`
+                    });
                     break;
 
                 default:

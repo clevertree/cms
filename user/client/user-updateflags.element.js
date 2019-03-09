@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserUpdateFlagsFormElement extends HTMLElement{
+    class HTMLUserUpdateflagsElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const userFlags = this.state.user.flags || [];
             this.innerHTML =
                 `
-                <form action="${this.state.src}/:flags" method="POST" class="user user-updateflagsform themed">
+                <form action="${this.state.src}/:flags" method="POST" class="user user-updateflags themed">
                     <fieldset>
                         <legend>Update User Flags</legend>
                         <table class="user">
@@ -166,5 +166,5 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-updateflagsform', HTMLUserUpdateFlagsFormElement);
+    customElements.define('user-updateflags', HTMLUserUpdateflagsElement);
 }

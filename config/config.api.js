@@ -87,10 +87,8 @@ class ConfigAPI {
                 case 'GET':
                     await ContentRenderer.send(req, res,{
                         title: `Edit Site Config`,
-                        data: `
-    <script src="/:config/:client/config-editor.element.js"></script>
-    <config-editor></config-editor>
-`});
+                        data: `<config-editor></config-editor>`
+                    });
                     break;
 
                 default:

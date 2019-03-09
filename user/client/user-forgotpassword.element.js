@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserForgotPasswordFormElement extends HTMLElement{
+    class HTMLUserForgotpasswordElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/:forgotpassword" method="POST" class="user user-forgotpasswordform themed">
+                <form action="/:user/:forgotpassword" method="POST" class="user user-forgotpassword themed">
                     <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
                         <legend>Forgot Password</legend>
                         <table class="user">
@@ -121,6 +121,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-forgotpasswordform', HTMLUserForgotPasswordFormElement);
+    customElements.define('user-forgotpassword', HTMLUserForgotpasswordElement);
 
 }

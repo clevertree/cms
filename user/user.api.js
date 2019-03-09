@@ -287,9 +287,8 @@ class UserAPI {
                 // Render Editor Form
                 await ContentRenderer.send(req, res, {
                     title: `Log in`,
-                    data: `
-<script src="/:user/:client/user-login.element.js"></script>
-<user-loginform${userID ? ` userID='${userID}'` : ''}></user-loginform>`});
+                    data: `<user-login${userID ? ` userID='${userID}'` : ''}></user-login>`
+                });
 
             } else {
                 // Handle Form (POST) Request
@@ -313,9 +312,8 @@ class UserAPI {
                 // Render Editor Form
                 await ContentRenderer.send(req, res, {
                     title: `Log Out`,
-                    data: `
-<script src="/:user/:client/user-logout.element.js"></script>
-<user-logoutform></user-logoutform>`});
+                    data: `<user-logout></user-logout>`
+                });
 
             } else {
                 // Handle Form (POST) Request
@@ -339,9 +337,8 @@ class UserAPI {
                 // Render Editor Form
                 await ContentRenderer.send(req, res, {
                     title: `Register`,
-                    data: `
-<script src="/:user/:client/user-register.element.js"></script>
-<user-registerform></user-registerform>`});
+                    data: `<user-register></user-register>`
+                });
 
             } else {
                 // Handle Form (POST) Request
@@ -388,9 +385,8 @@ class UserAPI {
                 // Render Editor Form
                     await ContentRenderer.send(req, res, {
                         title: `Forgot Password`,
-                        data: `
-<script src="/:user/:client/user-forgotpassword.element.js"></script>
-<user-forgotpasswordform userID="${userID}"></user-forgotpasswordform>`});
+                        data: `<user-forgotpassword userID="${userID}"></user-forgotpassword>`
+                    });
                     break;
 
                 default:
@@ -441,9 +437,8 @@ class UserAPI {
                     // Render Editor Form
                     await ContentRenderer.send(req, res, {
                         title: `Reset Password`,
-                        data: `
-<script src="/:user/:client/user-resetpassword.element.js"></script>
-<user-resetpasswordform uuid="${uuid}" src="${user.url}"></user-resetpasswordform>`});
+                        data: `<user-resetpassword uuid="${uuid}" src="${user.url}"></user-resetpassword>`
+                    });
                     break;
 
                 default:
@@ -494,18 +489,16 @@ class UserAPI {
                         await ContentRenderer.send(req, res, {
                             title: `Update Profile`,
                             data: `
-<script src="/:user/:client/user-updateprofile.element.js"></script>
-<user-updateprofileform src="${user.url}"></user-updateprofileform>
-<script src="/:user/:client/user-updatepassword.element.js"></script>
-<user-updatepasswordform src="${user.url}"></user-updatepasswordform>
-<script src="/:user/:client/user-updateflags.element.js"></script>
-<user-updateflagsform src="${user.url}"></user-updateflagsform>`});
+<user-updateprofile src="${user.url}"></user-updateprofile>
+<user-updatepassword src="${user.url}"></user-updatepassword>
+<user-updateflags src="${user.url}"></user-updateflags>
+`
+                        });
                     } else {
                         await ContentRenderer.send(req, res, {
                             title: `Profile: ${user.username}`,
-                            data: `
-<script src="/:user/:client/user-${type}.element.js"></script>
-<user-${type}form src="${user.url}"></user-${type}form>`});
+                            data: `<user-${type}form src="${user.url}"></user-${type}form>`
+                        });
                     }
                     break;
 
@@ -591,12 +584,7 @@ class UserAPI {
                 case 'GET':
                     await ContentRenderer.send(req, res, {
                         title: `Browse Users`,
-                        data: `
-        <script src="/:user/:client/user-browser.element.js"></script>
-        <user-browser></user-browser>
-    `});
-                // <script src="/:user/:client/user-add.element.js"></script>
-                // <user-addform></user-addform>
+                        data: `<user-browser></user-browser>`});
                     break;
 
                 case 'POST':

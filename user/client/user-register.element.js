@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserRegisterFormElement extends HTMLElement {
+    class HTMLUserRegisterElement extends HTMLElement {
         constructor() {
             super();
             this.state = {
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const hostname = document.location.host.split(':')[0];
             this.innerHTML =
                 `
-                <form action="/:user/:register" method="POST" class="user user-registerform themed">
+                <form action="/:user/:register" method="POST" class="user user-register themed">
                     <fieldset>
                         <legend>Register a new account</legend>
                         <table class="user">
@@ -151,6 +151,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-registerform', HTMLUserRegisterFormElement);
+    customElements.define('user-register', HTMLUserRegisterElement);
 
 }

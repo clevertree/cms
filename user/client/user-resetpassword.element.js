@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserResetPasswordFormElement extends HTMLElement{
+    class HTMLUserResetpasswordElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             this.innerHTML =
                 `
-                <form action="${this.state.src}/:resetpassword/${this.state.uuid}" method="POST" class="user user-resetpasswordform themed">
+                <form action="${this.state.src}/:resetpassword/${this.state.uuid}" method="POST" class="user user-resetpassword themed">
                     <fieldset>
                         <legend>Reset Password</legend>
                         <table class="user">
@@ -155,6 +155,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-resetpasswordform', HTMLUserResetPasswordFormElement);
+    customElements.define('user-resetpassword', HTMLUserResetpasswordElement);
 
 }

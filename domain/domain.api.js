@@ -71,10 +71,10 @@ class DomainAPI {
         try {
 
             if (req.method === 'GET') {
-                await ContentRenderer.send(req, res, `
-    <script src="/domain/form/domainform-editor.element.js"></script>
-    <domainform-editor></domainform-editor>
-`);
+                await ContentRenderer.send(req, res, {
+                    title: `Manage Domain`,
+                    data: `<domainform-editor></domainform-editor>`
+            });
             } else {
                 // Handle POST
                 const database = await DatabaseManager.selectDatabaseByRequest(req);

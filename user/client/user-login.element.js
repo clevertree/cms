@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/:login" method="POST" class="user user-loginform themed">
+                <form action="/:user/:login" method="POST" class="user user-login themed">
                     <fieldset>
                         <legend>Log In</legend>
                         <table class="user">
@@ -138,5 +138,5 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-loginform', HTMLUserLoginFormElement);
+    customElements.define('user-login', HTMLUserLoginFormElement);
 }

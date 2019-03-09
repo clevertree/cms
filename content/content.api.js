@@ -180,8 +180,7 @@ class ContentApi {
                     await ContentRenderer.send(req, res, {
                         title: `Edit Content #${content.id}`,
                         data: `
-                <script src="/:content/:client/content-editor.element.js"></script>
-                <content-editor id="${req.params.id}"></content-editor>
+            <content-editor id="${req.params.id}"></content-editor>
             
             <section class="content-preview-container">
                 <h1 style="text-align: center;">Preview</h1>
@@ -302,10 +301,7 @@ class ContentApi {
                     // Render Editor
                 await ContentRenderer.send(req, res, {
                     title: `Delete Content #${content.id}`,
-                    data: `
-    <script src="/:content/:client/content-delete.element.js"></script>
-    <content-delete id="${req.params.id}"></content-editor>
-`
+                    data: `<content-delete id="${req.params.id}"></content-editor>`
                 });
                     break;
 
@@ -378,12 +374,10 @@ class ContentApi {
                         {
                             title: `Add New Content`,
                             data: `
-    <script src="/:content/:client/content-add.element.js"></script>
     <content-addform></content-addform>
-    <script src="/:content/:client/content-upload.element.js"></script>
     <content-uploadform></content-uploadform>
-
-`});
+`
+                        });
 
                 default:
                 case 'OPTIONS':
@@ -488,12 +482,9 @@ class ContentApi {
                 case 'GET':
                     // Render Editor
                     await ContentRenderer.send(req, res, {
-                            title: `Upload Content`,
-                            data: `
-        <script src="/:content/:client/content-upload.element.js"></script>
-        <content-uploadform></content-uploadform>
-    
-    `})
+                        title: `Upload Content`,
+                        data: `<content-uploadform></content-uploadform>`
+                    })
                     break;
 
                 default:
@@ -585,16 +576,11 @@ class ContentApi {
                 await ContentRenderer.send(req, res, {
                     title: `Site Index`,
                     data: `
-
-    <script src="/:content/:client/content-browser.element.js"></script>
     <content-browser></content-browser>
-    <script src="/:content/:client/content-add.element.js"></script>
     <content-addform></content-addform>
-    <script src="/:content/:client/content-upload.element.js"></script>
     <content-uploadform></content-uploadform>
-
-
-`});
+`
+                });
 
             } else {
                 return await this.renderContentListJSON(req, res);

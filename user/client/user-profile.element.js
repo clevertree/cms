@@ -108,6 +108,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-profileform', HTMLUserProfileElement);
+    customElements.define('user-profile', HTMLUserProfileElement);
 
 }

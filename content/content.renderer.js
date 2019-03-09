@@ -39,13 +39,24 @@ class ContentRenderer {
         if(firstTag !== 'html') {
             if (firstTag !== 'body') {
                 const templateHTML = await contentTable.fetchContentDataByPath('/site/template.html', 'UTF8');
-                html = templateHTML.replace(/<%-html%>/g, html);
+                html = templateHTML.replace(/<%-data%>/g, html);
             }
         }
         html = html.replace(/<%-title%>/g, content.title);
         html = html.replace(/<%-path%>/g, content.path);
 
         let DOM = cheerio.load(html);
+
+        // TODO: optimize find custom elements
+        const customElms = [];
+        DOM('*').each((i, elm) => {
+            if(elm.name.indexOf('-') === -1)
+                return;
+            customElms.push(elm.name);
+        });
+
+
+        // TODO: optimize DOM manipulation
         const head = DOM('head');
 
         let headElm = head.find('base');
@@ -68,6 +79,11 @@ class ContentRenderer {
         if(content && content.id && headElm.length === 0 )
             head.append(`<meta name="content:id" content="${content.id}">`);
 
+        for(let i=0; i<customElms.length; i++) {
+            const customElementSourceFile = this.getCustomElementSourceFile(customElms[i]);
+            head.append(`<script src="${customElementSourceFile}" ></script>`);
+        }
+
         html = DOM.html(); // .window.document.documentElement.outerHTML;
         html = beautify_html(html, {
             "preserve-newlines": false
@@ -78,6 +94,14 @@ class ContentRenderer {
         // prependHTML += await TaskAPI.getSessionHTML(req);
     }
 
+    getCustomElementSourceFile(customName) {
+        if(typeof CUSTOM_ELEMENT_SOURCE[customName] !== "undefined")
+            return CUSTOM_ELEMENT_SOURCE[customName];
+        const prefix = customName.split('-')[0];
+        return `/:${prefix}/:client/${customName}.element.js`;
+
+    }
+
     async send(req, res, content) {
         return res.send(
             await this.render(req, content)
@@ -86,3 +110,32 @@ class ContentRenderer {
 
 }
 module.exports = {ContentRenderer: new ContentRenderer()};
+
+const CUSTOM_ELEMENT_SOURCE = {
+    // 'config-editor':        '/:config/:client/config-editor.element.js',
+    //
+    // 'content-add':          '/:content/:client/content-add.element.js',
+    // 'content-browser':      '/:content/:client/content-browser.element.js',
+    // 'content-delete':       '/:content/:client/content-delete.element.js',
+    // 'content-editor':       '/:content/:client/content-editor.element.js',
+    // 'content-nav':          '/:content/:client/content-nav.element.js',
+    // 'content-upload':       '/:content/:client/content-upload.element.js',
+    //
+    // // 'editor': 'databaseform-connect.client.js',
+    // // 'editor': 'databaseform-manage.client.js',
+    //
+    // 'slideshow-player':     '/:content/:client/slideshow-player.element.js',
+    //
+    // 'task-manager':         '/:task/:client/task-manager.element.js',
+    //
+    // 'user-browser':         '/:user/:client/user-browser.element.js',
+    // 'user-forgotpassword':  '/:user/:client/user-forgotpassword.element.js',
+    // 'user-login':           '/:user/:client/user-login.element.js',
+    // 'user-logout':          '/:user/:client/user-logout.element.js',
+    // 'user-profile':         '/:user/:client/user-profile.element.js',
+    // 'user-register':        '/:user/:client/user-register.element.js',
+    // 'user-resetpassword':   '/:user/:client/user-resetpassword.element.js',
+    // 'user-updateflags':     '/:user/:client/user-updateflags.element.js',
+    // 'user-updatepassword':  '/:user/:client/user-updatepassword.element.js',
+    // 'user-updateprofile':   '/:user/:client/user-updateprofile.element.js',
+};

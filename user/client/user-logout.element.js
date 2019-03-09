@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserLogoutFormElement extends HTMLElement{
+    class HTMLUserLogoutElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/:logout" method="POST" class="user user-logoutform themed">
+                <form action="/:user/:logout" method="POST" class="user user-logout themed">
                     <fieldset>
                         <legend>Log Out</legend>
                             <table class="user">
@@ -112,6 +112,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-logoutform', HTMLUserLogoutFormElement);
+    customElements.define('user-logout', HTMLUserLogoutElement);
 
 }
