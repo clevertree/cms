@@ -1,5 +1,0 @@
-<header>
-    <a href="/" class="title themed">${hostname}</a>
-    <div class="logo"></div>
-    <content-nav paths="/;/article;/upload;/about;/contact;"></content-nav>
-</header>

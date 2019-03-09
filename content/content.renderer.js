@@ -21,9 +21,6 @@ class ContentRenderer {
             data: null,
             baseURL: '/',
             keywords: null,
-            head: null,
-            header: null,
-            footer: null,
             // htmlMenu: null,
             // htmlSession: await this.UserAPI.getSessionHTML(req),
         }, content);
@@ -40,52 +37,14 @@ class ContentRenderer {
 
         const firstTag = html.match(/<(\w+)/)[1].toLowerCase();
         if(firstTag !== 'html') {
-
-            if (!content.header && contentTable)
-                content.header = await contentTable.fetchContentDataByPath('/site/header', 'UTF8');
-
-            if (!content.footer && contentTable)
-                content.footer = await contentTable.fetchContentDataByPath('/site/footer', 'UTF8');
-
             if (firstTag !== 'body') {
-                if (firstTag !== 'article') {
-                    html =
-`<article>
-${html}
-</article>`
-                }
-                html =
-`<body class='themed'>
-${content.header || ''}${html}${content.footer || ''}
-</body>`
-
+                const templateHTML = await contentTable.fetchContentDataByPath('/site/template.html', 'UTF8');
+                html = templateHTML.replace(/<%-html%>/g, html);
             }
-
-            if (!content.head && contentTable)
-                content.head = await contentTable.fetchContentDataByPath('/site/head', 'UTF8');
-
-            html = `<!DOCTYPE html>
-<html>
-${content.head || ''}
-${html}
-</html>`;
         }
+        html = html.replace(/<%-title%>/g, content.title);
+        html = html.replace(/<%-path%>/g, content.path);
 
-//         `    <head>
-//         <base href="${content.baseUrl}">
-//         <title>${content.title}</title>
-//         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-//         <meta name="keywords" CONTENT="${content.keywords}">
-//         <meta name="viewport" content="width=device-width, initial-scale=1">
-//         ${req.session && req.session.userID ? `<meta name="userID" content="${req.session.userID}">` : ''}
-//         ${content && content.id ? `<meta name="contentID" content="${content.id}">` : ''}
-//
-//         <link href=":theme/default/:client/default.theme.css" rel="stylesheet" />
-//         <script src=":content/:client/content-nav.element.js"></script>
-//         ${content.head}
-//     </head>
-// `
-//         let DOM = new JSDOM(html);
         let DOM = cheerio.load(html);
         const head = DOM('head');
 
@@ -101,13 +60,13 @@ ${html}
         if(content.keywords && headElm.length === 0)
             head.append(`<meta name="keywords" CONTENT="${content.keywords}">`);
 
-        headElm = head.find('meta[name=userID]');
+        headElm = head.find('meta[name="session:userID"]');
         if(req.session && req.session.userID && headElm.length === 0)
-            head.append(`<meta name="userID" content="${req.session.userID}">`);
+            head.append(`<meta name="session:userID" content="${req.session.userID}">`);
 
-        headElm = head.find('meta[name=contentID]');
+        headElm = head.find('meta[name="content:id"]');
         if(content && content.id && headElm.length === 0 )
-            head.append(`<meta name="contentID" content="${content.id}">`);
+            head.append(`<meta name="content:id" content="${content.id}">`);
 
         html = DOM.html(); // .window.document.documentElement.outerHTML;
         html = beautify_html(html, {

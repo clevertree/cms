@@ -28,12 +28,15 @@ class MailServer {
             await localConfig.promptValue('mail.port', `Please enter the Mail Server Port`, mailConfig.port || 587, 'number');
             await localConfig.promptValue('mail.auth.user', `Please enter the Mail Server Username`, mailConfig.auth.user || 'mail@' + mailConfig.host.replace(/mail\./, ''), 'email');
             await localConfig.promptValue('mail.auth.pass', `Please enter the Mail Server Password`, mailConfig.auth.pass || '', 'password');
+            let testMail = await promptCallback(`Would you like to test the Mail Settings [y or n]?`, false, 'boolean');
 
             try {
                 console.info(`Connecting to Mail Server '${mailConfig.host}'...`);
                 const server = nodemailer.createTransport(smtpTransport(mailConfig));
-                await server.verify();
-                console.info(`Connection to Mail Server '${mailConfig.host}' verified`);
+                if(testMail) {
+                    await server.verify();
+                    console.info(`Connection to Mail Server '${mailConfig.host}' verified`);
+                }
                 if(promptCallback)
                     await localConfig.saveAll();
                 this.config = mailConfig;
