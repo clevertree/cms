@@ -1,7 +1,10 @@
 <head>
+    <!--<link href=":content/:client/default/theme.css" rel="stylesheet" />-->
     <link href="/site/theme.css" rel="stylesheet" />
     <script src="/site/theme.js"></script>
+    <script src="/:content/:client/content-nav.element.js"></script>
 
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta charset="UTF-8">
+    <meta content="Welcome to ${hostname}." name="description">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>

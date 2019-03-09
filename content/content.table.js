@@ -1,5 +1,5 @@
 const path = require('path');
-const fsPromises = require('fs').promises;
+const fs = require('fs');
 
 // Init
 class ContentTable {
@@ -37,31 +37,42 @@ class ContentTable {
             console.info("Home Page Created: ", insertID);
         }
 
+
+
         if(!await this.fetchContentByPath("/site/head")) {
-            contentHTML = await fsPromises.readFile(path.resolve(__dirname + '/client/default/head'));
-            contentHTML = contentHTML.toString('UTF8').replace('${hostname}', hostname);
+            contentHTML = await this.readFileAsync(path.resolve(__dirname + '/client/default/head'), 'UTF8');
+            contentHTML = contentHTML.replace(/\${hostname}/g, hostname);
             insertID = await this.insertContent('Site Head', contentHTML, "/site/head");
             console.info("Site Head Created: ", insertID);
         }
 
         if(!await this.fetchContentByPath("/site/header")) {
-            contentHTML = await fsPromises.readFile(path.resolve(__dirname + '/client/default/header'));
-            contentHTML = contentHTML.toString('UTF8').replace('${hostname}', hostname);
+            contentHTML = await this.readFileAsync(path.resolve(__dirname + '/client/default/header'), 'UTF8');
+            contentHTML = contentHTML.replace(/\${hostname}/g, hostname);
             insertID = await this.insertContent('Site Header', contentHTML, "/site/header");
             console.info("Site Header Created: ", insertID);
         }
         if(!await this.fetchContentByPath("/site/footer")) {
-            contentHTML = await fsPromises.readFile(path.resolve(__dirname + '/client/default/footer'));
-            contentHTML = contentHTML.toString('UTF8').replace('${hostname}', hostname);
+            contentHTML = await this.readFileAsync(path.resolve(__dirname + '/client/default/footer'), 'UTF8');
+            contentHTML = contentHTML.replace(/\${hostname}/g, hostname);
             insertID = await this.insertContent('Site Footer', contentHTML, "/site/footer");
             console.info("Site Footer Created: ", insertID);
 
         }
 
         if(!await this.fetchContentByPath("/site/theme.css")) {
-            contentHTML = await fsPromises.readFile(path.resolve(__dirname + '/client/default/footer'));
-            contentHTML = contentHTML.toString('UTF8');
-            insertID = await this.insertContent('Site Footer', contentHTML, "/site/theme.css");
+            contentHTML = await this.readFileAsync(path.resolve(__dirname + '/client/default/theme.css'), 'UTF8');
+            insertID = await this.insertContent('Site CSS', contentHTML, "/site/theme.css");
+            console.info("Site Theme CSS Created: ", insertID);
+        }
+        if(!await this.fetchContentByPath("/site/theme.js")) {
+            contentHTML = await this.readFileAsync(path.resolve(__dirname + '/client/default/theme.js'), 'UTF8');
+            insertID = await this.insertContent('Site Javascript', contentHTML, "/site/theme.js");
+            console.info("Site Theme CSS Created: ", insertID);
+        }
+        if(!await this.fetchContentByPath("/site/logo.png")) {
+            contentHTML = await this.readFileAsync(path.resolve(__dirname + '/client/default/logo.png'), null);
+            insertID = await this.insertContent('Site Logo', contentHTML, "/site/logo.png");
             console.info("Site Theme CSS Created: ", insertID);
         }
 
@@ -223,6 +234,16 @@ class ContentTable {
         return mainMenu;
     }
 
+    /** File Utilities **/
+    readFileAsync (path, opts = 'utf8') {
+        return new Promise((resolve, reject) => {
+            fs.readFile(path, opts, (err, data) => {
+                err ? reject(err) : resolve(data);
+            })
+        })
+    }
+
+    
     /** Table Schema **/
 
     getTableSQL() {

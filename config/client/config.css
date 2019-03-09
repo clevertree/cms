@@ -7,6 +7,56 @@ table.config a{
 
 /** Forms **/
 
+form.config > fieldset {
+    padding: 1em 1em;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    background: #CCC;
+}
+form.config > fieldset > legend {
+    /* margin: 0 auto; */
+    padding: 2px 8px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    border-bottom: 1px outset #FFF;
+    background: #CCC;
+}
+
+
+form.config input,
+form.config select,
+form.config textarea,
+form.config button {
+    padding: 2px 3px 2px 3px;
+    margin: 0px 2px 0px 0px;
+    border-radius: 4px;
+    border-width: 1px;
+    font-size: large;
+}
+form.config textarea {
+    min-height: 300px;
+}
+form.config input[type=checkbox] {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin: 0 0px 4px 0px;
+}
+
+form.config input[type=submit],
+form.config button[type=submit] {
+    padding: 0.5em 1em;
+    font-weight: bold;
+    font-size: medium;
+    cursor: pointer;
+}
+form.config input:disabled,
+form.config button:disabled {
+    cursor: not-allowed;
+}
+
+
 form.config {
     max-width: 1200px;
     margin: auto;
@@ -33,11 +83,9 @@ form.config input[type=email],
 form.config input[type=password],
 form.config select,
 form.config textarea {
-    min-width: 100%;
+    min-width: 90%;
 }
-form.config textarea {
-    min-height: 120px;
-}
+
 
 /** Custom Forms **/
 
@@ -45,42 +93,47 @@ form.config-registerform {
     /*text-align: center;*/
 }
 
-
-/** Tables **/
-
+/** Table **/
 table.config {
     width: 100%;
+    margin: 0 auto;
+    padding: 0.5em;
+    border-radius: 8px;
+    /*border: 1px outset #DDD;*/
+    background: #CCC;
 }
+
+table.config > caption {
+    padding: 2px 8px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    background: #CCC;
+}
+
+/** Table Row **/
+table.config > tbody > tr.odd {
+    background-color: #0001;
+}
+
 
 table.config .icon-edit {
     text-decoration: none;
 }
 
 /** Row **/
-table.config tr {
-}
-
 table.config tr.odd {
     background-color: #0001;
 }
 
-/** Column **/
-table.config td {
-}
-
 /** Labels **/
-
-table.config label,
-table.config td.label {
-    text-align: center;
-    font-weight: bold;
-    white-space: nowrap;
-    display: block;
-}
 
 table.config td.label {
     text-align: right;
-    margin: 8px 8px 8px 0px;
+    padding: 8px 8px 8px 0px;
+    font-weight: bold;
+    white-space: nowrap;
+    display: block;
     min-width: 90%;
 }
 table.config td.label:after {

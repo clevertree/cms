@@ -7,6 +7,56 @@ table.user a{
 
 /** Forms **/
 
+form.user > fieldset {
+    padding: 1em 1em;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    background: #CCC;
+}
+form.user > fieldset > legend {
+    /* margin: 0 auto; */
+    padding: 2px 8px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    border-bottom: 1px outset #FFF;
+    background: #CCC;
+}
+
+
+form.user input,
+form.user select,
+form.user textarea,
+form.user button {
+    padding: 2px 3px 2px 3px;
+    margin: 0px 2px 0px 0px;
+    border-radius: 4px;
+    border-width: 1px;
+    font-size: large;
+}
+form.user textarea {
+    /* min-height: 100px; */
+}
+form.user input[type=checkbox] {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin: 0 0px 4px 0px;
+}
+
+form.user input[type=submit],
+form.user button[type=submit] {
+    padding: 0.5em 1em;
+    font-weight: bold;
+    font-size: medium;
+    cursor: pointer;
+}
+form.user input:disabled,
+form.user button:disabled {
+    cursor: not-allowed;
+}
+
+
 form.user {
     max-width: 520px;
     margin: auto;
@@ -43,8 +93,28 @@ form.user-registerform {
     /*text-align: center;*/
 }
 
+/** Table **/
+table.user {
+    margin: 0 auto;
+    padding: 0.5em;
+    border-radius: 8px;
+    /*border: 1px outset #DDD;*/
+    background: #CCC;
+}
 
-/** Tables **/
+table.user > caption {
+    padding: 2px 8px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    background: #CCC;
+}
+
+/** Table Row **/
+table.user > tbody > tr.odd {
+    background-color: #0001;
+}
+
 
 table.user .icon-edit {
     text-decoration: none;

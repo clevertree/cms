@@ -7,6 +7,56 @@ table.content a{
 
 /** Forms **/
 
+form.content > fieldset {
+    padding: 1em 1em;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    background: #CCC;
+}
+form.content > fieldset > legend {
+    /* margin: 0 auto; */
+    padding: 2px 8px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    border-bottom: 1px outset #FFF;
+    background: #CCC;
+}
+
+
+form.content input,
+form.content select,
+form.content textarea,
+form.content button {
+    padding: 2px 3px 2px 3px;
+    margin: 0px 2px 0px 0px;
+    border-radius: 4px;
+    border-width: 1px;
+    font-size: large;
+}
+form.content textarea {
+    min-height: 300px;
+}
+form.content input[type=checkbox] {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin: 0 0px 4px 0px;
+}
+
+form.content input[type=submit],
+form.content button[type=submit] {
+    padding: 0.5em 1em;
+    font-weight: bold;
+    font-size: medium;
+    cursor: pointer;
+}
+form.content input:disabled,
+form.content button:disabled {
+    cursor: not-allowed;
+}
+
+
 form.content {
     max-width: 1200px;
     margin: auto;
@@ -35,9 +85,7 @@ form.content select,
 form.content textarea {
     min-width: 90%;
 }
-form.content textarea {
-    min-height: 300px;
-}
+
 
 /** Custom Forms **/
 
@@ -45,12 +93,29 @@ form.content-registerform {
     /*text-align: center;*/
 }
 
-
-/** Tables **/
-
+/** Table **/
 table.content {
     width: 100%;
+    margin: 0 auto;
+    padding: 0.5em;
+    border-radius: 8px;
+    /*border: 1px outset #DDD;*/
+    background: #CCC;
 }
+
+table.content > caption {
+    padding: 2px 8px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    background: #CCC;
+}
+
+/** Table Row **/
+table.content > tbody > tr.odd {
+    background-color: #0001;
+}
+
 
 table.content .icon-edit {
     text-decoration: none;

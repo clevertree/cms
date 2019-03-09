@@ -1,15 +1,19 @@
 /** Background Image **/
 body.themed {
+    color: #2b2b2b;
+    font-family: 'Advent Pro', monospace;
+    font-size: 16px;
     background: #3d9be9;
+    margin: 0 auto;
     /*background: url(texture/default.background.png) no-repeat fixed center;*/
 }
 
-.themed {
-    color: #2b2b2b;
-    /*margin: 0 auto;*/
-    font-family: 'Advent Pro', monospace;
-    font-size: 16px;
-    /* line-height: 20px; */
+/** Hyperlinks **/
+.themed > a,
+a.themed {
+     color: rgb(255, 246, 212);
+     text-decoration: none;
+     text-shadow: #0008 4px 3px 9px;
 }
 
 /** Header **/
@@ -17,48 +21,38 @@ body.themed {
     background: linear-gradient(to bottom, #487bb3 0%, #88a9cc 1%,#487bb3 2%,#1b589b 98%,#022035 100%);
     /*background: url(texture/header.background.png);*/
     background-size: contain;
-    /* padding: 1em; */
-}
 
-.themed > header .logo-container {
-    max-width: 700px;
+    /* max-width: 700px; */
     margin: 0px auto;
-    padding-top: 10px;
+    padding: 0.5em;
+    /* padding-top: 10px; */
     text-align: center;
 }
 
-.themed > header .logo {
+.themed > header > .logo {
+    display: inline-block;
     background: url(logo.png) no-repeat center;
-    margin-left: 17px;
     background-size: 100% auto;
-    min-width: 200px;
-    min-height: 80px;
-    float: left;
-    /* box-shadow: #0008 1px 4px 19px; */
+    width: 180px;
+    height: 100px;
+    /* margin: 12px; */
+    margin: 0px auto;
+    box-shadow: #0008 1px 4px 19px;
 }
 
-.themed .logo-text {
-    text-decoration: none;
-    color: rgb(255, 246, 212);
-    text-shadow: #0008 4px 3px 9px;
+.themed > header > .title {
+    display: inline-block;
+    max-width: 400px;
+    margin: 0px 8px;
+    font-size: 2em;
+    font-weight: bold;
 }
 
-@media only screen and (max-width: 800px) {
-    .themed > header .logo-container {
-        max-width: 80vw;
-    }
-}
-@media only screen and (max-width: 500px) {
-    .themed > header .logo {
-        float: inherit;
-        margin: auto;
-    }
-}
 
 /** Footer **/
 .themed > footer {
     /* text-align: center; */
-    background: linear-gradient(to top, #3d9bea 0%, #6eb4ef 99%);
+    background: linear-gradient(to top, #3d9bea 0%, #6eb4ef 100%);
     /* background: url(texture/footer.background.png); */
     color: #fff6d4;
 }
@@ -129,78 +123,4 @@ body.themed {
 .themed div.error {
     color: #fee;
     background: #d25757;
-}
-
-
-/** Forms **/
-form.themed > fieldset {
-    padding: 1em 1em;
-    border-radius: 8px;
-    border: 1px outset #DDD;
-    background: #CCC;
-}
-form.themed > fieldset > legend {
-    /* margin: 0 auto; */
-    padding: 2px 8px;
-    font-weight: bold;
-    border-radius: 8px;
-    border: 1px outset #DDD;
-    border-bottom: 1px outset #FFF;
-    background: #CCC;
-}
-
-
-form.themed input,
-form.themed select,
-form.themed textarea,
-form.themed button {
-    padding: 2px 3px 2px 3px;
-    margin: 0px 2px 0px 0px;
-    border-radius: 4px;
-    border-width: 1px;
-    font-size: large;
-}
-form.themed textarea {
-    /* min-height: 100px; */
-}
-form.themed input[type=checkbox] {
-    width: 16px;
-    height: 16px;
-    vertical-align: middle;
-    margin: 0 0px 4px 0px;
-}
-
-form.themed input[type=submit],
-form.themed button[type=submit] {
-    padding: 0.5em 1em;
-    font-weight: bold;
-    font-size: medium;
-    cursor: pointer;
-}
-form.themed input:disabled,
-form.themed button:disabled {
-    cursor: not-allowed;
-}
-
-
-/** Table **/
-table.themed {
-    margin: 0 auto;
-    padding: 0.5em;
-    border-radius: 8px;
-    border: 1px outset #DDD;
-    background: #CCC;
-}
-
-table.themed > caption {
-    padding: 2px 8px;
-    font-weight: bold;
-    border-radius: 8px;
-    border: 1px outset #DDD;
-    background: #CCC;
-}
-
-/** Table Row **/
-table.themed > tbody > tr.odd {
-    background-color: #0001;
 }

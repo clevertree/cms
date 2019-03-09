@@ -1,5 +1,64 @@
+/** Anchors **/
+form.task a,
+table.task a{
+    text-decoration: none;
+    min-width: 300px;
+}
+
+/** Forms **/
+
+form.task > fieldset {
+    padding: 1em 1em;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    background: #CCC;
+}
+form.task > fieldset > legend {
+    /* margin: 0 auto; */
+    padding: 2px 8px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    border-bottom: 1px outset #FFF;
+    background: #CCC;
+}
+
+
+form.task input,
+form.task select,
+form.task textarea,
+form.task button {
+    padding: 2px 3px 2px 3px;
+    margin: 0px 2px 0px 0px;
+    border-radius: 4px;
+    border-width: 1px;
+    font-size: large;
+}
+form.task textarea {
+    min-height: 300px;
+}
+form.task input[type=checkbox] {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin: 0 0px 4px 0px;
+}
+
+form.task input[type=submit],
+form.task button[type=submit] {
+    padding: 0.5em 1em;
+    font-weight: bold;
+    font-size: medium;
+    cursor: pointer;
+}
+form.task input:disabled,
+form.task button:disabled {
+    cursor: not-allowed;
+}
+
+
 form.task {
-    max-width: 620px;
+    max-width: 1200px;
     margin: auto;
 }
 
@@ -27,45 +86,36 @@ form.task textarea {
     min-width: 90%;
 }
 
-/** Form Actions **/
-
-form.task .action-edit {
-    font-size: x-small;
-    text-decoration: none;
-}
-
-/** Row **/
-form.task tr.odd {
-    background-color: #0001;
-}
-
-/** Labels **/
-
-form.task td.label {
-    text-align: right;
-    padding: 8px 8px 8px 0px;
-    font-weight: bold;
-    white-space: nowrap;
-    display: block;
-    min-width: 90%;
-}
-form.task td.label:after {
-    content: ':'
-}
-
 
 /** Custom Forms **/
 
-form.task-register {
+form.task-registerform {
     /*text-align: center;*/
 }
 
-
-/** Tables **/
-
+/** Table **/
 table.task {
     width: 100%;
+    margin: 0 auto;
+    padding: 0.5em;
+    border-radius: 8px;
+    /*border: 1px outset #DDD;*/
+    background: #CCC;
 }
+
+table.task > caption {
+    padding: 2px 8px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    background: #CCC;
+}
+
+/** Table Row **/
+table.task > tbody > tr.odd {
+    background-color: #0001;
+}
+
 
 table.task .icon-edit {
     text-decoration: none;
@@ -90,14 +140,3 @@ table.task td.label:after {
     content: ':'
 }
 
-table.task td > p {
-    text-align: justify;
-    text-indent: 8px;
-}
-
-
-/** Task List **/
-task-manager ul.results {
-    list-style: none;
-    padding: 0 0;
-}

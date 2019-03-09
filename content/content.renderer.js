@@ -50,14 +50,14 @@ class ContentRenderer {
             if (firstTag !== 'body') {
                 if (firstTag !== 'article') {
                     html =
-                        `        <article>
+`<article>
 ${html}
-        </article>`
+</article>`
                 }
-                html = `    
-    <body class='themed'>
+                html =
+`<body class='themed'>
 ${content.header || ''}${html}${content.footer || ''}
-    </body>`
+</body>`
 
             }
 
