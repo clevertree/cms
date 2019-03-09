@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
                <form action="${this.state.src}/:password" method="POST" class="user user-form-updatepassword themed">
                     <fieldset>
                         <legend>Change Password</legend>
-                        <table class="user">
+                        <table class="user themed">
                             <thead>
                                 <tr>
                                     <td colspan="2">

@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form action="${this.state.src}/:resetpassword/${this.state.uuid}" method="POST" class="user user-form-resetpassword themed">
                     <fieldset>
                         <legend>Reset Password</legend>
-                        <table class="user">
+                        <table class="user themed">
                             <thead>
                                 <tr>
                                     <td colspan="2">

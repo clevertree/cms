@@ -2,56 +2,26 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/content/client/default/about.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/content/client/default/contact.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/content/client/default/site/template.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/client/config-editor.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/client/editor/config-editor.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/client/config.css" beforeDir="false" afterPath="$PROJECT_DIR$/config/client/editor/config-editor.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content-add.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-add.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content-browser.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-browser.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content-delete.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-delete.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content-editor.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-editor.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content-nav.css" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/nav/content-nav.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content-nav.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/nav/content-nav.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content-upload.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-upload.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/content.css" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/default/logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/default/site/image/logo.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/default/template.css" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/default/site/template.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/default/template.html" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/default/home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/default/template.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/default/site/template.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/client/default/site/template.html" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/default/site/template.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/client/form/content-form-add.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-add.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/client/form/content-form-browser.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-browser.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/client/form/content-form-delete.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-delete.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/client/form/content-form-editor.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-editor.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/client/form/content-form-upload.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-upload.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/client/form/content-form.css" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/client/nav/content-nav.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/nav/content-nav.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content/client/theme/minimal/minimal.theme.css" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/theme/minimal/minimal.theme.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/content.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/content.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/content.renderer.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/content.renderer.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/content.table.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/content.table.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/database.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/database.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/database.manager.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/database.manager.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/form/databaseform-connect.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/client/form/databaseform-connect.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/form/databaseform-manage.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/client/form/databaseform-manage.client.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/form/databaseform.css" beforeDir="false" afterPath="$PROJECT_DIR$/database/client/form/databaseform.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/task/database-configure.task.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/task/database-configure.task.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/dns.manager.js" beforeDir="false" afterPath="$PROJECT_DIR$/http/dns.manager.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/domain.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/http/domain.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/domain.table.js" beforeDir="false" afterPath="$PROJECT_DIR$/http/domain.table.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/slideshow/client/slideshow-player.css" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/slideshow/content-slideshow.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/slideshow/client/slideshow-player.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/slideshow/content-slideshow.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/task/client/task-manager.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/task/client/manager/task-manager.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/task/client/task.css" beforeDir="false" afterPath="$PROJECT_DIR$/task/client/manager/task-manager.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/task/task.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/task/task.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-browser.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-browser.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-forgotpassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-forgotpassword.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-login.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-login.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-logout.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-logout.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-profile.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-profile.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-register.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-register.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-resetpassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-resetpassword.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-updateflags.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-updateflags.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-updatepassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-updatepassword.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user-updateprofile.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-updateprofile.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client/user.css" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/user.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client/form/user-form-browser.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-browser.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client/form/user-form-forgotpassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-forgotpassword.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client/form/user-form-login.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-login.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client/form/user-form-logout.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-logout.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client/form/user-form-register.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-register.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client/form/user-form-resetpassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-resetpassword.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client/form/user-form-updateflags.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-updateflags.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client/form/user-form-updatepassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-updatepassword.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client/form/user-form-updateprofile.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-updateprofile.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client/form/user-form.css" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form.css" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -81,8 +51,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/content/client/default/site/template.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="15" column="34" selection-start-line="15" selection-start-column="34" selection-end-line="15" selection-end-column="34" />
+            <state relative-caret-position="209">
+              <caret line="11" column="26" selection-start-line="11" selection-start-column="26" selection-end-line="11" selection-end-column="26" />
             </state>
           </provider>
         </entry>
@@ -97,21 +67,17 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/client/nav/content-nav.element.js">
+        <entry file="file://$PROJECT_DIR$/content/client/form/content-form.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="266">
-              <caret line="14" column="47" selection-start-line="14" selection-start-column="47" selection-end-line="14" selection-end-column="47" />
+            <state relative-caret-position="114">
+              <caret line="6" selection-start-line="6" selection-end-line="6" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/content/content.table.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="317">
-              <caret line="27" column="102" lean-forward="true" selection-start-line="27" selection-start-column="102" selection-end-line="27" selection-end-column="102" />
-            </state>
-          </provider>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/user/client/form/user-form.css">
+          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -126,10 +92,9 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/content/client/default/about.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="19">
-              <caret line="1" column="8" lean-forward="true" selection-start-line="1" selection-start-column="8" selection-end-line="1" selection-end-column="8" />
+            <state>
+              <caret selection-end-line="1" />
               <folding>
-                <element signature="n#style#0;n#section#1;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#0;n#section#1;n#!!top" expanded="true" />
               </folding>
             </state>
@@ -139,8 +104,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/content/client/default/contact.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="53" lean-forward="true" selection-start-column="53" selection-end-column="72" />
+            <state relative-caret-position="342">
+              <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
               <folding>
                 <element signature="n#style#0;n#div#0;n#section#1;n#!!top" expanded="true" />
               </folding>
@@ -148,29 +113,29 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/content.api.js">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/content/client/theme/minimal/minimal.theme.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="850">
-              <caret line="726" column="77" selection-start-line="726" selection-start-column="77" selection-end-line="726" selection-end-column="77" />
+            <state relative-caret-position="1902">
+              <caret line="285" column="28" selection-start-line="285" selection-start-column="28" selection-end-line="285" selection-end-column="28" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/content.renderer.js">
+        <entry file="file://$PROJECT_DIR$/user/client/form/user-form-browser.element.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="817">
-              <caret line="43" selection-start-line="43" selection-end-line="43" />
+            <state relative-caret-position="725">
+              <caret line="84" column="27" lean-forward="true" selection-start-line="84" selection-start-column="27" selection-end-line="84" selection-end-column="27" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/client/slideshow/content-slideshow.css">
+        <entry file="file://$PROJECT_DIR$/content/client/nav/content-nav.element.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="152">
-              <caret line="8" selection-start-line="8" selection-end-line="9" />
+            <state relative-caret-position="456">
+              <caret line="99" selection-start-line="99" selection-end-line="99" />
             </state>
           </provider>
         </entry>
@@ -187,20 +152,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>user-login</find>
-      <find>user-profile</find>
-      <find>user-register</find>
-      <find>user-resetpassword</find>
-      <find>user-updateflags</find>
-      <find>user-updatepassword</find>
-      <find>user-updateprofile</find>
-      <find>})(&quot;:user/:client/user.css&quot;);</find>
-      <find>content-nav</find>
-      <find>/content-nav</find>
-      <find>this.queryAsync</find>
-      <find>console.error</find>
-      <find>console.error(`${req.method</find>
-      <find>await ContentRenderer.send</find>
       <find>res.json(Object.assign</find>
       <find>})(&quot;:user/:client/form/user-form.css&quot;);</find>
       <find>async renderError</find>
@@ -217,15 +168,22 @@
       <find>hostname</find>
       <find>site/logo</find>
       <find>&lt;%-data%&gt;</find>
+      <find>body.themed</find>
+      <find>body.theme-minimal</find>
+      <find>.themed</find>
+      <find>form.user</find>
+      <find>table.user</find>
+      <find>table class=&quot;user&quot;</find>
+      <find>table class=&quot;content</find>
+      <find>table class=&quot;content&quot;</find>
+      <find>min-</find>
+      <find>editor-pla</find>
+      <find>editor-pl</find>
+      <find>max-width</find>
+      <find>firstc</find>
+      <find>first</find>
     </findStrings>
     <replaceStrings>
-      <replace>user-login</replace>
-      <replace>register</replace>
-      <replace>resetpassword</replace>
-      <replace>profile</replace>
-      <replace>logout</replace>
-      <replace>forgotpassword</replace>
-      <replace>updateflags</replace>
       <replace>updatepassword</replace>
       <replace>content-form-add</replace>
       <replace>content-form-upload</replace>
@@ -249,6 +207,13 @@
       <replace />
       <replace>console.error(`${req.method} ${req.url}:`, error);</replace>
       <replace>user-browser</replace>
+      <replace>.theme-minimal form</replace>
+      <replace>body.theme-minimal</replace>
+      <replace>.theme-minimal</replace>
+      <replace>.theme-minimal form.themed</replace>
+      <replace>table class=&quot;user themed&quot;</replace>
+      <replace>table class=&quot;content themed&quot;</replace>
+      <replace>.theme-minimal table.themed</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/user</dir>
@@ -262,9 +227,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/.idea/workspace.xml" />
-        <option value="$PROJECT_DIR$/content/default/header" />
-        <option value="$PROJECT_DIR$/content/default/head" />
         <option value="$PROJECT_DIR$/theme/default/template/article/home.ejs" />
         <option value="$PROJECT_DIR$/content/default/theme.css" />
         <option value="$PROJECT_DIR$/README.md" />
@@ -303,16 +265,19 @@
         <option value="$PROJECT_DIR$/content/content.api.js" />
         <option value="$PROJECT_DIR$/database/database.api.js" />
         <option value="$PROJECT_DIR$/user/user.api.js" />
-        <option value="$PROJECT_DIR$/content/client/theme/minimal/minimal.theme.css" />
         <option value="$PROJECT_DIR$/content/client/nav/content-nav.css" />
-        <option value="$PROJECT_DIR$/content/client/nav/content-nav.element.js" />
         <option value="$PROJECT_DIR$/content/client/default/template.html" />
         <option value="$PROJECT_DIR$/content/client/default/home.html" />
         <option value="$PROJECT_DIR$/content/content.renderer.js" />
-        <option value="$PROJECT_DIR$/content/client/default/contact.html" />
-        <option value="$PROJECT_DIR$/content/client/default/about.html" />
-        <option value="$PROJECT_DIR$/content/client/default/site/template.html" />
         <option value="$PROJECT_DIR$/content/content.table.js" />
+        <option value="$PROJECT_DIR$/content/client/default/about.html" />
+        <option value="$PROJECT_DIR$/content/client/default/contact.html" />
+        <option value="$PROJECT_DIR$/content/client/default/site/template.html" />
+        <option value="$PROJECT_DIR$/user/client/form/user-form.css" />
+        <option value="$PROJECT_DIR$/user/client/form/user-form-browser.element.js" />
+        <option value="$PROJECT_DIR$/content/client/nav/content-nav.element.js" />
+        <option value="$PROJECT_DIR$/content/client/form/content-form.css" />
+        <option value="$PROJECT_DIR$/content/client/theme/minimal/minimal.theme.css" />
       </list>
     </option>
   </component>
@@ -398,6 +363,13 @@
               <item name="default" type="462c0819:PsiDirectoryNode" />
               <item name="site" type="462c0819:PsiDirectoryNode" />
               <item name="image" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cms" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cms" type="462c0819:PsiDirectoryNode" />
+              <item name="content" type="462c0819:PsiDirectoryNode" />
+              <item name="client" type="462c0819:PsiDirectoryNode" />
+              <item name="form" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="cms" type="b2602c69:ProjectViewProjectNode" />
@@ -556,7 +528,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="384188000" />
+    <option name="totallyTimeSpent" value="385464000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -571,7 +543,7 @@
     <frame x="0" y="-2" width="3840" height="2162" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49753937" visible="true" weight="0.12677912" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49753937" visible="true" weight="0.12677912" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="npm" order="2" sideWeight="0.5019685" side_tool="true" weight="0.124670535" />
       <window_info id="Favorites" order="3" sideWeight="0.50246066" side_tool="true" weight="0.12677912" />
@@ -590,8 +562,8 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Database" order="3" weight="0.32999474" />
-      <window_info active="true" anchor="right" id="Debug" order="4" visible="true" weight="0.2775435" />
-      <window_info anchor="right" id="Find" order="5" weight="0.3294676" />
+      <window_info anchor="right" id="Debug" order="4" weight="0.2775435" />
+      <window_info anchor="right" id="Find" order="5" visible="true" weight="0.3294676" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -696,13 +668,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/form/user-form.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="912">
-          <caret line="48" column="23" lean-forward="true" selection-end-line="141" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/config/client/editor/config-editor.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2033">
@@ -777,13 +742,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/form/content-form.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="857">
-          <caret line="89" column="20" lean-forward="true" selection-start-line="89" selection-start-column="20" selection-end-line="89" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/user/client/form/user-form-forgotpassword.element.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1826">
@@ -840,13 +798,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="76">
           <caret line="4" column="8" lean-forward="true" selection-start-line="4" selection-start-column="8" selection-end-line="4" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-browser.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1257">
-          <caret line="112" column="24" selection-start-line="112" selection-start-column="24" selection-end-line="112" selection-end-column="24" />
         </state>
       </provider>
     </entry>
@@ -920,31 +871,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/theme/minimal/minimal.theme.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1617">
-          <caret line="128" lean-forward="true" selection-start-line="128" selection-end-line="128" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/content/client/slideshow/content-slideshow.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
           <caret line="8" selection-start-line="8" selection-end-line="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/nav/content-nav.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="646">
-          <caret line="34" selection-start-line="34" selection-end-line="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/nav/content-nav.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="14" column="47" selection-start-line="14" selection-start-column="47" selection-end-line="14" selection-end-column="47" />
         </state>
       </provider>
     </entry>
@@ -955,13 +885,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/default/home.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19">
-          <caret line="1" column="36" selection-start-line="1" selection-start-column="36" selection-end-line="1" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/content/content.renderer.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="817">
@@ -969,38 +892,82 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/default/contact.html">
+    <entry file="file://$PROJECT_DIR$/content/content.table.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="53" lean-forward="true" selection-start-column="53" selection-end-column="72" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#section#1;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/default/site/template.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="15" column="34" selection-start-line="15" selection-start-column="34" selection-end-line="15" selection-end-column="34" />
+        <state relative-caret-position="317">
+          <caret line="27" column="102" lean-forward="true" selection-start-line="27" selection-start-column="102" selection-end-line="27" selection-end-column="102" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/content/client/default/about.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19">
-          <caret line="1" column="8" lean-forward="true" selection-start-line="1" selection-start-column="8" selection-end-line="1" selection-end-column="8" />
+        <state>
+          <caret selection-end-line="1" />
           <folding>
-            <element signature="n#style#0;n#section#1;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#section#1;n#!!top" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/content/content.table.js">
+    <entry file="file://$PROJECT_DIR$/content/client/default/contact.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="317">
-          <caret line="27" column="102" lean-forward="true" selection-start-line="27" selection-start-column="102" selection-end-line="27" selection-end-column="102" />
+        <state relative-caret-position="342">
+          <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
+          <folding>
+            <element signature="n#style#0;n#div#0;n#section#1;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/default/home.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="19">
+          <caret line="1" column="36" selection-start-line="1" selection-start-column="36" selection-end-line="1" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/default/site/template.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="11" column="26" selection-start-line="11" selection-start-column="26" selection-end-line="11" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/nav/content-nav.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="646">
+          <caret line="34" selection-start-line="34" selection-end-line="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/form/user-form.css">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-browser.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="725">
+          <caret line="84" column="27" lean-forward="true" selection-start-line="84" selection-start-column="27" selection-end-line="84" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/nav/content-nav.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="456">
+          <caret line="99" selection-start-line="99" selection-end-line="99" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/form/content-form.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="114">
+          <caret line="6" selection-start-line="6" selection-end-line="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/theme/minimal/minimal.theme.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1902">
+          <caret line="285" column="28" selection-start-line="285" selection-start-column="28" selection-end-line="285" selection-end-column="28" />
         </state>
       </provider>
     </entry>

@@ -183,7 +183,7 @@ class HTMLContentFormAddElement extends HTMLElement {
             `<form action="/:content/:add" method="POST" class="content content-form-add themed">
             <fieldset>
                 <legend>Add New Content</legend>
-                <table class="content">
+                <table class="content themed">
                     <thead>
                         <tr>
                             <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">

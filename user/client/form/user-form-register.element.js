@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form action="/:user/:register" method="POST" class="user user-form-register themed">
                     <fieldset>
                         <legend>Register a new account</legend>
-                        <table class="user">
+                        <table class="user themed">
                             <thead>
                                 <tr>
                                     <td colspan="2">

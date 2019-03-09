@@ -113,7 +113,7 @@ class HTMLContentBrowserElement extends HTMLElement {
             `<form action="/:content/:list" method="POST" class="content content-form-browser themed">
             <fieldset>
                 <legend>Search Content</legend>
-                <table class="content">
+                <table class="content themed">
                     <thead>
                         <tr>
                             <td colspan="5">

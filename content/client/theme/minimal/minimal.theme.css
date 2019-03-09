@@ -1,5 +1,5 @@
 /** Background Image **/
-body.themed {
+body.theme-minimal {
     color: #2b2b2b;
     font-family: 'Advent Pro', monospace;
     font-size: 16px;
@@ -9,18 +9,18 @@ body.themed {
 }
 
 /** Hyperlinks **/
-body.themed a,
-a.themed {
+.theme-minimal a,
+.theme-minimal a.themed {
     color: rgb(255, 246, 212);
     text-decoration: none;
     text-shadow: #0008 1px 1px 4px;
 }
-a.themed {
+.theme-minimal a.themed {
     text-shadow: #0008 4px 3px 9px;
 }
 
 /** Header **/
-body.themed > header {
+body.theme-minimal > header {
     background: linear-gradient(to bottom, #487bb3 0%, #88a9cc 1%,#487bb3 2%,#1b589b 98%,#022035 100%);
     /*background: url(texture/header.background.png);*/
     background-size: contain;
@@ -33,7 +33,7 @@ body.themed > header {
 }
 
 /** Title **/
-body.themed > header > .title {
+body.theme-minimal > header > .title {
     display: inline-block;
     max-width: 700px;
     margin: 0px 8px;
@@ -43,13 +43,13 @@ body.themed > header > .title {
 }
 
 /** Title Logo **/
-body.themed > header > .title > .logo {
+body.theme-minimal > header > .title > .logo {
     margin: 0px auto;
     vertical-align: middle;
 }
 
 /** Footer **/
-body.themed > footer {
+body.theme-minimal > footer {
     /* text-align: center; */
     background: linear-gradient(to top, #3d9bea 0%, #6eb4ef 100%);
     /* background: url(texture/footer.background.png); */
@@ -58,8 +58,8 @@ body.themed > footer {
 
 
 /** Page Width **/
-.themed > article > section,
-.themed > footer {
+body.theme-minimal > article > section,
+body.theme-minimal > footer {
     margin: 0 auto;
     max-width: 800px;
     padding: 0.5em;
@@ -67,26 +67,22 @@ body.themed > footer {
 
 
 /** Page Articles **/
-.themed > article {
+.theme-minimal > article {
     background: #EEC455;
     padding: 0 0;
     margin: 0 auto;
 
 }
-.themed > article > * {
+.theme-minimal > article > * {
     padding: 0.5em;
 
 }
 
 
 /** Page Sections **/
-.themed > article > section {
-    padding: 0.5em;
-    background: #f5e7a8;
-}
 
-.themed div.themed,
-.themed > article > section.themed {
+.theme-minimal div.themed,
+.theme-minimal > article > section.themed {
     color: #f5efd5;
     text-shadow: #000 1px 1px 1px;
     background-color: #ab6428ed;
@@ -94,7 +90,7 @@ body.themed > footer {
 
 
 /** Paragraphs **/
-.themed p.themed {
+.theme-minimal p.themed {
     text-align: justify;
     text-indent: 8px;
     padding: 4px 8px;
@@ -104,22 +100,22 @@ body.themed > footer {
 }
 
 /** Messages **/
-.themed div.message,
-.themed div.success,
-.themed div.error {
+.theme-minimal div.message,
+.theme-minimal div.success,
+.theme-minimal div.error {
     padding: 0.5em;
     margin: 0.5em;
     border-radius: 4px;
 }
-.themed div.message {
+.theme-minimal div.message {
     color: #000;
     background: #0002;
 }
-.themed div.success {
+.theme-minimal div.success {
     color: #f5fbf2;
     background: #118c09;
 }
-.themed div.error {
+.theme-minimal div.error {
     color: #fee;
     background: #d25757;
 }
@@ -127,16 +123,166 @@ body.themed > footer {
 
 /** Nav **/
 
-.themed content-nav ul.nav-submenu {
+.theme-minimal content-nav ul.nav-submenu {
     box-shadow: 3px 2px 12px #333;
 }
 
 /** Nav Colors **/
 
-.themed content-nav ul.nav-menu > li:hover,
-.themed content-nav ul.nav-menu > li:hover > ul.nav-submenu > li:hover{
+.theme-minimal content-nav ul.nav-menu > li:hover,
+.theme-minimal content-nav ul.nav-menu > li:hover > ul.nav-submenu > li:hover{
     /*background-color: #444;*/
 }
-.themed content-nav ul.nav-submenu {
+.theme-minimal content-nav ul.nav-submenu {
     /*background-color: #6190a0;*/
+}
+
+
+
+
+
+
+
+
+/** Anchors **/
+/*form.user a,*/
+/*table.user a{*/
+    /*text-decoration: none;*/
+    /*min-width: 300px;*/
+/*}*/
+
+/** Forms **/
+
+.theme-minimal form.themed > fieldset {
+    padding: 1em 1em;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    background: #CCC;
+}
+.theme-minimal form.themed > fieldset > legend {
+    /* margin: 0 auto; */
+    padding: 2px 8px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    border-bottom: 1px outset #FFF;
+    background: #CCC;
+}
+
+
+.theme-minimal form.themed input,
+.theme-minimal form.themed select,
+.theme-minimal form.themed textarea,
+.theme-minimal form.themed button {
+    padding: 2px 3px 2px 3px;
+    margin: 0px 2px 0px 0px;
+    border-radius: 4px;
+    border-width: 1px;
+    font-size: large;
+}
+.theme-minimal form.themed textarea {
+    /* min-height: 100px; */
+}
+.theme-minimal form.themed input[type=checkbox] {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin: 0 0px 4px 0px;
+}
+
+.theme-minimal form.themed input[type=submit],
+.theme-minimal form.themed button[type=submit] {
+    padding: 0.5em 1em;
+    font-weight: bold;
+    font-size: medium;
+    cursor: pointer;
+}
+.theme-minimal form.themed input:disabled,
+.theme-minimal form.themed button:disabled {
+    cursor: not-allowed;
+}
+
+
+.theme-minimal form.themed {
+     max-width: 1200px;
+    margin: auto;
+}
+
+.theme-minimal form.themed > fieldset {
+    margin: 0px auto;
+}
+
+.theme-minimal form.themed > fieldset > table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.theme-minimal form.themed > fieldset > table > caption {
+    /* font-weight: bold; */
+    /*font-style: italic;*/
+    text-align: left;
+    /* padding-bottom: 1em; */
+}
+/** Form Input **/
+
+.theme-minimal form.themed input[type=text],
+.theme-minimal form.themed input[type=email],
+.theme-minimal form.themed input[type=password],
+.theme-minimal form.themed select,
+.theme-minimal form.themed textarea {
+    min-width: 90%;
+}
+
+
+/** Custom Forms **/
+
+
+/** Table **/
+.theme-minimal table.themed {
+    margin: 0 auto;
+    padding: 0.5em;
+    border-radius: 8px;
+    /*border: 1px outset #DDD;*/
+    background: #CCC;
+}
+
+.theme-minimal table.themed > caption {
+    padding: 2px 8px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 1px outset #DDD;
+    background: #CCC;
+}
+
+/** Table Row **/
+.theme-minimal table.themed > tbody > tr.odd {
+    background-color: #0001;
+}
+
+
+.theme-minimal table.themed .icon-edit {
+    text-decoration: none;
+}
+
+/** Row **/
+.theme-minimal table.themed tr.odd {
+    background-color: #0001;
+}
+
+/** Labels **/
+
+.theme-minimal table.themed td.label {
+    text-align: right;
+    padding: 8px 8px 8px 0px;
+    font-weight: bold;
+    white-space: nowrap;
+    display: block;
+    min-width: 90%;
+}
+.theme-minimal table.themed td.label:after {
+    content: ':'
+}
+
+
+.theme-minimal table.themed > tbody > tr > td:first-child {
+    width: 8%;
 }

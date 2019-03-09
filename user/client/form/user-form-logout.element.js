@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form action="/:user/:logout" method="POST" class="user user-form-logout themed">
                     <fieldset>
                         <legend>Log Out</legend>
-                            <table class="user">
+                            <table class="user themed">
                                 <thead>
                                     <tr>
                                         <td colspan="2">

@@ -98,7 +98,7 @@ class HTMLContentDeleteFormElement extends HTMLElement {
             `<form action="/:content/${this.state.content.id}/:delete" method="POST" class="content content-form-delete themed">
             <input type="hidden" name="id" value="${this.state.content.id}" />
             <fieldset>
-                <table class="content">
+                <table class="content themed">
                     <thead>
                         <tr>
                             <td colspan="2">

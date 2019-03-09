@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form action="${this.state.src}/:profile" method="POST" class="user user-form-updateprofile themed">
                    <fieldset>
                         <legend>Update Profile</legend>
-                        <table class="user">
+                        <table class="user themed">
                             <thead>
                                 <tr>
                                     <td colspan="2">

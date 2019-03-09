@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form action="/:user/:forgotpassword" method="POST" class="user user-form-forgotpassword themed">
                     <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
                         <legend>Forgot Password</legend>
-                        <table class="user">
+                        <table class="user themed">
                             <thead>
                                 <tr>
                                     <td colspan="2">

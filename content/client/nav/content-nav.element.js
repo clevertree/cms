@@ -96,10 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
 
-            let contentID = null;
-            const contentArticle = document.body.querySelector('article[data-content-id]');
-            if(contentArticle)
-                contentID = contentArticle.getAttribute('data-content-id');
+            const contentID = (document.head.querySelector('meta[name="content:id"]') || {}).content || null;
 //             console.log(menu, rootPaths, this.state.contentList);
             const menuSubMenu = [];
             menu.push({

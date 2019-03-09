@@ -130,7 +130,7 @@ class HTMLContentFormUploadElement extends HTMLElement {
         <form action="/:content/:upload" target="content-form-upload-iframe" onchange="this.submit()" method="POST" class="content content-form-upload themed" enctype="multipart/form-data">
             <fieldset>
                 <legend>Upload Temporary Files</legend>
-                <table class="content">
+                <table class="content themed">
                     <thead>
                         <tr>
                             <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
@@ -162,7 +162,7 @@ class HTMLContentFormUploadElement extends HTMLElement {
         <form action="/:content/:upload" method="POST" class="content content-form-upload-manage themed" enctype="application/x-www-form-urlencoded">
             <fieldset>
                 <legend>Manage Uploaded Temporary Files</legend>
-                <table class="content">
+                <table class="content themed">
                     <thead>
                         <tr><td colspan="3"><hr/></td></tr>
                         <tr style="text-align: left;">

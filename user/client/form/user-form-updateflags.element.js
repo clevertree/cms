@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form action="${this.state.src}/:flags" method="POST" class="user user-form-updateflags themed">
                     <fieldset>
                         <legend>Update User Flags</legend>
-                        <table class="user">
+                        <table class="user themed">
                             <thead>
                                 <tr>
                                     <td colspan="2">

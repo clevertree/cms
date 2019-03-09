@@ -81,7 +81,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
         this.innerHTML =
             `<form action="/:user/:list" method="POST" class="user user-form-browser themed">
              <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
-                <table class="user">
+                <table class="user themed">
                     <thead>
                         <tr>
                             <td colspan="5">

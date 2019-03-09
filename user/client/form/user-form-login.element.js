@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form action="/:user/:login" method="POST" class="user user-form-login themed">
                     <fieldset>
                         <legend>Log In</legend>
-                        <table class="user">
+                        <table class="user themed">
                             <thead>
                                 <tr>
                                     <td colspan="2">

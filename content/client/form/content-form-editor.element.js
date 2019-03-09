@@ -163,7 +163,7 @@ class HTMLContentEditorFormElement extends HTMLElement {
             `<form action="${action}" method="POST" class="content content-form-editor themed">
             <input type="hidden" name="id" value="${this.state.content.id}" />
             <fieldset>
-                <table class="content">
+                <table class="content themed">
                     <thead>
                         <tr>
                             <td colspan="2">
