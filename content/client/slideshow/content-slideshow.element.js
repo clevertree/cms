@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("service/slideshow-player/slideshow-player.css");
+    })("service/slideshow-player/content-slideshow.css");
 });
 
 
@@ -42,4 +42,4 @@ class HTMLSlideShowPlayerElement extends HTMLElement {
         // console.log("Update", this.children[currentSlide]);
     }
 }
-customElements.define('slideshow-player', HTMLSlideShowPlayerElement);
+customElements.define('content-slideshow', HTMLSlideShowPlayerElement);

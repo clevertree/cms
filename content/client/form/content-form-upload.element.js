@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":content/:client/content.css");
+    })(":content/:client/form/content-form.css");
 });
 
 
@@ -117,8 +117,8 @@ class HTMLContentFormUploadElement extends HTMLElement {
 
 
     render() {
-        const formUpload = this.querySelector('form.content-uploadform');
-        const formManage = this.querySelector('form.content-uploadform-manage');
+        const formUpload = this.querySelector('form.content-form-upload');
+        const formManage = this.querySelector('form.content-form-upload-manage');
         const val = (name) => formManage && formManage.elements && formManage.elements[name] ? formManage.elements[name].value : '';
 
 
@@ -126,8 +126,8 @@ class HTMLContentFormUploadElement extends HTMLElement {
 //         console.log("RENDER", this.state, formData);
         this.innerHTML =
             `
-        <iframe name="content-uploadform-iframe" onload="this.dispatchEvent(new CustomEvent('iframe-loaded', {bubbles: true}))" style="display: none;"></iframe>
-        <form action="/:content/:upload" target="content-uploadform-iframe" onchange="this.submit()" method="POST" class="content content-uploadform themed" enctype="multipart/form-data">
+        <iframe name="content-form-upload-iframe" onload="this.dispatchEvent(new CustomEvent('iframe-loaded', {bubbles: true}))" style="display: none;"></iframe>
+        <form action="/:content/:upload" target="content-form-upload-iframe" onchange="this.submit()" method="POST" class="content content-form-upload themed" enctype="multipart/form-data">
             <fieldset>
                 <legend>Upload Temporary Files</legend>
                 <table class="content">
@@ -159,7 +159,7 @@ class HTMLContentFormUploadElement extends HTMLElement {
             </fieldset>
         </form>
         <br/>
-        <form action="/:content/:upload" method="POST" class="content content-uploadform-manage themed" enctype="application/x-www-form-urlencoded">
+        <form action="/:content/:upload" method="POST" class="content content-form-upload-manage themed" enctype="application/x-www-form-urlencoded">
             <fieldset>
                 <legend>Manage Uploaded Temporary Files</legend>
                 <table class="content">
@@ -201,4 +201,4 @@ class HTMLContentFormUploadElement extends HTMLElement {
     }
 
 }
-customElements.define('content-uploadform', HTMLContentFormUploadElement);
+customElements.define('content-form-upload', HTMLContentFormUploadElement);

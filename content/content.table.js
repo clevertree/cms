@@ -23,46 +23,27 @@ class ContentTable {
 
         let insertID, contentHTML;
         hostname = hostname || require('os').hostname();
-        if(!await this.fetchContentByPath("/")) {
-            contentHTML = `
-<section>
-    <h1 class="themed">${hostname}</h1>
-    <p>
-        Welcome to ${hostname}!
-    </p>
-</section>
-`;
-            // contentHTML = contentHTML.replace('${hostname}', hostname);
-            insertID = await this.insertContent('Home', contentHTML, "/");
-            console.info("Home Page Created: ", insertID);
-        }
 
+        await this.insertDefaultContent("/site/template.html",  "Site Template",    __dirname + '/client/default/site/template.html', hostname);
+        await this.insertDefaultContent("/site/template.js",    "Site Javascript",  __dirname + '/client/default/site/template.js');
+        await this.insertDefaultContent("/site/template.css",   "Site CSS",         __dirname + '/client/default/site/template.css');
+        await this.insertDefaultContent("/site/image/logo.png", "Site Logo",        __dirname + '/client/default/site/image/logo.png');
+        await this.insertDefaultContent("/",                    "Home",             __dirname + '/client/default/home.html', hostname);
+        await this.insertDefaultContent("/about",               "About Us",         __dirname + '/client/default/about.html', hostname);
+        await this.insertDefaultContent("/contact",             "Contact Us",       __dirname + '/client/default/contact.html', hostname);
 
-        if(!await this.fetchContentByPath("/site/template.html")) {
-            contentHTML = await this.readFileAsync(path.resolve(__dirname + '/client/default/template.html'), 'UTF8');
-            // contentHTML = contentHTML.replace(/\${hostname}/g, hostname);
-            contentHTML = contentHTML.replace(/<%-hostname%>/g, hostname);
-            insertID = await this.insertContent('Site Template', contentHTML, "/site/template.html");
-            console.info("Site Template: ", insertID);
+    }
 
+    async insertDefaultContent(renderPath, contentTitle, filePath, replaceHostname=false) {
+        if(await this.fetchContentByPath(renderPath))
+            return;
+        let contentHTML = await this.readFileAsync(path.resolve(filePath), replaceHostname ? 'UTF8' : null);
+        if(replaceHostname) {
+            contentHTML = contentHTML.replace(/<%-hostname%>/g, replaceHostname);
         }
-
-        if(!await this.fetchContentByPath("/site/template.css")) {
-            contentHTML = await this.readFileAsync(path.resolve(__dirname + '/client/default/template.css'), 'UTF8');
-            insertID = await this.insertContent('Site CSS', contentHTML, "/site/template.css");
-            console.info("Site Template CSS Created: ", insertID);
-        }
-        if(!await this.fetchContentByPath("/site/template.js")) {
-            contentHTML = await this.readFileAsync(path.resolve(__dirname + '/client/default/template.js'), 'UTF8');
-            insertID = await this.insertContent('Site Javascript', contentHTML, "/site/template.js");
-            console.info("Site Template JS Created: ", insertID);
-        }
-        if(!await this.fetchContentByPath("/site/logo.png")) {
-            contentHTML = await this.readFileAsync(path.resolve(__dirname + '/client/default/logo.png'), null);
-            insertID = await this.insertContent('Site Logo', contentHTML, "/site/logo.png");
-            console.info("Site Template Logo Created: ", insertID);
-        }
-
+        const insertID = await this.insertContent(contentTitle, contentHTML, renderPath);
+        console.info(`${contentTitle} Created: `, insertID);
+        return insertID;
     }
 
     /** Content **/

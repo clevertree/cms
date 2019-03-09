@@ -2,26 +2,29 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":user/:client/user.css");
+    })(":user/:client/form/user-form.css");
 });
 
 {
-    class HTMLUserLoginFormElement extends HTMLElement {
+    class HTMLUserUpdatepasswordElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
-                message: "In order to start a new session please enter your username or email and password and hit 'Log in' below",
+                src: null,
+                message: "In order to change password, please fill out this form and hit 'Update' below",
                 status: 0,
-                processing: false,
-                userID: "",
-                password: "",
-                session_save: ""
+                user: {id: -1},
+                require_old_password: true,
+                password_old: null,
+                password_new: null,
+                password_confirm: null,
             };
+            // this.state = {id:-1, resetpasswords:[]};
         }
 
         setState(newState) {
             for(let i=0; i<arguments.length; i++)
-               Object.assign(this.state, arguments[i]);
+                Object.assign(this.state, arguments[i]);
             this.render();
         }
 
@@ -29,8 +32,14 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('change', e => this.onChange(e));
             this.addEventListener('submit', e => this.onSubmit(e));
 
-            this.state.userID = this.getAttribute('userID');
-            this.render();
+            const src = this.getAttribute('src');
+            if(src) {
+                this.setState({src});
+                this.requestFormData();
+            } else {
+                this.setState({message: "attribute src=':/user/[userID]' required", status: 400});
+            }
+
         }
 
 
@@ -47,9 +56,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         onChange(e) {
-            if(typeof this.state[e.target.name] !== 'undefined')
-                this.state[e.target.name] = e.target.value;
+            let value = e.target.value;
+            if(e.target.getAttribute('type') === 'checkbox')
+                value = e.target.checked;
+            if(e.target.name && typeof this.state[e.target.name] !== 'undefined')
+                this.state[e.target.name] = value;
+            // console.log(this.state);
         }
+
+        requestFormData() {
+            const form = this.querySelector('form');
+            const xhr = new XMLHttpRequest();
+            xhr.onload = () => {
+                this.setState({processing: false}, xhr.response);
+            };
+            xhr.responseType = 'json';
+            xhr.open ('OPTIONS', form.getAttribute('action'), true);
+            xhr.send ();
+            this.setState({processing: true});
+        }
+
 
         onSubmit(e) {
             e.preventDefault();
@@ -78,15 +104,12 @@ document.addEventListener('DOMContentLoaded', function() {
             this.setState({processing: true});
         }
 
-
         render() {
-            const userID = this.state.userID || null;
-            // console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/:login" method="POST" class="user user-login themed">
+               <form action="${this.state.src}/:password" method="POST" class="user user-form-updatepassword themed">
                     <fieldset>
-                        <legend>Log In</legend>
+                        <legend>Change Password</legend>
                         <table class="user">
                             <thead>
                                 <tr>
@@ -98,26 +121,31 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </tr>
                                 <tr><td colspan="2"><hr/></td></tr>
                             </thead>
-                            <tbody>
+                            <tbody class="themed">
                                 <tr>
-                                    <td class="label">Username</td>
+                                    <td class="label">Email</td>
                                     <td>
-                                        <input type="text" name="userID" value="${userID || ''}" required />
+                                        <input type="email" name="email" value="${this.state.user.email}" disabled/>
+                                    </td>
+                                </tr>
+                                ${this.state.require_old_password ? `
+                                <tr>
+                                    <td class="label">Old Password</td>
+                                    <td>
+                                        <input type="password" name="password_old" value="${this.state.password_old||''}" required />
+                                    </td>
+                                </tr>
+                                ` : ''}
+                                <tr>
+                                    <td class="label">New Password</td>
+                                    <td>
+                                        <input type="password" name="password_new" value="${this.state.password_new||''}" required />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="label">Password</td>
+                                    <td class="label">Confirm Password</td>
                                     <td>
-                                        <input type="password" name="password" value="${this.state.password || ''}" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Stay Logged In</td>
-                                    <td>
-                                        <input type="checkbox" name="session_save" ${this.state.session_save ? 'checked="checked"' : ''} value="1"/>
-                                        <div style="float: right">
-                                            <a href=":user/:forgotpassword${userID ? '?userID=' + userID : ''}">Forgot Password?</a>
-                                        </div>
+                                        <input type="password" name="password_confirm" value="${this.state.password_confirm||''}" required />
                                     </td>
                                 </tr>
                             </tbody>
@@ -125,10 +153,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td>
-                                        <a href=":user/:register${userID ? '?userID=' + userID : ''}">Register</a>
                                     </td>
                                     <td style="text-align: right;">
-                                        <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Log In</button>
+                                        <button type="submit" ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>Update Password</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -138,5 +165,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-login', HTMLUserLoginFormElement);
+    customElements.define('user-form-updatepassword', HTMLUserUpdatepasswordElement);
+
 }

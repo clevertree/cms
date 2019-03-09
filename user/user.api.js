@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 const path = require('path');
 
-const { DNSManager } = require('../domain/dns.manager');
+const { DNSManager } = require('../http/dns.manager');
 
 // const { LocalConfig } = require('../config/local.config');
 // const { ConfigManager } = require('../config/config.manager');
@@ -287,7 +287,7 @@ class UserAPI {
                 // Render Editor Form
                 await ContentRenderer.send(req, res, {
                     title: `Log in`,
-                    data: `<user-login${userID ? ` userID='${userID}'` : ''}></user-login>`
+                    data: `<user-form-login${userID ? ` userID='${userID}'` : ''}></user-form-login>`
                 });
 
             } else {
@@ -312,7 +312,7 @@ class UserAPI {
                 // Render Editor Form
                 await ContentRenderer.send(req, res, {
                     title: `Log Out`,
-                    data: `<user-logout></user-logout>`
+                    data: `<user-form-logout></user-form-logout>`
                 });
 
             } else {
@@ -337,7 +337,7 @@ class UserAPI {
                 // Render Editor Form
                 await ContentRenderer.send(req, res, {
                     title: `Register`,
-                    data: `<user-register></user-register>`
+                    data: `<user-form-register></user-form-register>`
                 });
 
             } else {
@@ -385,7 +385,7 @@ class UserAPI {
                 // Render Editor Form
                     await ContentRenderer.send(req, res, {
                         title: `Forgot Password`,
-                        data: `<user-forgotpassword userID="${userID}"></user-forgotpassword>`
+                        data: `<user-form-forgotpassword userID="${userID}"></user-form-forgotpassword>`
                     });
                     break;
 
@@ -437,7 +437,7 @@ class UserAPI {
                     // Render Editor Form
                     await ContentRenderer.send(req, res, {
                         title: `Reset Password`,
-                        data: `<user-resetpassword uuid="${uuid}" src="${user.url}"></user-resetpassword>`
+                        data: `<user-form-resetpassword uuid="${uuid}" src="${user.url}"></user-form-resetpassword>`
                     });
                     break;
 
@@ -489,15 +489,15 @@ class UserAPI {
                         await ContentRenderer.send(req, res, {
                             title: `Update Profile`,
                             data: `
-<user-updateprofile src="${user.url}"></user-updateprofile>
-<user-updatepassword src="${user.url}"></user-updatepassword>
-<user-updateflags src="${user.url}"></user-updateflags>
+<user-form-updateprofile src="${user.url}"></user-form-updateprofile>
+<user-form-updatepassword src="${user.url}"></user-form-updatepassword>
+<user-form-updateflags src="${user.url}"></user-form-updateflags>
 `
                         });
                     } else {
                         await ContentRenderer.send(req, res, {
                             title: `Profile: ${user.username}`,
-                            data: `<user-${type}form src="${user.url}"></user-${type}form>`
+                            data: `<user-form-${type} src="${user.url}"></user-form-${type}>`
                         });
                     }
                     break;
@@ -584,7 +584,7 @@ class UserAPI {
                 case 'GET':
                     await ContentRenderer.send(req, res, {
                         title: `Browse Users`,
-                        data: `<user-browser></user-browser>`});
+                        data: `<user-form-browser></user-form-browser>`});
                     break;
 
                 case 'POST':
@@ -639,7 +639,7 @@ class UserAPI {
     }
 
     async renderError(error, req, res, json=null) {
-        console.error(`${req.method} ${req.url} ${error.message}`);
+        console.error(`${req.method} ${req.url}:`, error);
         res.status(400);
         if(error.redirect) {
             res.redirect(error.redirect);

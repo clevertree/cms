@@ -2,18 +2,17 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":content/:client/content.css");
+    })(":user/:client/form/user-form.css");
 });
 
 
-class HTMLContentBrowserElement extends HTMLElement {
+class HTMLUserFormBrowserElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
-            message: "Browsing Content",
-            status: 0,
-            processing: false,
-            contentList: []
+            users: [],
+            status: null,
+            message: null,
         };
         this.keyTimeout = null;
         // this.state = {id:-1, flags:[]};
@@ -26,29 +25,17 @@ class HTMLContentBrowserElement extends HTMLElement {
     }
 
     connectedCallback() {
-        this.addEventListener('submit', e => this.onSubmit(e));
-        this.addEventListener('change', e => this.onChange(e));
-        this.addEventListener('keyup', e => this.onKeyUp(e));
+        this.addEventListener('keyup', this.onKeyUp);
+        this.addEventListener('submit', this.onSubmit);
         this.render();
         this.onSubmit();
     }
 
     onSuccess(e, response) {
-        // console.log(response);
-        if(response.redirect) {
-            this.setState({processing: true});
-            setTimeout(() => window.location.href = response.redirect, 3000);
-        }
+        // if(response.redirect)
+        //     setTimeout(() => window.location.href = response.redirect, 3000);
     }
-
-    onError(e, response) {
-        console.error(e, response);
-    }
-
-    onChange(e) {
-        if(typeof this.state[e.target.name] !== 'undefined')
-            this.state[e.target.name] = e.target.value;
-    }
+    onError(e, response) {}
 
     onKeyUp(e) {
         switch(e.target.name) {
@@ -59,24 +46,6 @@ class HTMLContentBrowserElement extends HTMLElement {
         }
     }
 
-
-    // requestFormData() {
-    //     const xhr = new XMLHttpRequest();
-    //     xhr.onload = () => {
-    //         this.setState({processing: false});
-    //         // console.info(xhr.response);
-    //         if(!xhr.response || !xhr.response.content)
-    //             throw new Error("Invalid Response");
-    //         this.setState(xhr.response);
-    //         // this.state = xhr.response.user;
-    //         // this.render();
-    //     };
-    //     xhr.responseType = 'json';
-    //     xhr.open ("GET", `:content/${this.state.content.id}/:json?getAll=true&getRevision=${new Date(this.state.revisionDate).getTime()}`, true);
-    //     // xhr.setRequestHeader("Accept", "application/json");
-    //     xhr.send ();
-    //     this.setState({processing: true});
-    // }
 
     onSubmit(e) {
         if(e) e.preventDefault();
@@ -106,27 +75,26 @@ class HTMLContentBrowserElement extends HTMLElement {
     }
 
     render() {
-        // console.log("RENDER", this.state);
+        console.log("RENDER", this.state);
         let searchField = this.querySelector('input[name=search]');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
-            `<form action="/:content/:list" method="POST" class="content content-browser themed">
-            <fieldset>
-                <legend>Search Content</legend>
-                <table class="content">
+            `<form action="/:user/:list" method="POST" class="user user-form-browser themed">
+             <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
+                <table class="user">
                     <thead>
                         <tr>
                             <td colspan="5">
-                                <input type="text" name="search" placeholder="Search Content" value="${this.state.search||''}"/>
+                                <input type="text" name="search" placeholder="Search Users" value="${this.state.search||''}"/>
                             </td>
                         </tr>
                         <tr><td colspan="5"><hr/></td></tr>
-                        <tr style="text-align: left;">
-                            <th style="min-width: 50px;">ID</th>
-                            <th>Path</th>
-                            <th>Title</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Profile</th>
+                            <th>Flags</th>
+                            <th>Password</th>
                         </tr>
                     </thead>
                     <tbody class="results">
@@ -138,7 +106,7 @@ class HTMLContentBrowserElement extends HTMLElement {
                         <tr><td colspan="5"><hr/></td></tr>
                         <tr>
                             <td colspan="5" class="status">
-                                <div class="message">Content Browser</div> 
+                                <div class="message">User Browser</div> 
                             </td>
                         </tr>
                     </tfoot>
@@ -155,22 +123,35 @@ class HTMLContentBrowserElement extends HTMLElement {
     renderResults() {
         const resultsElement = this.querySelector('tbody.results');
         let classOdd = '';
-        resultsElement.innerHTML = this.state.contentList.map(content => `
+        resultsElement.innerHTML = this.state.users.map(user => `
             <tr class="results ${classOdd=classOdd===''?'odd':''}">
-                <td><a href=":content/${content.id}">${content.id}</a></td>
-                <td><a href="${content.path||`:content/${content.id}/:edit`}">${content.path||''}</a></td>
-                <td><a href=":content/${content.id}">${content.title}</a></td>
-                
-                <td><a href=":content/${content.id}/:edit" class="action-edit">&#x270D;</a></td>
-                <td><a href=":content/${content.id}/:delete" class="action-edit">&#x26D4;</a></td>
-                
+                <td><a href=":user/${user.id}">${user.id}</a></td>
+                <td><a href=":user/${user.username}">${user.username}</a></td>
+                <td><a href=":user/${user.id}/:profile" class="action-edit">[&#x270D; edit]</a></td>
+                <td>${user.flags.join(', ')}<a href=":user/${user.id}/:flags" class="action-edit"> [&#x270D;]</a></td>
+                <td><a href=":user/${user.id}/:password" class="action-edit">[&#x270D; change]</a></td>
             </tr>
-            `).join('');
+            `).join('');``
 
         const statusElement = this.querySelector('td.status');
         statusElement.innerHTML = this.state.message
             ? this.state.message
-            : `Content Browser`;
+            : `User Browser`;
     }
 }
-customElements.define('content-browser', HTMLContentBrowserElement);
+
+// HTMLUserFormBrowserElement.UserRow = class {
+//     constructor(row) {
+//         Object.assign(this, row);
+//         if(this.profile)
+//             this.profile = JSON.parse(this.profile);
+//         if(this.flags)
+//             this.flags = this.flags.split(',');
+//     }
+//
+//     hasFlag(flag) { return this.flags && this.flags.indexOf(flag) !== -1; }
+//     isAdmin() { return this.hasFlag('admin'); }
+//     // isGuest() { return this.hasFlag('guest'); }
+// };
+
+customElements.define('user-form-browser', HTMLUserFormBrowserElement);

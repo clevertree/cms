@@ -11,9 +11,12 @@ body.themed {
 /** Hyperlinks **/
 body.themed a,
 a.themed {
-     color: rgb(255, 246, 212);
-     text-decoration: none;
-     text-shadow: #0008 4px 3px 9px;
+    color: rgb(255, 246, 212);
+    text-decoration: none;
+    text-shadow: #0008 1px 1px 4px;
+}
+a.themed {
+    text-shadow: #0008 4px 3px 9px;
 }
 
 /** Header **/
@@ -119,4 +122,21 @@ body.themed > footer {
 .themed div.error {
     color: #fee;
     background: #d25757;
+}
+
+
+/** Nav **/
+
+.themed content-nav ul.nav-submenu {
+    box-shadow: 3px 2px 12px #333;
+}
+
+/** Nav Colors **/
+
+.themed content-nav ul.nav-menu > li:hover,
+.themed content-nav ul.nav-menu > li:hover > ul.nav-submenu > li:hover{
+    /*background-color: #444;*/
+}
+.themed content-nav ul.nav-submenu {
+    /*background-color: #6190a0;*/
 }

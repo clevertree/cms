@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":user/:client/user.css");
+    })(":user/:client/form/user-form.css");
 });
 
 {
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="${this.state.src}/:profile" method="POST" class="user user-updateprofile themed">
+                <form action="${this.state.src}/:profile" method="POST" class="user user-form-updateprofile themed">
                    <fieldset>
                         <legend>Update Profile</legend>
                         <table class="user">
@@ -168,6 +168,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-updateprofile', HTMLUserUpdateProfileElement);
+    customElements.define('user-form-updateprofile', HTMLUserUpdateProfileElement);
 
 }

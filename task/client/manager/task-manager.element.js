@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("/:task/:client/task.css");
+    })("/:task/:client/manager/task-manager.css");
 });
 
 
@@ -117,7 +117,7 @@ class HTMLTaskFormManagerElement extends HTMLElement {
     }
 
     render() {
-        console.log("RENDER", this.state);
+//         console.log("RENDER", this.state);
         let searchField = this.querySelector('input#search');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =

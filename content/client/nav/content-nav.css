@@ -1,55 +1,38 @@
 
 /** Navigation **/
 
-content-nav nav {
-    /*background-color: #333333;*/
-}
-
 content-nav ul.nav-menu {
     list-style-type: none;
-    margin: 0 auto;
-    padding: 0;
-    overflow: hidden;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    width: 85%;
+    margin: 0px auto;
+    text-align: center;
 }
 
 content-nav ul.nav-menu > li {
-    display: table-cell;
+    display: inline-block;
+    padding: 4px 0px;
 }
 
 content-nav ul.nav-menu > li:hover {
-    background-color: #6190a0;
     z-index: 2;
-    border-radius: 4px 4px 0px 0;
+    border-radius: 4px;
 }
 
 content-nav ul.nav-menu > li:hover > ul.nav-submenu > li:hover {
-    background-color: #444;
     font-weight: bold;
 }
 
 content-nav ul.nav-menu > li > a,
 content-nav ul.nav-submenu > li > a {
-    color: white;
-    /* font-weight: bold; */
-    font-size: 18px;
-    display: block;
     padding: 12px;
-    text-decoration: none;
 }
 
 /** Sub Menu **/
 content-nav ul.nav-submenu {
     position: absolute;
-    z-index: 2;
-    background-color: #6190a0;
     list-style: none;
-    padding: 0 0;
-    text-align: right;
-    border-radius: 0px 0px 4px 4px;
+    margin: 5px 0;
+    padding: 4px;
+    border-radius: 4px;
 }
 
 content-nav ul.nav-submenu > li > a {
@@ -64,4 +47,14 @@ content-nav ul.nav-submenu > li > a {
 
 content-nav li:not(:hover) > ul.nav-submenu {
     display: none;
+}
+
+/** Colors **/
+
+content-nav ul.nav-menu > li:hover,
+content-nav ul.nav-menu > li:hover > ul.nav-submenu > li:hover{
+    background-color: #888;
+}
+content-nav ul.nav-submenu {
+    background-color: #888E;
 }

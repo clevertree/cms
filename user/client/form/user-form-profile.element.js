@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":user/:client/user.css");
+    })(":user/:client/form/user-form.css");
 });
 
 {
@@ -108,6 +108,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-profile', HTMLUserProfileElement);
+    customElements.define('user-form-profile', HTMLUserProfileElement);
 
 }

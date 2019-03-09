@@ -113,7 +113,7 @@ class DomainAPI {
 
 
     async renderError(error, req, res, json=null) {
-        console.error(`${req.method} ${req.url} ${error.message}`);
+        console.error(`${req.method} ${req.url}:`, error);
         res.status(400);
         if(error.redirect) {
             res.redirect(error.redirect);

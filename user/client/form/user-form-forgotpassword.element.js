@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":user/:client/user.css");
+    })(":user/:client/form/user-form.css");
 });
 
 {
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/:forgotpassword" method="POST" class="user user-forgotpassword themed">
+                <form action="/:user/:forgotpassword" method="POST" class="user user-form-forgotpassword themed">
                     <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
                         <legend>Forgot Password</legend>
                         <table class="user">
@@ -121,6 +121,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-forgotpassword', HTMLUserForgotpasswordElement);
+    customElements.define('user-form-forgotpassword', HTMLUserForgotpasswordElement);
 
 }

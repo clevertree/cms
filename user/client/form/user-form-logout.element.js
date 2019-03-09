@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":user/:client/user.css");
+    })(":user/:client/form/user-form.css");
 });
 
 {
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/:logout" method="POST" class="user user-logout themed">
+                <form action="/:user/:logout" method="POST" class="user user-form-logout themed">
                     <fieldset>
                         <legend>Log Out</legend>
                             <table class="user">
@@ -112,6 +112,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-logout', HTMLUserLogoutElement);
+    customElements.define('user-form-logout', HTMLUserLogoutElement);
 
 }

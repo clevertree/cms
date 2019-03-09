@@ -14,10 +14,11 @@ class ContentRenderer {
         if(typeof content === "string")
             content = {data: content};
 
+        const hostname = require('os').hostname();
         content = Object.assign({}, {
             id: null,
             // path: null,
-            title: require('os').hostname(),
+            title: hostname,
             data: null,
             baseURL: '/',
             keywords: null,
@@ -44,6 +45,7 @@ class ContentRenderer {
         }
         html = html.replace(/<%-title%>/g, content.title);
         html = html.replace(/<%-path%>/g, content.path);
+        // html = html.replace(/<%-hostname%>/g, hostname);
 
         let DOM = cheerio.load(html);
 
@@ -97,9 +99,8 @@ class ContentRenderer {
     getCustomElementSourceFile(customName) {
         if(typeof CUSTOM_ELEMENT_SOURCE[customName] !== "undefined")
             return CUSTOM_ELEMENT_SOURCE[customName];
-        const prefix = customName.split('-')[0];
-        return `/:${prefix}/:client/${customName}.element.js`;
-
+        const split = customName.split('-');
+        return `/:${split[0]}/:client/${split[1]}/${customName}.element.js`;
     }
 
     async send(req, res, content) {
@@ -114,28 +115,28 @@ module.exports = {ContentRenderer: new ContentRenderer()};
 const CUSTOM_ELEMENT_SOURCE = {
     // 'config-editor':        '/:config/:client/config-editor.element.js',
     //
-    // 'content-add':          '/:content/:client/content-add.element.js',
-    // 'content-browser':      '/:content/:client/content-browser.element.js',
-    // 'content-delete':       '/:content/:client/content-delete.element.js',
-    // 'content-editor':       '/:content/:client/content-editor.element.js',
+    // 'content-form-add':          '/:content/:client/content-form-add.element.js',
+    // 'content-form-browser':      '/:content/:client/content-form-browser.element.js',
+    // 'content-form-delete':       '/:content/:client/content-form-delete.element.js',
+    // 'content-form-editor':       '/:content/:client/content-form-editor.element.js',
     // 'content-nav':          '/:content/:client/content-nav.element.js',
-    // 'content-upload':       '/:content/:client/content-upload.element.js',
+    // 'content-form-upload':       '/:content/:client/content-form-upload.element.js',
     //
     // // 'editor': 'databaseform-connect.client.js',
     // // 'editor': 'databaseform-manage.client.js',
     //
-    // 'slideshow-player':     '/:content/:client/slideshow-player.element.js',
+    // 'slideshow-player':     '/:content/:client/content-slideshow.element.js',
     //
     // 'task-manager':         '/:task/:client/task-manager.element.js',
     //
-    // 'user-browser':         '/:user/:client/user-browser.element.js',
-    // 'user-forgotpassword':  '/:user/:client/user-forgotpassword.element.js',
-    // 'user-login':           '/:user/:client/user-login.element.js',
-    // 'user-logout':          '/:user/:client/user-logout.element.js',
-    // 'user-profile':         '/:user/:client/user-profile.element.js',
-    // 'user-register':        '/:user/:client/user-register.element.js',
-    // 'user-resetpassword':   '/:user/:client/user-resetpassword.element.js',
-    // 'user-updateflags':     '/:user/:client/user-updateflags.element.js',
-    // 'user-updatepassword':  '/:user/:client/user-updatepassword.element.js',
-    // 'user-updateprofile':   '/:user/:client/user-updateprofile.element.js',
+    // 'user-form-browser':         '/:user/:client/user-form-browser.element.js',
+    // 'user-form-forgotpassword':  '/:user/:client/user-form-forgotpassword.element.js',
+    // 'user-form-login':           '/:user/:client/user-form-login.element.js',
+    // 'user-form-logout':          '/:user/:client/user-form-logout.element.js',
+    // 'user-form-profile':         '/:user/:client/user-form-profile.element.js',
+    // 'user-form-register':        '/:user/:client/user-form-register.element.js',
+    // 'user-form-resetpassword':   '/:user/:client/user-form-resetpassword.element.js',
+    // 'user-form-updateflags':     '/:user/:client/user-form-updateflags.element.js',
+    // 'user-form-updatepassword':  '/:user/:client/user-form-updatepassword.element.js',
+    // 'user-form-updateprofile':   '/:user/:client/user-form-updateprofile.element.js',
 };

@@ -2,16 +2,18 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":content/:client/content-nav.css");
+    })(":content/:client/nav/content-nav.css");
 });
 
 {
+    const DEFAULT_PATHS = '/;/article;/upload;/about';
     class ThemeDefaultNavMenu extends HTMLElement{
         constructor() {
             super();
             this.state = {
                 src: '/:content/:json',
-                userID: null,
+                paths: ['/','/about','/upload','/contact'],
+                // userID: null,
                 menu: []
             };
             // this.state = {id:-1, flags:[]};
@@ -28,10 +30,16 @@ document.addEventListener('DOMContentLoaded', function() {
             // this.addEventListener('change', e => this.onChange(e));
             // this.addEventListener('submit', e => this.onSubmit(e));
 
-            const userID = this.getAttribute('userID');
-            if(userID)
-                this.setState({userID});
             this.render();
+
+            let paths = this.getAttribute('paths');
+            if(paths) {
+                paths = paths.split(/[,;]/g).filter(p => !!p);
+                this.setState({paths});
+            } else {
+            }
+            // if(userID)
+            //     this.setState({userID});
             this.requestFormData();
         }
 
@@ -49,17 +57,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         buildMenu() {
             let menu = [];
-            let rootPaths = [];
             if(this.state.contentList) {
-                for (let i = 0; i < this.state.contentList.length; i++) {
-                    const contentEntry = this.state.contentList[i];
-                    if (!contentEntry.path)
-                        continue;
+                let rootPaths = this.state.paths.slice();
+                // for (let i = 0; i < this.state.contentList.length; i++) {
+                //     const contentEntry = this.state.contentList[i];
+                //     if (!contentEntry.path)
+                //         continue;
+                //
+                //     const rootPath = '/' + contentEntry.path.split('/')[1].split(/\W/g)[0];
+                //     if (rootPaths.indexOf(rootPath) === -1)
+                //         rootPaths.push(rootPath);
+                // }
 
-                    const rootPath = '/' + contentEntry.path.split('/')[1].split(/\W/g)[0];
-                    if (rootPaths.indexOf(rootPath) === -1)
-                        rootPaths.push(rootPath);
-                }
+                console.log("TODO: ", this.state.paths, rootPaths);
 
                 menu = rootPaths.map(rootPath => {
                     const menuEntry = {title:null, path: rootPath, content: null, subMenu: []};
@@ -84,6 +94,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     return menuEntry;
                 });
             }
+
+
             let contentID = null;
             const contentArticle = document.body.querySelector('article[data-content-id]');
             if(contentArticle)
@@ -104,7 +116,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 menuSubMenu.push('<hr/>');
             }
 
-            if(!this.state.userID) {
+            // Check for log in session userID
+            const userID = (document.head.querySelector('meta[name="session:userID"]') || {}).content || null;
+
+            if(userID) {
+                menuSubMenu.push({
+                    path: `/:user/${userID}`,
+                    title: 'My Profile',
+                });
+                menuSubMenu.push({
+                    path: `/:user/${userID}/:edit`,
+                    title: 'Edit Profile',
+                });
+                menuSubMenu.push({
+                    path: `/:user/:logout`,
+                    title: 'Log Out',
+                });
+
+            } else {
                 menuSubMenu.push({
                     path: '/:user/:login',
                     title: 'Log In',
@@ -112,21 +141,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 menuSubMenu.push({
                     path: '/:user/:register',
                     title: 'Register'
-                });
-
-            } else {
-
-                menuSubMenu.push({
-                    path: `/:user/${this.state.userID}`,
-                    title: 'My Profile',
-                });
-                menuSubMenu.push({
-                    path: `/:user/${this.state.userID}/:edit`,
-                    title: 'Edit Profile',
-                });
-                menuSubMenu.push({
-                    path: `/:user/:logout`,
-                    title: 'Log Out',
                 });
             }
             menuSubMenu.push('<hr/>');

@@ -2,25 +2,26 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":user/:client/user.css");
+    })(":user/:client/form/user-form.css");
 });
 
 {
-    class HTMLUserRegisterElement extends HTMLElement {
+    class HTMLUserLoginFormElement extends HTMLElement {
         constructor() {
             super();
             this.state = {
-                message: "To register a new account, please enter your email and password",
+                message: "In order to start a new session please enter your username or email and password and hit 'Log in' below",
                 status: 0,
-                response: null,
                 processing: false,
-                duplicateRegistration: false
-            }
+                userID: "",
+                password: "",
+                session_save: ""
+            };
         }
 
         setState(newState) {
             for(let i=0; i<arguments.length; i++)
-                Object.assign(this.state, arguments[i]);
+               Object.assign(this.state, arguments[i]);
             this.render();
         }
 
@@ -28,11 +29,10 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('change', e => this.onChange(e));
             this.addEventListener('submit', e => this.onSubmit(e));
 
+            this.state.userID = this.getAttribute('userID');
             this.render();
-            // const userID = this.getAttribute('userID');
-            // if(userID)
-            //     this.requestFormData(userID);
         }
+
 
         onSuccess(e, response) {
             console.log(response);
@@ -44,22 +44,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         onError(e, response) {
             console.error(e, response);
-            if(this.state.duplicateRegistration) {
-                this.state.duplicateRegistration = false;
-                if(confirm("This user account already exists. Would you like to attempt logging in?")) {
-                    document.location.href = ':user/:login?userID=' + (this.state.username || this.state.email);
-                }
-            }
         }
 
         onChange(e) {
-            const form = e.target.form || e.target;
-            if(!form.username.value && form.email.value) {
-                form.username.value = form.email.value.split('@')[0];
-            }
-            form.username.value = (form.username.value || '').replace(/[^\w.]/g, '');
+            if(typeof this.state[e.target.name] !== 'undefined')
+                this.state[e.target.name] = e.target.value;
         }
-
 
         onSubmit(e) {
             e.preventDefault();
@@ -88,14 +78,15 @@ document.addEventListener('DOMContentLoaded', function() {
             this.setState({processing: true});
         }
 
+
         render() {
-            // console.log(formData);
-            const hostname = document.location.host.split(':')[0];
+            const userID = this.state.userID || null;
+            // console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="/:user/:register" method="POST" class="user user-register themed">
+                <form action="/:user/:login" method="POST" class="user user-form-login themed">
                     <fieldset>
-                        <legend>Register a new account</legend>
+                        <legend>Log In</legend>
                         <table class="user">
                             <thead>
                                 <tr>
@@ -109,28 +100,24 @@ document.addEventListener('DOMContentLoaded', function() {
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="label">Email</td>
-                                    <td>
-                                        <input type="email" name="email" value="${this.state.email||''}" required />
-                                    </td>
-                                </tr>
-                                <tr>
                                     <td class="label">Username</td>
-                                    <td style="position: relative;">
-                                        <input type="text" name="username" value="${this.state.username||''}" required /> 
-                                        <div style="position: absolute; right: 30px; top: 7px; color: grey;">@${hostname}</div>
+                                    <td>
+                                        <input type="text" name="userID" value="${userID || ''}" required />
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="label">Password</td>
                                     <td>
-                                        <input type="password" name="password" value="${this.state.password||''}" autocomplete="off" required />
+                                        <input type="password" name="password" value="${this.state.password || ''}" required />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="label">Confirm</td>
+                                    <td class="label">Stay Logged In</td>
                                     <td>
-                                        <input type="password" name="password_confirm" value="${this.state.password_confirm||''}" autocomplete="off" required/>
+                                        <input type="checkbox" name="session_save" ${this.state.session_save ? 'checked="checked"' : ''} value="1"/>
+                                        <div style="float: right">
+                                            <a href=":user/:forgotpassword${userID ? '?userID=' + userID : ''}">Forgot Password?</a>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -138,10 +125,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td>
-                                        <a href=":user/:login${this.state.userID ? '?userID=' + this.state.userID : ''}">Back to Login</a>
+                                        <a href=":user/:register${userID ? '?userID=' + userID : ''}">Register</a>
                                     </td>
                                     <td style="text-align: right;">
-                                        <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Register</button>
+                                        <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Log In</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -151,6 +138,5 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-register', HTMLUserRegisterElement);
-
+    customElements.define('user-form-login', HTMLUserLoginFormElement);
 }

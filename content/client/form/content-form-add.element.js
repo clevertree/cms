@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":content/:client/content.css");
+    })(":content/:client/form/content-form.css");
 });
 
 
@@ -180,7 +180,7 @@ class HTMLContentFormAddElement extends HTMLElement {
 
         // console.log("RENDER", this.state);
         this.innerHTML =
-            `<form action="/:content/:add" method="POST" class="content content-addform themed">
+            `<form action="/:content/:add" method="POST" class="content content-form-add themed">
             <fieldset>
                 <legend>Add New Content</legend>
                 <table class="content">
@@ -247,4 +247,4 @@ class HTMLContentFormAddElement extends HTMLElement {
         return bytes.toFixed(1)+' '+units[u];
     }
 }
-customElements.define('content-addform', HTMLContentFormAddElement);
+customElements.define('content-form-add', HTMLContentFormAddElement);

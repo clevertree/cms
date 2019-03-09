@@ -180,7 +180,7 @@ class ContentApi {
                     await ContentRenderer.send(req, res, {
                         title: `Edit Content #${content.id}`,
                         data: `
-            <content-editor id="${req.params.id}"></content-editor>
+            <content-form-editor id="${req.params.id}"></content-form-editor>
             
             <section class="content-preview-container">
                 <h1 style="text-align: center;">Preview</h1>
@@ -301,7 +301,7 @@ class ContentApi {
                     // Render Editor
                 await ContentRenderer.send(req, res, {
                     title: `Delete Content #${content.id}`,
-                    data: `<content-delete id="${req.params.id}"></content-editor>`
+                    data: `<content-form-delete id="${req.params.id}"></content-form-editor>`
                 });
                     break;
 
@@ -374,8 +374,8 @@ class ContentApi {
                         {
                             title: `Add New Content`,
                             data: `
-    <content-addform></content-addform>
-    <content-uploadform></content-uploadform>
+    <content-form-add></content-form-add>
+    <content-form-upload></content-form-upload>
 `
                         });
 
@@ -483,7 +483,7 @@ class ContentApi {
                     // Render Editor
                     await ContentRenderer.send(req, res, {
                         title: `Upload Content`,
-                        data: `<content-uploadform></content-uploadform>`
+                        data: `<content-form-upload></content-form-upload>`
                     })
                     break;
 
@@ -576,9 +576,9 @@ class ContentApi {
                 await ContentRenderer.send(req, res, {
                     title: `Site Index`,
                     data: `
-    <content-browser></content-browser>
-    <content-addform></content-addform>
-    <content-uploadform></content-uploadform>
+    <content-form-browser></content-form-browser>
+    <content-form-add></content-form-add>
+    <content-form-upload></content-form-upload>
 `
                 });
 
@@ -719,7 +719,7 @@ class ContentApi {
 
 
     async renderError(error, req, res, json=null) {
-        console.error(`${req.method} ${req.url} ${error.message}`, error);
+        console.error(`${req.method} ${req.url}:`, error);
         res.status(400);
         if(error.redirect) {
             res.redirect(error.redirect);

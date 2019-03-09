@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":content/:client/content.css");
+    })(":content/:client/form/content-form.css");
 });
 
 
@@ -95,7 +95,7 @@ class HTMLContentDeleteFormElement extends HTMLElement {
     render() {
         console.log("RENDER", this.state);
         this.innerHTML =
-            `<form action="/:content/${this.state.content.id}/:delete" method="POST" class="content content-delete themed">
+            `<form action="/:content/${this.state.content.id}/:delete" method="POST" class="content content-form-delete themed">
             <input type="hidden" name="id" value="${this.state.content.id}" />
             <fieldset>
                 <table class="content">
@@ -143,4 +143,4 @@ class HTMLContentDeleteFormElement extends HTMLElement {
         </form>`;
     }
 }
-customElements.define('content-delete', HTMLContentDeleteFormElement);
+customElements.define('content-form-delete', HTMLContentDeleteFormElement);

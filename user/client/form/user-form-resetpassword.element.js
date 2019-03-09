@@ -2,27 +2,22 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":user/:client/user.css");
+    })(":user/:client/form/user-form.css");
 });
 
 {
-    class HTMLUserUpdateflagsElement extends HTMLElement{
+    class HTMLUserResetpasswordElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
-                src: null,
-                method: 'POST',
-                message: "In order to update this user's flags, please modify this form and hit 'Update' below",
+                message: "Please enter a new password and hit submit below",
                 status: 0,
-                processing: false,
-                editable: false,
-                user: {id: -1, flags:[]}
+                src: '',
+                uuid: '',
+                user: {},
+                password_new: "",
+                password_confirm: "",
             };
-            this.flags = {
-                admin: 'Admin',
-                debug: 'Debug',
-            }
-            // this.state = {id:-1, flags:[]};
         }
 
         setState(newState) {
@@ -36,13 +31,14 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('submit', e => this.onSubmit(e));
 
             const src = this.getAttribute('src');
-            if(src) {
-                this.setState({src});
+
+            const uuid = this.getAttribute('uuid');
+            if(src && uuid) {
+                this.setState({src, uuid});
                 this.requestFormData();
             } else {
-                this.setState({message: "attribute src=':/user/[userID]' required", status: 400});
+                this.setState({message: "attributes are required: uuid='[uuid]' src=':/user/[userID]'", status: 400});
             }
-
         }
 
         onSuccess(e, response) {
@@ -58,16 +54,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         onChange(e) {
-
-            const form = e.target.form;
-            const newFlags = [];
-            for(let i=0; i<form.elements.length; i++) {
-                const elm = form.elements[i];
-                if(elm.name && elm.getAttribute('type') === 'checkbox' && elm.checked === true)
-                    newFlags.push(elm.name);
-            }
-            this.state.user.flags = newFlags;
-            console.log(this.state.user.flags);
+            if(e.target.name && typeof this.state[e.target.name] !== 'undefined') // typeof this.state.user.profile[e.target.name] !== 'undefined')
+                this.state[e.target.name] = e.target.value;
+            // console.log(this.state);
         }
 
         requestFormData() {
@@ -111,13 +100,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
-            // console.log("STATE", this.state.user);
-            const userFlags = this.state.user.flags || [];
+            // console.log("STATE", this.state);
+
             this.innerHTML =
                 `
-                <form action="${this.state.src}/:flags" method="POST" class="user user-updateflags themed">
+                <form action="${this.state.src}/:resetpassword/${this.state.uuid}" method="POST" class="user user-form-resetpassword themed">
                     <fieldset>
-                        <legend>Update User Flags</legend>
+                        <legend>Reset Password</legend>
                         <table class="user">
                             <thead>
                                 <tr>
@@ -131,22 +120,21 @@ document.addEventListener('DOMContentLoaded', function() {
                             </thead>
                             <tbody class="themed">
                                 <tr>
-                                    <td class="label">User ID</td>
-                                    <td><a href=":user/${this.state.user.id}">${this.state.user.id}</a></td>
-                                </tr>
-                                <tr>
                                     <td class="label">Username</td>
-                                    <td><a href=":user/${this.state.user.username}">${this.state.user.username}</a></td>
+                                    <td>
+                                        <input type="text" name="username" value="${this.state.user.username}" disabled />
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td class="label">Flags</td>
+                                    <td class="label">New Password</td>
                                     <td>
-                                        ${Object.keys(this.flags).map(flagName => `
-                                        <label>
-                                            <input type="checkbox" class="themed" name="${flagName.toLowerCase()}" value="1" ${userFlags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
-                                            ${this.flags[flagName]}
-                                        </label>
-                                        `).join('')}
+                                        <input type="password" name="password_new" value="${this.state.password_new}" autocomplete="off" required />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Confirm Password</td>
+                                    <td>
+                                        <input type="password" name="password_confirm" value="${this.state.password_confirm}" autocomplete="off" required />
                                     </td>
                                 </tr>
                             </tbody>
@@ -154,9 +142,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr><td colspan="2"><hr/></td></tr>
                                 <tr>
                                     <td>
+                                        <button onclick="location.href=':user/:login'" type="button">Go Back to log in</button>
                                     </td>
                                     <td style="text-align: right;">
-                                        <button type="submit" ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>Update Flags</button>
+                                        <button type="submit">Submit</button>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -166,5 +155,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-updateflags', HTMLUserUpdateflagsElement);
+    customElements.define('user-form-resetpassword', HTMLUserResetpasswordElement);
+
 }

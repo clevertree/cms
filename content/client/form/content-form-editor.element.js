@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":content/:client/content.css");
+    })(":content/:client/form/content-form.css");
 });
 
 
@@ -15,7 +15,7 @@ class HTMLContentEditorFormElement extends HTMLElement {
             processing: false,
             mode: null,
             revisionID: null,
-            editor: sessionStorage.getItem("content-editor:editor"),
+            editor: sessionStorage.getItem("content-form-editor:editor"),
             content: {id: -1},
             revision: {},
             history: [],
@@ -66,7 +66,7 @@ class HTMLContentEditorFormElement extends HTMLElement {
     }
 
     onKeyUp(e) {
-        const form = e.target.form || this.querySelector('form.content-editor');
+        const form = e.target.form || this.querySelector('form.content-form-editor');
         this.renderPreview(form.elements['data'].value);
         this.state.content.data = form.elements['data'].value;
     }
@@ -82,7 +82,7 @@ class HTMLContentEditorFormElement extends HTMLElement {
                 break;
             case 'editor':
                 this.state.editor = e.target.value;
-                sessionStorage.setItem("content-editor:editor",this.state.editor);
+                sessionStorage.setItem("content-form-editor:editor",this.state.editor);
                 this.renderWYSIWYGEditor();
                 break;
             case 'title':
@@ -160,7 +160,7 @@ class HTMLContentEditorFormElement extends HTMLElement {
 
         console.log("RENDER", this.state);
         this.innerHTML =
-            `<form action="${action}" method="POST" class="content content-editor themed">
+            `<form action="${action}" method="POST" class="content content-form-editor themed">
             <input type="hidden" name="id" value="${this.state.content.id}" />
             <fieldset>
                 <table class="content">
@@ -669,4 +669,4 @@ class HTMLContentEditorFormElement extends HTMLElement {
     }
 
 }
-customElements.define('content-editor', HTMLContentEditorFormElement);
+customElements.define('content-form-editor', HTMLContentEditorFormElement);
