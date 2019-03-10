@@ -181,14 +181,15 @@ class HTMLContentFormAddElement extends HTMLElement {
         // console.log("RENDER", this.state);
         this.innerHTML =
             `<form action="/:content/:add" method="POST" class="content content-form-add themed">
-            <fieldset>
-                <legend>Add New Content</legend>
                 <table class="content themed">
+                    <caption>Add New Content</caption>
                     <thead>
                         <tr>
-                            <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                                ${this.state.message}
-                            </div>
+                            <td colspan="3">
+                                <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                    ${this.state.message}
+                                </div>
+                            </td>
                         </tr>
                         <tr><td colspan="3"><hr/></td></tr>
                         <tr>
@@ -233,8 +234,7 @@ class HTMLContentFormAddElement extends HTMLElement {
                         </tr>
                     </tfoot>            
                 </table>
-            </fieldset>
-        </form>`;
+            </form>`;
     }
 
     readableByteSize(bytes) {

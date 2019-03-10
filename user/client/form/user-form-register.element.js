@@ -108,26 +108,26 @@ document.addEventListener('DOMContentLoaded', function() {
                         </thead>
                         <tbody>
                             <tr>
-                                <td><label>Email</label></td>
+                                <td><label>Email:</label></td>
                                 <td>
                                     <input type="email" name="email" value="${this.state.email||''}" required />
                                 </td>
                             </tr>
                             <tr>
-                                <td><label>Username</label></td>
+                                <td><label>Username:</label></td>
                                 <td style="position: relative;">
                                     <input type="text" name="username" value="${this.state.username||''}" required /> 
                                     <div style="position: absolute; right: 30px; top: 7px; color: grey;">@${hostname}</div>
                                 </td>
                             </tr>
                             <tr>
-                                <td><label>Password</label></td>
+                                <td><label>Password:</label></td>
                                 <td>
                                     <input type="password" name="password" value="${this.state.password||''}" autocomplete="off" required />
                                 </td>
                             </tr>
                             <tr>
-                                <td><label>Confirm</label></td>
+                                <td><label>Confirm:</label></td>
                                 <td>
                                     <input type="password" name="password_confirm" value="${this.state.password_confirm||''}" autocomplete="off" required/>
                                 </td>

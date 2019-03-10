@@ -62,30 +62,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     <tbody>
                     ${this.state.user ? `
                         <tr>
-                            <th colspan="3">
-                                <hr/>
-                            </th>
-                        </tr>
-                        <tr>
-                            <td><label>ID</label></td>
+                            <td><label>ID:</label></td>
                             <td colspan="2"><a href=":user/${this.state.user.id}">${this.state.user.id}</a></td>
                         </tr>
                         <tr>
-                            <td><label>Username</label></td>
+                            <td><label>Username:</label></td>
                             <td colspan="2"><a href=":user/${this.state.user.username}">${this.state.user.username}</a></td>
                         </tr>
                         <tr>
-                            <td><label>Flags</label></td>
+                            <td><label>Flags:</label></td>
                             <td>[${(this.state.user.flags || ['none']).join(', ')}]</td>
                             <td>${this.state.editable ? `<a href=":user/${this.state.user.id}/:flags" class="icon-edit" title="Edit Flags">[&#x270D;]</a>` : ''}</td>
                         </tr>
                         <tr>
-                            <td><label>Email</label></td>
+                            <td><label>Email:</label></td>
                             <td colspan="2">${this.state.user.email}</td>
                         </tr>
                         ${(this.state.profileConfig || []).map(profileField => `
                             <tr>
-                                <td><label>${profileField.title || profileField.name}</label></td>
+                                <td><label>${profileField.title || profileField.name}:</label></td>
                                 <td>
                                     ${this.state.user.profile[profileField.name] || 'null'}
                                 </td>

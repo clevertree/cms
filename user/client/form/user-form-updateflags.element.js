@@ -130,15 +130,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         </thead>
                         <tbody class="themed">
                             <tr>
-                                <td><label>User ID</label></td>
+                                <td><label>User ID:</label></td>
                                 <td><a href=":user/${this.state.user.id}">${this.state.user.id}</a></td>
                             </tr>
                             <tr>
-                                <td><label>Username</label></td>
+                                <td><label>Username:</label></td>
                                 <td><a href=":user/${this.state.user.username}">${this.state.user.username}</a></td>
                             </tr>
                             <tr>
-                                <td><label>Flags</label></td>
+                                <td><label>Flags:</label></td>
                                 <td>
                                     ${Object.keys(this.flags).map(flagName => `
                                     <label>

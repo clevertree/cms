@@ -110,40 +110,38 @@ class HTMLContentBrowserElement extends HTMLElement {
         let searchField = this.querySelector('input[name=search]');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
-            `<form action="/:content/:list" method="POST" class="content content-form-browser themed">
-            <fieldset>
-                <legend>Search Content</legend>
-                <table class="content themed">
-                    <thead>
-                        <tr>
-                            <td colspan="5">
-                                <input type="text" name="search" placeholder="Search Content" value="${this.state.search||''}"/>
-                            </td>
-                        </tr>
-                        <tr><td colspan="5"><hr/></td></tr>
-                        <tr style="text-align: left;">
-                            <th style="min-width: 50px;">ID</th>
-                            <th>Path</th>
-                            <th>Title</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
-                        </tr>
-                    </thead>
-                    <tbody class="results">
-                        <tr>
-                            <th colspan="5">No Results</th>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr><td colspan="5"><hr/></td></tr>
-                        <tr>
-                            <td colspan="5" class="status">
-                                <div class="message">Content Browser</div> 
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </fieldset>
+        `<form action="/:content/:list" method="POST" class="content content-form-browser themed">
+            <table class="content themed">
+                <caption>Search Content</caption>
+                <thead>
+                    <tr>
+                        <td colspan="5">
+                            <input type="text" name="search" placeholder="Search Content" value="${this.state.search||''}"/>
+                        </td>
+                    </tr>
+                    <tr><td colspan="5"><hr/></td></tr>
+                    <tr style="text-align: left;">
+                        <th style="min-width: 50px;">ID</th>
+                        <th>Path</th>
+                        <th>Title</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody class="results">
+                    <tr>
+                        <th colspan="5">No Results</th>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="5"><hr/></td></tr>
+                    <tr>
+                        <td colspan="5" class="status">
+                            <div class="message">Content Browser</div> 
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
         </form>`;
         searchField = this.querySelector('input[name=search]');
         searchField.focus();

@@ -99,19 +99,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         </thead>
                         <tbody>
                             <tr>
-                                <td><label>Username</label></td>
+                                <td><label>Username:</label></td>
                                 <td>
                                     <input type="text" name="userID" value="${userID || ''}" required />
                                 </td>
                             </tr>
                             <tr>
-                                <td><label>Password</label></td>
+                                <td><label>Password:</label></td>
                                 <td>
                                     <input type="password" name="password" value="${this.state.password || ''}" required />
                                 </td>
                             </tr>
                             <tr>
-                                <td><label>Stay logged in</label></td>
+                                <td><label>Stay logged in:</label></td>
                                 <td>
                                     <input type="checkbox" name="session_save" ${this.state.session_save ? 'checked="checked"' : ''} value="1"/>
                                     <div style="float: right">

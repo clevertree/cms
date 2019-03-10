@@ -162,96 +162,94 @@ class HTMLContentEditorFormElement extends HTMLElement {
         this.innerHTML =
             `<form action="${action}" method="POST" class="content content-form-editor themed">
             <input type="hidden" name="id" value="${this.state.content.id}" />
-            <fieldset>
-                <table class="content themed">
-                    <thead>
-                        <tr>
-                            <td colspan="2">
-                            <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                                ${message}
-                            </div>
-                            </td>
-                        </tr>
+            <table class="content themed">
+                <thead>
+                    <tr>
+                        <td colspan="2">
+                        <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                            ${message}
+                        </div>
+                        </td>
+                    </tr>
+                    <tr><td colspan="2"><hr/></td></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="width:15%;"><label for="title">Title:</label></td>
+                        <td>
+                            <input type="text" name="title" id="title" value="${this.state.content.title || ''}" required/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="path">Path:</label></td>
+                        <td>
+                            <input type="text" name="path" id="path" placeholder="/path/to/content/" value="${this.state.content.path || ''}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="theme">Theme:</label></td>
+                        <td>
+                            <select name="theme" id="theme">
+                                <option value="">Default Site Theme</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="data">Content:</label></td>
+                        <td>
+                            <textarea class="editor-plain editor-wysiwyg-target" name="data" id="data"
+                                >${this.state.content.data || ''}</textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="editor">Editor:</label></td>
+                        <td>
+                            <select name="editor" id="editor">
+                            ${[
+        ['', 'Plain Text / HTML'],
+        ['summernote', 'SummerNote'],
+        ['jodit', 'Jodit (Image Uploads)'],
+        ['trumbowyg', 'Trumbowyg'],
+        ['pell', 'Pell'],
+        ['froala', 'Froala (Not free)'],
+        ['quill', 'Quill (Broken)'],
+    ].map(option => `
+                                <option value="${option[0]}"${option[0] === this.state.editor ? ' selected="selected"' : ''}>${option[1]}</option>
+                            `)}
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="revision">Revision:</label></td>
+                        <td>
+                            <select name="revision" id="revision">
+                                <option value="">Load a revision</option>
+                            ${this.state.history.map(revision => `
+                                <option value="${revision.id}">${new Date(revision.created).toLocaleString()}</option>
+                            `)}
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="action">Preview:</label></td>
+                        <td>
+                            <select name="action" id="action">
+                                <option value="publish">Publish Now (No Preview)</option>
+                                <option value="draft">Save as Unpublished Draft</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+                    <tfoot>
                         <tr><td colspan="2"><hr/></td></tr>
-                    </thead>
-                    <tbody>
                         <tr>
-                            <td style="width:15%;"><label for="title">Title</label></td>
-                            <td>
-                                <input type="text" name="title" id="title" value="${this.state.content.title || ''}" required/>
+                            <td style="text-align: right;" colspan="2">
+                                <a href=":content/${this.state.content.id}">Back to content</a>
+                                <button type="submit" ${this.state.processing || !this.state.editable ? 'disabled="disabled"' : ''}>Publish</button>
                             </td>
                         </tr>
-                        <tr>
-                            <td><label for="path">Path</label></td>
-                            <td>
-                                <input type="text" name="path" id="path" placeholder="/path/to/content/" value="${this.state.content.path || ''}" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><label for="theme">Theme</label></td>
-                            <td>
-                                <select name="theme" id="theme">
-                                    <option value="">Default Site Theme</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><label for="data">Content</label></td>
-                            <td>
-                                <textarea class="editor-plain editor-wysiwyg-target" name="data" id="data"
-                                    >${this.state.content.data || ''}</textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><label for="editor">Editor</label></td>
-                            <td>
-                                <select name="editor" id="editor">
-                                ${[
-            ['', 'Plain Text / HTML'],
-            ['summernote', 'SummerNote'],
-            ['jodit', 'Jodit (Image Uploads)'],
-            ['trumbowyg', 'Trumbowyg'],
-            ['pell', 'Pell'],
-            ['froala', 'Froala (Not free)'],
-            ['quill', 'Quill (Broken)'],
-        ].map(option => `
-                                    <option value="${option[0]}"${option[0] === this.state.editor ? ' selected="selected"' : ''}>${option[1]}</option>
-                                `)}
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><label for="revision">Revision</label></td>
-                            <td>
-                                <select name="revision" id="revision">
-                                    <option value="">Load a revision</option>
-                                ${this.state.history.map(revision => `
-                                    <option value="${revision.id}">${new Date(revision.created).toLocaleString()}</option>
-                                `)}
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><label for="action">Preview</label></td>
-                            <td>
-                                <select name="action" id="action">
-                                    <option value="publish">Publish Now (No Preview)</option>
-                                    <option value="draft">Save as Unpublished Draft</option>
-                                </select>
-                            </td>
-                        </tr>
-                    </tbody>
-                        <tfoot>
-                            <tr><td colspan="2"><hr/></td></tr>
-                            <tr>
-                                <td style="text-align: right;" colspan="2">
-                                    <a href=":content/${this.state.content.id}">Back to content</a>
-                                    <button type="submit" ${this.state.processing || !this.state.editable ? 'disabled="disabled"' : ''}>Publish</button>
-                                </td>
-                            </tr>
-                        </tfoot>
-                </table>
-            </fieldset>
+                    </tfoot>
+            </table>
         </form>`;
 
         clearTimeout(this.renderEditorTimeout);

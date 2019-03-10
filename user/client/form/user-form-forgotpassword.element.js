@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </thead>
                         <tbody>
                             <tr>
-                                <td><label>Email or UserID</label></td>
+                                <td><label>Email or UserID:</label></td>
                                 <td>
                                     <input type="text" name="userID" value="${this.state.userID||''}" placeholder="Username or Email" required />
                                 </td>

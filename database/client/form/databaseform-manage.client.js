@@ -104,58 +104,56 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="${this.state.action}" method="${this.state.method}" class="${this.state.classes}">
-                    <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
-                        <legend>${this.state.title}</legend>
-                        <table style="width: 100%">
-                            <thead>
-                                <tr>
-                                    <td colspan="2">
-                                        <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                                            ${this.state.message}
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr><td colspan="2"><hr/></td></tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><label for="hostname">Hostname</label></td>
-                                    <td>
-                                        <input type="text" name="hostname" id="hostname" value="${formData.hostname||'localhost'}" autocomplete="off" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><label for="user">Username</label></td>
-                                    <td>
-                                        <input type="text" name="user" id="user" value="${formData.user||'cms_user'}" autocomplete="off" required /> 
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><label for="password">Password</label></td>
-                                    <td>
-                                        <input type="password" name="password" id="password" value="${formData.password||'cms_pass'}" autocomplete="off" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><label for="database">Database Name</label></td>
-                                    <td>
-                                        <input type="database" name="database" id="database" value="${formData.database||defaultDatabaseName}" autocomplete="off" />
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr><td colspan="2"><hr/></td></tr>
-                                <tr>
-                                    <td>
-                                        <a href=":database">Database Status</a>
-                                    </td>
-                                    <td style="text-align: right;">
-                                        <button type="submit">Manage</button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </fieldset>
+                    <table style="width: 100%">
+                        <caption>${this.state.title}</caption>
+                        <thead>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                        ${this.state.message}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr><td colspan="2"><hr/></td></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><label for="hostname">Hostname:</label></td>
+                                <td>
+                                    <input type="text" name="hostname" id="hostname" value="${formData.hostname||'localhost'}" autocomplete="off" required />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="user">Username:</label></td>
+                                <td>
+                                    <input type="text" name="user" id="user" value="${formData.user||'cms_user'}" autocomplete="off" required /> 
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="password">Password:</label></td>
+                                <td>
+                                    <input type="password" name="password" id="password" value="${formData.password||'cms_pass'}" autocomplete="off" required />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="database">Database Name:</label></td>
+                                <td>
+                                    <input type="database" name="database" id="database" value="${formData.database||defaultDatabaseName}" autocomplete="off" />
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="2"><hr/></td></tr>
+                            <tr>
+                                <td>
+                                    <a href=":database">Database Status</a>
+                                </td>
+                                <td style="text-align: right;">
+                                    <button type="submit">Manage</button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </form>
 `;
         }

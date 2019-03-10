@@ -119,19 +119,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         </thead>
                         <tbody class="themed">
                             <tr>
-                                <td><label>Username</label></td>
+                                <td><label>Username:</label></td>
                                 <td>
                                     <input type="text" name="username" value="${this.state.user.username}" disabled />
                                 </td>
                             </tr>
                             <tr>
-                                <td><label>New Password</label></td>
+                                <td><label>New Password:</label></td>
                                 <td>
                                     <input type="password" name="password_new" value="${this.state.password_new}" autocomplete="off" required />
                                 </td>
                             </tr>
                             <tr>
-                                <td><label>Confirm Password</label></td>
+                                <td><label>Confirm Password:</label></td>
                                 <td>
                                     <input type="password" name="password_confirm" value="${this.state.password_confirm}" autocomplete="off" required />
                                 </td>

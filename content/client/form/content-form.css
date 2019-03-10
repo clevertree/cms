@@ -1,7 +1,10 @@
+/** Content Table **/
 
+table.content {
+    min-width: 950px;
+}
 
 /** Forms **/
-
 
 form.content textarea {
 }

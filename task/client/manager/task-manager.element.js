@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ((INCLUDE_CSS) => {
         if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
             document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })("/:task/:client/manager/task-manager.css");
+    })("/:task/:client/manager/task-form.css");
 });
 
 
@@ -122,20 +122,18 @@ class HTMLTaskFormManagerElement extends HTMLElement {
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
             `<form action="#" class="task task-editor themed" ${this.state.taskName ? 'style="display: none"' : ''}>
-                <fieldset>
-                    <table class="task">
-                        <thead>
-                            <tr>
-                                <td>
-                                    <input type="text" id="search" placeholder="Search Tasks" value="${searchField ? searchField.value||'' : ''}"/>
-                                </td>
-                                <td class="status">
-                                    <div class="message">Task Editor</div> 
-                                </td>
-                            </tr>
-                        </thead>
-                    </table>
-                </fieldset>
+                <table class="task themed">
+                    <thead>
+                        <tr>
+                            <td>
+                                <input type="text" id="search" placeholder="Search Tasks" value="${searchField ? searchField.value||'' : ''}"/>
+                            </td>
+                            <td class="status">
+                                <div class="message">Task Editor</div> 
+                            </td>
+                        </tr>
+                    </thead>
+                </table>
             </form>
             <ul class="results"><li><div class="message">Loading Available Tasks...</div></li></ul>
 `;

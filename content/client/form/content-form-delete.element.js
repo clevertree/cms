@@ -97,49 +97,48 @@ class HTMLContentDeleteFormElement extends HTMLElement {
         this.innerHTML =
             `<form action="/:content/${this.state.content.id}/:delete" method="POST" class="content content-form-delete themed">
             <input type="hidden" name="id" value="${this.state.content.id}" />
-            <fieldset>
-                <table class="content themed">
-                    <thead>
-                        <tr>
-                            <td colspan="2">
+            <table class="content themed">
+                <caption>Delete Site Content</caption>
+                <thead>
+                    <tr>
+                        <td colspan="2">
                             <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
                                 ${this.state.message}
                             </div>
-                            </td>
-                        </tr>
-                        <tr><td colspan="2"><hr/></td></tr>
-                    </thead>
-                    <tbody class="themed">
-                        <tr>
-                            <td><label>Content ID</label></td>
-                            <td><a href=":content/${this.state.content.id}">${this.state.content.id}</a></td>
-                        </tr>
-                        <tr>
-                            <td><label>Title</label></td>
-                            <td>${this.state.content.title}</td>
-                        </tr>
-                        <tr>
-                            <td><label>Path</label></td>
-                            <td><a href="${this.state.content.path}">${this.state.content.path}</a></td>
-                        </tr>
-                        <tr>
-                            <td><label>Content</label></td>
-                            <td>
-                                <textarea disabled>${this.state.content.data}</textarea>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr><td colspan="2"><hr/></td></tr>
-                        <tr>
-                            <td style="text-align: right;" colspan="2">
-                                <a href=":content/${this.state.content.id}">Back to content</a>
-                                <button type="submit" ${!this.state.editable ? 'disabled="disabled"' : ''}>Delete Content</button>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </fieldset>
+                        </td>
+                    </tr>
+                    <tr><td colspan="2"><hr/></td></tr>
+                </thead>
+                <tbody class="themed">
+                    <tr>
+                        <td><label>Content ID:</label></td>
+                        <td><a href=":content/${this.state.content.id}">${this.state.content.id}</a></td>
+                    </tr>
+                    <tr>
+                        <td><label>Title:</label></td>
+                        <td>${this.state.content.title}</td>
+                    </tr>
+                    <tr>
+                        <td><label>Path:</label></td>
+                        <td><a href="${this.state.content.path}">${this.state.content.path}</a></td>
+                    </tr>
+                    <tr>
+                        <td><label>Content:</label></td>
+                        <td>
+                            <textarea disabled>${this.state.content.data}</textarea>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="2"><hr/></td></tr>
+                    <tr>
+                        <td style="text-align: right;" colspan="2">
+                            <a href=":content/${this.state.content.id}">Back to content</a>
+                            <button type="submit" ${!this.state.editable ? 'disabled="disabled"' : ''}>Delete Content</button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
         </form>`;
     }
 }

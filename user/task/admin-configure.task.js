@@ -119,83 +119,81 @@ class AdminConfigureTask {
         return `
             <form action="/:task/${taskName}" method="POST" class="task task-database-configure themed">
                 ${requestUUID ? `<input type="hidden" name="uuid" value="${requestUUID||''}">` : ``}
-                <fieldset ${!isActive ? `disabled` : ``}>
-                    <legend>Task '${taskName}'</legend>
-                    <table class="task">
-                        <thead>
+                <table class="task">
+                <caption>Task '${taskName}'</caption>
+                    <thead>
+                        <td colspan="2">
+                            <div class="${status === 200 ? 'success' : (!status ? 'message' : 'error')} status-${status}">
+                                ${message}
+                            </div>
+                        </td>
+                        <tr><td colspan="2"><hr/></td></tr>
+                        <tr>
                             <td colspan="2">
-                                <div class="${status === 200 ? 'success' : (!status ? 'message' : 'error')} status-${status}">
-                                    ${message}
-                                </div>
+                                <p>
+                                    <strong>${hostname}</strong> does not have an administrator account.  
+                                ${requestUUID ? `
+                                    Please use this form to configure the <strong>administrator</strong>.
+                                ` : `
+                                    Please use this form send an account creation request.
+                                    A <strong>validation email</strong> will be sent to the <strong>hostmaster</strong> of this server. 
+                                </p>
+                                <p>
+                                    Please have the hostmaster complete the last step according to the email's instructions.
+                                ` }
+                                </p>
                             </td>
-                            <tr><td colspan="2"><hr/></td></tr>
-                            <tr>
-                                <td colspan="2">
-                                    <p>
-                                        <strong>${hostname}</strong> does not have an administrator account.  
-                                    ${requestUUID ? `
-                                        Please use this form to configure the <strong>administrator</strong>.
-                                    ` : `
-                                        Please use this form send an account creation request.
-                                        A <strong>validation email</strong> will be sent to the <strong>hostmaster</strong> of this server. 
-                                    </p>
-                                    <p>
-                                        Please have the hostmaster complete the last step according to the email's instructions.
-                                    ` }
-                                    </p>
-                                </td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><label>Hostname</label></td>
-                                <td>
-                                    <input type="hostname" name="hostname" value="${hostname || "No Hostname Found"}" disabled/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><label>Administrator Email</label></td>
-                                <td>
-                                    ${requestUUID ? `
-                                    <input type="email" name="admin_email" value="${requestData.adminEmail}" disabled/>
-                                    ` : `
-                                    <select name="admin_email" required>
-                                        ${dnsAdminEmails.map(dnsAdminEmail =>
-                                            `<option value="${dnsAdminEmail}">${dnsAdminEmail}</option>`
-                                        ).join('')}
-                                    </select>
-                                    `}
-                                </td>
-                            </tr>
-                            ${requestUUID ? `
-                            <tr>
-                                <td><label>Administrator Username</label></td>
-                                <td>
-                                    <input type="text" name="username" value="admin" required/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><label>Administrator Password</label></td>
-                                <td>
-                                    <input type="password" name="password" value="" required/>
-                                </td>
-                            </tr>
-                            ` : `` }
-                        </tbody>
-                        <tfoot>
-                            <tr><td colspan="2"><hr/></td></tr>
-                            <tr>
-                                <td colspan="2" style="text-align: right;">
-                                    ${requestUUID ? `
-                                    <button type="submit">Create Administrator</button>
-                                    ` : `
-                                    <button type="submit">Send Validation Email</button>
-                                    `}
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </fieldset>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><label>Hostname:</label></td>
+                            <td>
+                                <input type="hostname" name="hostname" value="${hostname || "No Hostname Found"}" disabled/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label>Administrator Email:</label></td>
+                            <td>
+                                ${requestUUID ? `
+                                <input type="email" name="admin_email" value="${requestData.adminEmail}" disabled/>
+                                ` : `
+                                <select name="admin_email" required>
+                                    ${dnsAdminEmails.map(dnsAdminEmail =>
+                                        `<option value="${dnsAdminEmail}">${dnsAdminEmail}</option>`
+                                    ).join('')}
+                                </select>
+                                `}
+                            </td>
+                        </tr>
+                        ${requestUUID ? `
+                        <tr>
+                            <td><label>Administrator Username:</label></td>
+                            <td>
+                                <input type="text" name="username" value="admin" required/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label>Administrator Password:</label></td>
+                            <td>
+                                <input type="password" name="password" value="" required/>
+                            </td>
+                        </tr>
+                        ` : `` }
+                    </tbody>
+                    <tfoot>
+                        <tr><td colspan="2"><hr/></td></tr>
+                        <tr>
+                            <td colspan="2" style="text-align: right;">
+                                ${requestUUID ? `
+                                <button type="submit">Create Administrator</button>
+                                ` : `
+                                <button type="submit">Send Validation Email</button>
+                                `}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
             </form>`;
     }
 

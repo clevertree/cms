@@ -128,75 +128,75 @@ class HTMLContentFormUploadElement extends HTMLElement {
             `
         <iframe name="content-form-upload-iframe" onload="this.dispatchEvent(new CustomEvent('iframe-loaded', {bubbles: true}))" style="display: none;"></iframe>
         <form action="/:content/:upload" target="content-form-upload-iframe" onchange="this.submit()" method="POST" class="content content-form-upload themed" enctype="multipart/form-data">
-            <fieldset>
-                <legend>Upload Temporary Files</legend>
-                <table class="content themed">
-                    <thead>
-                        <tr>
+            <table class="content themed">
+                <caption>Upload Temporary Files</caption>
+                <thead>
+                    <tr>
+                        <td colspan="2">
                             <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
                                 ${this.state.message}
                             </div>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td colspan="2"><hr/></td></tr>
-                        <tr>
-                            <td>
-                                <input name="files" type="file" multiple required/>
-                            </td>
-                            <td>
-                                <input name="upload_path" type="text" value="/uploads" required/>
-                            </td>
-                            <td style="text-align: right;">
-                                <button type="submit">Upload</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr><td colspan="2"><hr/></td></tr>
-                    </tfoot>            
-                </table>
-            </fieldset>
+                        </td>
+                    </tr>
+                    <tr><td colspan="2"><hr/></td></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <input name="files" type="file" multiple required/>
+                        </td>
+                        <td>
+                            <input name="upload_path" type="text" value="/uploads" required/>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="2"><hr/></td></tr>
+                    <tr>
+                        <td colspan="2" style="text-align: right;">
+                            <button type="submit">Upload</button>
+                        </td>
+                    </tr>
+                </tfoot>            
+            </table>
         </form>
         <br/>
         <form action="/:content/:upload" method="POST" class="content content-form-upload-manage themed" enctype="application/x-www-form-urlencoded">
-            <fieldset>
-                <legend>Manage Uploaded Temporary Files</legend>
-                <table class="content themed">
-                    <thead>
-                        <tr><td colspan="3"><hr/></td></tr>
-                        <tr style="text-align: left;">
-                            <th>Uploaded File Name</th>
-                            <th>Size</th>
-                            <th>
-                                <input type="checkbox" name="selectAll" value="1" />
-                                Discard
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${this.state.currentUploads.map((currentUpload, i) => `
-                        <tr>
-                            <td style="max-width: 260px;">${currentUpload.name || ''}</td>
-                            <td>${currentUpload.size || ''}</td>
-                            <td>
-                                <label>
-                                    <input type="checkbox" class="delete" name="delete[]" value="${i}" ${val(`delete[${i}]`) ? ' checked="checked"' : ''}/>
-                                </label>
-                            </td>
-                        </tr>
-                        `).join('')}
-                    </tbody>  
-                    <tfoot>
-                        <tr><td colspan="3"><hr/></td></tr>
-                        <tr>
-                            <td colspan="3" style="text-align: center;">
-                                <button type="submit">Discard Selected Files</button>
-                            </td>
-                        </tr>
-                    </tfoot>      
-                </table>
-            </fieldset>
+            <table class="content themed">
+                <caption>Manage Uploaded Temporary Files</caption>
+                <thead>
+                    <tr><td colspan="3"><hr/></td></tr>
+                    <tr style="text-align: left;">
+                        <th>Uploaded File Name</th>
+                        <th>Size</th>
+                        <th>
+                            <input type="checkbox" name="selectAll" value="1" />
+                            Discard
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${this.state.currentUploads.map((currentUpload, i) => `
+                    <tr>
+                        <td style="max-width: 260px;">${currentUpload.name || ''}</td>
+                        <td>${currentUpload.size || ''}</td>
+                        <td>
+                            <label>
+                                <input type="checkbox" class="delete" name="delete[]" value="${i}" ${val(`delete[${i}]`) ? ' checked="checked"' : ''}/>
+                            </label>
+                        </td>
+                    </tr>
+                    `).join('')}
+                </tbody>  
+                <tfoot>
+                    <tr><td colspan="3"><hr/></td></tr>
+                    <tr>
+                        <td colspan="3" style="text-align: right;">
+                            <button type="submit">Discard Selected Files</button>
+                        </td>
+                    </tr>
+                </tfoot>      
+            </table>
         </form>`;
     }
 

@@ -122,27 +122,27 @@ document.addEventListener('DOMContentLoaded', function() {
                         </thead>
                         <tbody class="themed">
                             <tr>
-                                <td><label for="email">Email</label></td>
+                                <td><label for="email">Email:</label></td>
                                 <td>
                                     <input type="email" name="email" id="email" value="${this.state.user.email}" disabled/>
                                 </td>
                             </tr>
                             ${this.state.require_old_password ? `
                             <tr>
-                                <td><label for="password_old">Old Password</label></td>
+                                <td><label for="password_old">Old Password:</label></td>
                                 <td>
                                     <input type="password" name="password_old" id="password_old" value="${this.state.password_old||''}" required />
                                 </td>
                             </tr>
                             ` : ''}
                             <tr>
-                                <td><label for="password_new">New Password</label></td>
+                                <td><label for="password_new">New Password:</label></td>
                                 <td>
                                     <input type="password" name="password_new" id="password_new" value="${this.state.password_new||''}" required />
                                 </td>
                             </tr>
                             <tr>
-                                <td><label for="password_confirm">Confirm Password</label></td>
+                                <td><label for="password_confirm">Confirm Password:</label></td>
                                 <td>
                                     <input type="password" name="password_confirm" id="password_confirm" value="${this.state.password_confirm||''}" required />
                                 </td>

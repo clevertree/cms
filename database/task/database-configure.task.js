@@ -141,91 +141,89 @@ class DatabaseConfigureTask {
         return `
             <form action="/:task/${taskName}" method="POST" class="task task-database-configure themed">
                 ${requestUUID ? `<input type="hidden" name="uuid" value="${requestUUID||''}">` : ``}
-                <fieldset ${!isActive ? `disabled` : ``}>
-                    <legend>Task '${taskName}'</legend>
-                    <table class="task">
-                        <thead>
+                <table class="task themed">
+                <caption>Task '${taskName}'</caption>
+                    <thead>
+                        <td colspan="2">
+                            <div class="${status === 200 ? 'success' : (!status ? 'message' : 'error')} status-${status}">
+                                ${message}
+                            </div>
+                        </td>
+                        <tr><td colspan="2"><hr/></td></tr>
+                        <tr>
                             <td colspan="2">
-                                <div class="${status === 200 ? 'success' : (!status ? 'message' : 'error')} status-${status}">
-                                    ${message}
-                                </div>
+                                <p>
+                                    The database for <strong>${hostname}</strong> has not yet been configured.  
+                                ${requestUUID ? `
+                                    Please use this form to configure the <strong>domain database</strong>.
+                                ` : `
+                                    Please use this form send a database configuration request.
+                                    A <strong>validation email</strong> will be sent to the <strong>hostmaster</strong> of this server. 
+                                </p>
+                                <p>
+                                    Please have the hostmaster complete the last step according to the email's instructions.
+                                ` }
+                                </p>
                             </td>
-                            <tr><td colspan="2"><hr/></td></tr>
-                            <tr>
-                                <td colspan="2">
-                                    <p>
-                                        The database for <strong>${hostname}</strong> has not yet been configured.  
-                                    ${requestUUID ? `
-                                        Please use this form to configure the <strong>domain database</strong>.
-                                    ` : `
-                                        Please use this form send a database configuration request.
-                                        A <strong>validation email</strong> will be sent to the <strong>hostmaster</strong> of this server. 
-                                    </p>
-                                    <p>
-                                        Please have the hostmaster complete the last step according to the email's instructions.
-                                    ` }
-                                    </p>
-                                </td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><label for="hostname">Host Name</label></td>
-                                <td>
-                                    <input type="text" name="hostname" id="hostname" value="${formData.hostname||'localhost'}" autocomplete="off" required />
-                                </td>
-                            </tr>
-                            ${requestUUID ? `
-                            <tr>
-                                <td><label for="hostname">Database Name</label></td>
-                                <td>
-                                    <input type="text" name="database" value="${defaultDatabaseName}" ${requestUUID ? '' : 'disabled'}/>
-                                </td>
-                            </tr>
-                            ` : `` }
-                            <tr>
-                                <td><label for="admin_email">Administrator Email</label></td>
-                                <td>
-                                    ${requestUUID ? `
-                                    <input type="email" name="admin_email" id="admin_email" value="${requestData.adminEmail}" disabled/>
-                                    ` : `
-                                    <select name="admin_email" required>
-                                        ${dnsAdminEmails.map(dnsAdminEmail => 
-                                            `<option value="${dnsAdminEmail}">${dnsAdminEmail}</option>`
-                                        ).join('')}
-                                    </select>
-                                    `}
-                                </td>
-                            </tr>
-                            ${requestUUID ? `
-                            <tr>
-                                <td><label for="username">Administrator Email</label></td>
-                                <td>
-                                    <input type="text" name="username" id="username" value="admin" required/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><label for="password">Administrator Password</label></td>
-                                <td>
-                                    <input type="password" name="password" id="password" value="" required/>
-                                </td>
-                            </tr>
-                            ` : `` }
-                        </tbody>
-                        <tfoot>
-                            <tr><td colspan="2"><hr/></td></tr>
-                            <tr>
-                                <td colspan="2" style="text-align: right;">
-                                    ${requestUUID ? `
-                                    <button type="submit">Create Domain Database</button>
-                                    ` : `
-                                    <button type="submit">Send Validation Email</button>
-                                    `}
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </fieldset>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><label for="hostname">Host Name:</label></td>
+                            <td>
+                                <input type="text" name="hostname" id="hostname" value="${formData.hostname||'localhost'}" autocomplete="off" required />
+                            </td>
+                        </tr>
+                        ${requestUUID ? `
+                        <tr>
+                            <td><label for="hostname">Database Name:</label></td>
+                            <td>
+                                <input type="text" name="database" value="${defaultDatabaseName}" ${requestUUID ? '' : 'disabled'}/>
+                            </td>
+                        </tr>
+                        ` : `` }
+                        <tr>
+                            <td><label for="admin_email">Administrator Email:</label></td>
+                            <td>
+                                ${requestUUID ? `
+                                <input type="email" name="admin_email" id="admin_email" value="${requestData.adminEmail}" disabled/>
+                                ` : `
+                                <select name="admin_email" required>
+                                    ${dnsAdminEmails.map(dnsAdminEmail => 
+                                        `<option value="${dnsAdminEmail}">${dnsAdminEmail}</option>`
+                                    ).join('')}
+                                </select>
+                                `}
+                            </td>
+                        </tr>
+                        ${requestUUID ? `
+                        <tr>
+                            <td><label for="username">Administrator Email:</label></td>
+                            <td>
+                                <input type="text" name="username" id="username" value="admin" required/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label for="password">Administrator Password:</label></td>
+                            <td>
+                                <input type="password" name="password" id="password" value="" required/>
+                            </td>
+                        </tr>
+                        ` : `` }
+                    </tbody>
+                    <tfoot>
+                        <tr><td colspan="2"><hr/></td></tr>
+                        <tr>
+                            <td colspan="2" style="text-align: right;">
+                                ${requestUUID ? `
+                                <button type="submit">Create Domain Database</button>
+                                ` : `
+                                <button type="submit">Send Validation Email</button>
+                                `}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
             </form>`;
     }
 

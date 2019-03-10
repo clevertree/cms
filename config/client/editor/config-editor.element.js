@@ -131,40 +131,38 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
         `<form action="/:config/:edit" method="POST" class="config config-editor themed">
-            <fieldset ${!this.state.editable || this.state.processing ? 'disabled="disabled"' : null}>
-                <table class="config">
-                    <thead>
-                        <tr>
-                            <td colspan="4">
-                                <input type="text" id="search" placeholder="Search Configs" value="${searchField ? searchField.value||'' : ''}"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4" class="status">
-                                <div class="message">Config Editor</div> 
-                            </td>
-                        </tr>
-                        <tr><td colspan="4"><hr/></td></tr>
-                        <tr>
-                            <th>Name</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tbody class="results">
-                        <tr>
-                            <th colspan="4">No Results</th>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr><td colspan="2"><hr/></td></tr>
-                        <tr>
-                            <td colspan="2" style="text-align: right;">
-                                <button type="submit" disabled>Update Config</button>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </fieldset>
+            <table class="config">
+                <thead>
+                    <tr>
+                        <td colspan="4">
+                            <input type="text" id="search" placeholder="Search Configs" value="${searchField ? searchField.value||'' : ''}"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="status">
+                            <div class="message">Config Editor</div> 
+                        </td>
+                    </tr>
+                    <tr><td colspan="4"><hr/></td></tr>
+                    <tr>
+                        <th>Name</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody class="results">
+                    <tr>
+                        <th colspan="4">No Results</th>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="2"><hr/></td></tr>
+                    <tr>
+                        <td colspan="2" style="text-align: right;">
+                            <button type="submit" disabled>Update Config</button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
         </form>`;
         searchField = this.querySelector('input#search');
         searchField.focus();
@@ -203,7 +201,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
             case 'password':
                 return `
                 <tr class="results ${trClass}">
-                    <td><label>${config.name}</label></td>
+                    <td><label>${config.name}:</label></td>
                     <td><input type='${config.type || 'text'}' name='${config.name}' value='${value||''}' /></td>
                 </tr>`;
 
@@ -211,7 +209,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
             case 'textarea':
                 return `
                 <tr class="results ${trClass}">
-                    <td><label>${config.name}</label></td>
+                    <td><label>${config.name}:</label></td>
                     <td></td>
                 </tr>
                 <tr class="results ${trClass}">
