@@ -2,7 +2,7 @@
 const path = require('path');
 // const fs = require('fs');
 const fsPromises = require('fs').promises;
-const etag = require('etag');
+// const etag = require('etag');
 
 const multiparty = require('multiparty');
 
@@ -17,6 +17,8 @@ const { SessionAPI } = require('../user/session/session.api');
 
 const DIR_CONTENT = path.resolve(__dirname);
 
+
+// TODO: move / rename multi
 class ContentApi {
     constructor() {
     }
@@ -644,23 +646,23 @@ class ContentApi {
     }
 
     async renderData(req, res, data, mimeType, lastModified) {
-        const newETAG = etag(data);
+        // const newETAG = etag(data);
 
         //check if if-modified-since header is the same as the mtime of the file
-        if (req.headers["if-none-match"]) {
-            //Get the if-modified-since header from the request
-            const oldETAG = req.headers["if-none-match"];
-            if (oldETAG === newETAG) {
-                res.writeHead(304, {"Last-Modified": lastModified.toUTCString()});
-                res.end();
-                return true;
-            }
-        }
-
+        // if (req.headers["if-none-match"]) {
+        //     //Get the if-modified-since header from the request
+        //     const oldETAG = req.headers["if-none-match"];
+        //     if (oldETAG === newETAG) {
+        //         res.writeHead(304, {"Last-Modified": lastModified.toUTCString()});
+        //         res.end();
+        //         return true;
+        //     }
+        // }
         res.setHeader('Last-Modified', lastModified.toUTCString());
         res.setHeader('Content-type', mimeType );
-        res.setHeader('ETag', newETAG);
-        res.end(data);
+        // res.setHeader('ETag', newETAG);
+        res.send(data);
+// TODO: send instead of end?
 
     }
 

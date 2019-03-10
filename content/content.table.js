@@ -125,12 +125,12 @@ class ContentTable {
         return existingContent.id;
     }
 
-    async insertContent(title, data, path, user_id) {
+    async insertContent(title, data, path) {
         let set = {};
         if(title) set.title = title;
         if(data) set.data = data;
         if(path) set.path = path[0] === '/' ? path : '/' + path;
-        if(user_id !== null) set.user_id = user_id;
+        // if(user_id) set.user_id = user_id;
         // if(parent_id !== null) set.parent_id = parent_id;
         // if(theme) set.theme = theme;
         // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
@@ -142,12 +142,12 @@ class ContentTable {
         return results.insertId;
     }
 
-    async updateContent(id, title, data, path, user_id) {
+    async updateContent(id, title, data, path) {
         let set = {};
         if(title) set.title = title;
         if(data) set.data = data;
         if(path) set.path = path;
-        if(user_id !== null) set.user_id = user_id;
+        // if(user_id !== null) set.user_id = user_id;
         // if(theme) set.theme = theme;
         // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
         let SQL = `

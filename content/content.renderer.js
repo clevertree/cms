@@ -38,7 +38,7 @@ class ContentRenderer {
 
         const firstTag = html.match(/<(\w+)/)[1].toLowerCase();
         if(firstTag !== 'html') {
-            if (firstTag !== 'body') {
+            if (firstTag !== 'body') { // TODO: finish body logic
                 const templateHTML = await contentTable.fetchContentDataByPath('/site/template.html', 'UTF8');
                 html = templateHTML.replace(/<%-data%>/g, html);
             }
@@ -104,6 +104,7 @@ class ContentRenderer {
     }
 
     async send(req, res, content) {
+        res.setHeader('X-Generator', "Clevertree CMS");
         return res.send(
             await this.render(req, content)
         );

@@ -1,5 +1,4 @@
-const { DatabaseManager } = require('../database/database.manager');
-
+// TODO: user_id isn't available during insert
 // Init
 class ContentRevisionTable {
     constructor(dbName, debug=false) {
