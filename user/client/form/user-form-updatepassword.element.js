@@ -108,59 +108,57 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                <form action="${this.state.src}/:password" method="POST" class="user user-form-updatepassword themed">
-                    <fieldset>
-                        <legend>Change Password</legend>
-                        <table class="user themed">
-                            <thead>
-                                <tr>
-                                    <td colspan="2">
-                                        <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                                            ${this.state.message}
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr><td colspan="2"><hr/></td></tr>
-                            </thead>
-                            <tbody class="themed">
-                                <tr>
-                                    <td class="label">Email</td>
-                                    <td>
-                                        <input type="email" name="email" value="${this.state.user.email}" disabled/>
-                                    </td>
-                                </tr>
-                                ${this.state.require_old_password ? `
-                                <tr>
-                                    <td class="label">Old Password</td>
-                                    <td>
-                                        <input type="password" name="password_old" value="${this.state.password_old||''}" required />
-                                    </td>
-                                </tr>
-                                ` : ''}
-                                <tr>
-                                    <td class="label">New Password</td>
-                                    <td>
-                                        <input type="password" name="password_new" value="${this.state.password_new||''}" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Confirm Password</td>
-                                    <td>
-                                        <input type="password" name="password_confirm" value="${this.state.password_confirm||''}" required />
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr><td colspan="2"><hr/></td></tr>
-                                <tr>
-                                    <td>
-                                    </td>
-                                    <td style="text-align: right;">
-                                        <button type="submit" ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>Update Password</button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </fieldset>
+                    <table class="user themed">
+                        <caption>Change Password</caption>
+                        <thead>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                        ${this.state.message}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr><td colspan="2"><hr/></td></tr>
+                        </thead>
+                        <tbody class="themed">
+                            <tr>
+                                <td><label for="email">Email</label></td>
+                                <td>
+                                    <input type="email" name="email" id="email" value="${this.state.user.email}" disabled/>
+                                </td>
+                            </tr>
+                            ${this.state.require_old_password ? `
+                            <tr>
+                                <td><label for="password_old">Old Password</label></td>
+                                <td>
+                                    <input type="password" name="password_old" id="password_old" value="${this.state.password_old||''}" required />
+                                </td>
+                            </tr>
+                            ` : ''}
+                            <tr>
+                                <td><label for="password_new">New Password</label></td>
+                                <td>
+                                    <input type="password" name="password_new" id="password_new" value="${this.state.password_new||''}" required />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label for="password_confirm">Confirm Password</label></td>
+                                <td>
+                                    <input type="password" name="password_confirm" id="password_confirm" value="${this.state.password_confirm||''}" required />
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="2"><hr/></td></tr>
+                            <tr>
+                                <td>
+                                </td>
+                                <td style="text-align: right;">
+                                    <button type="submit" ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>Update Password</button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </form>
 `;
         }

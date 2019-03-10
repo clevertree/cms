@@ -80,7 +80,6 @@ class HTMLUserFormBrowserElement extends HTMLElement {
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
             `<form action="/:user/:list" method="POST" class="user user-form-browser themed">
-             <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
                 <table class="user themed">
                     <thead>
                         <tr>
@@ -111,8 +110,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
                         </tr>
                     </tfoot>
                 </table>
-            </fieldset>
-        </form>`;
+            </form>`;
         searchField = this.querySelector('input[name=search]');
         searchField.focus();
         if(selectionStart)

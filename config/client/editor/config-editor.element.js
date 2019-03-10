@@ -203,7 +203,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
             case 'password':
                 return `
                 <tr class="results ${trClass}">
-                    <td class="label">${config.name}</td>
+                    <td><label>${config.name}</label></td>
                     <td><input type='${config.type || 'text'}' name='${config.name}' value='${value||''}' /></td>
                 </tr>`;
 
@@ -211,7 +211,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
             case 'textarea':
                 return `
                 <tr class="results ${trClass}">
-                    <td class="label">${config.name}</td>
+                    <td><label>${config.name}</label></td>
                     <td></td>
                 </tr>
                 <tr class="results ${trClass}">

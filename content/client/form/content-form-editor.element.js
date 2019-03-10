@@ -176,60 +176,54 @@ class HTMLContentEditorFormElement extends HTMLElement {
                     </thead>
                     <tbody>
                         <tr>
-                            <th style="width: 65px;"></th>
-                            <th></th>
-                        </tr>
-                        <tr>
-                            <td class="label">Title</td>
+                            <td style="width:15%;"><label for="title">Title</label></td>
                             <td>
-                                <input type="text" name="title" value="${this.state.content.title || ''}" required/>
+                                <input type="text" name="title" id="title" value="${this.state.content.title || ''}" required/>
                             </td>
                         </tr>
                         <tr>
-                            <td class="label">Path</td>
+                            <td><label for="path">Path</label></td>
                             <td>
-                                <input type="text" name="path" placeholder="/path/to/content/" value="${this.state.content.path || ''}" />
+                                <input type="text" name="path" id="path" placeholder="/path/to/content/" value="${this.state.content.path || ''}" />
                             </td>
                         </tr>
                         <tr>
-                            <td class="label">Theme</td>
+                            <td><label for="theme">Theme</label></td>
                             <td>
-                                <select name="theme">
+                                <select name="theme" id="theme">
                                     <option value="">Default Site Theme</option>
                                 </select>
                             </td>
                         </tr>
                         <tr>
-                            <td class="label">Content</td>
+                            <td><label for="data">Content</label></td>
                             <td>
-                                <textarea class="editor-plain editor-wysiwyg-target" name="data"
+                                <textarea class="editor-plain editor-wysiwyg-target" name="data" id="data"
                                     >${this.state.content.data || ''}</textarea>
                             </td>
                         </tr>
                         <tr>
-                            <td class="label">Switch Editor</td>
+                            <td><label for="editor">Editor</label></td>
                             <td>
-                                <label>
-                                    <select name="editor">
-                                    ${[
-                ['', 'Plain Text / HTML'],
-                ['summernote', 'SummerNote'],
-                ['jodit', 'Jodit (Image Uploads)'],
-                ['trumbowyg', 'Trumbowyg'],
-                ['pell', 'Pell'],
-                ['froala', 'Froala (Not free)'],
-                ['quill', 'Quill (Broken)'],
-            ].map(option => `
-                                        <option value="${option[0]}"${option[0] === this.state.editor ? ' selected="selected"' : ''}>${option[1]}</option>
-                                    `)}
-                                    </select>
-                                </label>
+                                <select name="editor" id="editor">
+                                ${[
+            ['', 'Plain Text / HTML'],
+            ['summernote', 'SummerNote'],
+            ['jodit', 'Jodit (Image Uploads)'],
+            ['trumbowyg', 'Trumbowyg'],
+            ['pell', 'Pell'],
+            ['froala', 'Froala (Not free)'],
+            ['quill', 'Quill (Broken)'],
+        ].map(option => `
+                                    <option value="${option[0]}"${option[0] === this.state.editor ? ' selected="selected"' : ''}>${option[1]}</option>
+                                `)}
+                                </select>
                             </td>
                         </tr>
                         <tr>
-                            <td class="label">Revision</td>
+                            <td><label for="revision">Revision</label></td>
                             <td>
-                                <select name="revision">
+                                <select name="revision" id="revision">
                                     <option value="">Load a revision</option>
                                 ${this.state.history.map(revision => `
                                     <option value="${revision.id}">${new Date(revision.created).toLocaleString()}</option>
@@ -238,14 +232,12 @@ class HTMLContentEditorFormElement extends HTMLElement {
                             </td>
                         </tr>
                         <tr>
-                            <td class="label">Preview</td>
+                            <td><label for="action">Preview</label></td>
                             <td>
-                                <label>
-                                    <select name="action">
-                                        <option value="publish">Publish Now (No Preview)</option>
-                                        <option value="draft">Save as Unpublished Draft</option>
-                                    </select>
-                                </label>
+                                <select name="action" id="action">
+                                    <option value="publish">Publish Now (No Preview)</option>
+                                    <option value="draft">Save as Unpublished Draft</option>
+                                </select>
                             </td>
                         </tr>
                     </tbody>

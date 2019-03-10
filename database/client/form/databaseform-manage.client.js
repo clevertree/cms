@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 message: "In order to manage this Website to a Database, please enter the database credentials below and hit 'Manage'",
                 method: 'POST',
                 action: '/:database/:manage/',
-                classes: 'databaseform databaseform-manage themed',
+                classes: 'databaseform database-manage themed',
                 status: 0,
                 processing: false
             }
@@ -119,27 +119,27 @@ document.addEventListener('DOMContentLoaded', function() {
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="label">Host</td>
+                                    <td><label for="hostname">Hostname</label></td>
                                     <td>
-                                        <input type="text" name="host" value="${formData.host||'localhost'}" autocomplete="off" required />
+                                        <input type="text" name="hostname" id="hostname" value="${formData.hostname||'localhost'}" autocomplete="off" required />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="label">Username</td>
+                                    <td><label for="user">Username</label></td>
                                     <td>
-                                        <input type="text" name="user" value="${formData.user||'cms_user'}" autocomplete="off" required /> 
+                                        <input type="text" name="user" id="user" value="${formData.user||'cms_user'}" autocomplete="off" required /> 
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="label">Password</td>
+                                    <td><label for="password">Password</label></td>
                                     <td>
-                                        <input type="password" name="password" value="${formData.password||'cms_pass'}" autocomplete="off" required />
+                                        <input type="password" name="password" id="password" value="${formData.password||'cms_pass'}" autocomplete="off" required />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="label">Database Name</td>
+                                    <td><label for="database">Database Name</label></td>
                                     <td>
-                                        <input type="database" name="database" value="${formData.database||defaultDatabaseName}" autocomplete="off" />
+                                        <input type="database" name="database" id="database" value="${formData.database||defaultDatabaseName}" autocomplete="off" />
                                     </td>
                                 </tr>
                             </tbody>
@@ -160,5 +160,5 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('databaseform-manage', HTMLDatabaseManageFormElement);
+    customElements.define('database-manage', HTMLDatabaseManageFormElement);
 }

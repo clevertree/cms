@@ -105,52 +105,50 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="${this.state.src}/:resetpassword/${this.state.uuid}" method="POST" class="user user-form-resetpassword themed">
-                    <fieldset>
-                        <legend>Reset Password</legend>
-                        <table class="user themed">
-                            <thead>
-                                <tr>
-                                    <td colspan="2">
-                                        <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                                            ${this.state.message}
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr><td colspan="2"><hr/></td></tr>
-                            </thead>
-                            <tbody class="themed">
-                                <tr>
-                                    <td class="label">Username</td>
-                                    <td>
-                                        <input type="text" name="username" value="${this.state.user.username}" disabled />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">New Password</td>
-                                    <td>
-                                        <input type="password" name="password_new" value="${this.state.password_new}" autocomplete="off" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Confirm Password</td>
-                                    <td>
-                                        <input type="password" name="password_confirm" value="${this.state.password_confirm}" autocomplete="off" required />
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr><td colspan="2"><hr/></td></tr>
-                                <tr>
-                                    <td>
-                                        <button onclick="location.href=':user/:login'" type="button">Go Back to log in</button>
-                                    </td>
-                                    <td style="text-align: right;">
-                                        <button type="submit">Submit</button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </fieldset>
+                    <table class="user themed">
+                    <caption>Reset Password</caption>
+                        <thead>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                        ${this.state.message}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr><td colspan="2"><hr/></td></tr>
+                        </thead>
+                        <tbody class="themed">
+                            <tr>
+                                <td><label>Username</label></td>
+                                <td>
+                                    <input type="text" name="username" value="${this.state.user.username}" disabled />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label>New Password</label></td>
+                                <td>
+                                    <input type="password" name="password_new" value="${this.state.password_new}" autocomplete="off" required />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label>Confirm Password</label></td>
+                                <td>
+                                    <input type="password" name="password_confirm" value="${this.state.password_confirm}" autocomplete="off" required />
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="2"><hr/></td></tr>
+                            <tr>
+                                <td>
+                                    <button onclick="location.href=':user/:login'" type="button">Go Back to log in</button>
+                                </td>
+                                <td style="text-align: right;">
+                                    <button type="submit">Submit</button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </form>
 `;
         }

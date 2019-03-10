@@ -73,7 +73,7 @@ class DatabaseAPI {
             if (req.method === 'GET') {
                 await ContentRenderer.send(req, res, {
                     title: `Manage Database`,
-                    data: `<databaseform-manage></databaseform-manage>`
+                    data: `<database-manage></database-manage>`
                 });
             } else {
                 // Handle POST
@@ -117,7 +117,7 @@ class DatabaseAPI {
             if (req.method === 'GET') {
                 await ContentRenderer.send(req, res, {
                     title: `Connect to Database`,
-                    content: `<databaseform-connect></databaseform-connect>`
+                    content: `<database-connect></database-connect>`
                 });
 
             } else {

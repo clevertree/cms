@@ -116,52 +116,50 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="${this.state.src}/:flags" method="POST" class="user user-form-updateflags themed">
-                    <fieldset>
-                        <legend>Update User Flags</legend>
-                        <table class="user themed">
-                            <thead>
-                                <tr>
-                                    <td colspan="2">
-                                        <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                                            ${this.state.message}
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr><td colspan="2"><hr/></td></tr>
-                            </thead>
-                            <tbody class="themed">
-                                <tr>
-                                    <td class="label">User ID</td>
-                                    <td><a href=":user/${this.state.user.id}">${this.state.user.id}</a></td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Username</td>
-                                    <td><a href=":user/${this.state.user.username}">${this.state.user.username}</a></td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Flags</td>
-                                    <td>
-                                        ${Object.keys(this.flags).map(flagName => `
-                                        <label>
-                                            <input type="checkbox" class="themed" name="${flagName.toLowerCase()}" value="1" ${userFlags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
-                                            ${this.flags[flagName]}
-                                        </label>
-                                        `).join('')}
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr><td colspan="2"><hr/></td></tr>
-                                <tr>
-                                    <td>
-                                    </td>
-                                    <td style="text-align: right;">
-                                        <button type="submit" ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>Update Flags</button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </fieldset>
+                    <table class="user themed">
+                        <caption>Update User Flags</caption>
+                        <thead>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                        ${this.state.message}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr><td colspan="2"><hr/></td></tr>
+                        </thead>
+                        <tbody class="themed">
+                            <tr>
+                                <td><label>User ID</label></td>
+                                <td><a href=":user/${this.state.user.id}">${this.state.user.id}</a></td>
+                            </tr>
+                            <tr>
+                                <td><label>Username</label></td>
+                                <td><a href=":user/${this.state.user.username}">${this.state.user.username}</a></td>
+                            </tr>
+                            <tr>
+                                <td><label>Flags</label></td>
+                                <td>
+                                    ${Object.keys(this.flags).map(flagName => `
+                                    <label>
+                                        <input type="checkbox" class="themed" name="${flagName.toLowerCase()}" value="1" ${userFlags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
+                                        ${this.flags[flagName]}
+                                    </label>
+                                    `).join('')}
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="2"><hr/></td></tr>
+                            <tr>
+                                <td>
+                                </td>
+                                <td style="text-align: right;">
+                                    <button type="submit" ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>Update Flags</button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </form>
 `;
         }

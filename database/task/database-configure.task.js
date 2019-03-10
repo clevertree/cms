@@ -170,24 +170,24 @@ class DatabaseConfigureTask {
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="label">Hostname</td>
+                                <td><label for="hostname">Host Name</label></td>
                                 <td>
-                                    <input type="hostname" name="hostname" value="${hostname || "No Hostname Found"}" disabled/>
+                                    <input type="text" name="hostname" id="hostname" value="${formData.hostname||'localhost'}" autocomplete="off" required />
                                 </td>
                             </tr>
                             ${requestUUID ? `
                             <tr>
-                                <td class="label">Database Name</td>
+                                <td><label for="hostname">Database Name</label></td>
                                 <td>
                                     <input type="text" name="database" value="${defaultDatabaseName}" ${requestUUID ? '' : 'disabled'}/>
                                 </td>
                             </tr>
                             ` : `` }
                             <tr>
-                                <td class="label">Administrator Email</td>
+                                <td><label for="admin_email">Administrator Email</label></td>
                                 <td>
                                     ${requestUUID ? `
-                                    <input type="email" name="admin_email" value="${requestData.adminEmail}" disabled/>
+                                    <input type="email" name="admin_email" id="admin_email" value="${requestData.adminEmail}" disabled/>
                                     ` : `
                                     <select name="admin_email" required>
                                         ${dnsAdminEmails.map(dnsAdminEmail => 
@@ -199,15 +199,15 @@ class DatabaseConfigureTask {
                             </tr>
                             ${requestUUID ? `
                             <tr>
-                                <td class="label">Administrator Username</td>
+                                <td><label for="username">Administrator Email</label></td>
                                 <td>
-                                    <input type="text" name="username" value="admin" required/>
+                                    <input type="text" name="username" id="username" value="admin" required/>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="label">Administrator Password</td>
+                                <td><label for="password">Administrator Password</label></td>
                                 <td>
-                                    <input type="password" name="password" value="" required/>
+                                    <input type="password" name="password" id="password" value="" required/>
                                 </td>
                             </tr>
                             ` : `` }

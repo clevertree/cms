@@ -83,40 +83,38 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/:forgotpassword" method="POST" class="user user-form-forgotpassword themed">
-                    <fieldset ${this.state.processing ? 'disabled="disabled"' : null}>
-                        <legend>Forgot Password</legend>
-                        <table class="user themed">
-                            <thead>
-                                <tr>
-                                    <td colspan="2">
-                                        <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                                            ${this.state.message}
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr><td colspan="2"><hr/></td></tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="label">Email or UserID</td>
-                                    <td>
-                                        <input type="text" name="userID" value="${this.state.userID||''}" placeholder="Username or Email" required />
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr><td colspan="2"><hr/></td></tr>
-                                <tr>
-                                    <td>
-                                        <button onclick="location.href=':user/:login'" type="button">Go Back</button>
-                                    </td>
-                                    <td style="text-align: right;">
-                                        <button type="submit">Submit</button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </fieldset>
+                    <table class="user themed">
+                        <caption>Forgot Password</caption>
+                        <thead>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                        ${this.state.message}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr><td colspan="2"><hr/></td></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><label>Email or UserID</label></td>
+                                <td>
+                                    <input type="text" name="userID" value="${this.state.userID||''}" placeholder="Username or Email" required />
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="2"><hr/></td></tr>
+                            <tr>
+                                <td>
+                                    <button onclick="location.href=':user/:login'" type="button">Go Back</button>
+                                </td>
+                                <td style="text-align: right;">
+                                    <button type="submit">Submit</button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </form>
 `;
         }

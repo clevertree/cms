@@ -122,8 +122,8 @@ const CUSTOM_ELEMENT_SOURCE = {
     // 'content-nav':          '/:content/:client/content-nav.element.js',
     // 'content-form-upload':       '/:content/:client/content-form-upload.element.js',
     //
-    // // 'editor': 'databaseform-connect.client.js',
-    // // 'editor': 'databaseform-manage.client.js',
+    // // 'editor': 'database-connect.client.js',
+    // // 'editor': 'database-manage.client.js',
     //
     // 'slideshow-player':     '/:content/:client/content-slideshow.element.js',
     //

@@ -123,47 +123,46 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="${this.state.src}/:profile" method="POST" class="user user-form-updateprofile themed">
-                   <fieldset>
-                        <legend>Update Profile</legend>
-                        <table class="user themed">
-                            <thead>
-                                <tr>
-                                    <td colspan="2">
-                                        <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                                            ${this.state.message}
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr><td colspan="2"><hr/></td></tr>
-                            </thead>
-                            <tbody class="themed">
-                                <tr>
-                                    <td class="label">User ID</td>
-                                    <td><a href=":user/${this.state.user.id}">${this.state.user.id}</a></td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Username</td>
-                                    <td><a href=":user/${this.state.user.username}">${this.state.user.username}</a></td>
-                                </tr>
-                            ${(this.state.profileConfig || []).map(profileField => `
-                                <tr>
-                                    <td class="label">${profileField.title || profileField.name}</td>
-                                    <td>
-                                        ${this.renderProfileField(profileField)}
-                                    </td>
-                                </tr>
-                            `).join('')}
-                            </tbody>
-                            <tfoot>
-                                <tr><td colspan="2"><hr/></td></tr>
-                                    <td>
-                                    </td>
-                                    <td style="text-align: right;">
-                                        <button type="submit" ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>Update Profile</button>
-                                    </td>
-                            </tfoot>
-                        </table>
-                    </fieldset>
+                    <table class="user themed">
+                        <caption>Update Profile</caption>
+                        <thead>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                        ${this.state.message}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr><td colspan="2"><hr/></td></tr>
+                        </thead>
+                        <tbody class="themed">
+                            <tr>
+                                <td style="width:15%;"><label>User ID</label></td>
+                                <td><a href=":user/${this.state.user.id}">${this.state.user.id}</a></td>
+                            </tr>
+                            <tr>
+                                <td><label>Username</label></td>
+                                <td><a href=":user/${this.state.user.username}">${this.state.user.username}</a></td>
+                            </tr>
+                        ${(this.state.profileConfig || []).map(profileField => `
+                            <tr>
+                                <td><label>${profileField.title || profileField.name}</label></td>
+                                <td>
+                                    ${this.renderProfileField(profileField)}
+                                </td>
+                            </tr>
+                        `).join('')}
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="2"><hr/></td></tr>
+                                <td>
+                                </td>
+                                <td style="text-align: right;">
+                                    <button type="submit" ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}
+                                        >Update Profile</button>
+                                </td>
+                        </tfoot>
+                    </table>
                 </form>
 `;
         }

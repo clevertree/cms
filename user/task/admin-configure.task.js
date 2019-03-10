@@ -148,13 +148,13 @@ class AdminConfigureTask {
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="label">Hostname</td>
+                                <td><label>Hostname</label></td>
                                 <td>
                                     <input type="hostname" name="hostname" value="${hostname || "No Hostname Found"}" disabled/>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="label">Administrator Email</td>
+                                <td><label>Administrator Email</label></td>
                                 <td>
                                     ${requestUUID ? `
                                     <input type="email" name="admin_email" value="${requestData.adminEmail}" disabled/>
@@ -169,13 +169,13 @@ class AdminConfigureTask {
                             </tr>
                             ${requestUUID ? `
                             <tr>
-                                <td class="label">Administrator Username</td>
+                                <td><label>Administrator Username</label></td>
                                 <td>
                                     <input type="text" name="username" value="admin" required/>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="label">Administrator Password</td>
+                                <td><label>Administrator Password</label></td>
                                 <td>
                                     <input type="password" name="password" value="" required/>
                                 </td>

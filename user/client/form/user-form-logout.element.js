@@ -84,30 +84,28 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/:logout" method="POST" class="user user-form-logout themed">
-                    <fieldset>
-                        <legend>Log Out</legend>
-                            <table class="user themed">
-                                <thead>
-                                    <tr>
-                                        <td colspan="2">
-                                            <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                                                ${this.state.message}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <tr><td colspan="2"><hr/></td></tr>
-                                    <tr>
-                                        <td>
-                                        </td>
-                                        <td style="text-align: right;">
-                                            <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Log Out</button>
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                    </fieldset>
+                    <table class="user themed">
+                        <caption>Log Out</caption>
+                        <thead>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                        ${this.state.message}
+                                    </div>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr><td colspan="2"><hr/></td></tr>
+                            <tr>
+                                <td>
+                                </td>
+                                <td style="text-align: right;">
+                                    <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Log Out</button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </form>
 `;
         }

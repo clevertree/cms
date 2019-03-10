@@ -94,59 +94,57 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/:register" method="POST" class="user user-form-register themed">
-                    <fieldset>
-                        <legend>Register a new account</legend>
-                        <table class="user themed">
-                            <thead>
-                                <tr>
-                                    <td colspan="2">
-                                        <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                                            ${this.state.message}
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr><td colspan="2"><hr/></td></tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="label">Email</td>
-                                    <td>
-                                        <input type="email" name="email" value="${this.state.email||''}" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Username</td>
-                                    <td style="position: relative;">
-                                        <input type="text" name="username" value="${this.state.username||''}" required /> 
-                                        <div style="position: absolute; right: 30px; top: 7px; color: grey;">@${hostname}</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Password</td>
-                                    <td>
-                                        <input type="password" name="password" value="${this.state.password||''}" autocomplete="off" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Confirm</td>
-                                    <td>
-                                        <input type="password" name="password_confirm" value="${this.state.password_confirm||''}" autocomplete="off" required/>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr><td colspan="2"><hr/></td></tr>
-                                <tr>
-                                    <td>
-                                        <a href=":user/:login${this.state.userID ? '?userID=' + this.state.userID : ''}">Back to Login</a>
-                                    </td>
-                                    <td style="text-align: right;">
-                                        <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Register</button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </fieldset>
+                    <table class="user themed">
+                        <caption>Register a new account</caption>
+                        <thead>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                        ${this.state.message}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr><td colspan="2"><hr/></td></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><label>Email</label></td>
+                                <td>
+                                    <input type="email" name="email" value="${this.state.email||''}" required />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label>Username</label></td>
+                                <td style="position: relative;">
+                                    <input type="text" name="username" value="${this.state.username||''}" required /> 
+                                    <div style="position: absolute; right: 30px; top: 7px; color: grey;">@${hostname}</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label>Password</label></td>
+                                <td>
+                                    <input type="password" name="password" value="${this.state.password||''}" autocomplete="off" required />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label>Confirm</label></td>
+                                <td>
+                                    <input type="password" name="password_confirm" value="${this.state.password_confirm||''}" autocomplete="off" required/>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="2"><hr/></td></tr>
+                            <tr>
+                                <td>
+                                    <a href=":user/:login${this.state.userID ? '?userID=' + this.state.userID : ''}">Back to Login</a>
+                                </td>
+                                <td style="text-align: right;">
+                                    <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Register</button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </form>
 `;
         }

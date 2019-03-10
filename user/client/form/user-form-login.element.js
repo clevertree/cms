@@ -85,55 +85,53 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `
                 <form action="/:user/:login" method="POST" class="user user-form-login themed">
-                    <fieldset>
-                        <legend>Log In</legend>
-                        <table class="user themed">
-                            <thead>
-                                <tr>
-                                    <td colspan="2">
-                                        <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                                            ${this.state.message}
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr><td colspan="2"><hr/></td></tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="label">Username</td>
-                                    <td>
-                                        <input type="text" name="userID" value="${userID || ''}" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Password</td>
-                                    <td>
-                                        <input type="password" name="password" value="${this.state.password || ''}" required />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Stay Logged In</td>
-                                    <td>
-                                        <input type="checkbox" name="session_save" ${this.state.session_save ? 'checked="checked"' : ''} value="1"/>
-                                        <div style="float: right">
-                                            <a href=":user/:forgotpassword${userID ? '?userID=' + userID : ''}">Forgot Password?</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr><td colspan="2"><hr/></td></tr>
-                                <tr>
-                                    <td>
-                                        <a href=":user/:register${userID ? '?userID=' + userID : ''}">Register</a>
-                                    </td>
-                                    <td style="text-align: right;">
-                                        <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Log In</button>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </fieldset>
+                    <table class="user themed">
+                        <caption>Log In</caption>
+                        <thead>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                        ${this.state.message}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr><td colspan="2"><hr/></td></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><label>Username</label></td>
+                                <td>
+                                    <input type="text" name="userID" value="${userID || ''}" required />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label>Password</label></td>
+                                <td>
+                                    <input type="password" name="password" value="${this.state.password || ''}" required />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label>Stay logged in</label></td>
+                                <td>
+                                    <input type="checkbox" name="session_save" ${this.state.session_save ? 'checked="checked"' : ''} value="1"/>
+                                    <div style="float: right">
+                                        <a href=":user/:forgotpassword${userID ? '?userID=' + userID : ''}">Forgot Password?</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="2"><hr/></td></tr>
+                            <tr>
+                                <td>
+                                    <a href=":user/:register${userID ? '?userID=' + userID : ''}">Register</a>
+                                </td>
+                                <td style="text-align: right;">
+                                    <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Log In</button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </form>
 `;
         }

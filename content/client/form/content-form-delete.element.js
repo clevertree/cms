@@ -111,19 +111,19 @@ class HTMLContentDeleteFormElement extends HTMLElement {
                     </thead>
                     <tbody class="themed">
                         <tr>
-                            <td class="label">Content ID</td>
+                            <td><label>Content ID</label></td>
                             <td><a href=":content/${this.state.content.id}">${this.state.content.id}</a></td>
                         </tr>
                         <tr>
-                            <td class="label">Title</td>
+                            <td><label>Title</label></td>
                             <td>${this.state.content.title}</td>
                         </tr>
                         <tr>
-                            <td class="label">Path</td>
+                            <td><label>Path</label></td>
                             <td><a href="${this.state.content.path}">${this.state.content.path}</a></td>
                         </tr>
                         <tr>
-                            <td class="label">Content</td>
+                            <td><label>Content</label></td>
                             <td>
                                 <textarea disabled>${this.state.content.data}</textarea>
                             </td>

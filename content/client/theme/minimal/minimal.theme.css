@@ -106,6 +106,7 @@ body.theme-minimal > footer {
     padding: 0.5em;
     margin: 0.5em;
     border-radius: 4px;
+    max-width: 760px;
 }
 .theme-minimal div.message {
     color: #000;
@@ -153,20 +154,15 @@ body.theme-minimal > footer {
 
 /** Forms **/
 
-.theme-minimal form.themed > fieldset {
-    padding: 1em 1em;
-    border-radius: 8px;
-    border: 1px outset #DDD;
-    background: #CCC;
-}
 .theme-minimal form.themed > fieldset > legend {
-    /* margin: 0 auto; */
-    padding: 2px 8px;
+    /* margin: 0 0; */
+    padding: 2px 6px;
     font-weight: bold;
     border-radius: 8px;
     border: 1px outset #DDD;
     border-bottom: 1px outset #FFF;
     background: #CCC;
+    /* text-align: center; */
 }
 
 
@@ -205,23 +201,9 @@ body.theme-minimal > footer {
 
 .theme-minimal form.themed {
      max-width: 1200px;
-    margin: auto;
+     margin: auto;
 }
 
-.theme-minimal form.themed > fieldset {
-    margin: 0px auto;
-}
-
-.theme-minimal form.themed > fieldset > table {
-    width: 100%;
-    border-collapse: collapse;
-}
-.theme-minimal form.themed > fieldset > table > caption {
-    /* font-weight: bold; */
-    /*font-style: italic;*/
-    text-align: left;
-    /* padding-bottom: 1em; */
-}
 /** Form Input **/
 
 .theme-minimal form.themed input[type=text],
@@ -239,10 +221,12 @@ body.theme-minimal > footer {
 /** Table **/
 .theme-minimal table.themed {
     margin: 0 auto;
-    padding: 0.5em;
+    padding: 1em;
+    /* border: 1px outset #DDD; */
     border-radius: 8px;
     /*border: 1px outset #DDD;*/
     background: #CCC;
+    box-shadow: 2px 1px 4px #5558;
 }
 
 .theme-minimal table.themed > caption {
@@ -251,6 +235,7 @@ body.theme-minimal > footer {
     border-radius: 8px;
     border: 1px outset #DDD;
     background: #CCC;
+    box-shadow: 2px 0px 4px #5558;
 }
 
 /** Table Row **/
@@ -270,19 +255,17 @@ body.theme-minimal > footer {
 
 /** Labels **/
 
-.theme-minimal table.themed td.label {
+.theme-minimal table.themed td > label {
     text-align: right;
     padding: 8px 8px 8px 0px;
     font-weight: bold;
-    white-space: nowrap;
+    /*white-space: nowrap;*/
     display: block;
-    min-width: 90%;
+    /* min-width: 90%; */
+    /* max-width: 132px; */
 }
-.theme-minimal table.themed td.label:after {
+.theme-minimal table.themed td > label:after {
     content: ':'
 }
 
 
-.theme-minimal table.themed > tbody > tr > td:first-child {
-    width: 8%;
-}

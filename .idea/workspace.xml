@@ -3,25 +3,27 @@
   <component name="ChangeListManager">
     <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/default/site/template.html" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/default/site/template.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/form/content-form-add.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-add.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/form/content-form-browser.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-browser.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/client/editor/config-editor.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/client/editor/config-editor.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content/client/form/content-form-delete.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-delete.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content/client/form/content-form-editor.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-editor.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/form/content-form-upload.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-upload.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/form/content-form.css" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/nav/content-nav.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/nav/content-nav.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content/client/theme/minimal/minimal.theme.css" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/theme/minimal/minimal.theme.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/content.renderer.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/content.renderer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/client/form/databaseform-connect.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/client/form/databaseform-connect.client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/client/form/databaseform-manage.client.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/client/form/databaseform-manage.client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/database.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/database.api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/task/database-configure.task.js" beforeDir="false" afterPath="$PROJECT_DIR$/database/task/database-configure.task.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/client/form/user-form-browser.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-browser.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/client/form/user-form-forgotpassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-forgotpassword.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/client/form/user-form-login.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-login.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/client/form/user-form-logout.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-logout.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client/form/user-form-profile.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-profile.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/client/form/user-form-register.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-register.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/client/form/user-form-resetpassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-resetpassword.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/client/form/user-form-updateflags.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-updateflags.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/client/form/user-form-updatepassword.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-updatepassword.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/client/form/user-form-updateprofile.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form-updateprofile.element.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/client/form/user-form.css" beforeDir="false" afterPath="$PROJECT_DIR$/user/client/form/user-form.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/task/admin-configure.task.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/task/admin-configure.task.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -49,65 +51,13 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/client/default/site/template.html">
+        <entry file="file://$PROJECT_DIR$/user/client/form/user-form-updateprofile.element.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="209">
-              <caret line="11" column="26" selection-start-line="11" selection-start-column="26" selection-end-line="11" selection-end-column="26" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/client/nav/content-nav.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="646">
-              <caret line="34" selection-start-line="34" selection-end-line="34" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/client/form/content-form.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="114">
-              <caret line="6" selection-start-line="6" selection-end-line="6" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/user/client/form/user-form.css">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/client/default/home.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="19">
-              <caret line="1" column="36" selection-start-line="1" selection-start-column="36" selection-end-line="1" selection-end-column="36" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/client/default/about.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret selection-end-line="1" />
+            <state relative-caret-position="990">
+              <caret line="124" column="69" lean-forward="true" selection-start-line="124" selection-start-column="69" selection-end-line="124" selection-end-column="69" />
               <folding>
-                <element signature="n#style#0;n#div#0;n#section#1;n#!!top" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/client/default/contact.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
-              <folding>
-                <element signature="n#style#0;n#div#0;n#section#1;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#0;n#form#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -116,26 +66,80 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/content/client/theme/minimal/minimal.theme.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1902">
-              <caret line="285" column="28" selection-start-line="285" selection-start-column="28" selection-end-line="285" selection-end-column="28" />
+            <state relative-caret-position="1256">
+              <caret line="237" column="21" selection-start-line="237" selection-start-column="21" selection-end-line="237" selection-end-column="21" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/user/client/form/user-form-browser.element.js">
+        <entry file="file://$PROJECT_DIR$/content/client/slideshow/content-slideshow.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="725">
-              <caret line="84" column="27" lean-forward="true" selection-start-line="84" selection-start-column="27" selection-end-line="84" selection-end-column="27" />
+            <state relative-caret-position="323">
+              <caret line="17" selection-start-line="17" selection-end-line="18" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/client/nav/content-nav.element.js">
+        <entry file="file://$PROJECT_DIR$/content/client/default/site/template.css">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="456">
-              <caret line="99" selection-start-line="99" selection-end-line="99" />
+              <caret line="24" selection-start-line="24" selection-end-line="25" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/user/client/form/user-form-logout.element.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1351">
+              <caret line="87" column="4" selection-start-line="87" selection-start-column="4" selection-end-line="87" selection-end-column="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/user/client/form/user-form-profile.element.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1009">
+              <caret line="63" selection-start-line="63" selection-end-line="63" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/user/client/form/user-form-register.element.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1750">
+              <caret line="147" selection-start-line="147" selection-end-line="147" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/user/client/form/user-form-resetpassword.element.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1750">
+              <caret line="151" selection-start-line="151" selection-end-line="151" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/user/client/form/user-form-updateflags.element.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1814">
+              <caret line="162" selection-start-line="162" selection-end-line="162" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/user/client/form/user-form-updatepassword.element.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1750">
+              <caret line="161" selection-start-line="161" selection-end-line="161" />
             </state>
           </provider>
         </entry>
@@ -152,21 +156,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>res.json(Object.assign</find>
-      <find>})(&quot;:user/:client/form/user-form.css&quot;);</find>
-      <find>async renderError</find>
-      <find>console.error(`${req.method} ${req.url} ${error.message}`);</find>
-      <find>profileform</find>
-      <find>profile</find>
-      <find>userID</find>
-      <find>/site</find>
-      <find>box-</find>
-      <find>paths=</find>
-      <find>shad</find>
-      <find>&lt;%-hostname%&gt;</find>
-      <find>replace</find>
-      <find>hostname</find>
-      <find>site/logo</find>
       <find>&lt;%-data%&gt;</find>
       <find>body.themed</find>
       <find>body.theme-minimal</find>
@@ -182,10 +171,23 @@
       <find>max-width</find>
       <find>firstc</find>
       <find>first</find>
+      <find>label</find>
+      <find>width: 65px</find>
+      <find>&lt;td class=&quot;label&quot;&gt;</find>
+      <find>&lt;td class</find>
+      <find>for=&quot;host&quot;</find>
+      <find>&lt;td class=&quot;lab</find>
+      <find>host</find>
+      <find>databaseform-</find>
+      <find>&lt;td class=</find>
+      <find>&quot;label&quot;</find>
+      <find>'label'</find>
+      <find>fieldset</find>
+      <find>box</find>
+      <find>width:</find>
+      <find>box-sh</find>
     </findStrings>
     <replaceStrings>
-      <replace>updatepassword</replace>
-      <replace>content-form-add</replace>
       <replace>content-form-upload</replace>
       <replace>form-add</replace>
       <replace>upload</replace>
@@ -204,7 +206,6 @@
       <replace>user-form-updatepassword</replace>
       <replace>user-form-updateprofile</replace>
       <replace>})(&quot;:user/:client/form/user-form.css&quot;);</replace>
-      <replace />
       <replace>console.error(`${req.method} ${req.url}:`, error);</replace>
       <replace>user-browser</replace>
       <replace>.theme-minimal form</replace>
@@ -213,7 +214,10 @@
       <replace>.theme-minimal form.themed</replace>
       <replace>table class=&quot;user themed&quot;</replace>
       <replace>table class=&quot;content themed&quot;</replace>
+      <replace />
       <replace>.theme-minimal table.themed</replace>
+      <replace>database-</replace>
+      <replace>hostname</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/user</dir>
@@ -227,18 +231,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/theme/default/template/article/home.ejs" />
-        <option value="$PROJECT_DIR$/content/default/theme.css" />
-        <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/content/client/default/theme.js" />
-        <option value="$PROJECT_DIR$/user/client/user.css" />
-        <option value="$PROJECT_DIR$/config/client/config.css" />
-        <option value="$PROJECT_DIR$/task/client/task.css" />
-        <option value="$PROJECT_DIR$/config/config.manager.js" />
-        <option value="$PROJECT_DIR$/content/client/default/theme.css" />
-        <option value="$PROJECT_DIR$/content/client/default/footer" />
-        <option value="$PROJECT_DIR$/content/client/default/header" />
-        <option value="$PROJECT_DIR$/content/client/default/site.css" />
         <option value="$PROJECT_DIR$/content/client/default/head" />
         <option value="$PROJECT_DIR$/content/client/default/body" />
         <option value="$PROJECT_DIR$/content/client/default/site.html" />
@@ -255,12 +247,7 @@
         <option value="$PROJECT_DIR$/content/client/form/content-form-add.element.js" />
         <option value="$PROJECT_DIR$/user/client/user-browser.element.js" />
         <option value="$PROJECT_DIR$/user/client/form/user-login.element.js" />
-        <option value="$PROJECT_DIR$/user/client/form/user-form-logout.element.js" />
-        <option value="$PROJECT_DIR$/user/client/form/user-form-login.element.js" />
         <option value="$PROJECT_DIR$/content/client/slideshow/content-slideshow.element.js" />
-        <option value="$PROJECT_DIR$/config/client/editor/config-editor.element.js" />
-        <option value="$PROJECT_DIR$/task/client/manager/task-manager.element.js" />
-        <option value="$PROJECT_DIR$/database/task/database-configure.task.js" />
         <option value="$PROJECT_DIR$/task/task.api.js" />
         <option value="$PROJECT_DIR$/content/content.api.js" />
         <option value="$PROJECT_DIR$/database/database.api.js" />
@@ -273,10 +260,27 @@
         <option value="$PROJECT_DIR$/content/client/default/about.html" />
         <option value="$PROJECT_DIR$/content/client/default/contact.html" />
         <option value="$PROJECT_DIR$/content/client/default/site/template.html" />
-        <option value="$PROJECT_DIR$/user/client/form/user-form.css" />
-        <option value="$PROJECT_DIR$/user/client/form/user-form-browser.element.js" />
         <option value="$PROJECT_DIR$/content/client/nav/content-nav.element.js" />
         <option value="$PROJECT_DIR$/content/client/form/content-form.css" />
+        <option value="$PROJECT_DIR$/user/client/form/user-form.css" />
+        <option value="$PROJECT_DIR$/content/client/form/content-form-editor.element.js" />
+        <option value="$PROJECT_DIR$/config/client/editor/config-editor.element.js" />
+        <option value="$PROJECT_DIR$/user/task/admin-configure.task.js" />
+        <option value="$PROJECT_DIR$/task/client/manager/task-manager.element.js" />
+        <option value="$PROJECT_DIR$/database/client/form/databaseform-connect.client.js" />
+        <option value="$PROJECT_DIR$/content/client/form/content-form-delete.element.js" />
+        <option value="$PROJECT_DIR$/database/client/form/databaseform-manage.client.js" />
+        <option value="$PROJECT_DIR$/database/task/database-configure.task.js" />
+        <option value="$PROJECT_DIR$/user/client/form/user-form-browser.element.js" />
+        <option value="$PROJECT_DIR$/user/client/form/user-form-forgotpassword.element.js" />
+        <option value="$PROJECT_DIR$/user/client/form/user-form-login.element.js" />
+        <option value="$PROJECT_DIR$/user/client/form/user-form-logout.element.js" />
+        <option value="$PROJECT_DIR$/user/client/form/user-form-profile.element.js" />
+        <option value="$PROJECT_DIR$/user/client/form/user-form-register.element.js" />
+        <option value="$PROJECT_DIR$/user/client/form/user-form-resetpassword.element.js" />
+        <option value="$PROJECT_DIR$/user/client/form/user-form-updateflags.element.js" />
+        <option value="$PROJECT_DIR$/user/client/form/user-form-updatepassword.element.js" />
+        <option value="$PROJECT_DIR$/user/client/form/user-form-updateprofile.element.js" />
         <option value="$PROJECT_DIR$/content/client/theme/minimal/minimal.theme.css" />
       </list>
     </option>
@@ -528,7 +532,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="385464000" />
+    <option name="totallyTimeSpent" value="389888000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -637,44 +641,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="361">
-            <caret line="19" selection-end-line="64" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/default/site/template.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="37" lean-forward="true" selection-start-column="37" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config/local.config.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1567">
-          <caret line="110" lean-forward="true" selection-start-line="102" selection-start-column="4" selection-end-line="110" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config/config.manager.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="13" column="53" selection-start-line="13" selection-start-column="53" selection-end-line="13" selection-end-column="53" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config/client/editor/config-editor.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2033">
-          <caret line="107" column="22" lean-forward="true" selection-end-line="142" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/task/client/manager/task-manager.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="836">
@@ -683,13 +649,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/content/client/default/footer" />
-    <entry file="file://$PROJECT_DIR$/content/client/default/site/template.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="9" column="4" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/content/client/default/header" />
     <entry file="file://$PROJECT_DIR$/content/client/default/head" />
     <entry file="file://$PROJECT_DIR$/content/client/default/body" />
@@ -742,55 +701,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-forgotpassword.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1826">
-          <caret line="123" column="46" selection-start-line="123" selection-start-column="32" selection-end-line="123" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-profile.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1826">
-          <caret line="110" column="32" lean-forward="true" selection-start-line="110" selection-start-column="32" selection-end-line="110" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-register.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1864">
-          <caret line="155" column="1" lean-forward="true" selection-start-line="155" selection-start-column="1" selection-end-line="155" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-resetpassword.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1826">
-          <caret line="157" column="45" selection-start-line="157" selection-start-column="32" selection-end-line="157" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-updateflags.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1845">
-          <caret line="168" column="32" selection-start-line="168" selection-start-column="32" selection-end-line="168" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-updatepassword.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1826">
-          <caret line="167" column="51" selection-start-line="167" selection-start-column="32" selection-end-line="167" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-updateprofile.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="686">
-          <caret line="110" column="32" selection-start-line="110" selection-start-column="32" selection-end-line="110" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -801,20 +711,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-logout.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1852">
-          <caret line="114" column="32" selection-start-line="114" selection-start-column="32" selection-end-line="114" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-login.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1007">
-          <caret line="53" column="21" lean-forward="true" selection-start-line="53" selection-start-column="21" selection-end-line="53" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/content/client/slideshow/content-slideshow.element.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="836">
@@ -822,31 +718,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config/client/editor/config-editor.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1864">
-          <caret line="225" column="68" lean-forward="true" selection-start-line="225" selection-start-column="68" selection-end-line="225" selection-end-column="68" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/task/task.api.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1522">
           <caret line="187" selection-start-line="187" selection-end-line="187" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/task/client/manager/task-manager.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="4" column="31" lean-forward="true" selection-start-line="4" selection-start-column="31" selection-end-line="4" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/database/task/database-configure.task.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="668">
-          <caret line="37" column="52" selection-start-line="37" selection-start-column="52" selection-end-line="37" selection-end-column="52" />
         </state>
       </provider>
     </entry>
@@ -868,13 +743,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="839">
           <caret line="497" column="62" lean-forward="true" selection-start-line="497" selection-start-column="62" selection-end-line="497" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/slideshow/content-slideshow.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="8" selection-start-line="8" selection-end-line="9" />
         </state>
       </provider>
     </entry>
@@ -940,16 +808,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/form/user-form.css">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-browser.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="725">
-          <caret line="84" column="27" lean-forward="true" selection-start-line="84" selection-start-column="27" selection-end-line="84" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/content/client/nav/content-nav.element.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="456">
@@ -959,15 +817,169 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/content/client/form/content-form.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="114">
-          <caret line="6" selection-start-line="6" selection-end-line="6" />
+        <state relative-caret-position="209">
+          <caret line="11" column="1" lean-forward="true" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/form/user-form.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="19">
+          <caret line="1" column="21" selection-start-line="1" selection-start-column="21" selection-end-line="1" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/form/content-form-editor.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="592">
+          <caret line="178" column="39" selection-start-line="178" selection-start-column="39" selection-end-line="178" selection-end-column="39" />
+          <folding>
+            <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/client/editor/config-editor.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1636">
+          <caret line="213" selection-start-line="213" selection-end-line="213" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/task/admin-configure.task.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1237">
+          <caret line="171" selection-start-line="171" selection-end-line="171" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/task/client/manager/task-manager.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1054">
+          <caret line="131" column="32" selection-start-line="131" selection-start-column="32" selection-end-line="131" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/form/content-form-delete.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1484">
+          <caret line="125" selection-start-line="125" selection-end-line="125" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/database/client/form/databaseform-connect.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1111">
+          <caret line="120" column="35" lean-forward="true" selection-start-line="120" selection-start-column="35" selection-end-line="120" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/database/client/form/databaseform-manage.client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1066">
+          <caret line="121" selection-start-line="121" selection-end-line="121" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/database/task/database-configure.task.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="211">
+          <caret line="146" column="31" lean-forward="true" selection-start-line="146" selection-start-column="31" selection-end-line="146" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-browser.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1257">
+          <caret line="112" column="12" selection-start-line="112" selection-start-column="12" selection-end-line="112" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-forgotpassword.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1750">
+          <caret line="117" selection-start-line="117" selection-end-line="117" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-login.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1769">
+          <caret line="134" selection-start-line="134" selection-end-line="134" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-logout.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1351">
+          <caret line="87" column="4" selection-start-line="87" selection-start-column="4" selection-end-line="87" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-profile.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1009">
+          <caret line="63" selection-start-line="63" selection-end-line="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-register.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1750">
+          <caret line="147" selection-start-line="147" selection-end-line="147" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-resetpassword.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1750">
+          <caret line="151" selection-start-line="151" selection-end-line="151" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-updateflags.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1814">
+          <caret line="162" selection-start-line="162" selection-end-line="162" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-updatepassword.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1750">
+          <caret line="161" selection-start-line="161" selection-end-line="161" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/default/site/template.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="456">
+          <caret line="24" selection-start-line="24" selection-end-line="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/user/client/form/user-form-updateprofile.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="990">
+          <caret line="124" column="69" lean-forward="true" selection-start-line="124" selection-start-column="69" selection-end-line="124" selection-end-column="69" />
+          <folding>
+            <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#0;n#form#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#1;n#tfoot#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/slideshow/content-slideshow.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="17" selection-start-line="17" selection-end-line="18" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/content/client/theme/minimal/minimal.theme.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1902">
-          <caret line="285" column="28" selection-start-line="285" selection-start-column="28" selection-end-line="285" selection-end-column="28" />
+        <state relative-caret-position="1256">
+          <caret line="237" column="21" selection-start-line="237" selection-start-column="21" selection-end-line="237" selection-end-column="21" />
         </state>
       </provider>
     </entry>
