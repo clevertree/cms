@@ -146,9 +146,23 @@ class HTMLContentEditorFormElement extends HTMLElement {
     }
 
     renderPreview(html) {
-        const previewContent = document.querySelector('.content-preview-content');
-        if(previewContent)
-            previewContent.innerHTML = html;
+
+        const doc = new DOMParser().parseFromString(html, "text/xml");
+        console.log(doc.firstChild.innerHTML); // => <div id="foo">...
+        console.log(doc.firstChild.firstChild.innerHTML); // => <a href="#">...
+
+        const previewContent = document.querySelector('.content-preview-iframe');
+        switch(doc.firstChild.nodeName) {
+            case 'html':
+                previewContent.contentWindow.document.body.innerHTML = doc.body.innerHTML;
+                break;
+            case 'body':
+                previewContent.contentWindow.document.body.innerHTML = doc.body.innerHTML;
+                break;
+            default:
+                previewContent.contentWindow.document.body.querySelector('article').innerHTML = html; // TODO: fix
+        }
+        // previewContent.src = previewContent.src.split("?")[0] + '?t=' + new Date().getTime();
     }
 
     render() {
@@ -257,8 +271,8 @@ class HTMLContentEditorFormElement extends HTMLElement {
     }
 
     renderWYSIWYGEditor() {
-        if(this.state.content.data)
-            this.renderPreview(this.state.content.data);
+        // if(this.state.content.data)
+            // this.renderPreview(this.state.content.data);
 
         // console.log("RENDER", this.state);
         switch(this.state.editor) {

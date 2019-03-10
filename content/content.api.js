@@ -218,15 +218,11 @@ class ContentApi {
                         data: `
             <content-form-editor id="${req.params.id}"></content-form-editor>
             
-            <section class="content-preview-container">
+            <section>
                 <h1 style="text-align: center;">Preview</h1>
-                <hr/>
-                <div class="content-preview-content">
-                    <article>
-                        ${renderedData}                
-                    </article>
-                </div>
             </section>
+
+            <iframe src="${content.path}" class="content-preview-iframe"></iframe>
     `});
                     break;
 

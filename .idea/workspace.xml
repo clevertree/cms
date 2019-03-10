@@ -2,14 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/form/content-form-add.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-add.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/form/content-form-upload.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-upload.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/slideshow/content-slideshow.css" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/slideshow/content-slideshow.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/client/slideshow/content-slideshow.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/slideshow/content-slideshow.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/client/form/content-form-editor.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-editor.element.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/content/client/form/content-form.css" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/content/content.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/content.api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/content.renderer.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/content.renderer.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/content.table.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/content.table.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -39,17 +34,39 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/content/content.api.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="716">
-              <caret line="284" column="56" selection-start-line="284" selection-start-column="56" selection-end-line="284" selection-end-column="56" />
+            <state relative-caret-position="649">
+              <caret line="372" column="75" selection-start-line="372" selection-start-column="70" selection-end-line="372" selection-end-column="75" />
+              <folding>
+                <element signature="n#style#0;n#h1#0;n#section#0;n#!!top" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/content/client/form/content-form-editor.element.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="934">
+              <caret line="162" column="114" selection-start-line="162" selection-start-column="114" selection-end-line="162" selection-end-column="114" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="mock://vm:8230">
+          <provider selected="true" editor-type-id="vmFileEditor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="http://localhost:8080/:content/:client/form/content-form-editor.element.js">
+          <provider selected="true" editor-type-id="httpFileEditor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/content/client/slideshow/content-slideshow.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="20" column="17" selection-start-line="20" selection-start-column="17" selection-end-line="20" selection-end-column="17" />
+            <state relative-caret-position="456">
+              <caret line="24" lean-forward="true" selection-start-line="24" selection-end-line="24" />
             </state>
           </provider>
         </entry>
@@ -64,15 +81,6 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/client/form/content-form-add.element.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="39" column="8" selection-start-line="39" selection-start-column="8" selection-end-line="39" selection-end-column="8" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/content/client/form/content-form-upload.element.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="591">
@@ -80,15 +88,6 @@
               <folding>
                 <element signature="n#style#0;n#td#0;n#tr#0;n#!!top" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/content/content.renderer.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="570">
-              <caret line="30" column="27" selection-start-line="30" selection-start-column="27" selection-end-line="30" selection-end-column="27" />
             </state>
           </provider>
         </entry>
@@ -114,6 +113,15 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/content/client/form/content-form.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="323">
+              <caret line="17" column="6" selection-start-line="17" selection-start-column="6" selection-end-line="17" selection-end-column="6" />
+            </state>
+          </provider>
+        </entry>
+      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -126,13 +134,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>&lt;/label&gt;&lt;/td&gt;</find>
-      <find>icon-edit</find>
-      <find>Upload Temporary Files</find>
-      <find>Add New</find>
-      <find>Upload Temp</find>
-      <find>&lt;fieldset</find>
-      <find>content</find>
       <find>&lt;!--</find>
       <find>res.set</find>
       <find>created.</find>
@@ -156,10 +157,15 @@
       <find>insertContentRevisionID</find>
       <find>session.uploads</find>
       <find>currentUploads</find>
+      <find>slideshow-player</find>
+      <find>Preview</find>
+      <find>content-preview-container</find>
+      <find>content-preview-content</find>
+      <find>content-preview-iframe</find>
+      <find>split</find>
+      <find>renderPreview</find>
     </findStrings>
     <replaceStrings>
-      <replace>:content/:client/form/content-form.css</replace>
-      <replace>user-form-browser</replace>
       <replace>user-form-forgotpassword</replace>
       <replace>user-form-login</replace>
       <replace>user-form-logout</replace>
@@ -188,6 +194,8 @@
       <replace>database</replace>
       <replace>config</replace>
       <replace>uploadPath: uploadEntry.uploadPath</replace>
+      <replace>content-preview-iframe</replace>
+      <replace>content-slideshow</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/user</dir>
@@ -228,7 +236,6 @@
         <option value="$PROJECT_DIR$/user/client/form/user-form.css" />
         <option value="$PROJECT_DIR$/content/client/theme/minimal/minimal.theme.css" />
         <option value="$PROJECT_DIR$/user/client/form/user-form-profile.element.js" />
-        <option value="$PROJECT_DIR$/content/client/form/content-form-editor.element.js" />
         <option value="$PROJECT_DIR$/content/client/form/content-form-browser.element.js" />
         <option value="$PROJECT_DIR$/content/client/form/content-form-delete.element.js" />
         <option value="$PROJECT_DIR$/config/client/editor/config-editor.element.js" />
@@ -238,7 +245,6 @@
         <option value="$PROJECT_DIR$/database/client/form/databaseform-manage.client.js" />
         <option value="$PROJECT_DIR$/database/task/database-configure.task.js" />
         <option value="$PROJECT_DIR$/task/client/manager/task-manager.css" />
-        <option value="$PROJECT_DIR$/content/client/form/content-form.css" />
         <option value="$PROJECT_DIR$/task/client/manager/task-form.css" />
         <option value="$PROJECT_DIR$/database/client/form/databaseform.css" />
         <option value="$PROJECT_DIR$/config/client/editor/config-editor.css" />
@@ -249,9 +255,11 @@
         <option value="$PROJECT_DIR$/content/client/form/content-form-add.element.js" />
         <option value="$PROJECT_DIR$/content/client/form/content-form-upload.element.js" />
         <option value="$PROJECT_DIR$/content/content.table.js" />
-        <option value="$PROJECT_DIR$/content/content.api.js" />
         <option value="$PROJECT_DIR$/content/client/slideshow/content-slideshow.element.js" />
         <option value="$PROJECT_DIR$/content/client/slideshow/content-slideshow.css" />
+        <option value="$PROJECT_DIR$/content/client/form/content-form.css" />
+        <option value="$PROJECT_DIR$/content/content.api.js" />
+        <option value="$PROJECT_DIR$/content/client/form/content-form-editor.element.js" />
       </list>
     </option>
   </component>
@@ -448,12 +456,12 @@
       <workItem from="1552228901265" duration="4957000" />
       <workItem from="1552248233805" duration="1766000" />
       <workItem from="1552252132956" duration="129000" />
-      <workItem from="1552252295733" duration="6443000" />
+      <workItem from="1552252295733" duration="8078000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="405595000" />
+    <option name="totallyTimeSpent" value="407230000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -468,7 +476,7 @@
     <frame x="0" y="-2" width="3840" height="2162" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49753937" visible="true" weight="0.12888771" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49753937" visible="true" weight="0.12888771" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="npm" order="2" sideWeight="0.5019685" side_tool="true" weight="0.124670535" />
       <window_info id="Favorites" order="3" sideWeight="0.50246066" side_tool="true" weight="0.12677912" />
@@ -487,7 +495,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Database" order="3" weight="0.32999474" />
-      <window_info anchor="right" id="Debug" order="4" visible="true" weight="0.2775435" />
+      <window_info active="true" anchor="right" id="Debug" order="4" visible="true" weight="0.2775435" />
       <window_info anchor="right" id="Find" order="5" weight="0.3294676" />
     </layout>
   </component>
@@ -713,16 +721,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/form/content-form-editor.element.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="38">
-          <caret line="252" selection-start-line="252" selection-end-line="252" />
-          <folding>
-            <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#0;n#fieldset#0;n#form#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/user/client/form/user-form.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
@@ -835,13 +833,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/content/client/form/content-form.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="38">
-          <caret line="2" column="13" selection-end-line="14" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/http/http.server.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="613">
@@ -890,13 +881,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/content/content.api.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="716">
-          <caret line="284" column="56" selection-start-line="284" selection-start-column="56" selection-end-line="284" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/content/client/slideshow/content-slideshow.element.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="836">
@@ -906,8 +890,35 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/content/client/slideshow/content-slideshow.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="20" column="17" selection-start-line="20" selection-start-column="17" selection-end-line="20" selection-end-column="17" />
+        <state relative-caret-position="456">
+          <caret line="24" lean-forward="true" selection-start-line="24" selection-end-line="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/content.api.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="649">
+          <caret line="372" column="75" selection-start-line="372" selection-start-column="70" selection-end-line="372" selection-end-column="75" />
+          <folding>
+            <element signature="n#style#0;n#h1#0;n#section#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/form/content-form.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="17" column="6" selection-start-line="17" selection-start-column="6" selection-end-line="17" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="http://localhost:8080/:content/:client/form/content-form-editor.element.js">
+      <provider selected="true" editor-type-id="httpFileEditor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/content/client/form/content-form-editor.element.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="934">
+          <caret line="162" column="114" selection-start-line="162" selection-start-column="114" selection-end-line="162" selection-end-column="114" />
         </state>
       </provider>
     </entry>

@@ -11,5 +11,11 @@ form.content textarea {
 
 
 form.content textarea.editor-plain {
-    min-height: 600px;
+    min-height: 300px;
+}
+
+
+iframe.content-preview-iframe {
+    width: 100%;
+    height: 100%;
 }
