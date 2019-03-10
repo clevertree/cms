@@ -18,7 +18,7 @@ const { SessionAPI } = require('../user/session/session.api');
 const DIR_CONTENT = path.resolve(__dirname);
 
 
-// TODO: move / rename multi
+// TODO: move / rename multi, check for references to path links
 class ContentApi {
     constructor() {
     }
@@ -57,7 +57,20 @@ class ContentApi {
             const content = await contentTable.fetchContentByPath(req.url, '*');
             if(content) {
                 await this.checkForRevisionContent(req, content);
-                return this.renderContent(req, res, content);
+
+                const mimeType = this.getMimeType(path.extname(content.path) || '');
+                switch(mimeType) {
+                    case 'text/html':
+                        // Load session if we're using the theme
+                        const SM = SessionAPI.getMiddleware();
+                        SM(req, res, async () => {
+                            await ContentRenderer.send(req, res, content);
+                        });
+                        break;
+                    default:
+                        await this.renderData(req, res, content.data, mimeType, content.updated);
+                        break;
+                }
             }
 
             // if(!req.url.startsWith('/:content'))
@@ -113,7 +126,7 @@ class ContentApi {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
             const contentTable = new ContentTable(database);
             const contentRevisionTable = new ContentRevisionTable(database);
-            const content = await contentTable.fetchContentByID(req.params.id);
+            const content = await contentTable.fetchContentByID(req.params.id, '*');
             if(!content)
                 return next();
 
@@ -148,7 +161,28 @@ class ContentApi {
                 res.json(response);
 
             } else {
-                await ContentRenderer.send(req, res, content);
+
+                // Load session if we're using the theme
+                const SM = SessionAPI.getMiddleware();
+                SM(req, res, async () => {
+                    const mimeType = this.getMimeType(path.extname(content.path) || '');
+                    switch(mimeType) {
+                        case 'text/html':
+                            await ContentRenderer.send(req, res, content);
+                            break;
+                        default:
+                            if(renderableMimeTypes.indexOf(mimeType) !== -1) {
+                                await ContentRenderer.send(req, res, Object.assign({}, content, {
+                                    data: `<iframe src="${content.path}"></iframe>`
+                                }));
+                            } else {
+                                await ContentRenderer.send(req, res, Object.assign({}, content, {
+                                    data: `<section><div class="message"><a href="${content.path}">Download (${content.title})</a></div></section>`
+                                }));
+                            }
+                            break;
+                    }
+                });
             }
         } catch (error) {
             await this.renderError(error, req, res, asJSON ? {} : null);
@@ -236,48 +270,40 @@ class ContentApi {
                     break;
                 case 'POST':
                    // Handle POST
-                    let insertContentRevisionID, revision;
                     switch (req.body.action) {
                         default:
                         case 'publish':
                             if(!sessionUser || !sessionUser.isAdmin())
                                 throw new Error("Not authorized");
-                            const affectedRows = await contentTable.updateContent(
-                                content.id,
-                                req.body.title,
-                                req.body.data,
-                                req.body.path,
-                                sessionUser.id,
-                                req.body.theme,
-                                req.body.flags
-                            );
-                            content = await contentTable.fetchContentByID(req.params.id);
+                            const affectedRows = await contentTable.updateContent(content.id, req.body.path, req.body.title, req.body.data, sessionUser.id);
 
-                            insertContentRevisionID = await contentRevisionTable.insertContentRevision(
-                                content.id,
-                                req.body.data,
-                                sessionUser.id
+                            // Insert revision for old content
+                            const oldContent = content;
+                            await contentRevisionTable.insertContentRevision(
+                                oldContent.id,
+                                oldContent.data,       // Old Data
+                                oldContent.user_id || -1     // Old User
                             );
 
+                            // Refresh content
+                            const newContent = await contentTable.fetchContentByID(req.params.id, '*');
                             return res.json({
-                                redirect: content.url,
+                                redirect: newContent.url,
                                 message: "Content published successfully.<br/>Redirecting...",
-                                insertContentRevisionID: insertContentRevisionID,
                                 affectedContentRows: affectedRows,
-                                content
+                                content: newContent
                             });
 
                         case 'draft':
-                            insertContentRevisionID = await contentRevisionTable.insertContentRevision(
+                            const insertContentRevisionID = await contentRevisionTable.insertContentRevision(
                                 content.id,
                                 req.body.data,
                                 sessionUser.id
                             );
-                            revision = await contentRevisionTable.fetchContentRevisionByID(insertContentRevisionID);
+                            // revision = await contentRevisionTable.fetchContentRevisionByID(insertContentRevisionID);
                             return res.json({
-                                redirect: content.url + '?r=' + revision.id,
+                                redirect: content.url + '?r=' + insertContentRevisionID,
                                 message: "Draft saved successfully",
-                                insertContentRevisionID: insertContentRevisionID,
                                 content
                             });
                     }
@@ -286,6 +312,210 @@ class ContentApi {
         } catch (error) {
             await this.renderError(error, req, res);
         }
+    }
+
+    async renderContentAdd(req, res) {
+        try {
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const contentTable = new ContentTable(database);
+            // const contentRevisionTable = new ContentRevisionTable(database);
+            const userTable = new UserTable(database);
+            if(!req.session || !req.session.userID)
+                throw new Error("Must be logged in");
+            const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
+
+            const currentUploads = req.session.uploads || [];
+
+            switch(req.method) {
+                case 'GET':
+                    // Render Editor
+                    return await ContentRenderer.send(req, res,
+                        {
+                            title: `Add New Content`,
+                            data: `
+    <content-form-add></content-form-add>
+    <content-form-upload></content-form-upload>
+`
+                        });
+
+                default:
+                case 'OPTIONS':
+                    // const currentCount = req.session.uploads ? req.session.uploads.length : 0;
+                    let editable = sessionUser && sessionUser.isAdmin();
+                    let message = `${currentUploads.length} temporary file${currentUploads.length!== 1 ? 's' : ''} available`;
+                    if(!sessionUser) {
+                        message = `Must be logged in to create new content`;
+                    } else {
+                        if(!sessionUser.isAdmin())
+                            message = `Only administrators may create new content`;
+                    }
+
+                    return res.json({
+                        editable,
+                        message,
+                        status: editable ? 200 : 400,
+                        // message: `${currentCount} temporary file${currentCount !== 1 ? 's' : ''} uploaded`,
+                        currentUploads
+                    });
+
+                case 'POST':
+                    // Handle POST
+                    if(!sessionUser || !sessionUser.isAdmin())
+                        throw new Error("Not authorized");
+                    // TODO: submit articles for approval? No, it would flood the hostmaster with requests
+
+                    const insertIDs = [];
+                    for(let i=0; i<req.body.content.length; i++) {
+                        let contentData = req.body.content[i];
+                        if(!contentData.title && !contentData.path)
+                            continue;
+                        if(!contentData.title)
+                            throw new Error("Invalid Title: " + i);
+                        if(!contentData.path)
+                            throw new Error("Invalid Path: " + i)
+                        if(contentData.dataSource) {
+                            const dataMethod = contentData.dataSource.split(':');
+                            contentData.data = null;
+                            switch (dataMethod[0]) {
+                                case 'temp':
+                                    const tempFileUploadPath = dataMethod[1];
+                                    const tempFilePos = currentUploads.findIndex(upload => upload.uploadPath === tempFileUploadPath);
+                                    if(tempFilePos === -1)
+                                        throw new Error("Temporary file not found: " + tempFileUploadPath);
+                                    contentData.data = await fsPromises.readFile(currentUploads[tempFilePos].tmpPath);
+                                    currentUploads.splice(tempFilePos, 1);
+                                    break;
+                                default:
+                                    throw new Error("Invalid data upload method: " + dataMethod);
+                            }
+                        }
+
+                        const insertID = await contentTable.insertOrUpdateContentWithRevision(contentData.path, contentData.title, contentData.data);
+                        insertIDs.push(insertID);
+
+                        // Initial revision shouldn't be created until first edit has been made
+                        // const contentEntry = await contentTable.fetchContentByID(insertID);
+                        //
+                        // const insertRevisionID = await contentRevisionTable.insertContentRevision(
+                        //     contentEntry.id,
+                        //     contentData.title,
+                        //     contentData.data,
+                        //     sessionUser.id
+                        // );
+                        // insertRevisionIDs.push(insertRevisionID);
+                    }
+
+
+                    return res.json({
+                        redirect: '/:content',
+                        message: `${insertIDs.length} Content Entr${insertIDs.length === 1 ? 'y' : 'ies'} created.`,
+                        insertIDs,
+                        // insertRevisionIDs,
+                    });
+            }
+        } catch (error) {
+            await this.renderError(error, req, res);
+        }
+    }
+
+    async renderContentUpload(req, res) {
+        try {
+            // const database = await DatabaseManager.selectDatabaseByRequest(req);
+            // const contentTable = new ContentTable(database);
+            // const userTable = new UserTable(database);
+            if(!req.session)
+                throw new Error("Session is not available");
+
+            if(typeof req.session.uploads === "undefined")
+                req.session.uploads = [];
+            let currentCount = req.session.uploads ? req.session.uploads.length : 0;
+
+            switch(req.method) {
+                case 'GET':
+                    // Render Editor
+                    await ContentRenderer.send(req, res, {
+                        title: `Upload Content`,
+                        data: `<content-form-upload></content-form-upload>`
+                    })
+                    break;
+
+                default:
+                case 'OPTIONS':
+
+                    return res.json({
+                        message: `${currentCount} temporary file upload${currentCount !== 1 ? 's' : ''} available`,
+                        currentUploads: req.session.uploads
+                    });
+
+                case 'POST':
+                    // const currentUploads = req.session.uploads;
+                    let message = '';
+                    const newUploads = [];
+                    if(Object.values(req.body).length > 0) {
+                        let deletePositions = req.body.delete;
+                        if(deletePositions) {
+                            deletePositions = deletePositions.map(p => parseInt(p));
+                            deletePositions.sort((a,b) => b-a);
+                            for (let i=0; i<deletePositions.length; i++) {
+                                const deletedFile = req.session.uploads.splice(deletePositions[i], 1)[0];
+                                try {
+                                    await fsPromises.unlink(deletedFile.tmpPath);
+                                } catch (e) {
+                                    console.warn(e);
+                                }
+                            }
+                        }
+                        message += `${deletePositions.length} temporary file${deletePositions.length !== 1 ? 's' : ''} deleted. `;
+                        // Handle JSON Form
+                    } else {
+                        // Handle File Upload Form
+                        const { files, fields } = await this.parseFileUploads(req);
+                        if(!files || !fields) {
+                            throw new Error("Uploads not available");
+
+                        }
+                        const uploadCount = Object.values(files).length;
+                        if(uploadCount === 0)
+                            throw new Error("No files were uploaded");
+
+                        let uploadPath = fields.uploadPath[0];
+                        if(!uploadPath)
+                            throw new Error("Upload path required");
+                        if(uploadPath[uploadPath.length-1] !== '/')
+                            uploadPath += '/';
+
+                        for(let i=0; i<files.length; i++) {
+                            const uploadEntry = {
+                                // originalFilename: files[i].originalFilename,
+                                tmpPath: files[i].path,
+                                uploadPath: uploadPath + files[i].originalFilename,
+                                size: files[i].size,
+                            };
+                            newUploads.push(uploadEntry);
+                            const pos = req.session.uploads.findIndex(searchUploadEntry => searchUploadEntry.uploadPath === uploadEntry.uploadPath);
+                            if(pos >= 0) {
+                                req.session.uploads[pos] = uploadEntry;
+                            } else {
+                                req.session.uploads.push(uploadEntry)
+                            }
+                        }
+                        if(req.session.uploads.length === 0)
+                            throw new Error("Files failed to upload");
+                        currentCount = req.session.uploads ? req.session.uploads.length : 0;
+                        message += `${uploadCount} temporary file${uploadCount !== 1 ? 's' : ''} uploaded. ${currentCount} files available.`;
+                    }
+
+
+                    return res.json({
+                        message: message,
+                        newUploads: newUploads,
+                        currentUploads: req.session.uploads
+                    });
+            }
+        } catch (error) {
+            await this.renderError(error, req, res);
+        }
+
     }
 
     async renderContentDeleteByID(req, res) {
@@ -357,220 +587,6 @@ class ContentApi {
         }
     }
 
-    async renderContentAdd(req, res) {
-        try {
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const contentTable = new ContentTable(database);
-            const contentRevisionTable = new ContentRevisionTable(database);
-            const userTable = new UserTable(database);
-            if(!req.session || !req.session.userID)
-                throw new Error("Must be logged in");
-            const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
-
-            const currentUploads = req.session.uploads || [];
-
-            switch(req.method) {
-                case 'GET':
-                    // Render Editor
-                    return await ContentRenderer.send(req, res,
-                        {
-                            title: `Add New Content`,
-                            data: `
-    <content-form-add></content-form-add>
-    <content-form-upload></content-form-upload>
-`
-                        });
-
-                default:
-                case 'OPTIONS':
-                    // const currentCount = req.session.uploads ? req.session.uploads.length : 0;
-                    let editable = sessionUser && sessionUser.isAdmin();
-                    let message = `${currentUploads.length} temporary file${currentUploads.length!== 1 ? 's' : ''} available`;
-                    if(!sessionUser)
-                        message = `Must be logged in to create new content`;
-                    if(!sessionUser.isAdmin())
-                        message = `Only administrators may create new content`;
-
-                    return res.json({
-                        editable,
-                        message,
-                        status: editable ? 200 : 400,
-                        // message: `${currentCount} temporary file${currentCount !== 1 ? 's' : ''} uploaded`,
-                        currentUploads: currentUploads
-                            .map(uploadEntry => { return {
-                                name: uploadEntry.originalFilename,
-                                size: uploadEntry.size
-                            }})
-                    });
-
-                case 'POST':
-                    // Handle POST
-                    if(!sessionUser || !sessionUser.isAdmin())
-                        throw new Error("Not authorized");
-                    // TODO: submit articles for approval? No, it would flood the hostmaster with requests
-
-                    const insertIDs = [];
-                    for(let i=0; i<req.body.content.length; i++) {
-                        let contentData = req.body.content[i];
-                        if(!contentData.title)
-                            throw new Error("Invalid Title: " + i);
-                        if(!contentData.path)
-                            throw new Error("Invalid Path: " + i)
-                        if(contentData.data) {
-                            const dataMethod = contentData.data.split(':');
-                            contentData.data = null;
-                            switch (dataMethod[0]) {
-                                case 'temp':
-                                    const tempFileName = dataMethod[1];
-                                    const tempFilePos = currentUploads.findIndex(upload => upload.originalFilename === tempFileName);
-                                    if(tempFilePos === -1)
-                                        throw new Error("Temporary file not found: " + tempFileName);
-                                    contentData.data = await fsPromises.readFile(currentUploads[tempFilePos].path);
-                                    currentUploads.splice(tempFilePos, 1);
-                                    break;
-                                default:
-                                    throw new Error("Invalid data upload method: " + dataMethod);
-                            }
-                        }
-
-                        const insertID = await contentTable.updateContentWithRevision(
-                            contentData.title,
-                            contentData.data,
-                            contentData.path,
-                            sessionUser.id,
-                            // req.body.parent_id ? parseInt(req.body.parent_id) : null,
-                            contentData.theme
-                        );
-                        insertIDs.push(insertID);
-
-                        // Initial revision shouldn't be created until first edit has been made
-                        // const contentEntry = await contentTable.fetchContentByID(insertID);
-                        //
-                        // const insertRevisionID = await contentRevisionTable.insertContentRevision(
-                        //     contentEntry.id,
-                        //     contentData.title,
-                        //     contentData.data,
-                        //     sessionUser.id
-                        // );
-                        // insertRevisionIDs.push(insertRevisionID);
-                    }
-
-
-                    return res.json({
-                        redirect: '/:content',
-                        message: `${insertIDs} Content Entr${insertIDs.length === 1 ? 'y' : 'ies'} created successfully.`,
-                        insertIDs,
-                        // insertRevisionIDs,
-                    });
-            }
-        } catch (error) {
-            await this.renderError(error, req, res);
-        }
-    }
-
-    async renderContentUpload(req, res) {
-        try {
-            // const database = await DatabaseManager.selectDatabaseByRequest(req);
-            // const contentTable = new ContentTable(database);
-            // const userTable = new UserTable(database);
-            if(!req.session)
-                throw new Error("Session is not available");
-
-            if(typeof req.session.uploads === "undefined")
-                req.session.uploads = [];
-            let currentCount = req.session.uploads ? req.session.uploads.length : 0;
-
-            switch(req.method) {
-                case 'GET':
-                    // Render Editor
-                    await ContentRenderer.send(req, res, {
-                        title: `Upload Content`,
-                        data: `<content-form-upload></content-form-upload>`
-                    })
-                    break;
-
-                default:
-                case 'OPTIONS':
-
-                    return res.json({
-                        message: `${currentCount} temporary file upload${currentCount !== 1 ? 's' : ''} available`,
-                        currentUploads: req.session.uploads
-                            .map(uploadEntry => { return {
-                                name: uploadEntry.originalFilename,
-                                size: uploadEntry.size
-                            }})
-                    });
-
-                case 'POST':
-                    const currentUploads = req.session.uploads;
-                    let message = '';
-                    const newUploads = [];
-                    if(Object.values(req.body).length > 0) {
-                        let deletePositions = req.body.delete;
-                        if(deletePositions) {
-                            deletePositions = deletePositions.map(p => parseInt(p));
-                            deletePositions.sort((a,b) => b-a);
-                            for (let i=0; i<deletePositions.length; i++) {
-                                const deletedFile = currentUploads.splice(deletePositions[i], 1)[0];
-                                try {
-                                    await fsPromises.unlink(deletedFile.path);
-                                } catch (e) {
-                                    console.warn(e);
-                                }
-                            }
-                        }
-                        message += `${deletePositions.length} temporary file${deletePositions.length !== 1 ? 's' : ''} deleted. `;
-                        // Handle JSON Form
-                    } else {
-                        // Handle File Upload Form
-                        const { files, fields } = await this.parseFileUploads(req);
-                        if(!files || !fields) {
-                            throw new Error("Uploads not available");
-
-                        }
-                        const uploadCount = Object.values(files).length;
-
-                        if(uploadCount === 0)
-                            throw new Error("No files were uploaded");
-                        for(let i=0; i<files.length; i++) {
-                            const uploadEntry = {
-                                originalFilename: files[i].originalFilename,
-                                path: files[i].path,
-                                size: files[i].size,
-                            };
-                            newUploads.push(uploadEntry);
-                            const pos = currentUploads.findIndex(searchUploadEntry => searchUploadEntry.originalFilename === uploadEntry.originalFilename);
-                            if(pos >= 0) {
-                                currentUploads[pos] = uploadEntry;
-                            } else {
-                                currentUploads.push(uploadEntry)
-                            }
-                        }
-                        currentCount = req.session.uploads ? req.session.uploads.length : 0;
-                        message += `${uploadCount} temporary file${uploadCount !== 1 ? 's' : ''} uploaded. ${currentCount} files available.`;
-                    }
-
-
-                    return res.json({
-                        message: message,
-                        newUploads: newUploads
-                            .map(uploadEntry => { return {
-                                name: uploadEntry.originalFilename,
-                                size: uploadEntry.size
-                            }}),
-                        currentUploads: req.session.uploads
-                            .map(uploadEntry => { return {
-                                name: uploadEntry.originalFilename,
-                                size: uploadEntry.size
-                            }})
-                    });
-            }
-        } catch (error) {
-            await this.renderError(error, req, res);
-        }
-
-    }
-
     async renderContentList(req, res) {
         try {
 
@@ -623,21 +639,11 @@ class ContentApi {
         const mimeType = this.getMimeType(path.extname(content.path) || '');
         switch(mimeType) {
             case 'text/html':
-                content.data = content.data.toString('UTF8');
-                const firstTag = content.data.match(/<([^>]+)/)[1].toLowerCase();
-                switch(firstTag) {
-                    case 'body':
-                    case 'html':
-                        await this.renderData(req, res, content.data, mimeType, content.updated);
-                        break;
-
-                    default:
-                        // Load session if we're using the theme
-                        const SM = SessionAPI.getMiddleware();
-                        SM(req, res, () => {
-                            ContentRenderer.send(req, res, content);
-                        });
-                }
+                // Load session if we're using the theme
+                const SM = SessionAPI.getMiddleware();
+                SM(req, res, async () => {
+                    await ContentRenderer.send(req, res, content);
+                });
                 break;
             default:
                 await this.renderData(req, res, content.data, mimeType, content.updated);
@@ -762,7 +768,8 @@ const mapMimeTypes = {
     '.svg': 'image/svg+xml',
     '.pdf': 'application/pdf',
     '.doc': 'application/msword',
-    '.xml': 'application/xml'
+    '.xml': 'application/xml',
+    '.rtf': 'text/rtf'
 };
 
 const editableMimeTypes = [
@@ -771,6 +778,22 @@ const editableMimeTypes = [
     'text/javascript',
     'application/json',
     'text/css',
+    'image/svg+xml',
+    // 'application/pdf',
+    // 'application/msword',
+    'application/xml'
+];
+
+const renderableMimeTypes = [
+    'image/x-icon',
+    'text/html',
+    'text/javascript',
+    'application/json',
+    'text/css',
+    'image/png',
+    'image/jpeg',
+    'audio/wav',
+    'audio/mpeg',
     'image/svg+xml',
     'application/pdf',
     'application/msword',

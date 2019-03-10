@@ -1,4 +1,4 @@
-slideshow-player {
+content-slideshow {
     position: relative;
     /* width: 400px; */
     height: 220px;
@@ -9,7 +9,7 @@ slideshow-player {
     box-shadow: 0px 0px 8px #000;
 }
 
-slideshow-player > * {
+content-slideshow > * {
     opacity: 1;
     transition: opacity 2s ease-in;
     width: 100%;
@@ -18,7 +18,7 @@ slideshow-player > * {
     /* box-shadow: 0px 0px 4px #000; */
     /* text-align: center; */
 }
-slideshow-player > *:not(.current){
+content-slideshow > *:not(.current){
     position: absolute;
     opacity: 0;
 }

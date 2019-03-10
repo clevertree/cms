@@ -46,9 +46,9 @@ class HTMLContentFormAddElement extends HTMLElement {
             if (!form.elements[`content[${i}][title]`])
                 break;
 
-            const dataValue = form.elements[`content[${i}][data]`].value;
+            const dataValue = form.elements[`content[${i}][dataSource]`].value;
             for(let j=0; j<this.state.newUploads.length; j++) {
-                if('temp:' + this.state.newUploads[j].name === dataValue) {
+                if('temp:' + this.state.newUploads[j].uploadPath === dataValue) {
                     this.state.newUploads.splice(j, 1);
                     break;
                 }
@@ -57,20 +57,20 @@ class HTMLContentFormAddElement extends HTMLElement {
         while(++i);
 
         const lastContent = this.state.content[this.state.content.length-1];
-        if(!lastContent.title && !lastContent.path && !lastContent.data)
+        if(!lastContent.title && !lastContent.path && !lastContent.dataSource)
             this.state.content.splice(this.state.content.length-1, 1);
         for(let j=0; j<this.state.newUploads.length; j++) {
             this.state.content.push({
                 title: null,
                 path: null,
-                data: 'temp:' + this.state.newUploads[j].name,
+                dataSource: 'temp:' + this.state.newUploads[j].uploadPath,
             });
         }
         this.state.newUploads = [];
         this.state.content.push({
             title: null,
             path: null,
-            data: null,
+            dataSource: null,
         });
         this.render();
         this.updateFormData();
@@ -97,17 +97,17 @@ class HTMLContentFormAddElement extends HTMLElement {
             const content = this.state.content[i];
             content.title = form.elements[`content[${i}][title]`].value;
             content.path = form.elements[`content[${i}][path]`].value;
-            content.data = form.elements[`content[${i}][data]`].value;
-            if(content.data && content.data.startsWith('temp:')) {
-                const tempFile = content.data.substr(5);
+            content.dataSource = form.elements[`content[${i}][dataSource]`].value;
+            if(content.dataSource && content.dataSource.startsWith('temp:')) {
+                const uploadPath = content.dataSource.substr(5);
                 if(!content.title) {
-                    content.title = tempFile.split('.')[0]
+                    content.title = uploadPath.split('/').pop().split('.')[0]
                         .replace(/[_-]+/g, ' ').replace(/^([a-z])|\s+([a-z])/g, function ($1) {
                             return $1.toUpperCase();
                         });
                 }
                 if(!content.path) {
-                    content.path = '/upload/' + tempFile.replace(' ', '_').toLowerCase();
+                    content.path = uploadPath;
                 }
             }
             if(content.title && !content.path) {
@@ -208,13 +208,13 @@ class HTMLContentFormAddElement extends HTMLElement {
                                 <input type="text" name="content[${i}][path]" placeholder="/new/content/path" value="${content.path||''}"/>
                             </td>
                             <td>
-                                <select name="content[${i}][data]" style="max-width: 140px;">
+                                <select name="content[${i}][dataSource]" style="max-width: 140px;">
                                     <option value="">Empty (Default)</option>
                                     <optgroup label="Uploaded Files">
                                     ${this.state.currentUploads.map((upload, i) => 
-                                        `<option value="temp:${upload.name}"${
-                                            content.data === `temp:${upload.name}` ? ' selected="selected"' : ''
-                                            }>${upload.name} (${this.readableByteSize(upload.size)})</option>`
+                                        `<option value="temp:${upload.uploadPath}"${
+                                            content.dataSource === `temp:${upload.uploadPath}` ? ' selected="selected"' : ''
+                                            }>${upload.uploadPath.split('/').pop()} (${this.readableByteSize(upload.size)})</option>`
                                     )}
                                     </optgroup>
                                     <optgroup label="Existing Content">

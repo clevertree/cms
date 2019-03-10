@@ -14,6 +14,7 @@ class HTMLContentFormUploadElement extends HTMLElement {
             status: 0,
             processing: false,
             currentUploads: [],
+            uploadPath: '/file/'
         };
     }
 
@@ -84,6 +85,9 @@ class HTMLContentFormUploadElement extends HTMLElement {
                     checkboxes[i].checked = e.target.checked;
 
                 break;
+            case 'uploadPath':
+                this.state.uploadPath = e.target.value;
+                break;
         }
     }
 
@@ -117,7 +121,7 @@ class HTMLContentFormUploadElement extends HTMLElement {
 
 
     render() {
-        const formUpload = this.querySelector('form.content-form-upload');
+        // const formUpload = this.querySelector('form.content-form-upload');
         const formManage = this.querySelector('form.content-form-upload-manage');
         const val = (name) => formManage && formManage.elements && formManage.elements[name] ? formManage.elements[name].value : '';
 
@@ -127,7 +131,7 @@ class HTMLContentFormUploadElement extends HTMLElement {
         this.innerHTML =
             `
         <iframe name="content-form-upload-iframe" onload="this.dispatchEvent(new CustomEvent('iframe-loaded', {bubbles: true}))" style="display: none;"></iframe>
-        <form action="/:content/:upload" target="content-form-upload-iframe" onchange="this.submit()" method="POST" class="content content-form-upload themed" enctype="multipart/form-data">
+        <form action="/:content/:upload" target="content-form-upload-iframe" method="POST" class="content content-form-upload themed" enctype="multipart/form-data">
             <table class="content themed">
                 <caption>Upload Temporary Files</caption>
                 <thead>
@@ -143,10 +147,18 @@ class HTMLContentFormUploadElement extends HTMLElement {
                 <tbody>
                     <tr>
                         <td>
-                            <input name="files" type="file" multiple required/>
+                            <label>Upload:</label>
                         </td>
                         <td>
-                            <input name="upload_path" type="text" value="/uploads" required/>
+                            <input name="files" type="file" onchange="this.form.submit()" multiple required/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>Path:</label>
+                        </td>
+                        <td>
+                            <input name="uploadPath" type="text" value="${this.state.uploadPath}" required/>
                         </td>
                     </tr>
                 </tbody>
@@ -178,7 +190,7 @@ class HTMLContentFormUploadElement extends HTMLElement {
                 <tbody>
                     ${this.state.currentUploads.map((currentUpload, i) => `
                     <tr>
-                        <td style="max-width: 260px;">${currentUpload.name || ''}</td>
+                        <td style="max-width: 260px;">${currentUpload.uploadPath|| ''}</td>
                         <td>${currentUpload.size || ''}</td>
                         <td>
                             <label>

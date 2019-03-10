@@ -41,7 +41,7 @@ class ContentTable {
         if(replaceHostname) {
             contentHTML = contentHTML.replace(/<%-hostname%>/g, replaceHostname);
         }
-        const insertID = await this.insertContent(contentTitle, contentHTML, renderPath);
+        const insertID = await this.insertContent(renderPath, contentTitle, contentHTML);
         console.info(`${contentTitle} Created: `, insertID);
         return insertID;
     }
@@ -89,16 +89,11 @@ class ContentTable {
     //     return await this.selectContent(whereSQL, flags, selectSQL);
     // }
 
-    async updateContentWithRevision(title, data, path, user_id) {
+    async insertOrUpdateContentWithRevision(path, title, data, user_id = null) {
         const existingContent = await this.fetchContentByPath(path);
         if(!existingContent) {
             // Initial revision shouldn't be created until first edit has been made
-            return await this.insertContent(
-                title,
-                data,
-                path,
-                user_id,
-            );
+            return await this.insertContent(path, title, data, user_id);
         }
 
         const oldData = await this.fetchContentData(existingContent.id);
@@ -113,27 +108,19 @@ class ContentTable {
         await contentRevisionTable.insertContentRevision(
             existingContent.id,
             existingContent.data,
-            existingContent.user_id,
+            existingContent.user_id
         );
-        await this.updateContent(
-            existingContent.id,
-            title,
-            data,
-            path,
-            user_id
-        );
+        await this.updateContent(existingContent.id, path, title, data, user_id);
         return existingContent.id;
     }
 
-    async insertContent(title, data, path) {
+    async insertContent(path, title, data, user_id = null) {
         let set = {};
         if(title) set.title = title;
         if(data) set.data = data;
         if(path) set.path = path[0] === '/' ? path : '/' + path;
-        // if(user_id) set.user_id = user_id;
-        // if(parent_id !== null) set.parent_id = parent_id;
-        // if(theme) set.theme = theme;
-        // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
+        if(user_id) set.user_id = user_id;
+
         let SQL = `
           INSERT INTO ${this.table}
           SET ?
@@ -142,14 +129,13 @@ class ContentTable {
         return results.insertId;
     }
 
-    async updateContent(id, title, data, path) {
+    async updateContent(id, path, title, data, user_id = null) {
         let set = {};
         if(title) set.title = title;
         if(data) set.data = data;
         if(path) set.path = path;
-        // if(user_id !== null) set.user_id = user_id;
-        // if(theme) set.theme = theme;
-        // if(data !== null && typeof data === "object") set.data = JSON.stringify(data);
+        if(user_id) set.user_id = user_id;
+
         let SQL = `
           UPDATE ${this.table} c
           SET ?, updated = UTC_TIMESTAMP()
@@ -168,39 +154,6 @@ class ContentTable {
         return results.affectedRows;
     }
 
-    /** Content Menu **/
-
-    async queryMenuData(req) {
-        let SQL = `
-          SELECT c.id, c.path, c.title
-          FROM ${this.table} c
-          WHERE c.path IS NOT NULL
-`;
-        let menuEntries = await this.queryAsync(SQL);
-        // if(!menuEntries || menuEntries.length === 0)
-        //     throw new Error("No menu items found");
-
-        const mainMenu = [];
-        // menuEntries = menuEntries.map(menuEntry => Object.assign({}, menuEntry));
-
-        for(let i=0; i<menuEntries.length; i++) {
-            let menuEntry = menuEntries[i];
-            // if(menuEntry.parent_id === null) { // parent_id === null indicates top level menu
-            mainMenu.push(menuEntry);
-            continue;
-            // }
-            // for(let j=0; j<menuEntries.length; j++) {
-            //     let menuEntry2 = menuEntries[j];
-            //     if(menuEntry.id === menuEntry2.parent_id) {
-            //         if(typeof menuEntry.subMenu === "undefined")
-            //             menuEntry.subMenu = [];
-            //         menuEntry.subMenu.push(menuEntry2);
-            //     }
-            // }
-        }
-
-        return mainMenu;
-    }
 
     /** File Utilities **/
     readFileAsync (path, opts = 'utf8') {

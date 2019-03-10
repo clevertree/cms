@@ -26,7 +26,7 @@ class ContentRenderer {
             // htmlSession: await this.UserAPI.getSessionHTML(req),
         }, content);
 
-        let html = content.data;
+        let html = content.data.toString('UTF8'); // This isn't inefficient, right?
 
         let contentTable = null;
         if(this.DatabaseManager.isAvailable) {
