@@ -1,0 +1,15 @@
+/** Database Table **/
+
+table.database {
+    min-width: 950px;
+}
+
+/** Forms **/
+
+form.database textarea {
+}
+
+
+form.database textarea.editor-plain {
+    min-height: 600px;
+}

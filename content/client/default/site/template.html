@@ -1,0 +1,36 @@
+<html>
+<head>
+    <link href="/site/template.css" rel="stylesheet" />
+    <script src="/site/template.js"></script>
+
+    <link href=":content/:client/theme/minimal/minimal.theme.css" rel="stylesheet" />
+
+    <meta charset="UTF-8">
+    <meta content="Welcome to <%-hostname%>." name="description">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body class='theme-minimal'>
+    <header>
+        <a href="/">
+            <h1><%-title%></h1>
+            <img src="/site/logo.png" alt="<%-hostname%>" class="logo"/>
+        </a>
+        <content-nav paths="/;/about;/upload;/contact;"></content-nav>
+    </header>
+
+    <%-data%>
+
+    <footer>
+        <div style="display: flex; align-items: center; text-align: center;">
+            <div style="flex-grow: 1; flex-basis: 0; padding: 1em;">
+                <h2>Created With</h2>
+                <a class="created-by" target='_blank' href='https://github.com/clevertree/cms'>CleverTree CMS</a>
+            </div>
+            <div style="flex-grow: 1; flex-basis: 0; padding: 1em;">
+                <h2>Contact Us</h2>
+                <a href='/:content'>Site Index</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

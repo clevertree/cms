@@ -1,0 +1,24 @@
+content-slideshow {
+    position: relative;
+    /* width: 400px; */
+    height: 220px;
+    display: block;
+    overflow: hidden;
+    margin: auto;
+    text-align: center;
+    box-shadow: 0px 0px 8px #000;
+}
+
+content-slideshow > * {
+    opacity: 1;
+    transition: opacity 2s ease-in;
+    width: 100%;
+    margin: auto;
+    min-height: 100%;
+    /* box-shadow: 0px 0px 4px #000; */
+    /* text-align: center; */
+}
+content-slideshow > *:not(.current){
+    position: absolute;
+    opacity: 0;
+}

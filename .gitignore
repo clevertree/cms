@@ -1,0 +1,30 @@
+#Config files
+.config.json
+
+#IDE
+.idea
+
+#SSL Certificates
+.acme
+
+#JetBrains
+#.idea
+
+# Logs
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+
+# Dependency directories
+node_modules/
+.DS_Store
+.well-known/
+package-lock.json
+_cacache
+_locks
+anonymous-cli-metrics.json

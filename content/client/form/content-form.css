@@ -1,0 +1,21 @@
+/** Content Table **/
+
+table.content {
+    min-width: 950px;
+}
+
+/** Forms **/
+
+form.content textarea {
+}
+
+
+form.content textarea.editor-plain {
+    min-height: 300px;
+}
+
+
+iframe.content-preview-iframe {
+    width: 100%;
+    height: 100%;
+}

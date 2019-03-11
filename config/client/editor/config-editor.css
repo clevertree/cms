@@ -1,0 +1,15 @@
+/** Config Table **/
+
+table.config {
+    min-width: 950px;
+}
+
+/** Forms **/
+
+form.config textarea {
+}
+
+
+form.config textarea.editor-plain {
+    min-height: 600px;
+}

@@ -1,0 +1,42 @@
+{
+  "name": "clevertree-cms",
+  "version": "1.0.0",
+  "description": "Clevertree Content Management System",
+  "author": "Ari Asulin",
+  "license": "GPL-3.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "configure": "node server.js --configure"
+  },
+  "repository": {
+    "type": "git",
+    "customURL": "git+ssh://git@github.com/clevertree/cms.git"
+  },
+  "keywords": [
+    "content management system",
+    "cms",
+    "server",
+    "clevertree"
+  ],
+  "bugs": {
+    "customURL": "https://github.com/clevertree/cms/issues"
+  },
+  "homepage": "https://github.com/clevertree/cms#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "client-sessions": "^0.8.0",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.3",
+    "multiparty": "^4.2.1",
+    "greenlock": "^2.6.7",
+    "mysql": "^2.16.0",
+    "nodemailer": "^5.1.1",
+    "nodemailer-smtp-transport": "^2.7.4",
+    "uuid": "^3.3.2",
+    "whois": "^2.9.1",
+    "jsdom": "^13.2.0",
+    "cheerio": "^1.0.0-rc.2",
+    "js-beautify": "^1.9.0"
+  }
+}

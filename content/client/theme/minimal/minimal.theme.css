@@ -1,0 +1,282 @@
+/** Background Image **/
+body.theme-minimal {
+    color: #f5efd5;
+    text-shadow: #000 1px 1px 1px;
+
+    /* font-family: 'Advent Pro', monospace; */
+    font-size: 16px;
+    background: #3d9be9;
+    margin: 0 auto;
+    /*background: url(texture/default.background.png) no-repeat fixed center;*/
+}
+/** Font **/
+body.theme-minimal h2.themed {
+    font-family: Helvetica,serif;
+}
+
+/** Hyperlinks **/
+.theme-minimal a,
+.theme-minimal a.themed {
+    color: rgb(255, 246, 212);
+    text-decoration: none;
+}
+.theme-minimal a.themed {
+}
+
+/** Header **/
+body.theme-minimal > header {
+    background: linear-gradient(to bottom, #487bb3 0%, #88a9cc 1%,#487bb3 2%,#1b589b 98%,#022035 100%);
+    /*background: url(texture/header.background.png);*/
+    background-size: contain;
+
+    /* max-width: 700px; */
+    margin: 0px auto;
+    padding: 0.5em;
+    /* padding-top: 10px; */
+    text-align: center;
+}
+
+/** Title **/
+body.theme-minimal > header > .title {
+    /* max-width: 746px; */
+}
+body.theme-minimal > header h1 {
+    display: inline-block;
+    margin: 8px;
+    font-size: 2.5em;
+    font-weight: bold;
+    max-width: 238px;
+    /* vertical-align: top; */
+    /*text-shadow: #0008 4px 3px 9px;*/
+}
+
+/** Title Logo **/
+body.theme-minimal > header img.logo {
+    vertical-align: top;
+    max-width: 191px;
+    margin-bottom: 4px;
+}
+
+/** Footer **/
+body.theme-minimal > footer {
+    /* text-align: center; */
+    background: linear-gradient(to top, #3d9bea 0%, #6eb4ef 100%);
+    /* background: url(texture/footer.background.png); */
+    color: #fff6d4;
+}
+
+/** Navigation **/
+
+.theme-minimal content-nav {
+    font-size: larger;
+}
+
+/** Page Width **/
+body.theme-minimal > article > section,
+body.theme-minimal > footer {
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 0.5em;
+}
+
+
+/** Page Articles **/
+.theme-minimal > article {
+    background: #EEC455;
+    padding: 0 0;
+    margin: 0 auto;
+
+}
+.theme-minimal > article > * {
+    padding: 0.5em;
+
+}
+
+
+/** Page Sections **/
+.theme-minimal > article > section {
+    background: #4e85b3;
+}
+
+.theme-minimal div.themed,
+.theme-minimal > article > section.themed {
+    /* text-shadow: #000 1px 1px 1px; */
+    background-color: #ab6428ed;
+    box-shadow: 2px 2px 4px #0008;
+    border-radius: 2px;
+}
+
+
+/** Paragraphs **/
+
+.theme-minimal p {
+    text-align: justify;
+    text-indent: 8px;
+    padding: 4px 8px;
+    line-height: 20px;
+    font-weight: 300;
+}
+
+.theme-minimal p.themed {
+    /*text-shadow: #000 1px 1px 1px;*/
+    background-color: #0e171fa6;
+    border-radius: 4px;
+    margin: 0px 0.5em;
+}
+
+/** Messages **/
+.theme-minimal div.message,
+.theme-minimal div.success,
+.theme-minimal div.error {
+    padding: 0.5em;
+    margin: 0.5em;
+    border-radius: 4px;
+    max-width: 760px;
+}
+.theme-minimal div.message {
+    color: #000;
+    background: #0002;
+}
+.theme-minimal div.success {
+    color: #f5fbf2;
+    background: #118c09;
+}
+.theme-minimal div.error {
+    color: #fee;
+    background: #d25757;
+}
+
+
+/** Nav **/
+
+.theme-minimal content-nav ul.nav-submenu {
+    box-shadow: 3px 2px 12px #333;
+}
+
+/** Nav Colors **/
+
+.theme-minimal content-nav ul.nav-menu > li:hover,
+.theme-minimal content-nav ul.nav-menu > li:hover > ul.nav-submenu > li:hover{
+    /*background-color: #444;*/
+}
+.theme-minimal content-nav ul.nav-submenu {
+    /*background-color: #6190a0;*/
+}
+
+/** Colors **/
+
+
+
+/** Anchors **/
+/*form.user a,*/
+/*table.user a{*/
+    /*text-decoration: none;*/
+    /*min-width: 300px;*/
+/*}*/
+
+/** Form Legend **/
+
+.theme-minimal form.themed > fieldset > legend {
+    /* margin: 0 0; */
+    /*padding: 2px 6px;*/
+    /*font-weight: bold;*/
+    /*border-radius: 8px;*/
+    /*border: 1px outset #DDD;*/
+    /*border-bottom: 1px outset #FFF;*/
+    /*background: #CCC;*/
+    /* text-align: center; */
+}
+
+
+/** Form Inputs **/
+
+.theme-minimal form.themed input,
+.theme-minimal form.themed select,
+.theme-minimal form.themed textarea,
+.theme-minimal form.themed button {
+    padding: 2px 3px 2px 3px;
+    margin: 0px 2px 0px 0px;
+    border-radius: 4px;
+    border-width: 1px;
+    font-size: large;
+}
+.theme-minimal form.themed textarea {
+    /* min-height: 100px; */
+}
+.theme-minimal form.themed input[type=checkbox] {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin: 0 0px 4px 0px;
+}
+
+.theme-minimal form.themed input[type=submit],
+.theme-minimal form.themed button[type=submit] {
+    padding: 0.5em 1em;
+    font-weight: bold;
+    font-size: medium;
+    cursor: pointer;
+}
+.theme-minimal form.themed input:disabled,
+.theme-minimal form.themed button:disabled {
+    cursor: not-allowed;
+}
+
+
+.theme-minimal form.themed {
+     /* max-width: 1200px; */
+     /* margin: auto; */
+}
+
+.theme-minimal form.themed input[type=text],
+.theme-minimal form.themed input[type=email],
+.theme-minimal form.themed input[type=password],
+.theme-minimal form.themed select,
+.theme-minimal form.themed textarea {
+    min-width: 90%;
+}
+
+
+
+
+/** Table **/
+.theme-minimal table.themed {
+    margin: 0 auto;
+    padding: 1em;
+    /* border: 1px outset #DDD; */
+    border-radius: 0px 0px 8px 8px;
+    /*border: 1px outset #DDD;*/
+    background: #CCC;
+    box-shadow: 2px 1px 4px #5558;
+}
+
+.theme-minimal table.themed > caption {
+    padding: 2px 8px;
+    font-weight: bold;
+    border-radius: 8px 8px 0px 0px;
+    /* border: 1px outset #DDD; */
+    background: #CCC;
+    box-shadow: 2px 1px 4px #5558;
+}
+
+/** Table Row **/
+.theme-minimal table.themed > tr.odd,
+.theme-minimal table.themed > tbody > tr.odd {
+    background-color: #0001;
+}
+
+
+
+/** Labels **/
+
+.theme-minimal table.themed td:first-child > label {
+    text-align: right;
+    display: block;
+}
+
+
+/** Images **/
+.theme-minimal img.themed {
+    width: 100%;
+    box-shadow: 0px 0px 8px #000;
+}

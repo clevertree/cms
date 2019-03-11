@@ -1,0 +1,15 @@
+/** task Table **/
+
+table.task {
+    min-width: 950px;
+}
+
+/** Forms **/
+
+form.task textarea {
+}
+
+
+form.task textarea.editor-plain {
+    min-height: 600px;
+}
