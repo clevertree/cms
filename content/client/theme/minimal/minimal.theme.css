@@ -1,11 +1,17 @@
 /** Background Image **/
 body.theme-minimal {
-    color: #2b2b2b;
-    font-family: 'Advent Pro', monospace;
+    color: #f5efd5;
+    text-shadow: #000 1px 1px 1px;
+
+    /* font-family: 'Advent Pro', monospace; */
     font-size: 16px;
     background: #3d9be9;
     margin: 0 auto;
     /*background: url(texture/default.background.png) no-repeat fixed center;*/
+}
+/** Font **/
+body.theme-minimal h2.themed {
+    font-family: Helvetica,serif;
 }
 
 /** Hyperlinks **/
@@ -13,10 +19,8 @@ body.theme-minimal {
 .theme-minimal a.themed {
     color: rgb(255, 246, 212);
     text-decoration: none;
-    text-shadow: #0008 1px 1px 4px;
 }
 .theme-minimal a.themed {
-    text-shadow: #0008 4px 3px 9px;
 }
 
 /** Header **/
@@ -34,18 +38,23 @@ body.theme-minimal > header {
 
 /** Title **/
 body.theme-minimal > header > .title {
+    /* max-width: 746px; */
+}
+body.theme-minimal > header h1 {
     display: inline-block;
-    max-width: 700px;
-    margin: 0px 8px;
-    font-size: 2em;
+    margin: 8px;
+    font-size: 2.5em;
     font-weight: bold;
+    max-width: 238px;
     /* vertical-align: top; */
+    /*text-shadow: #0008 4px 3px 9px;*/
 }
 
 /** Title Logo **/
-body.theme-minimal > header > .title > .logo {
-    margin: 0px auto;
-    vertical-align: middle;
+body.theme-minimal > header img.logo {
+    vertical-align: top;
+    max-width: 191px;
+    margin-bottom: 4px;
 }
 
 /** Footer **/
@@ -56,6 +65,11 @@ body.theme-minimal > footer {
     color: #fff6d4;
 }
 
+/** Navigation **/
+
+.theme-minimal content-nav {
+    font-size: larger;
+}
 
 /** Page Width **/
 body.theme-minimal > article > section,
@@ -80,23 +94,32 @@ body.theme-minimal > footer {
 
 
 /** Page Sections **/
+.theme-minimal > article > section {
+    background: #4e85b3;
+}
 
 .theme-minimal div.themed,
 .theme-minimal > article > section.themed {
-    color: #f5efd5;
-    text-shadow: #000 1px 1px 1px;
+    /* text-shadow: #000 1px 1px 1px; */
     background-color: #ab6428ed;
 }
 
 
 /** Paragraphs **/
-.theme-minimal p.themed {
+
+.theme-minimal p {
     text-align: justify;
     text-indent: 8px;
     padding: 4px 8px;
     line-height: 20px;
-    /* font-weight: 300; */
-    /* text-shadow: #000 1px 1px 1px; */
+    font-weight: 300;
+}
+
+.theme-minimal p.themed {
+    /*text-shadow: #000 1px 1px 1px;*/
+    background-color: #0e171fa6;
+    border-radius: 4px;
+    margin: 0px 0.5em;
 }
 
 /** Messages **/
@@ -138,10 +161,7 @@ body.theme-minimal > footer {
     /*background-color: #6190a0;*/
 }
 
-
-
-
-
+/** Colors **/
 
 
 
@@ -253,3 +273,8 @@ body.theme-minimal > footer {
 }
 
 
+/** Images **/
+.theme-minimal img.themed {
+    width: 100%;
+    box-shadow: 0px 0px 8px #000;
+}

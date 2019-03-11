@@ -33,11 +33,12 @@ content-nav ul.nav-submenu {
     margin: 5px 0;
     padding: 4px;
     border-radius: 4px;
+    z-index: 99;
 }
 
 content-nav ul.nav-submenu > li > a {
     /* font-weight: bold; */
-    font-size: 14px;
+    /* font-size: 14px; */
     display: block;
     color: white;
     text-align: left;

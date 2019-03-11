@@ -386,7 +386,7 @@ class ContentApi {
                             }
                         }
 
-                        const insertID = await contentTable.insertOrUpdateContentWithRevision(contentData.path, contentData.title, contentData.data);
+                        const insertID = await contentTable.insertOrUpdateContentWithRevision(contentData.path, contentData.title, contentData.data, sessionUser.id);
                         insertIDs.push(insertID);
 
                         // Initial revision shouldn't be created until first edit has been made

@@ -1,6 +1,6 @@
 /** Background Image **/
 body {
-    /*font-family: 'Advent Pro', monospace;*/
+    font-family: 'Advent Pro', monospace;
     /*font-size: 12px;*/
     /*background: #2b2b2b url(texture/default.background.png) no-repeat fixed center;*/
 }
@@ -19,10 +19,8 @@ body > header > .title {
 }
 
 /** Title Logo **/
-body > header > .title > .logo {
-    margin: 0px auto;
-    vertical-align: middle;
-    /*box-shadow: #0008 1px 4px 19px;*/
+body > header img.logo {
+    box-shadow: #0008 1px 4px 19px;
 }
 
 /** Site Hyperlinks **/

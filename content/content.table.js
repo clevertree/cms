@@ -27,7 +27,7 @@ class ContentTable {
         await this.insertDefaultContent("/site/template.html",  "Site Template",    __dirname + '/client/default/site/template.html', hostname);
         await this.insertDefaultContent("/site/template.js",    "Site Javascript",  __dirname + '/client/default/site/template.js');
         await this.insertDefaultContent("/site/template.css",   "Site CSS",         __dirname + '/client/default/site/template.css');
-        await this.insertDefaultContent("/site/image/logo.png", "Site Logo",        __dirname + '/client/default/site/image/logo.png');
+        await this.insertDefaultContent("/site/logo.png",       "Site Logo",        __dirname + '/client/default/site/logo.png');
         await this.insertDefaultContent("/",                    "Home",             __dirname + '/client/default/home.html', hostname);
         await this.insertDefaultContent("/about",               "About Us",         __dirname + '/client/default/about.html', hostname);
         await this.insertDefaultContent("/contact",             "Contact Us",       __dirname + '/client/default/contact.html', hostname);
@@ -108,7 +108,7 @@ class ContentTable {
         await contentRevisionTable.insertContentRevision(
             existingContent.id,
             existingContent.data,
-            existingContent.user_id
+            existingContent.user_id || -1
         );
         await this.updateContent(existingContent.id, path, title, data, user_id);
         return existingContent.id;

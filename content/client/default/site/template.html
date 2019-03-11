@@ -11,23 +11,23 @@
 </head>
 <body class='theme-minimal'>
     <header>
-        <a href="/" class="title themed">
-            <span><%-title%></span>
-            <img src="/site/image/logo.png" alt="<%-hostname%>" class="logo"/>
+        <a href="/">
+            <h1><%-title%></h1>
+            <img src="/site/logo.png" alt="<%-hostname%>" class="logo"/>
         </a>
         <content-nav paths="/;/about;/upload;/contact;"></content-nav>
     </header>
-    <article>
-        <%-data%>
-    </article>
+
+    <%-data%>
+
     <footer>
-        <div style="text-align: center;">
-            <div style="display: inline-block; width: 200px; vertical-align: top;">
-                <h3>Created With</h3>
+        <div style="display: flex; align-items: center; text-align: center;">
+            <div style="flex-grow: 1; flex-basis: 0; padding: 1em;">
+                <h2>Created With</h2>
                 <a class="created-by" target='_blank' href='https://github.com/clevertree/cms'>CleverTree CMS</a>
             </div>
-            <div style="display: inline-block; width: 200px; vertical-align: top;">
-                <h3>Contact Us</h3>
+            <div style="flex-grow: 1; flex-basis: 0; padding: 1em;">
+                <h2>Contact Us</h2>
                 <a href='/:content'>Site Index</a>
             </div>
         </div>
