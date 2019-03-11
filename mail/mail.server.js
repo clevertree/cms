@@ -15,7 +15,7 @@ class MailServer {
     getDefaultSender() { return this.config && this.config.auth ? this.config.auth.user : null; }
 
     async configure(promptCallback=null) {
-        console.info("Configuring Mail Client");
+        // console.info("Configuring Mail Client");
         const localConfig = new LocalConfig(promptCallback);
         const mailConfig = await localConfig.getOrCreate('mail');
         if(typeof mailConfig.auth === "undefined")
@@ -31,9 +31,9 @@ class MailServer {
             let testMail = await promptCallback(`Would you like to test the Mail Settings [y or n]?`, false, 'boolean');
 
             try {
-                console.info(`Connecting to Mail Server '${mailConfig.host}'...`);
-                const server = nodemailer.createTransport(smtpTransport(mailConfig));
                 if(testMail) {
+                    console.info(`Connecting to Mail Server '${mailConfig.host}'...`);
+                    const server = nodemailer.createTransport(smtpTransport(mailConfig));
                     await server.verify();
                     console.info(`Connection to Mail Server '${mailConfig.host}' verified`);
                 }

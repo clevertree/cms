@@ -4,7 +4,7 @@ const fs = require('fs');
 // const { FileManager } = require('../file/file.manager');
 // const { ConfigManager } = require('./config.manager');promptCallback
 
-const BASE_DIR = path.resolve(path.dirname(__dirname));
+// const BASE_DIR = path.resolve(path.dirname(__dirname));
 
 // Missing database config always prompts. --configure forces all config options
 class LocalConfig {
@@ -40,7 +40,7 @@ class LocalConfig {
 
     async getAll() {
         if(!this.config) {
-            const configPath = path.resolve(BASE_DIR + '/.config.json');
+            const configPath = path.resolve(process.cwd() + '/.config.json');
             if (await this.accessAsync(configPath)) {
                 const configJSON = await this.readFileAsync(configPath, "utf8");
                 this.config = JSON.parse(configJSON);
@@ -53,7 +53,7 @@ class LocalConfig {
     }
 
     async saveAll() {
-        const configPath = path.resolve(BASE_DIR + '/.config.json');
+        const configPath = path.resolve(process.cwd() + '/.config.json');
         let newConfigJSON = JSON.stringify(this.config, null, 4);
         let oldConfigJSON = '';
         try {

@@ -65,12 +65,15 @@ class HTTPServer {
             }
 
             this.config = serverConfig;
-            try {
-                await this.createServers();
-                await this.stop();
-                break;
-            } catch (e) {
-                console.error(e.message);
+            let testServer = await promptCallback(`Would you like to test the Server Settings [y or n]?`, false, 'boolean');
+            if(testServer) {
+                try {
+                    await this.createServers();
+                    await this.stop();
+                    break;
+                } catch (e) {
+                    console.error(e.message);
+                }
             }
         }
         await localConfig.saveAll();
@@ -84,19 +87,20 @@ class HTTPServer {
         const { DatabaseAPI } = require('../database/database.api');
         const { UserAPI } = require('../user/user.api');
         const { ContentAPI } = require('../content/content.api');
-        // const { FileAPI } = require('../file/file.api');
         const { ConfigAPI } = require('../config/config.api');
         const { TaskAPI } = require('../task/task.api');
+        const { ConfigManager } = require('../config/config.manager');
 
         const router = express.Router();
-        // Routes
-        router.use(DatabaseAPI.getMiddleware());
-        router.use(UserAPI.getMiddleware());
-        router.use(ContentAPI.getMiddleware());
-        // router.use(FileAPI.getMiddleware());
-        router.use(ConfigAPI.getMiddleware());
-        router.use(TaskAPI.getMiddleware());
-        // router.use(ThemeAPI.getMiddleware());
+        ConfigManager.autoConfigure().then(() => {
+            // Routes
+            router.use(DatabaseAPI.getMiddleware());
+            router.use(UserAPI.getMiddleware());
+            router.use(ContentAPI.getMiddleware());
+            router.use(ConfigAPI.getMiddleware());
+            router.use(TaskAPI.getMiddleware());
+
+        });
 
 
         // CMS Asset files
@@ -115,6 +119,7 @@ class HTTPServer {
         const appHTTP = express();
         // appHTTP.locals.pretty = true;
         const appMiddleware = this.getMiddleware();
+        appHTTP.use(appMiddleware);
         this.httpServer = require('http').createServer(appHTTP).listen(this.config.httpPort, () => {
             console.log(`HTTP listening on port ${this.config.httpPort}`);
         });
@@ -130,11 +135,12 @@ class HTTPServer {
             appHTTP.use(this.greenlock.middleware());
         }
 
-        appHTTP.use(appMiddleware);
     }
 
     async listen() {
         try {
+            const { ConfigManager } = require('../config/config.manager');
+            await ConfigManager.autoConfigure();
             if(!this.config)
                 await this.configure();
 

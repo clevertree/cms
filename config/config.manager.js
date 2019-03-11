@@ -7,6 +7,7 @@ const { MailServer } = require('../mail/mail.server');
 
 class ConfigManager {
     constructor() {
+        this.configured = false;
         this.configList = [];
 
         // Add Site-specific configuration
@@ -31,7 +32,7 @@ class ConfigManager {
         for(let i=0; i<this.configList.length; i++) {
             if(this.configList[i].name === name)
                 p = i;
-                // throw new Error("Config setting already exists: " + name);
+            // throw new Error("Config setting already exists: " + name);
         }
         this.configList[p] = {name, defaultValue, type};
     }
@@ -39,6 +40,13 @@ class ConfigManager {
 
     getConfigList() {
         return this.configList.slice();
+    }
+
+    async autoConfigure() {
+        if(this.configured === false) {
+            this.configured = null;
+            await this.configure(false);
+        }
     }
 
     async configure(interactive=false) {
@@ -50,6 +58,7 @@ class ConfigManager {
             await TaskAPI.configure(promptCallback);
             // await ThemeAPI.configure(promptCallback);
             await MailServer.configure(promptCallback);
+            this.configured = true;
         } catch (e) {
             console.error("Configuration failed: ", e);
             if(!interactive)
@@ -122,7 +131,7 @@ class ConfigManager {
     }
 
 
-        // var readline = require('readline');
+    // var readline = require('readline');
     //
     // var rl = readline.createInterface({
     //     input: process.stdin,
