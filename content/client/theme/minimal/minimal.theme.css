@@ -102,6 +102,8 @@ body.theme-minimal > footer {
 .theme-minimal > article > section.themed {
     /* text-shadow: #000 1px 1px 1px; */
     background-color: #ab6428ed;
+    box-shadow: 2px 2px 4px #0008;
+    border-radius: 2px;
 }
 
 
