@@ -1,4 +1,4 @@
-# Clevertree 
+# Clevertree CMS
 Content Management System
 
 
@@ -30,14 +30,13 @@ This is made possible with a common set of APIs (controllers), database table na
 
 ### Technical/Code Goals
 * Content only! No CMS-specific tags, prefixes, or support libraries on ANY rendered output.
-* Maximum server performance with minimal overhead. Avoids caching.
-* Serve unlimited domains on a single app instance, or multithread.
+* Maximum server performance with minimal overhead. 
 * Micro-MVC: Database / API / client files must exist within the same topic directory.
 
 
 
 #### Additional Features
-* User services: Add, edit, reset / change password, list, delete, message.
+* User services: Add, edit, reset / change password, list, delete.
 * Content services: Add, edit, multi-upload, WYSIWYG editor
 
 
@@ -62,6 +61,10 @@ This is made possible with a common set of APIs (controllers), database table na
 
 
 
+### Sites Powered by CleverTree CMS
+* https://afoh.info - Arizona Friends of Homeless 
+
+
 # Installation (Stand alone)
 ```
 $ git clone https://github.com/clevertree/cms
@@ -79,12 +82,12 @@ FLUSH PRIVILEGES;
 
 ### Configure 
 ```
-$ node configure
+$ npm run configure
 ```
 
 ### Run Server
 ```
-$ node start
+$ npm start
 ```
 
 
@@ -118,6 +121,7 @@ require('http').createServer(app).listen(httpPort, () => {
 
 ```
 
+### Run Server
 ```
 $ node myapp.js
 ```
