@@ -1,12 +1,11 @@
 {
-  "name": "afoh",
-  "version": "0.0.2",
-  "description": "Arizona Friends of the Homeless Website",
+  "name": "clevertree-cms",
+  "version": "1.0.0",
+  "description": "Clevertree Content Management System",
   "author": "Ari Asulin",
   "license": "GPL-3.0",
-  "main": "index.html",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "configure": "node server.js --configure"
   },
@@ -17,6 +16,7 @@
   "keywords": [
     "content management system",
     "cms",
+    "server",
     "clevertree"
   ],
   "bugs": {

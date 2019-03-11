@@ -1,7 +1,7 @@
-const fs = require('fs');
+// const fs = require('fs');
 const path = require('path');
 const express = require('express');
-const etag = require('etag')
+// const etag = require('etag')
 // var qs = require('qs');
 // var parseUrl = require('parseurl');
 

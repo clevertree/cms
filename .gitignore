@@ -1,17 +1,17 @@
+#Config files
 .config.json
 
-#SSL
+#IDE
+.idea
+
+#SSL Certificates
 .acme
 
 #JetBrains
 #.idea
 
 # Logs
-logs
-*.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 # Runtime data
 pids
@@ -22,7 +22,6 @@ pids
 
 # Dependency directories
 node_modules/
-jspm_packages/
 .DS_Store
 .well-known/
 package-lock.json
