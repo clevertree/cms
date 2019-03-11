@@ -66,10 +66,10 @@ class ContentApi {
                         SM(req, res, async () => {
                             await ContentRenderer.send(req, res, content);
                         });
-                        break;
+                        return;
                     default:
                         await this.renderData(req, res, content.data, mimeType, content.updated);
-                        break;
+                        return;
                 }
             }
 
@@ -271,23 +271,43 @@ class ContentApi {
                         case 'publish':
                             if(!sessionUser || !sessionUser.isAdmin())
                                 throw new Error("Not authorized");
+                            content.data = await contentTable.fetchContentData(content.id, 'UTF8');
+
+                            if(req.body.path === content.path
+                                && req.body.title === content.title
+                                && req.body.data === content.data
+                                && sessionUser.id === content.user_id) {
+                                return res.status(400).json({
+                                    // redirect: content.url,
+                                    message: "No changes detected",
+                                    affectedContentRows: 0,
+                                    content: content
+                                });
+                            }
                             const affectedRows = await contentTable.updateContent(content.id, req.body.path, req.body.title, req.body.data, sessionUser.id);
 
                             // Insert revision for old content
                             const oldContent = content;
-                            await contentRevisionTable.insertContentRevision(
-                                oldContent.id,
-                                oldContent.data,       // Old Data
-                                oldContent.user_id || -1     // Old User
-                            );
-
                             // Refresh content
-                            const newContent = await contentTable.fetchContentByID(req.params.id, '*');
+                            content = await contentTable.fetchContentByID(content.id, '*');
+                            content.data = content.data.toString('UTF8');
+
+                            oldContent.data = await contentTable.fetchContentData(oldContent.id, 'UTF8');
+                            if(oldContent.data === content.data && oldContent.user_id === content.user_id) {
+                                console.warn("Old content matches new. Skipping revision");
+                            } else {
+                                await contentRevisionTable.insertContentRevision(
+                                    oldContent.id,
+                                    oldContent.data,       // Old Data
+                                    oldContent.user_id || -1     // Old User
+                                );
+                            }
+
                             return res.json({
-                                redirect: newContent.url,
+                                redirect: content.url,
                                 message: "Content published successfully.<br/>Redirecting...",
                                 affectedContentRows: affectedRows,
-                                content: newContent
+                                content: content
                             });
 
                         case 'draft':

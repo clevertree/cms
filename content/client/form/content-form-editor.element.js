@@ -203,14 +203,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         </td>
                     </tr>
                     <tr>
-                        <td><label for="theme">Theme:</label></td>
-                        <td>
-                            <select name="theme" id="theme">
-                                <option value="">Default Site Theme</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
                         <td><label for="data">Content:</label></td>
                         <td>
                             <textarea class="editor-plain editor-wysiwyg-target" name="data" id="data"
