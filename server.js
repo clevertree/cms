@@ -5,7 +5,7 @@ const { HTTPServer } = require('./http/http.server');
 (async () => {
     if(process && process.argv && process.argv.indexOf('--configure') !== -1) {
         console.log("Starting configuration");
-        await ConfigManager.configure();
+        await ConfigManager.configure(true);
     }
 
 
