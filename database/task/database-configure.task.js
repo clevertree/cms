@@ -29,8 +29,10 @@ class DatabaseConfigureTask {
 
         const domainTable = DatabaseManager.getPrimaryDomainDB();
         const domain = await domainTable.fetchDomainByHostname(hostname);
-        if(!domain)
-            throw new Error("Domain entry missing. Shouldn't happen");
+        if(!domain) {
+            console.warn("TODO: Domain entry missing. Shouldn't happen");
+            return false;
+        }
         if(!domain.database)
             return true;
 
