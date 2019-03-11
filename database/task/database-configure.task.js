@@ -4,12 +4,8 @@ const { DatabaseManager } = require("../database.manager");
 const { UserAPI } = require("../../user/user.api");
 const { UserTable } = require("../../user/user.table");
 const { ConfigureDatabaseMail } = require('../mail/configuredatabase.mail');
-const configureRequests = {
-    '3a001463-7fa3-4399-bb18-f31f4d510dd0': {
-        adminEmail: 'ari.asulin@gmail.com',
-        hostname: 'paradigmthreat.org',
-    }
-};
+const configureRequests = {};
+
 class DatabaseConfigureTask {
     constructor(database) {
         // Null domain means domain hasn't been configured yet

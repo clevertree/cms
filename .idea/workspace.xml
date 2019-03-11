@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/content/client/form/content-form-editor.element.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/client/form/content-form-editor.element.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content/content.api.js" beforeDir="false" afterPath="$PROJECT_DIR$/content/content.api.js" afterDir="false" />
-    </list>
+    <list default="true" id="54044607-5377-4468-b41f-ad2f3977bb43" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,11 +54,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="513">
-              <caret line="27" column="64" lean-forward="true" selection-start-line="27" selection-start-column="64" selection-end-line="27" selection-end-column="64" />
+            <state relative-caret-position="665">
+              <caret line="35" column="49" lean-forward="true" selection-start-line="35" selection-start-column="49" selection-end-line="35" selection-end-column="49" />
               <folding>
                 <element signature="n#style#0;n#div#0;n#section#0;n#article#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#0;n#div#0;n#section#0;n#article#0;n#!!top" expanded="true" />
@@ -76,6 +73,15 @@
                 <element signature="n#style#0;n#div#1;n#div#1;n#section#1;n#article#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#2;n#div#1;n#section#1;n#article#0;n#!!top" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/database/task/database-configure.task.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="608">
+              <caret line="32" column="22" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
             </state>
           </provider>
         </entry>
@@ -130,7 +136,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>currentUploads</find>
       <find>slideshow-player</find>
       <find>Preview</find>
       <find>content-preview-container</find>
@@ -160,6 +165,7 @@
       <find>ContentRenderer.send</find>
       <find>Default Site T</find>
       <find>class=&quot;themed&quot;</find>
+      <find>Domain e</find>
     </findStrings>
     <replaceStrings>
       <replace>user-form-register</replace>
@@ -235,7 +241,6 @@
         <option value="$PROJECT_DIR$/task/client/manager/task-manager.element.js" />
         <option value="$PROJECT_DIR$/database/client/form/databaseform-connect.client.js" />
         <option value="$PROJECT_DIR$/database/client/form/databaseform-manage.client.js" />
-        <option value="$PROJECT_DIR$/database/task/database-configure.task.js" />
         <option value="$PROJECT_DIR$/task/client/manager/task-manager.css" />
         <option value="$PROJECT_DIR$/task/client/manager/task-form.css" />
         <option value="$PROJECT_DIR$/database/client/form/databaseform.css" />
@@ -256,6 +261,7 @@
         <option value="$PROJECT_DIR$/content/client/form/content-form-editor.element.js" />
         <option value="$PROJECT_DIR$/content/content.api.js" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.html" />
+        <option value="$PROJECT_DIR$/database/task/database-configure.task.js" />
       </list>
     </option>
   </component>
@@ -485,12 +491,12 @@
       <workItem from="1552252132956" duration="129000" />
       <workItem from="1552252295733" duration="17292000" />
       <workItem from="1552276573716" duration="2426000" />
-      <workItem from="1552318807087" duration="1664000" />
+      <workItem from="1552318807087" duration="2096000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="420534000" />
+    <option name="totallyTimeSpent" value="420966000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -770,13 +776,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/database/task/database-configure.task.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="143" column="41" selection-start-line="143" selection-start-column="41" selection-end-line="143" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/task/client/manager/task-manager.element.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="743">
@@ -972,8 +971,8 @@
     </entry>
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="513">
-          <caret line="27" column="64" lean-forward="true" selection-start-line="27" selection-start-column="64" selection-end-line="27" selection-end-column="64" />
+        <state relative-caret-position="665">
+          <caret line="35" column="49" lean-forward="true" selection-start-line="35" selection-start-column="49" selection-end-line="35" selection-end-column="49" />
           <folding>
             <element signature="n#style#0;n#div#0;n#section#0;n#article#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#div#0;n#section#0;n#article#0;n#!!top" expanded="true" />
@@ -988,6 +987,13 @@
             <element signature="n#style#0;n#div#1;n#div#1;n#section#1;n#article#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#2;n#div#1;n#section#1;n#article#0;n#!!top" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/database/task/database-configure.task.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="608">
+          <caret line="32" column="22" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
         </state>
       </provider>
     </entry>
