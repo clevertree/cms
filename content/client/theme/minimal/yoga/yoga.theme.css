@@ -1,0 +1,69 @@
+/** Background Image **/
+body.theme-minimal-yoga {
+    color: #222;
+     font-family: 'Advent Pro', monospace;
+    background: #FFF;
+}
+
+/** Font **/
+body.theme-minimal-yoga h2.themed {
+    font-family: Helvetica,serif;
+}
+
+/** Hyperlinks **/
+.theme-minimal-yoga a {
+    color: #000;
+    /*text-decoration: none;*/
+     text-decoration-color: #CCCC;
+}
+
+.theme-minimal-yoga header a,
+.theme-minimal-yoga footer a
+{
+    text-decoration: none;
+}
+
+.theme-minimal-yoga a:hover {
+    color: #FFF;
+    text-decoration: underline;
+    text-decoration-color: #FFF;
+}
+
+/** Header **/
+body.theme-minimal-yoga > header {
+    background: #FFF;
+    /*background: linear-gradient(to bottom, #487bb3 0%, #88a9cc 1%,#487bb3 2%,#1b589b 98%,#022035 100%);*/
+}
+
+/** Header Tags **/
+.theme-minimal-yoga h1, .theme-minimal-yoga h2,  .theme-minimal-yoga h3, .theme-minimal-yoga h4, .theme-minimal-yoga h5, .theme-minimal-yoga h6 {
+    color: #fff6d4;
+     text-shadow: #000 1px 1px 1px;
+}
+
+/** Footer **/
+body.theme-minimal-yoga > footer {
+    background: #FFF;
+    /*background: linear-gradient(to top, #3d9bea 0%, #6eb4ef 100%);*/
+    /* background: url(texture/footer.background.png); */
+}
+
+/** Navigation **/
+.theme-minimal-yoga content-nav {
+    font-size: larger;
+}
+
+
+/** Page Sections **/
+.theme-minimal-yoga > article > section {
+    background: #DDD;
+}
+
+.theme-minimal-yoga div.themed,
+.theme-minimal-yoga > article > section.themed {
+    /* text-shadow: #000 1px 1px 1px; */
+    background-color: #ab6428ed;
+    box-shadow: 2px 2px 4px #0008;
+    border-radius: 2px;
+}
+
