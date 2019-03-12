@@ -13,16 +13,22 @@ body.theme-minimal h2.themed {
 }
 
 /** Hyperlinks **/
-.theme-minimal header a,
-.theme-minimal footer a {
-     color: #fff6d4;
-    /*color: #FFF;*/
-    text-decoration: none;
-    /* text-decoration-color: #FFF5; */
+.theme-minimal a {
+    color: #FFF;
+    /*text-decoration: none;*/
+     text-decoration-color: #CCCC;
 }
+
+.theme-minimal header a,
+.theme-minimal footer a
+{
+    text-decoration: none;
+}
+
 .theme-minimal a:hover {
     color: #FFF;
     text-decoration: underline;
+    text-decoration-color: #FFF;
 }
 
 /** Header **/
@@ -124,10 +130,11 @@ body.theme-minimal > footer {
 }
 
 .theme-minimal p.themed {
-    /*text-shadow: #000 1px 1px 1px;*/
-    background-color: #429eed;
+    text-shadow: #000 1px 1px 1px;
+    background-color: #503d25e3;
     border-radius: 4px;
     margin: 0px 0.5em;
+    padding: 8px;
 }
 
 /** Messages **/
