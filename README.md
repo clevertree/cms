@@ -20,10 +20,10 @@ This is made possible with a common set of APIs (controllers), database table na
 ### What's Currently Working?
 * HTML-based content management with historic revisions.
 * Upload files and create pages to any path.
-* Multi-domain hosting: Host limitless domains on a single node instance. 
-* Automatic SSL: Free, automated SSL via greenlock.
-* Automatic administration: Request administrator access by setting the domain's SOA email.
-* Interactive configuration: No manually editing json files.
+* Host limitless domains on a single node instance. 
+* Free, automated SSL via greenlock.
+* Request administrator access by setting the domain's SOA email.
+* Interactive configuration - No manually editing json files.
 * Can be used stand-alone, or as a middleware within another NodeJS app.
 
 
@@ -31,9 +31,9 @@ This is made possible with a common set of APIs (controllers), database table na
 ### Technical/Code Goals
 * Content only! No CMS-specific tags, prefixes, or support libraries on ANY rendered output.
 * Maximum server performance with minimal overhead. 
-* Micro-MVC: Database / API / client files must exist within the same topic directory.
-
-
+* Micro-MVC - Database / API / client files must exist within the same topic directory.
+* Render all <forms> on the client's browser, never the server.
+* No server admins required - DNS SOA email authorizes administrator
 
 #### Additional Features
 * User services: Add, edit, reset / change password, list, delete.
