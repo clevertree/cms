@@ -70,7 +70,7 @@
                 //         rootPaths.push(rootPath);
                 // }
 
-                console.log("TODO: ", this.state.paths, rootPaths);
+                console.log("TODO: ", this.state.paths, rootPaths, this.innerHTML);
 
                 menu = rootPaths.map(rootPath => {
                     const menuEntry = {title:null, path: rootPath, content: null, subMenu: []};
