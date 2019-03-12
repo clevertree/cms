@@ -6,12 +6,17 @@ table.content {
 
 /** Forms **/
 
-form.content textarea {
+form.content select,
+form.content input[type=text],
+form.content input[type=password],
+form.content input[type=email] {
+    width: 100%;
 }
 
 
 form.content textarea.editor-plain {
     min-height: 300px;
+    width: 100%;
 }
 
 

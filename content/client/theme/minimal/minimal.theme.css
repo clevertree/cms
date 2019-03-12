@@ -1,8 +1,6 @@
 /** Background Image **/
 body.theme-minimal {
-    color: #f5efd5;
-    text-shadow: #000 1px 1px 1px;
-
+    color: #fff6d4;
     /* font-family: 'Advent Pro', monospace; */
     font-size: 16px;
     background: #3d9be9;
@@ -15,12 +13,16 @@ body.theme-minimal h2.themed {
 }
 
 /** Hyperlinks **/
-.theme-minimal a,
-.theme-minimal a.themed {
-    color: rgb(255, 246, 212);
+.theme-minimal header a,
+.theme-minimal footer a {
+     color: #fff6d4;
+    /*color: #FFF;*/
     text-decoration: none;
+    /* text-decoration-color: #FFF5; */
 }
-.theme-minimal a.themed {
+.theme-minimal a:hover {
+    color: #FFF;
+    text-decoration: underline;
 }
 
 /** Header **/
@@ -36,6 +38,10 @@ body.theme-minimal > header {
     text-align: center;
 }
 
+.theme-minimal h1, .theme-minimal h2,  .theme-minimal h3, .theme-minimal h4, .theme-minimal h5, .theme-minimal h6 {
+    color: #fff6d4;
+     text-shadow: #000 1px 1px 1px;
+}
 /** Title **/
 body.theme-minimal > header > .title {
     /* max-width: 746px; */
@@ -62,7 +68,6 @@ body.theme-minimal > footer {
     /* text-align: center; */
     background: linear-gradient(to top, #3d9bea 0%, #6eb4ef 100%);
     /* background: url(texture/footer.background.png); */
-    color: #fff6d4;
 }
 
 /** Navigation **/
@@ -74,9 +79,9 @@ body.theme-minimal > footer {
 /** Page Width **/
 body.theme-minimal > article > section,
 body.theme-minimal > footer {
-    margin: 0 auto;
+    margin: 0px auto;
     max-width: 800px;
-    padding: 0.5em;
+    padding: 1px 1em;
 }
 
 
@@ -112,14 +117,15 @@ body.theme-minimal > footer {
 .theme-minimal p {
     text-align: justify;
     text-indent: 8px;
-    padding: 4px 8px;
+    padding: 0px 8px;
     line-height: 20px;
     font-weight: 300;
+    /* max-width: 800px; */
 }
 
 .theme-minimal p.themed {
     /*text-shadow: #000 1px 1px 1px;*/
-    background-color: #0e171fa6;
+    background-color: #429eed;
     border-radius: 4px;
     margin: 0px 0.5em;
 }
@@ -129,7 +135,7 @@ body.theme-minimal > footer {
 .theme-minimal div.success,
 .theme-minimal div.error {
     padding: 0.5em;
-    margin: 0.5em;
+    margin: 0.5em auto;
     border-radius: 4px;
     max-width: 760px;
 }
@@ -233,7 +239,7 @@ body.theme-minimal > footer {
 .theme-minimal form.themed input[type=password],
 .theme-minimal form.themed select,
 .theme-minimal form.themed textarea {
-    min-width: 90%;
+    /* min-width: 90%; */
 }
 
 
@@ -241,16 +247,19 @@ body.theme-minimal > footer {
 
 /** Table **/
 .theme-minimal table.themed {
-    margin: 0 auto;
+    margin: 1em auto;
     padding: 1em;
     /* border: 1px outset #DDD; */
     border-radius: 0px 0px 8px 8px;
     /*border: 1px outset #DDD;*/
     background: #CCC;
+    color: #000;
+    font-family: monospace;
     box-shadow: 2px 1px 4px #5558;
 }
 
 .theme-minimal table.themed > caption {
+    color: #333;
     padding: 2px 8px;
     font-weight: bold;
     border-radius: 8px 8px 0px 0px;

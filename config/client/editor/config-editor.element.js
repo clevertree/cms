@@ -131,7 +131,8 @@ class HTMLConfigFormEditorElement extends HTMLElement {
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
         `<form action="/:config/:edit" method="POST" class="config config-editor themed">
-            <table class="config">
+            <table class="config themed">
+                <caption>Search Configuration</caption>
                 <thead>
                     <tr>
                         <td colspan="4">
@@ -145,7 +146,7 @@ class HTMLConfigFormEditorElement extends HTMLElement {
                     </tr>
                     <tr><td colspan="4"><hr/></td></tr>
                     <tr>
-                        <th>Name</th>
+                        <th style="width: 25%;">Name</th>
                         <th>Value</th>
                     </tr>
                 </thead>

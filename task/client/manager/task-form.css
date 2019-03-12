@@ -1,15 +1,24 @@
 /** task Table **/
 
 table.task {
-    min-width: 950px;
+    width: 800px;
 }
 
 /** Forms **/
 
+form.task select,
+form.task input[type=text],
+form.task input[type=password],
+form.task input[type=email],
 form.task textarea {
+    width: 100%;
+}
+
+form.task textarea[name=description] {
+    min-height: 200px;
 }
 
 
-form.task textarea.editor-plain {
-    min-height: 600px;
+task-manager .results {
+    /*text-align: center;*/
 }

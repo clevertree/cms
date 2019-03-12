@@ -6,3 +6,15 @@ table.user {
 table.user .icon-edit {
     text-decoration: none;
 }
+
+form.user select,
+form.user input[type=text],
+form.user input[type=password],
+form.user input[type=email],
+form.user textarea {
+    width: 100%;
+}
+
+form.user textarea[name=description] {
+    min-height: 200px;
+}

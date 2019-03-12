@@ -1,11 +1,11 @@
-document.addEventListener('DOMContentLoaded', function() {
-    ((INCLUDE_CSS) => {
-        if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
-            document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":content/:client/nav/content-nav.css");
-});
-
 {
+    function loadCSS() {
+        ((INCLUDE_CSS) => {
+            if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
+                document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
+        })(":content/:client/nav/content-nav.css");
+    }
+
     const DEFAULT_PATHS = '/;/article;/upload;/about';
     class ThemeDefaultNavMenu extends HTMLElement{
         constructor() {
@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // userID: null,
                 menu: []
             };
+            loadCSS();
             // this.state = {id:-1, flags:[]};
         }
 
