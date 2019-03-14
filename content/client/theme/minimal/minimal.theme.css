@@ -5,17 +5,6 @@ body.theme-minimal {
 }
 /** Font **/
 
-/** Hyperlinks **/
-.theme-minimal a {
-}
-.theme-minimal a:hover {
-}
-
-.theme-minimal header a:not(:hover),
-.theme-minimal footer a:not(:hover) {
-    text-decoration: none;
-}
-
 
 /** Header **/
 body.theme-minimal > header {
@@ -38,6 +27,7 @@ body.theme-minimal > header img.logo {
     vertical-align: top;
     max-width: 191px;
     margin-bottom: 4px;
+    float: left;
 }
 
 /** Footer **/
@@ -107,23 +97,6 @@ body.theme-minimal > footer {
     background: #d25757;
 }
 
-
-
-/** Navigation **/
-
-.theme-minimal content-nav {
-}
-
-.theme-minimal content-nav ul.nav-submenu {
-}
-
-/** Nav Colors **/
-
-.theme-minimal content-nav ul.nav-menu > li:hover,
-.theme-minimal content-nav ul.nav-menu > li:hover > ul.nav-submenu > li:hover{
-}
-.theme-minimal content-nav ul.nav-submenu {
-}
 
 
 
@@ -201,16 +174,11 @@ body.theme-minimal > footer {
 }
 
 
-/** Header Themes **/
 
-body.theme-minimal header.wide {
-    text-align: left;
-}
 
-body.theme-minimal header.wide content-nav {
-    float: right;
-    padding: 1em;
-}
 
 /** Color Themes **/
-body.theme-minimal
+body.theme-minimal {
+
+}
+

@@ -4,12 +4,7 @@ const uuidv4 = require('uuid/v4');
 const { UserAPI } = require("../../user/user.api");
 const { UserTable } = require("../user.table");
 const { CreateAdminMail } = require('../mail/createadmin.mail');
-const adminRequests = {
-    '3a001463-7fa3-4399-bb18-f31f4d510dd0': {
-        adminEmail: 'ari.asulin@gmail.com',
-        hostname: 'paradigmthreat.org',
-    }
-};
+const adminRequests = {};
 
 
 class AdminConfigureTask {

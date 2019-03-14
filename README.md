@@ -25,7 +25,7 @@ This is made possible with a common set of APIs (controllers), database table na
 * Request administrator access by setting the domain's SOA email.
 * Interactive configuration - No manually editing json files.
 * Can be used stand-alone, or as a middleware within another NodeJS app.
-
+* CMS API middleware can be enabled individually (example: content management @ /:content/ with no user management @ /:user/)
 
 
 ### Technical/Code Goals
@@ -51,18 +51,24 @@ This is made possible with a common set of APIs (controllers), database table na
 * Custom elements:  Create and share custom elements between websites.
 * Server-wide search: Search for specific content on all sites within a server, and even on other UCMS servers.
 * MarkDown (.md) support
+* DB support (NOSQL etc)
+* Git-driven content management (no database)
 
 
-
-#### Help Wanted
-* CSS Theme Designer
-* CustomElement Programmer
+#### Help Wanted 
+* Javascript/NodeJS Programmer!
+* CSS Designer
 * Publicist
 
 
 
 ### Sites Powered by CleverTree CMS
 * https://afoh.info - Arizona Friends of Homeless 
+
+
+### Perquisites
+* nodejs
+* MySQL/MariaDB Server
 
 
 # Installation (Stand alone)
