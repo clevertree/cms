@@ -4,15 +4,16 @@
     <script src="/site/template.js"></script>
 
     <link href=":content/:client/theme/minimal/minimal.theme.css" rel="stylesheet" />
+    <link href=":content/:client/theme/minimal/yoga/yoga.theme.css" rel="stylesheet" />
 
     <meta charset="UTF-8">
     <meta content="Welcome to <%-hostname%>." name="description">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-<body class='theme-minimal'>
+<body class='theme-minimal theme-minimal-yoga'>
     <header>
-        <h1><a href="/"><%-title%></a></h1>
-        <img src="/site/logo.png" alt="<%-hostname%>" class="logo"/></a>
+        <a href="/"><img src="/site/logo.png" alt="<%-hostname%>" class="logo"/></a>
+        <h1 class="title"><a href="<%-path%>"><%-title%></a></h1>
         <content-nav>
             <a href="/">Home</a>
             <a href="/about">About Us</a>
@@ -23,14 +24,18 @@
     <%-data%>
 
     <footer>
-        <div style="display: flex; align-items: center; text-align: center;">
-            <div style="flex-grow: 1; flex-basis: 0; padding: 1em;">
+        <div style="display: flex; text-align: center;">
+            <div style="flex-grow: 1; flex-basis: 0;">
                 <h2>Created With</h2>
-                <a class="created-by" target='_blank' href='https://github.com/clevertree/cms'>CleverTree CMS</a>
+                <div><a class="created-by" target='_blank' href='https://github.com/clevertree/cms'>CleverTree CMS</a></div>
+                <div><a href='/:content'>[Site Index]</a> <a href='/:user'>[User Index]</a></div>
             </div>
-            <div style="flex-grow: 1; flex-basis: 0; padding: 1em;">
+            <div style="flex-grow: 1; flex-basis: 0;">
+            </div>
+            <div style="flex-grow: 1; flex-basis: 0;">
                 <h2>Contact Us</h2>
-                <a href='/:content'>Site Index</a>
+                <div>Email: <a href="mail:admin@<%-hostname%>">admin@<%-hostname%></a></div>
+                <div>Address: <a href="http://maps.google.com/q=123 clevertree ln">123 clevertree ln</a></div>
             </div>
         </div>
     </footer>

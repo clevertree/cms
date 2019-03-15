@@ -15,7 +15,7 @@
                 // paths: ['/','/about','/upload','/contact'],
                 // userID: null,
                 menu: [],
-                contentList: null,
+                contentList: [],
                 linkList: null
             };
             loadCSS();

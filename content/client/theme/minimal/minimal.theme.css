@@ -1,16 +1,28 @@
 /** Background Image **/
 body.theme-minimal {
-    background: #EEE;
+    /* background: #EEE; */
     margin: 0 auto;
 }
+
 /** Font **/
+body.theme-minimal > header a:not(:hover),
+body.theme-minimal > footer a:not(:hover) {
+    text-decoration: none;
+}
+body.theme-minimal header content-nav {
+    font-size: smaller;
+}
+body.theme-minimal > footer {
+    font-size: small;
+}
 
 
 /** Header **/
 body.theme-minimal > header {
-    background: linear-gradient(to top, #EEE 0%, #CCC 100%);
+    /* background: linear-gradient(to top, #EEE 0%, #CCC 100%); */
     padding: 0.5em;
     text-align: center;
+    border-bottom: solid 1px #CCC;
 }
 
 /** Title **/
@@ -19,41 +31,42 @@ body.theme-minimal > header h1 {
     margin: 8px;
     font-size: 2.5em;
     font-weight: bold;
-    max-width: 238px;
+    max-width: 300px;
 }
 
 /** Title Logo **/
 body.theme-minimal > header img.logo {
     vertical-align: top;
-    max-width: 191px;
-    margin-bottom: 4px;
-    float: left;
+    max-width: 300px;
+    margin: 4px;
+    object-fit: contain;
 }
 
 /** Footer **/
 body.theme-minimal > footer {
-    background: linear-gradient(to bottom, #EEE 0%, #CCC 100%);
+    /* background: linear-gradient(to bottom, #EEE 0%, #CCC 100%); */
 }
-/** Page Width **/
+
+
+/** Navigation **/
+
+/** Navigation Menu Colors **/
+content-nav ul.menu > li:hover > a,
+content-nav ul.submenu > li > a {
+    /* background-color: #FFF; */
+}
+
+/** Page Articles & Sections **/
+body.theme-minimal > section,
 body.theme-minimal > article > section,
 body.theme-minimal > footer {
     margin: 0px auto;
     max-width: 800px;
-    padding: 1px 1em;
+    padding: 1px 16px;
+    /* border: 1px solid #CCC; */
 }
 
-
-/** Page Articles **/
-.theme-minimal > article {
-}
-.theme-minimal > article > * {
-}
-
-
-/** Page Sections **/
-.theme-minimal > article > section {
-}
-
+/** Themed Containers **/
 .theme-minimal div.themed,
 .theme-minimal > article > section.themed {
     background-color: #BBB;
@@ -174,11 +187,4 @@ body.theme-minimal > footer {
 }
 
 
-
-
-
-/** Color Themes **/
-body.theme-minimal {
-
-}
 

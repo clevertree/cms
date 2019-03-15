@@ -27,7 +27,7 @@ body.theme-minimal-yoga {
 .theme-minimal-yoga a {
     color: #000;
     /*text-decoration: none;*/
-     /*text-decoration-color: #CCCC;*/
+    /*text-decoration-color: #CCCC;*/
 }
 
 .theme-minimal-yoga header a:not(:hover),
@@ -39,36 +39,62 @@ body.theme-minimal-yoga {
 
 /** Header **/
 body.theme-minimal-yoga > header {
-    max-width: 93%;
-    text-align: right;
     background: #FFF;
+    /* max-width: 93%; */
+    display: flex;
+    justify-content: space-around;
+    flex-flow: wrap;
+    /* margin: 0px auto; */
     /*background: linear-gradient(to bottom, #487bb3 0%, #88a9cc 1%,#487bb3 2%,#1b589b 98%,#022035 100%);*/
 }
 
+@media only screen and (max-width: 480px) {
+    body.theme-minimal-yoga > header {
+        display: block;
+        /* text-align: center; */
+    }
+}
+
+body.theme-minimal-yoga .logo {
+}
+body.theme-minimal-yoga .title a {
+    font-size: medium;
+}
 
 /** Navigation **/
 body.theme-minimal-yoga header content-nav {
     /* float: right; */
     font-size: smaller;
     padding: 1.3em;
+    /* min-width: 386px; */
+    /* display: block; */
 }
 
-/** Nav Menu Colors **/
+/** Navigation Menu Colors **/
 content-nav ul.menu > li:hover > a,
-content-nav ul.submenu > li > a {
-    background-color: #FFF;
+content-nav ul.submenu {
+    background-color: #EEE8;
+}
+content-nav ul.submenu > li:hover > a {
+    background-color: #F8F8F8;
 }
 
-content-nav ul.menu > li > a,
-content-nav ul.submenu > li > a {
+content-nav ul.menu > li > a
+/*content-nav ul.submenu > li > a*/
+{
     border-top: 1px solid #EEE;
     /*border-bottom: 1px solid #CCCC;*/
 }
 
 /** Header Tags **/
-.theme-minimal-yoga h1, .theme-minimal-yoga h2,  .theme-minimal-yoga h3, .theme-minimal-yoga h4, .theme-minimal-yoga h5, .theme-minimal-yoga h6 {
-    color: #fff6d4;
-    text-shadow: #000 1px 1px 1px;
+.theme-minimal-yoga h1, .theme-minimal-yoga h1 a,
+.theme-minimal-yoga h2, .theme-minimal-yoga h2 a,
+.theme-minimal-yoga h3, .theme-minimal-yoga h3 a,
+.theme-minimal-yoga h4, .theme-minimal-yoga h4 a,
+.theme-minimal-yoga h5, .theme-minimal-yoga h5 a,
+.theme-minimal-yoga h6, .theme-minimal-yoga h6 a {
+    color: #1cb18a;
+    text-shadow: #8888 1px 1px 1px;
 }
 
 /** Footer **/

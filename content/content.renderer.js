@@ -44,7 +44,7 @@ class ContentRenderer {
             }
         }
         html = html.replace(/<%-title%>/g, content.title);
-        html = html.replace(/<%-path%>/g, content.path);
+        html = html.replace(/<%-path%>/g, content.path || req.url);
         // html = html.replace(/<%-hostname%>/g, hostname);
 
         let DOM = cheerio.load(html);

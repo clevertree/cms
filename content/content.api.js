@@ -1,7 +1,7 @@
 // const formidableMiddleware = require('express-formidable');
 const path = require('path');
-// const fs = require('fs');
-const fsPromises = require('fs').promises;
+const fs = require('fs');
+// const fsPromises = require('fs').promises;
 // const etag = require('etag');
 
 const multiparty = require('multiparty');
@@ -336,11 +336,9 @@ class ContentApi {
             const contentTable = new ContentTable(database);
             // const contentRevisionTable = new ContentRevisionTable(database);
             const userTable = new UserTable(database);
-            if(!req.session || !req.session.userID)
-                throw new Error("Must be logged in");
-            const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
 
             const currentUploads = req.session.uploads || [];
+            let sessionUser = null;
 
             switch(req.method) {
                 case 'GET':
@@ -356,6 +354,10 @@ class ContentApi {
 
                 default:
                 case 'OPTIONS':
+                    // if(!req.session || !req.session.userID)
+                    //     throw new Error("Must be logged in");
+                    sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
+
                     // const currentCount = req.session.uploads ? req.session.uploads.length : 0;
                     let editable = sessionUser && sessionUser.isAdmin();
                     let message = `${currentUploads.length} temporary file${currentUploads.length!== 1 ? 's' : ''} available`;
@@ -369,13 +371,16 @@ class ContentApi {
                     return res.json({
                         editable,
                         message,
-                        status: editable ? 200 : 400,
+                        status: editable ? 200 : 0,
                         // message: `${currentCount} temporary file${currentCount !== 1 ? 's' : ''} uploaded`,
                         currentUploads
                     });
 
                 case 'POST':
                     // Handle POST
+                    if(!req.session || !req.session.userID)
+                        throw new Error("Must be logged in");
+                    sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
                     if(!sessionUser || !sessionUser.isAdmin())
                         throw new Error("Not authorized");
                     // TODO: submit articles for approval? No, it would flood the hostmaster with requests
@@ -398,7 +403,7 @@ class ContentApi {
                                     const tempFilePos = currentUploads.findIndex(upload => upload.uploadPath === tempFileUploadPath);
                                     if(tempFilePos === -1)
                                         throw new Error("Temporary file not found: " + tempFileUploadPath);
-                                    contentData.data = await fsPromises.readFile(currentUploads[tempFilePos].tmpPath);
+                                    contentData.data = await this.readFileAsync(currentUploads[tempFilePos].tmpPath);
                                     currentUploads.splice(tempFilePos, 1);
                                     break;
                                 default:
@@ -475,7 +480,7 @@ class ContentApi {
                             for (let i=0; i<deletePositions.length; i++) {
                                 const deletedFile = req.session.uploads.splice(deletePositions[i], 1)[0];
                                 try {
-                                    await fsPromises.unlink(deletedFile.tmpPath);
+                                    await this.unlinkFileAsync(deletedFile.tmpPath);
                                 } catch (e) {
                                     console.warn(e);
                                 }
@@ -650,42 +655,11 @@ class ContentApi {
 
     }
 
-    // }
-    async renderContent(req, res, content) {
-        const mimeType = this.getMimeType(path.extname(content.path) || '');
-        switch(mimeType) {
-            case 'text/html':
-                // Load session if we're using the theme
-                const SM = SessionAPI.getMiddleware();
-                SM(req, res, async () => {
-                    await ContentRenderer.send(req, res, content);
-                });
-                break;
-            default:
-                await this.renderData(req, res, content.data, mimeType, content.updated);
-                break;
-        }
-    }
-
     async renderData(req, res, data, mimeType, lastModified) {
-        // const newETAG = etag(data);
-
-        //check if if-modified-since header is the same as the mtime of the file
-        // if (req.headers["if-none-match"]) {
-        //     //Get the if-modified-since header from the request
-        //     const oldETAG = req.headers["if-none-match"];
-        //     if (oldETAG === newETAG) {
-        //         res.writeHead(304, {"Last-Modified": lastModified.toUTCString()});
-        //         res.end();
-        //         return true;
-        //     }
-        // }
         res.setHeader('Last-Modified', lastModified.toUTCString());
         res.setHeader('Content-type', mimeType );
         // res.setHeader('ETag', newETAG);
         res.send(data);
-// TODO: send instead of end?
-
     }
 
     // TODO: render static data
@@ -694,7 +668,7 @@ class ContentApi {
 
         let stats = null;
         try {
-            stats = await fsPromises.stat(filePath);
+            stats = await this.statFileAsync(filePath);
         } catch (e) {
             if(e.code === 'ENOENT')
                 return next();
@@ -718,7 +692,7 @@ class ContentApi {
         }
 
         try {
-            const data = await fsPromises.readFile(filePath);
+            const data = await this.readFileAsync(filePath);
             await this.renderData(req, res, data, this.getMimeType(ext), stats.mtime);
             // if the file is found, set Content-type and send data
             // res.setHeader("Expires", new Date(Date.now() + 1000 * 60 * 60 * 24).toUTCString()); // Static files deserve long term caching
@@ -763,6 +737,33 @@ class ContentApi {
             return mapMimeTypes[ext];
         return null;
     }
+
+
+    /** File Utils **/
+    readFileAsync (path, opts = 'utf8') {
+        return new Promise((resolve, reject) => {
+            fs.readFile(path, opts, (err, data) => {
+                err ? reject(err) : resolve(data);
+            })
+        })
+    }
+
+    statFileAsync (path) {
+        return new Promise((resolve, reject) => {
+            fs.stat(path, (err, data) => {
+                err ? reject(err) : resolve(data);
+            })
+        })
+    }
+
+    unlinkFileAsync (path) {
+        return new Promise((resolve, reject) => {
+            fs.unlink(path, (err, data) => {
+                err ? reject(err) : resolve(data);
+            })
+        })
+    }
+
 }
 
 

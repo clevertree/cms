@@ -1,15 +1,20 @@
+content-nav {
+    display: block;
+}
 
 /** Navigation **/
 
 content-nav ul.menu {
     list-style-type: none;
     margin: 0px auto;
+    padding: 0;
     /* text-align: center; */
 }
 
 content-nav ul.menu > li {
     display: inline-block;
     padding: 13px 0px;
+    /* min-width: 100px; */
 }
 
 content-nav ul.menu > li > a {
@@ -19,7 +24,7 @@ content-nav ul.submenu > li > a {
     display: block;
     /* padding: 12px; */
     text-align: left;
-    white-space: nowrap;
+    /* white-space: nowrap; */
 }
 
 /** Sub Menu **/

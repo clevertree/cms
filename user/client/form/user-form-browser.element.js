@@ -81,6 +81,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
         this.innerHTML =
             `<form action="/:user/:list" method="POST" class="user user-form-browser themed">
                 <table class="user themed">
+                    <caption>Browse Users</caption>
                     <thead>
                         <tr>
                             <td colspan="5">
