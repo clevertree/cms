@@ -44,49 +44,24 @@ body.theme-minimal > header img.logo {
 
 /** Footer **/
 body.theme-minimal > footer {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
     /* background: linear-gradient(to bottom, #EEE 0%, #CCC 100%); */
 }
 
-
-/** Navigation **/
-
-/** Navigation Menu Colors **/
-content-nav ul.menu > li:hover > a,
-content-nav ul.submenu > li > a {
-    /* background-color: #FFF; */
-}
 
 /** Page Articles & Sections **/
 body.theme-minimal > section,
 body.theme-minimal > article > section,
 body.theme-minimal > footer {
-    margin: 0px auto;
+    margin: 6px auto;
     max-width: 800px;
     padding: 1px 16px;
     /* border: 1px solid #CCC; */
 }
 
-/** Themed Containers **/
-.theme-minimal div.themed,
-.theme-minimal > article > section.themed {
-    background-color: #BBB;
-    box-shadow: 2px 2px 4px #666;
-    border-radius: 2px;
-}
 
-
-/** Paragraphs **/
-
-.theme-minimal p {
-    text-align: justify;
-    text-indent: 8px;
-}
-
-/** Images **/
-.theme-minimal img.themed {
-    width: 100%;
-    box-shadow: 0px 0px 8px #000;
-}
 
 /** Messages **/
 .theme-minimal div.message,

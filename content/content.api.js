@@ -197,11 +197,8 @@ class ContentApi {
             const contentRevisionTable = new ContentRevisionTable(database);
             const userTable = new UserTable(database);
 
-            if(!req.session || !req.session.userID)
-                throw new Error("Must be logged in");
-            const sessionUser = await userTable.fetchUserByID(req.session.userID);
-
-            let content = await contentTable.fetchContentByID(req.params.id);
+            let content = await contentTable.fetchContentByID(req.params.id, 'c.*, NULL as data, LENGTH(data) as data_length');
+            const currentUploads = req.session.uploads || [];
 
             switch(req.method) {
                 case 'GET':
@@ -235,15 +232,17 @@ class ContentApi {
                         redirect: content.url,
                         message: "Content Queried Successfully",
                         editable: false,
-                        content
+                        content,
+                        currentUploads
                     };
                     if(req.session && req.session.userID) {
-                        const database = await DatabaseManager.selectDatabaseByRequest(req);
-                        const userTable = new UserTable(database);
                         const sessionUser = await userTable.fetchUserByID(req.session.userID);
-                        if (sessionUser.isAdmin() || sessionUser.id === content.user_id)
+                        if (sessionUser.isAdmin())
                             response.editable = true;
                     }
+                    if(!response.editable)
+                        response.message = 'Administrator access required to modify content';
+
                     response.history = await contentRevisionTable.fetchContentRevisionsByContentID(content.id);
                     // response.revision = await contentRevisionTable.fetchContentRevisionByID(content.id, req.query.getRevision || null);
                     if(!contentRevision && response.history.length > 0) // Fetch latest revision? sloppy
@@ -257,7 +256,7 @@ class ContentApi {
                         content.data = await contentTable.fetchContentData(content.id, 'UTF8');
                         content.isBinary = false;
                     } else {
-                        content.data = '[binary file]';
+                        content.data = `[Binary File]\nMime Type: ${content.mimeType}\nLength: ${this.readableByteSize(content.data_length)}`;
                         content.isBinary = true;
                     }
 
@@ -269,6 +268,9 @@ class ContentApi {
                     switch (req.body.action) {
                         default:
                         case 'publish':
+                            if(!req.session || !req.session.userID)
+                                throw new Error("Must be logged in");
+                            const sessionUser = await userTable.fetchUserByID(req.session.userID);
                             if(!sessionUser || !sessionUser.isAdmin())
                                 throw new Error("Not authorized");
                             content.data = await contentTable.fetchContentData(content.id, 'UTF8');
@@ -738,6 +740,16 @@ class ContentApi {
         return null;
     }
 
+
+    readableByteSize(bytes) {
+        if(Math.abs(bytes) < 1024)
+            return bytes + ' B';
+        const units = ['kB','MB','GB','TB','PB','EB','ZB','YB'];
+        let u = -1;
+        do { bytes /= 1024; ++u; }
+        while(Math.abs(bytes) >= 1024 && u < units.length - 1);
+        return bytes.toFixed(1)+' '+units[u];
+    }
 
     /** File Utils **/
     readFileAsync (path, opts = 'utf8') {

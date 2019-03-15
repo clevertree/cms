@@ -126,7 +126,6 @@ class HTMLContentFormUploadElement extends HTMLElement {
         const val = (name) => formManage && formManage.elements && formManage.elements[name] ? formManage.elements[name].value : '';
 
 
-        // TODO: multiple file upload
 //         console.log("RENDER", this.state, formData);
         this.innerHTML =
             `
@@ -190,7 +189,7 @@ class HTMLContentFormUploadElement extends HTMLElement {
                     ${this.state.currentUploads.map((currentUpload, i) => `
                     <tr>
                         <td style="max-width: 260px;">${currentUpload.uploadPath|| ''}</td>
-                        <td>${currentUpload.size || ''}</td>
+                        <td>${this.readableByteSize(currentUpload.size)}</td>
                         <td>
                             <label>
                                 <input type="checkbox" class="delete" name="delete[]" value="${i}" ${val(`delete[${i}]`) ? ' checked="checked"' : ''}/>
@@ -211,5 +210,15 @@ class HTMLContentFormUploadElement extends HTMLElement {
         </form>`;
     }
 
+
+    readableByteSize(bytes) {
+        if(Math.abs(bytes) < 1024)
+            return bytes + ' B';
+        const units = ['kB','MB','GB','TB','PB','EB','ZB','YB'];
+        let u = -1;
+        do { bytes /= 1024; ++u; }
+        while(Math.abs(bytes) >= 1024 && u < units.length - 1);
+        return bytes.toFixed(1)+' '+units[u];
+    }
 }
 customElements.define('content-form-upload', HTMLContentFormUploadElement);

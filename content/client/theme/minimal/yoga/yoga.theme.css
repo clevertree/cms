@@ -43,6 +43,7 @@ body.theme-minimal-yoga > header {
     /* max-width: 93%; */
     display: flex;
     justify-content: space-around;
+    align-items: center;
     flex-flow: wrap;
     /* margin: 0px auto; */
     /*background: linear-gradient(to bottom, #487bb3 0%, #88a9cc 1%,#487bb3 2%,#1b589b 98%,#022035 100%);*/
@@ -61,7 +62,20 @@ body.theme-minimal-yoga .title a {
     font-size: medium;
 }
 
+
+
 /** Navigation **/
+
+/** Navigation Menu Colors **/
+.theme-minimal-afoh content-nav ul.menu > li:hover > a,
+.theme-minimal-afoh content-nav ul.submenu > li > a {
+    /* background-color: #FFF; */
+}
+
+.theme-minimal-afoh content-nav {
+    font-size: larger;
+}
+
 body.theme-minimal-yoga header content-nav {
     /* float: right; */
     font-size: smaller;
@@ -99,22 +113,39 @@ content-nav ul.menu > li > a
 
 /** Footer **/
 body.theme-minimal-yoga > footer {
-    background: #FFF;
+    /* background: #FFF; */
     /*background: linear-gradient(to top, #3d9bea 0%, #6eb4ef 100%);*/
     /* background: url(texture/footer.background.png); */
 }
 
 
-/** Page Sections **/
+/** Page Articles & Sections **/
+body.theme-minimal-yoga > section,
+body.theme-minimal-yoga > article > section,
+body.theme-minimal-yoga > footer {
+    margin: 6px auto;
+    max-width: 2600px;
+    padding: 1px 16px;
+    /* border: 1px solid #CCC; */
+}
+
 .theme-minimal-yoga > article > section {
-    background: #DDD;
+    text-align: center;
+}
+.theme-minimal-yoga > article > section.themed {
+    background: #f4f7f7;
 }
 
 .theme-minimal-yoga div.themed,
 .theme-minimal-yoga > article > section.themed {
     /* text-shadow: #000 1px 1px 1px; */
-    background-color: #ab6428ed;
+    background-color: #f4f7f7;
     box-shadow: 2px 2px 4px #0008;
     border-radius: 2px;
 }
 
+/** Images **/
+.theme-minimal-yoga img.themed {
+    width: 100%;
+    box-shadow: 0px 0px 8px #000;
+}

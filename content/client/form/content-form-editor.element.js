@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 revision: {},
                 history: [],
                 parentList: [],
+                currentUploads: []
             };
             this.renderEditorTimeout = null;
             this.removeWYSIWYGEditor = null;
@@ -98,10 +99,52 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.state.content[e.target.name] = e.target.value;
                     this.renderPreview(e.target.value);
                     break;
+                case 'dataSource':
+                    break;
+                case 'dataSourceFile':
+                    if(!e.target.files || e.target.files.length === 0)
+                        return;
+
+                    const reader = new FileReader();
+
+                    if(this.state.content.isBinary) {
+                        reader.onloadend = (e) => {
+                            if(!e.target.result)
+                                throw new Error("Invalid upload data");
+                            const base64String = this.uint8ToString(e.target.result);
+                            Object.assign(this.state.content, {data: base64String});
+                            this.setState({encoding: 'base64'});
+                            console.log("Uploaded Binary: ", this.readableByteSize(base64String.length));
+                        };
+                        // If mime is editable, read as text, otherwise upload as binary
+                        reader.readAsArrayBuffer(e.target.files[0]);
+
+                    } else {
+
+                        reader.onloadend = (e) => {
+                            if(!e.target.result)
+                                throw new Error("Invalid upload data");
+                            console.log("Uploaded Text: ", this.readableByteSize(e.target.result.length));
+                            Object.assign(this.state.content, {data: e.target.result});
+                            this.setState({encoding: 'UTF8'});
+                        };
+                        // If mime is editable, read as text, otherwise upload as binary
+                        reader.readAsText(e.target.files[0]);
+
+                    }
+                    break;
             }
             // TODO: warn user about unsaved data
         }
 
+        uint8ToString(buffer) {
+            var binary = '';
+            var bytes = new Uint8Array( buffer );
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode( bytes[ i ] );
+            }
+            return window.btoa( binary );
+        }
 
         requestFormData() {
             const form = this.querySelector('form');
@@ -207,7 +250,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         <td><label for="data">Content:</label></td>
                         <td>
                             <textarea class="editor-plain editor-wysiwyg-target" name="data" id="data"
+                                ${this.state.content.isBinary ? ' disabled' : ''}
                                 >${this.state.content.data || ''}</textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="data">Upload:</label></td>
+                        <td>
+                            <input type="file" name="dataSourceFile"/>
+                            ${this.state.currentUploads.map((upload, i) => `
+                            <select name="dataSource">
+                                <option value="temp:${upload.uploadPath}">${upload.uploadPath} (${this.readableByteSize(upload.size)})</option>
+                            </select>
+                            </tr>
+                            `).join('')}
                         </td>
                     </tr>
                     <tr>
@@ -265,6 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.renderEditorTimeout = setTimeout(e => this.renderWYSIWYGEditor(), 100);
         }
 
+        // TODO: load script
         renderWYSIWYGEditor() {
             if (this.state.content.data)
                 this.renderPreview(this.state.content.data);
@@ -630,6 +687,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     break;
             }
         }
+
+
+        readableByteSize(bytes) {
+            if(Math.abs(bytes) < 1024)
+                return bytes + ' B';
+            const units = ['kB','MB','GB','TB','PB','EB','ZB','YB'];
+            let u = -1;
+            do { bytes /= 1024; ++u; }
+            while(Math.abs(bytes) >= 1024 && u < units.length - 1);
+            return bytes.toFixed(1)+' '+units[u];
+        }
+
 
         loadScripts(scriptPaths, onLoaded) {
             if (scriptPaths.length === 0)
