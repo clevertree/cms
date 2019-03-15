@@ -172,7 +172,6 @@ class HTMLContentFormUploadElement extends HTMLElement {
                 </tfoot>            
             </table>
         </form>
-        <br/>
         <form action="/:content/:upload" method="POST" class="content content-form-upload-manage themed" enctype="application/x-www-form-urlencoded">
             <table class="content themed">
                 <caption>Manage Uploaded Temporary Files</caption>

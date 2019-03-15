@@ -1,61 +1,64 @@
+content-nav {
+    display: block;
+}
 
 /** Navigation **/
 
-content-nav ul.nav-menu {
+content-nav ul.menu {
     list-style-type: none;
     margin: 0px auto;
-    text-align: center;
+    padding: 0;
+    /* text-align: center; */
 }
 
-content-nav ul.nav-menu > li {
+content-nav ul.menu > li {
     display: inline-block;
-    padding: 4px 0px;
+    padding: 13px 0px;
+    /* min-width: 100px; */
 }
 
-content-nav ul.nav-menu > li:hover {
-    z-index: 2;
-    border-radius: 4px;
+content-nav ul.menu > li > a {
 }
 
-content-nav ul.nav-menu > li:hover > ul.nav-submenu > li:hover {
-    font-weight: bold;
-}
-
-content-nav ul.nav-menu > li > a,
-content-nav ul.nav-submenu > li > a {
-    padding: 12px;
+content-nav ul.submenu > li > a {
+    display: block;
+    /* padding: 12px; */
+    text-align: left;
+    /* white-space: nowrap; */
 }
 
 /** Sub Menu **/
-content-nav ul.nav-submenu {
+content-nav ul.submenu {
+    display: block;
     position: absolute;
     list-style: none;
-    margin: 5px 0;
-    padding: 4px;
-    border-radius: 4px;
+    margin: 13px 0px 0px 0px;
+    padding: 0;
+    /* border-radius: 2px; */
     z-index: 99;
+    overflow-y: hidden;
+    max-height: 100%;
+    border-radius: 4px;
 }
 
-content-nav ul.nav-submenu > li > a {
-    /* font-weight: bold; */
-    /* font-size: 14px; */
-    display: block;
-    color: white;
-    text-align: left;
-    padding: 0.5em 0.5em 0.5em;
-    text-decoration: none;
-}
-
-content-nav li:not(:hover) > ul.nav-submenu {
+content-nav li:not(:hover) > ul.submenu {
     display: none;
+    /*max-height: 0px;*/
+    /*transition: max-height 1s;*/
+    z-index: 1;
 }
 
-/** Colors **/
-
-content-nav ul.nav-menu > li:hover,
-content-nav ul.nav-menu > li:hover > ul.nav-submenu > li:hover{
-    background-color: #888;
+/** Anchors **/
+content-nav a {
+    padding: 12px 16px;
+    /*background-color: #CCCE;*/
 }
-content-nav ul.nav-submenu {
-    background-color: #888E;
+
+
+
+/** Nav Menu Colors **/
+
+content-nav ul.submenu,
+content-nav ul.menu > li:hover,
+content-nav ul.menu > li:hover > ul.submenu > li:hover{
 }

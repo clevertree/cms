@@ -1,0 +1,83 @@
+/** Import Font **/
+@font-face {
+    font-family: 'Advent Pro';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Advent Pro Regular'), local('AdventPro-Regular'), url(https://fonts.gstatic.com/s/adventpro/v9/V8mAoQfxVT4Dvddr_yOwhTmtKI5Z.woff2) format('woff2');
+    unicode-range: U+0370-03FF;
+}
+@font-face {
+    font-family: 'Advent Pro';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Advent Pro Regular'), local('AdventPro-Regular'), url(https://fonts.gstatic.com/s/adventpro/v9/V8mAoQfxVT4Dvddr_yOwhTStKI5Z.woff2) format('woff2');
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Advent Pro';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Advent Pro Regular'), local('AdventPro-Regular'), url(https://fonts.gstatic.com/s/adventpro/v9/V8mAoQfxVT4Dvddr_yOwhTqtKA.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+
+/** Background Image **/
+body.theme-minimal-afoh {
+    color: #fff6d4;
+     font-family: 'Advent Pro', monospace;
+    /*font-size: 16px;*/
+    background: #3d9be9;
+    /*margin: 0 auto;*/
+    /*background: url(texture/default.background.png) no-repeat fixed center;*/
+}
+
+/** Hyperlinks **/
+.theme-minimal-afoh a {
+    color: #FFF;
+    /*text-decoration: none;*/
+     text-decoration-color: #CCCC;
+}
+
+/** Header **/
+body.theme-minimal-afoh > header {
+    background: linear-gradient(to bottom, #487bb3 0%, #88a9cc 1%,#487bb3 2%,#1b589b 98%,#022035 100%);
+}
+
+/** Header Tags **/
+.theme-minimal-afoh h1, .theme-minimal-afoh h2,  .theme-minimal-afoh h3, .theme-minimal-afoh h4, .theme-minimal-afoh h5, .theme-minimal-afoh h6 {
+    font-family: Helvetica,serif;
+    color: #fff6d4;
+     text-shadow: #000 1px 1px 1px;
+}
+
+/** Footer **/
+body.theme-minimal-afoh > footer {
+    background: linear-gradient(to top, #3d9bea 0%, #6eb4ef 100%);
+    /* background: url(texture/footer.background.png); */
+}
+
+/** Navigation **/
+.theme-minimal-afoh content-nav {
+    font-size: larger;
+}
+
+/** Nav Menu Colors **/
+content-nav ul.menu > li:hover > a,
+content-nav ul.submenu > li > a {
+    background-color: #CCCE;
+}
+
+/** Page Sections **/
+.theme-minimal-afoh > article > section {
+    background: #4e85b3;
+}
+
+.theme-minimal-afoh div.themed,
+.theme-minimal-afoh > article > section.themed {
+    /* text-shadow: #000 1px 1px 1px; */
+    background-color: #ab6428ed;
+    box-shadow: 2px 2px 4px #0008;
+    border-radius: 2px;
+}
+

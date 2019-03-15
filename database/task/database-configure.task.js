@@ -131,7 +131,7 @@ class DatabaseConfigureTask {
                     break;
             }
         } catch (e) {
-            isActive = false;
+            // isActive = false;
             console.error(e);
             status = 400;
             message = `Database for ${hostname} could not be configured. <br/><code>${e}</code>`;
@@ -150,18 +150,15 @@ class DatabaseConfigureTask {
                         <tr><td colspan="2"><hr/></td></tr>
                         <tr>
                             <td colspan="2">
-                                <p>
-                                    The database for <strong>${hostname}</strong> has not yet been configured.  
-                                ${requestUUID ? `
-                                    Please use this form to configure the <strong>domain database</strong>.
-                                ` : `
-                                    Please use this form send a database configuration request.
-                                    A <strong>validation email</strong> will be sent to the <strong>hostmaster</strong> of this server. 
-                                </p>
-                                <p>
-                                    Please have the hostmaster complete the last step according to the email's instructions.
-                                ` }
-                                </p>
+                                The database for <strong>${hostname}</strong> has not yet been configured.  
+                            ${requestUUID ? `
+                                Please use this form to configure the <strong>domain database</strong>.
+                            ` : `
+                                Please use this form send a database configuration request.
+                                A <strong>validation email</strong> will be sent to the <strong>hostmaster</strong> of this server. 
+                                <br/>
+                                Please have the hostmaster complete the last step according to the email's instructions.
+                            ` }
                             </td>
                         </tr>
                     </thead>
@@ -169,7 +166,7 @@ class DatabaseConfigureTask {
                         <tr>
                             <td><label for="hostname">Host Name:</label></td>
                             <td>
-                                <input type="text" name="hostname" id="hostname" value="${formData.hostname||'localhost'}" autocomplete="off" required />
+                                <input type="text" name="hostname" id="hostname" value="${hostname||'localhost'}" autocomplete="off" required />
                             </td>
                         </tr>
                         ${requestUUID ? `
@@ -187,6 +184,7 @@ class DatabaseConfigureTask {
                                 <input type="email" name="admin_email" id="admin_email" value="${requestData.adminEmail}" disabled/>
                                 ` : `
                                 <select name="admin_email" required>
+                                    <option value="">Select an email</option>
                                     ${dnsAdminEmails.map(dnsAdminEmail => 
                                         `<option value="${dnsAdminEmail}">${dnsAdminEmail}</option>`
                                     ).join('')}

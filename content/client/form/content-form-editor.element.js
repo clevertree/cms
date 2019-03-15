@@ -179,6 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 `<form action="${action}" method="POST" class="content content-form-editor themed">
             <input type="hidden" name="id" value="${this.state.content.id}" />
             <table class="content themed">
+                <caption>Editing content ID ${this.state.content.id}</caption>
                 <thead>
                     <tr>
                         <td colspan="2">
@@ -191,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </thead>
                 <tbody>
                     <tr>
-                        <td style="width:15%;"><label for="title">Title:</label></td>
+                        <td style="width:10%;"><label for="title">Title:</label></td>
                         <td>
                             <input type="text" name="title" id="title" value="${this.state.content.title || ''}" required/>
                         </td>

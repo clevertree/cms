@@ -6,10 +6,14 @@ table.config {
 
 /** Forms **/
 
+form.config select,
+form.config input[type=text],
+form.config input[type=password],
+form.config input[type=email],
 form.config textarea {
+    width: 100%;
 }
 
-
-form.config textarea.editor-plain {
-    min-height: 600px;
+form.config textarea {
+    min-height: 216px;
 }

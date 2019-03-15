@@ -123,6 +123,7 @@ class HTMLTaskFormManagerElement extends HTMLElement {
         this.innerHTML =
             `<form action="#" class="task task-editor themed" ${this.state.taskName ? 'style="display: none"' : ''}>
                 <table class="task themed">
+                <caption>Search Tasks</caption>
                     <thead>
                         <tr>
                             <td>
@@ -135,7 +136,7 @@ class HTMLTaskFormManagerElement extends HTMLElement {
                     </thead>
                 </table>
             </form>
-            <ul class="results"><li><div class="message">Loading Available Tasks...</div></li></ul>
+            <div class="results"><div class="message">Loading Available Tasks...</div></div>
 `;
         searchField = this.querySelector('input#search');
         searchField.focus();
@@ -148,16 +149,16 @@ class HTMLTaskFormManagerElement extends HTMLElement {
     renderResults() {
         const form = this.querySelector('form');
         // const formData = this.getFormData();
-        const resultsElement = this.querySelector('ul.results');
+        const resultsElement = this.querySelector('.results');
         let classOdd = '';
         const search = form ? form.search.value : null;
         let resultHTML = '', resultCount = 0;
         for(let taskName in this.state.taskForms) {
             if(this.state.taskForms.hasOwnProperty(taskName)) {
                 if(!search || taskName.indexOf(search) !== -1) {
-                    resultHTML += `<li class="${classOdd=classOdd===''?'odd':''}">
+                    resultHTML += `<div class="${classOdd=classOdd===''?'odd':''}">
                         ${this.state.taskForms[taskName]}
-                    </li>`;
+                    </div>`;
                     resultCount++;
                 }
             }

@@ -20,7 +20,7 @@ body > header > .title {
 
 /** Title Logo **/
 body > header img.logo {
-    box-shadow: #0008 1px 4px 19px;
+    /*box-shadow: #0008 1px 4px 19px;*/
 }
 
 /** Site Hyperlinks **/

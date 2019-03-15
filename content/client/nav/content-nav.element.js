@@ -1,25 +1,30 @@
-document.addEventListener('DOMContentLoaded', function() {
-    ((INCLUDE_CSS) => {
-        if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
-            document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
-    })(":content/:client/nav/content-nav.css");
-});
-
 {
+    function loadCSS() {
+        ((INCLUDE_CSS) => {
+            if (document.head.innerHTML.indexOf(INCLUDE_CSS) === -1)
+                document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
+        })(":content/:client/nav/content-nav.css");
+    }
+
     const DEFAULT_PATHS = '/;/article;/upload;/about';
     class ThemeDefaultNavMenu extends HTMLElement{
         constructor() {
             super();
             this.state = {
                 src: '/:content/:json',
-                paths: ['/','/about','/upload','/contact'],
+                // paths: ['/','/about','/upload','/contact'],
                 // userID: null,
-                menu: []
+                menu: [],
+                contentList: [],
+                linkList: null
             };
+            loadCSS();
             // this.state = {id:-1, flags:[]};
         }
 
         setState(newState) {
+            if(this.state.linkList === null)
+                this.state.linkList = Array.prototype.slice.call(this.querySelectorAll('a[href]'));
             for(let i=0; i<arguments.length; i++)
                Object.assign(this.state, arguments[i]);
             this.render();
@@ -30,17 +35,17 @@ document.addEventListener('DOMContentLoaded', function() {
             // this.addEventListener('change', e => this.onChange(e));
             // this.addEventListener('submit', e => this.onSubmit(e));
 
-            this.render();
-
-            let paths = this.getAttribute('paths');
-            if(paths) {
-                paths = paths.split(/[,;]/g).filter(p => !!p);
-                this.setState({paths});
-            } else {
-            }
-            // if(userID)
-            //     this.setState({userID});
-            this.requestFormData();
+            // this.render();
+            //
+            // let paths = this.getAttribute('paths');
+            // if(paths) {
+            //     paths = paths.split(/[,;]/g).filter(p => !!p);
+            //     this.setState({paths});
+            // } else {
+            // }
+            // // if(userID)
+            // //     this.setState({userID});
+            setTimeout(() => this.requestFormData(), 1);
         }
 
         requestFormData() {
@@ -57,41 +62,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
         buildMenu() {
             let menu = [];
-            if(this.state.contentList) {
-                let rootPaths = this.state.paths.slice();
-                // for (let i = 0; i < this.state.contentList.length; i++) {
-                //     const contentEntry = this.state.contentList[i];
-                //     if (!contentEntry.path)
-                //         continue;
-                //
-                //     const rootPath = '/' + contentEntry.path.split('/')[1].split(/\W/g)[0];
-                //     if (rootPaths.indexOf(rootPath) === -1)
-                //         rootPaths.push(rootPath);
-                // }
-
-                console.log("TODO: ", this.state.paths, rootPaths);
-
-                menu = rootPaths.map(rootPath => {
-                    const menuEntry = {title:null, path: rootPath, content: null, subMenu: []};
+            if(this.state.linkList) {
+                menu = this.state.linkList.map(aElm => {
+                    const rootPath = aElm.pathname;
+                    let submenu = [];
+                    // const menuEntry = {title:null, path: rootPath, content: null, submenu: []};
                     for (let i = 0; i < this.state.contentList.length; i++) {
                         const contentEntry = this.state.contentList[i];
                         if (!contentEntry.path)
                             continue;
 
                         if (contentEntry.path === rootPath) {
-                            menuEntry.content = contentEntry;
+                            aElm.title = contentEntry.title;
+                            // content = contentEntry;   // Found content entry for main menu link
                         } else if (contentEntry.path.indexOf(rootPath) === 0) {
                             if (rootPath !== '/')
-                                menuEntry.subMenu.push(contentEntry);
+                                submenu.push(`<a href="${contentEntry.path}">${contentEntry.title}</a>`);
                         }
                     }
-                    if(menuEntry.content)
-                        menuEntry.title = menuEntry.content.title;
-                    else
-                        menuEntry.title = menuEntry.path.replace('/', '').replace(/[_-]+/g, ' ').replace(/^([a-z])|\s+([a-z])/g, function ($1) {
-                            return $1.toUpperCase();
-                        });
-                    return menuEntry;
+                    // if(content)
+                    //     aElm.title = content.title;
+                    // else
+                    //     title = rootPath.replace('/', '').replace(/[_-]+/g, ' ').replace(/^([a-z])|\s+([a-z])/g, function ($1) {
+                    //         return $1.toUpperCase();
+                    //     });
+                    return {
+                        linkHTML: aElm.outerHTML,
+                        submenu
+                    };
                 });
             }
 
@@ -100,16 +98,12 @@ document.addEventListener('DOMContentLoaded', function() {
 //             console.log(menu, rootPaths, this.state.contentList);
             const menuSubMenu = [];
             menu.push({
-                title: 'Menu',
-                path: '#',
-                subMenu: menuSubMenu
-            });
+                linkHTML: `<a href='#'>Menu</a>`,
+                submenu: menuSubMenu
+            })
 
             if(contentID) {
-                menuSubMenu.push({
-                    path: `/:content/${contentID}/:edit`,
-                    title: 'Edit Page Content',
-                });
+                menuSubMenu.push(`<a href='/:content/${contentID}/:edit'>Edit Page Content</a>`);
                 menuSubMenu.push('<hr/>');
             }
 
@@ -117,47 +111,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const userID = (document.head.querySelector('meta[name="session:userID"]') || {}).content || null;
 
             if(userID) {
-                menuSubMenu.push({
-                    path: `/:user/${userID}`,
-                    title: 'My Profile',
-                });
-                menuSubMenu.push({
-                    path: `/:user/${userID}/:edit`,
-                    title: 'Edit Profile',
-                });
-                menuSubMenu.push({
-                    path: `/:user/:logout`,
-                    title: 'Log Out',
-                });
+                menuSubMenu.push(`<a href='/:user/${userID}'>My Profile</a>`);
+                menuSubMenu.push(`<a href='/:user/${userID}/:edit'>Edit Profile</a>`);
+                menuSubMenu.push(`<a href='/:user/:logout'>Log Out</a>`);
 
             } else {
-                menuSubMenu.push({
-                    path: '/:user/:login',
-                    title: 'Log In',
-                });
-                menuSubMenu.push({
-                    path: '/:user/:register',
-                    title: 'Register'
-                });
+                menuSubMenu.push(`<a href='/:user/:login'>Log In</a>`);
+                menuSubMenu.push(`<a href='/:user/:register'>Register</a>`);
             }
             menuSubMenu.push('<hr/>');
-
-            menuSubMenu.push({
-                path: '/:user',
-                title: 'Browse Users'
-            });
-            menuSubMenu.push({
-                path: '/:task',
-                title: `Browse Tasks`
-            });
-            menuSubMenu.push({
-                path: '/:content',
-                title: 'Site Index'
-            });
-            menuSubMenu.push({
-                path: '/:config',
-                title: 'Configure Site'
-            });
+            menuSubMenu.push(`<a href='/:user'>Browse Users</a>`);
+            menuSubMenu.push(`<a href='/:task'>Browse Tasks</a>`);
+            menuSubMenu.push(`<a href='/:content'>Site Index</a>`);
+            menuSubMenu.push(`<a href='/:config'>Configure Site</a>`);
 
 
             return menu;
@@ -165,25 +131,22 @@ document.addEventListener('DOMContentLoaded', function() {
         
         render() {
             const menu = this.buildMenu();
-//             console.log("RENDER", this.state, menu);
+            console.log("RENDER", this.state, menu);
             this.innerHTML =
                 `
-                <ul class="nav-menu">
-                    ${menu.map(menuItem => `
+                <ul class="menu">
+                ${menu.map(menuItem => `
                     <li>
-                        <a href="${menuItem.path}">${menuItem.title}</a>
-                        ${menuItem.subMenu && menuItem.subMenu.length === 0 ? `` : `
-                        <ul class="nav-submenu">
-                            ${menuItem.subMenu.map(subMenuItem => {
-                                if(typeof subMenuItem === "string")
-                                    return subMenuItem;
-            
-                                return `<li><a href="${subMenuItem.path}">${subMenuItem.title}</a></li>`;
-                            }).join('')}
+                        ${menuItem.linkHTML}
+                        ${menuItem.submenu && menuItem.submenu.length === 0 ? `` : `
+                        <ul class="submenu">
+                            ${menuItem.submenu
+                                .map(submenuItem => `<li>${submenuItem}</li>`)
+                                .join('')}
                         </ul>
-                        `}
                     </li>
-                    `).join('')}
+                    `}
+                `).join('')}
                 </ul>
 `;
         }

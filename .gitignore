@@ -1,14 +1,11 @@
 #Config files
 .config.json
 
-#IDE
-.idea
-
 #SSL Certificates
 .acme
 
 #JetBrains
-#.idea
+.idea
 
 # Logs
 npm-debug.log*
