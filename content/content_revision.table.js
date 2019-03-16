@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS ${this.table} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`content_id\` int(11) NOT NULL,
   \`user_id\` int(11) DEFAULT NULL,
-  \`data\` varbinary(65536) DEFAULT NULL,
+  \`data\` varbinary(MAX) DEFAULT NULL,
   \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (\`id\`),
   KEY \`idx:content_revision.content_id\` (\`content_id\` ASC),
