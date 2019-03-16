@@ -109,7 +109,7 @@ class DatabaseManager {
             require('../user/user.table').UserTable,
             require('../content/content.table').ContentTable,
             require('../content/content_revision.table').ContentRevisionTable,
-            require('../config/config.database').ConfigDatabase,
+            // require('../config/config.database').ConfigDatabase,
         ];
 
         for(let i=0; i<tableClasses.length; i++) {

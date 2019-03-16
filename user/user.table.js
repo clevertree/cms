@@ -3,7 +3,7 @@ const uuidv4 = require('uuid/v4');
 
 const { DatabaseManager } = require('../database/database.manager');
 // const { LocalConfig } = require('../config/local.config');
-const { ConfigDatabase } = require("../config/config.database");
+// const { ConfigDatabase } = require("../config/config.database");
 
 
 // const { ConfigManager } = require('../config/config.manager');
@@ -11,10 +11,9 @@ const { ConfigDatabase } = require("../config/config.database");
 class UserTable  {
     get UserAPI() { return require('./user.api').UserAPI; }
 
-    constructor(dbName, debug=false) {
+    constructor(dbName) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
         this.table = tablePrefix + '`user`';
-        this.debug = debug;
     }
 
     async configure(promptCallback=null, hostname=null) {

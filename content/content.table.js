@@ -3,11 +3,10 @@ const fs = require('fs');
 
 // Init
 class ContentTable {
-    constructor(database, debug=false) {
+    constructor(database) {
         const tablePrefix = database ? `\`${database}\`.` : '';
         this.database = database;
         this.table = tablePrefix + '`content`';
-        this.debug = debug;
     }
 
     /** SQL Query Method **/
@@ -21,13 +20,13 @@ class ContentTable {
         // Check for tables
         await this.queryAsync(this.getTableSQL());
 
-        let insertID, contentHTML;
         hostname = hostname || require('os').hostname();
 
         await this.insertDefaultContent("/site/template.html",  "Site Template",    __dirname + '/client/default/site/template.html', hostname);
         await this.insertDefaultContent("/site/template.js",    "Site Javascript",  __dirname + '/client/default/site/template.js');
         await this.insertDefaultContent("/site/template.css",   "Site CSS",         __dirname + '/client/default/site/template.css');
         await this.insertDefaultContent("/site/logo.png",       "Site Logo",        __dirname + '/client/default/site/logo.png');
+        await this.insertDefaultContent("/config/profile.json", "Profile Config",   __dirname + '/client/default/config/profile.json');
         await this.insertDefaultContent("/",                    "Home",             __dirname + '/client/default/home.html', hostname);
         await this.insertDefaultContent("/about",               "About Us",         __dirname + '/client/default/about.html', hostname);
         await this.insertDefaultContent("/contact",             "Contact Us",       __dirname + '/client/default/contact.html', hostname);

@@ -1,10 +1,9 @@
 // TODO: user_id isn't available during insert
 // Init
 class ContentRevisionTable {
-    constructor(dbName, debug=false) {
+    constructor(dbName) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
         this.table = tablePrefix + '`content_revision`';
-        this.debug = debug;
     }
 
     /** Configure Table **/
@@ -80,7 +79,7 @@ class ContentRevisionTable {
 CREATE TABLE IF NOT EXISTS ${this.table} (
   \`id\` int(11) NOT NULL AUTO_INCREMENT,
   \`content_id\` int(11) NOT NULL,
-  \`user_id\` int(11) NOT NULL,
+  \`user_id\` int(11) DEFAULT NULL,
   \`data\` varbinary(65536) DEFAULT NULL,
   \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (\`id\`),
