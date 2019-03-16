@@ -61,6 +61,7 @@ class ContentApi {
 
                 // const mimeType = this.getMimeType(path.extname(content.path) || '');
                 switch(content.mimeType) {
+                    case null:
                     case 'text/html':
                         // Load session if we're using the theme
                         const SM = SessionAPI.getMiddleware();

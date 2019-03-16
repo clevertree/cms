@@ -196,8 +196,11 @@ class ContentRow {
 
 
     get mimeType() {
+        const ext = path.extname(this.path);
+        if(!ext)
+            return null;
         const mime = require('mime');
-        return mime.lookup(this.path);
+        return mime.lookup(ext);
     }
 
 
