@@ -18,6 +18,10 @@ form.content textarea.editor-plain {
     min-height: 300px;
     width: 100%;
 }
+form.content textarea.editor-binary {
+    min-height: 60px;
+    width: 100%;
+}
 
 
 iframe.content-preview-iframe {

@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 content: {id: -1},
                 revision: {},
                 history: [],
-                parentList: [],
-                currentUploads: []
+                // parentList: [],
+                currentUploads: [] // TODO: finish
             };
             this.renderEditorTimeout = null;
             this.removeWYSIWYGEditor = null;
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.requestFormData();
         }
 
-        onSuccess(e, response) {
+        onSuccess(response) {
             console.log(response);
             if (response.redirect) {
                 this.setState({processing: true});
@@ -63,8 +63,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        onError(e, response) {
-            console.error(e, response);
+        onError(response) {
+            console.error(response.message || 'Error: ', response);
         }
 
         onKeyUp(e) {
@@ -107,14 +107,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     const reader = new FileReader();
 
-                    if(this.state.content.isBinary) {
+                    if(this.state.isBinary) {
                         reader.onloadend = (e) => {
                             if(!e.target.result)
                                 throw new Error("Invalid upload data");
-                            const base64String = this.uint8ToString(e.target.result);
-                            Object.assign(this.state.content, {data: base64String});
-                            this.setState({encoding: 'base64'});
+
+                            const base64String = this.uint8ToBase64(e.target.result);
+                            Object.assign(this.state.content, {data: base64String, length: e.target.result.byteLength, encoding: 'base64'}); // TODO: show binary file info
+                            this.render();
                             console.log("Uploaded Binary: ", this.readableByteSize(base64String.length));
+                            e.target.value = "";
                         };
                         // If mime is editable, read as text, otherwise upload as binary
                         reader.readAsArrayBuffer(e.target.files[0]);
@@ -125,8 +127,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             if(!e.target.result)
                                 throw new Error("Invalid upload data");
                             console.log("Uploaded Text: ", this.readableByteSize(e.target.result.length));
-                            Object.assign(this.state.content, {data: e.target.result});
-                            this.setState({encoding: 'UTF8'});
+                            Object.assign(this.state.content, {data: e.target.result, encoding: 'UTF8'});
+                            this.render();
+                            e.target.value = "";
                         };
                         // If mime is editable, read as text, otherwise upload as binary
                         reader.readAsText(e.target.files[0]);
@@ -137,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // TODO: warn user about unsaved data
         }
 
-        uint8ToString(buffer) {
+        uint8ToBase64(buffer) {
             var binary = '';
             var bytes = new Uint8Array( buffer );
             for (let i = 0; i < bytes.byteLength; i++) {
@@ -150,12 +153,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const form = this.querySelector('form');
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
-                this.setState({processing: false}, xhr.response);
+                const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+                response.status = xhr.status;
+                if(response.revision) {
+                    if(response.revision.data)
+                        response.content.data = response.revision.data
+                    response.content.length = response.revision.length;
+                }
+                this.setState({processing: false}, response);
             };
             xhr.responseType = 'json';
             let params = '?t=' + new Date().getTime();
             if (this.state.revisionID)
-                params = `&r=${this.state.revisionID}`;
+                params += `&r=${this.state.revisionID}`;
             xhr.open('OPTIONS', form.getAttribute('action') + params, true);
             xhr.send();
             this.setState({processing: true});
@@ -165,21 +175,21 @@ document.addEventListener('DOMContentLoaded', function() {
         onSubmit(e) {
             e.preventDefault();
             const form = e.target;
-            const formValues = Array.prototype.filter
-                .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
-                .map((input, i) => input.name + '=' + encodeURIComponent(input.value))
+            const formValues = Object.keys(this.state.content)
+                .map(key => key + '=' + encodeURIComponent(this.state.content[key]))
                 .join('&');
             const method = form.getAttribute('method');
             const action = form.getAttribute('action');
 
             const xhr = new XMLHttpRequest();
-            xhr.onload = (e) => {
+            xhr.onload = () => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                this.setState({processing: false, status: xhr.status}, response);
+                response.status = xhr.status;
+                this.setState({processing: false}, response);
                 if (xhr.status === 200) {
-                    this.onSuccess(e, response);
+                    this.onSuccess(response);
                 } else {
-                    this.onError(e, response);
+                    this.onError(response);
                 }
             };
             xhr.open(method, action, true);
@@ -189,22 +199,28 @@ document.addEventListener('DOMContentLoaded', function() {
             this.setState({processing: true});
         }
 
-        renderPreview(html) {
+        renderPreview(data) {
 
             clearTimeout(iframeRenderTimeout);
             iframeRenderTimeout = setTimeout(() => {
-                const doc = new DOMParser().parseFromString(html, "text/xml");
-
                 const previewContent = document.querySelector('.content-preview-iframe');
-                switch (doc.firstChild.nodeName) {
-                    case 'html':
-                        previewContent.contentWindow.document.body.innerHTML = doc.body.innerHTML;
-                        break;
-                    case 'body':
-                        previewContent.contentWindow.document.body.innerHTML = doc.body.innerHTML;
-                        break;
-                    default:
-                        previewContent.contentWindow.document.body.innerHTML = html;
+                if(this.state.isBinary) {
+                    previewContent.contentWindow.document.body.innerHTML
+                        = `<img src='data:image/png;base64,${data}' />`;
+                } else {
+
+                    const doc = new DOMParser().parseFromString(data, "text/xml");
+
+                    switch (doc.firstChild.nodeName) {
+                        case 'html':
+                            previewContent.contentWindow.document.body.innerHTML = doc.body.innerHTML;
+                            break;
+                        case 'body':
+                            previewContent.contentWindow.document.body.innerHTML = doc.body.innerHTML;
+                            break;
+                        default:
+                            previewContent.contentWindow.document.body.innerHTML = data;
+                    }
                 }
             }, 300);
             // previewContent.src = previewContent.src.split("?")[0] + '?t=' + new Date().getTime();
@@ -249,9 +265,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     <tr>
                         <td><label for="data">Content:</label></td>
                         <td>
-                            <textarea class="editor-plain editor-wysiwyg-target" name="data" id="data"
-                                ${this.state.content.isBinary ? ' disabled' : ''}
-                                >${this.state.content.data || ''}</textarea>
+                            ${this.state.isBinary ? `
+                            <textarea class="editor-binary editor-wysiwyg-target" name="data" id="data" disabled>[Binary File]
+Mime Type: ${this.state.mimeType || ''}
+Length: ${this.readableByteSize(this.state.content.length)}
+</textarea>
+                            ` : `
+                            <textarea class="editor-plain editor-wysiwyg-target" name="data" id="data">${this.state.content.data || ''}</textarea>
+                            `}
                         </td>
                     </tr>
                     <tr>

@@ -39,7 +39,7 @@ class ContentRevisionTable {
     //     return revisions[0];
     // }
 
-    async fetchContentRevisionByID(id, selectSQL = '*, NULL as data') {
+    async fetchContentRevisionByID(id, selectSQL = '*, NULL as data, LENGTH(data) as "length"') {
         const revisions = await this.selectContentRevision(`cr.id = ?`,
             [id], selectSQL);
         return revisions[0];
@@ -55,10 +55,10 @@ class ContentRevisionTable {
             [contentID], selectSQL);
     }
 
-    async fetchRevisionData(contentID, asString=null) {
-        const content = await this.fetchContentRevisionByID(contentID, 'cr.data');
+    async fetchRevisionData(contentRevisionID, asString=null) {
+        const content = await this.fetchContentRevisionByID(contentRevisionID, 'cr.data');
         if(!content)
-            throw new Error("Content ID not found: " + contentID);
+            throw new Error("Content Revision ID not found: " + contentRevisionID);
         if(asString)
             return content.data.toString(asString);
         return content.data;

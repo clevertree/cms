@@ -31,11 +31,13 @@ class HTMLUserFormBrowserElement extends HTMLElement {
         this.onSubmit();
     }
 
-    onSuccess(e, response) {
+    onSuccess(response) {
         // if(response.redirect)
-        //     setTimeout(() => window.location.href = response.redirect, 3000);
+        //     setTimeout(() => window.location.href = response.redirect, 2000);
     }
-    onError(e, response) {}
+    onError(response) {
+            console.error(response.message || 'Error: ', response);
+        }
 
     onKeyUp(e) {
         switch(e.target.name) {
@@ -62,9 +64,9 @@ class HTMLUserFormBrowserElement extends HTMLElement {
             const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
             this.setState({processing: false, status: xhr.status}, response);
             if(xhr.status === 200) {
-                this.onSuccess(e, response);
+                this.onSuccess(response);
             } else {
-                this.onError(e, response);
+                this.onError(response);
             }
         };
         xhr.open(method, action, true);

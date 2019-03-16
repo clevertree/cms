@@ -194,9 +194,15 @@ class ContentRow {
         Object.assign(this, row);
     }
 
+
+    get mimeType() {
+        const mime = require('mime');
+        return mime.lookup(this.path);
+    }
+
+
     get url() { return this.path || `/:content/${this.id}/`}
     // hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
 }
 
 module.exports = {ContentTable, ContentRow};
-
