@@ -54,7 +54,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
         const form = this.querySelector('form');
         const formValues = Array.prototype.filter
             .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
-            .map((input, i) => input.name + '=' + encodeURI(input.value))
+            .map((input, i) => input.name + '=' + encodeURIComponent(input.value))
             .join('&');
         const method = form.getAttribute('method');
         const action = form.getAttribute('action');

@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const form = e.target;
             const formValues = Array.prototype.filter
                 .call(form ? form.elements : [], (input, i) => !!input.name && !input.disabled && (input.type !== 'checkbox' || input.checked))
-                .map((input, i) => input.name + '=' + encodeURI(input.value))
+                .map((input, i) => input.name + '=' + encodeURIComponent(input.value))
                 .join('&');
             const method = form.getAttribute('method');
             const action = form.getAttribute('action');
@@ -268,7 +268,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         <td><label for="data">Content:</label></td>
                         <td>
                             ${this.state.isBinary ? `
-                            <textarea class="editor-binary editor-wysiwyg-target" name="data" id="data" disabled>[Binary File]
+                            <input type="hidden" name="data" id="data" value="${this.state.content.data}" />
+                            <textarea class="editor-binary editor-wysiwyg-target" disabled>[Binary File]
 Mime Type: ${this.state.mimeType || ''}
 Length: ${this.readableByteSize(this.state.content.length)}
 </textarea>

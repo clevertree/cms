@@ -1,0 +1,11 @@
+[
+  {
+    "name": "name",
+    "title": "Full Name"
+  },
+  {
+    "name": "description",
+    "title": "Description",
+    "type": "textarea"
+  }
+]

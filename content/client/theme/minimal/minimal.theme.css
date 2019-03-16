@@ -20,17 +20,13 @@ body.theme-minimal > footer {
 /** Header **/
 body.theme-minimal > header {
     /* background: linear-gradient(to top, #EEE 0%, #CCC 100%); */
-    padding: 0.5em;
     text-align: center;
-    border-bottom: solid 1px #CCC;
+    /* border-bottom: solid 1px #CCC; */
 }
 
-/** Title **/
+/** Title Text **/
 body.theme-minimal > header h1 {
     display: inline-block;
-    margin: 8px;
-    font-size: 2.5em;
-    font-weight: bold;
     max-width: 300px;
 }
 

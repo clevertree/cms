@@ -175,15 +175,15 @@ class ContentApi {
                             await ContentRenderer.send(req, res, content);
                             break;
                         default:
-                            if(this.isMimeTypeRenderable(content.mimeType)) {
+                            // if(this.isMimeTypeRenderable(content.mimeType)) {
                                 await ContentRenderer.send(req, res, Object.assign({}, content, {
-                                    data: `<iframe src="${content.path}"></iframe>`
+                                    data: `<iframe src="${content.path}" style="width: 100%; height: 100%; border: 0;"></iframe>`
                                 }));
-                            } else {
-                                await ContentRenderer.send(req, res, Object.assign({}, content, {
-                                    data: `<section><div class="message"><a href="${content.path}">Download (${content.title})</a></div></section>`
-                                }));
-                            }
+                            // } else {
+                            //     await ContentRenderer.send(req, res, Object.assign({}, content, {
+                            //         data: `<section><div class="message"><a href="${content.path}">Download (${content.title})</a></div></section>`
+                            //     }));
+                            // }
                             break;
                     }
                 });
@@ -320,8 +320,8 @@ class ContentApi {
                             } else {
                                 await contentRevisionTable.insertContentRevision(
                                     content.id,
-                                    oldContentData,       // Old Data
-                                    content.user_id || -1     // Old User
+                                    oldContentData,                 // Old Data
+                                    content.user_id || null     // Old User
                                 );
                             }
 
@@ -382,7 +382,7 @@ class ContentApi {
 
                     // const currentCount = req.session.uploads ? req.session.uploads.length : 0;
                     let editable = sessionUser && sessionUser.isAdmin();
-                    let message = `${currentUploads.length} temporary file${currentUploads.length!== 1 ? 's' : ''} available`;
+                    let message = `${currentUploads.length} temporary file upload${currentUploads.length!== 1 ? 's' : ''} available`;
                     if(!sessionUser) {
                         message = `Must be logged in to create new content`;
                     } else {
@@ -393,7 +393,7 @@ class ContentApi {
                     return res.json({
                         editable,
                         message,
-                        status: editable ? 200 : 0,
+                        status: 0,
                         // message: `${currentCount} temporary file${currentCount !== 1 ? 's' : ''} uploaded`,
                         currentUploads
                     });
@@ -437,15 +437,6 @@ class ContentApi {
                         insertIDs.push(insertID);
 
                         // Initial revision shouldn't be created until first edit has been made
-                        // const contentEntry = await contentTable.fetchContentByID(insertID);
-                        //
-                        // const insertRevisionID = await contentRevisionTable.insertContentRevision(
-                        //     contentEntry.id,
-                        //     contentData.title,
-                        //     contentData.data,
-                        //     sessionUser.id
-                        // );
-                        // insertRevisionIDs.push(insertRevisionID);
                     }
 
 
@@ -487,6 +478,7 @@ class ContentApi {
 
                     return res.json({
                         message: `${currentCount} temporary file upload${currentCount !== 1 ? 's' : ''} available`,
+                        status: 0,
                         currentUploads: req.session.uploads
                     });
 

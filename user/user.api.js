@@ -9,12 +9,11 @@ const { DNSManager } = require('../http/dns.manager');
 // const { LocalConfig } = require('../config/local.config');
 // const { ConfigManager } = require('../config/config.manager');
 const { DatabaseManager } = require('../database/database.manager');
-// const { ContentTable } = require("../article/article.database");
 // const { ContentAPI } = require('../content/content.api');
+const { ContentTable } = require("../content/content.table");
 const { UserTable } = require('./user.table');
-const { ConfigDatabase } = require("../config/config.database");
 const { SessionAPI } = require('./session/session.api');
-const { HTTPServer } = require('../http/http.server');
+// const { HTTPServer } = require('../http/http.server');
 
 // const { DNSManager } = require('../service/domain/dns.manager');
 const { ContentRenderer } = require('../content/content.renderer');
@@ -103,12 +102,15 @@ class UserAPI {
     }
 
     async fetchProfileConfig(database) {
-        const configDB = new ConfigDatabase(database);
-        const configList = await configDB.selectAllConfigValues();
-        const allConfig = configDB.parseConfigValues(configList);
-        if(!allConfig.user.profile)
-            throw new Error("Profile config is missing");
-        return JSON.parse(allConfig.user.profile);
+        const path = '/config/profile.json';
+        const configDB = new ContentTable(database);
+        const content = await configDB.fetchContentByPath(path, '*');
+        if(!content)
+            throw new Error("Profile content not found: " + path);
+        const profileConfig = JSON.parse(content.data.toString("UTF8"));
+        if(!profileConfig)
+            throw new Error("Invalid Config");
+        return profileConfig;
     }
 
 

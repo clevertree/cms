@@ -1,15 +1,7 @@
-// const fs = require('fs');
 const path = require('path');
 const express = require('express');
-// const etag = require('etag')
-// var qs = require('qs');
-// var parseUrl = require('parseurl');
 
 const { LocalConfig } = require('../config/local.config');
-// const { ConfigManager } = require('../../config/config.manager');
-
-// const { TaskAPI } = require('../task/task.manager');
-// const { DatabaseManager } = require('../../database/database.manager');
 
 const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
 
@@ -87,7 +79,6 @@ class HTTPServer {
         const { DatabaseAPI } = require('../database/database.api');
         const { UserAPI } = require('../user/user.api');
         const { ContentAPI } = require('../content/content.api');
-        const { ConfigAPI } = require('../config/config.api');
         const { TaskAPI } = require('../task/task.api');
         const { ConfigManager } = require('../config/config.manager');
 
@@ -97,14 +88,9 @@ class HTTPServer {
             router.use(DatabaseAPI.getMiddleware());
             router.use(UserAPI.getMiddleware());
             router.use(ContentAPI.getMiddleware());
-            router.use(ConfigAPI.getMiddleware());
             router.use(TaskAPI.getMiddleware());
 
         });
-
-
-        // CMS Asset files
-        // router.use(express.static(BASE_DIR));
 
         return (req, res, next) => {
             return router(req, res, next);
