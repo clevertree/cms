@@ -23,19 +23,6 @@ body.theme-minimal-yoga {
 }
 
 
-/** Hyperlinks **/
-.theme-minimal-yoga a {
-    color: #000;
-    /*text-decoration: none;*/
-    /*text-decoration-color: #CCCC;*/
-}
-
-.theme-minimal-yoga header a:not(:hover),
-.theme-minimal-yoga footer a:not(:hover)
-{
-    text-decoration: none;
-}
-
 
 /** Header **/
 body.theme-minimal-yoga > header {
@@ -100,6 +87,27 @@ content-nav ul.menu > li > a
     /*border-bottom: 1px solid #CCCC;*/
 }
 
+/** Hyperlinks **/
+.theme-minimal-yoga a {
+    color: #000;
+    /*text-decoration: none;*/
+    /*text-decoration-color: #CCCC;*/
+}
+
+.theme-minimal-yoga header a:not(:hover),
+.theme-minimal-yoga footer a:not(:hover)
+{
+    text-decoration: none;
+}
+
+
+/** Paragraphs **/
+.theme-minimal-yoga p {
+    max-width: 800px;
+    margin: auto;
+    text-align: justify;
+    text-indent: 8px;
+}
 /** Header Tags **/
 .theme-minimal-yoga h1, .theme-minimal-yoga h1 a,
 .theme-minimal-yoga h2, .theme-minimal-yoga h2 a,
@@ -124,8 +132,8 @@ body.theme-minimal-yoga > section,
 body.theme-minimal-yoga > article > section,
 body.theme-minimal-yoga > footer {
     margin: 6px auto;
-    max-width: 2600px;
-    padding: 1px 16px;
+    /* max-width: 2600px; */
+    padding: 1px 16px 16px 16px;
     /* border: 1px solid #CCC; */
 }
 
@@ -140,7 +148,7 @@ body.theme-minimal-yoga > footer {
 .theme-minimal-yoga > article > section.themed {
     /* text-shadow: #000 1px 1px 1px; */
     background-color: #fef1fe;
-    box-shadow: 2px 2px 4px #0008;
+    box-shadow: 2px 2px 4px #cbcbcb;
     border-radius: 2px;
 }
 
