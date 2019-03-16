@@ -173,7 +173,7 @@ CREATE TABLE IF NOT EXISTS ${this.table} (
   \`path\` varchar(96) NOT NULL,
   \`title\` varchar(96) NOT NULL,
   \`user_id\` int(11) DEFAULT NULL,
-  \`data\` varbinary(MAX) NOT NULL,
+  \`data\` BLOB NOT NULL,
   \`created\` datetime DEFAULT current_timestamp(),
   \`updated\` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (\`id\`),
