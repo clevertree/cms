@@ -34,16 +34,16 @@ document.addEventListener('DOMContentLoaded', function() {
             //     this.requestFormData(userID);
         }
 
-        onSuccess(e, response) {
+        onSuccess(response) {
             console.log(response);
             if(response.redirect) {
                 this.setState({processing: true});
-                setTimeout(() => window.location.href = response.redirect, 3000);
+                setTimeout(() => window.location.href = response.redirect, 2000);
             }
         }
 
-        onError(e, response) {
-            console.error(e, response);
+        onError(response) {
+            console.error(response);
             if(this.state.duplicateRegistration) {
                 this.state.duplicateRegistration = false;
                 if(confirm("This user account already exists. Would you like to attempt logging in?")) {
@@ -76,9 +76,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
                 this.setState({processing: false, status: xhr.status}, response);
                 if(xhr.status === 200) {
-                    this.onSuccess(e, response);
+                    this.onSuccess(response);
                 } else {
-                    this.onError(e, response);
+                    this.onError(response);
                 }
             };
             xhr.open(method, action, true);

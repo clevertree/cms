@@ -66,17 +66,17 @@ class HTMLContentFormUploadElement extends HTMLElement {
         }
     }
 
-    onSuccess(e, response) {
+    onSuccess(response) {
         console.log(response);
         if(response.redirect) {
             this.setState({processing: true});
-            setTimeout(() => window.location.href = response.redirect, 3000);
+            setTimeout(() => window.location.href = response.redirect, 2000);
         }
     }
 
-    onError(e, response) {
-        console.error(e, response);
-    }
+    onError(response) {
+            console.error(response.message || 'Error: ', response);
+        }
     onChange(e) {
         switch(e.target.name) {
             case 'selectAll':
@@ -107,9 +107,9 @@ class HTMLContentFormUploadElement extends HTMLElement {
             const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
             this.setState({processing: false, status: xhr.status}, response);
             if(xhr.status === 200) {
-                this.onSuccess(e, response);
+                this.onSuccess(response);
             } else {
-                this.onError(e, response);
+                this.onError(response);
             }
         };
         xhr.open(method, action, true);
@@ -126,7 +126,6 @@ class HTMLContentFormUploadElement extends HTMLElement {
         const val = (name) => formManage && formManage.elements && formManage.elements[name] ? formManage.elements[name].value : '';
 
 
-        // TODO: multiple file upload
 //         console.log("RENDER", this.state, formData);
         this.innerHTML =
             `
@@ -190,7 +189,7 @@ class HTMLContentFormUploadElement extends HTMLElement {
                     ${this.state.currentUploads.map((currentUpload, i) => `
                     <tr>
                         <td style="max-width: 260px;">${currentUpload.uploadPath|| ''}</td>
-                        <td>${currentUpload.size || ''}</td>
+                        <td>${this.readableByteSize(currentUpload.size)}</td>
                         <td>
                             <label>
                                 <input type="checkbox" class="delete" name="delete[]" value="${i}" ${val(`delete[${i}]`) ? ' checked="checked"' : ''}/>
@@ -211,5 +210,15 @@ class HTMLContentFormUploadElement extends HTMLElement {
         </form>`;
     }
 
+
+    readableByteSize(bytes) {
+        if(Math.abs(bytes) < 1024)
+            return bytes + ' B';
+        const units = ['kB','MB','GB','TB','PB','EB','ZB','YB'];
+        let u = -1;
+        do { bytes /= 1024; ++u; }
+        while(Math.abs(bytes) >= 1024 && u < units.length - 1);
+        return bytes.toFixed(1)+' '+units[u];
+    }
 }
 customElements.define('content-form-upload', HTMLContentFormUploadElement);

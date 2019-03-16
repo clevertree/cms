@@ -39,7 +39,7 @@ class HTMLTaskFormManagerElement extends HTMLElement {
     }
 
 
-    onSuccess(e, response) {
+    onSuccess(response) {
         if(response.result) {
             if(!response.result.updatedTaskName)
                 throw new Error("Invalid updatedTaskName: " + response.result.updatedTaskName);
@@ -50,13 +50,13 @@ class HTMLTaskFormManagerElement extends HTMLElement {
         console.log(response);
         if(response.redirect) {
             this.setState({processing: true});
-            setTimeout(() => window.location.href = response.redirect, 3000);
+            setTimeout(() => window.location.href = response.redirect, 2000);
         }
     }
 
-    onError(e, response) {
-        console.error(e, response);
-    }
+    onError(response) {
+            console.error(response.message || 'Error: ', response);
+        }
 
     onChange(e) {
         if(!this.state.user.profile)
@@ -104,9 +104,9 @@ class HTMLTaskFormManagerElement extends HTMLElement {
             const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
             this.setState({processing: false, status: xhr.status}, response);
             if(xhr.status === 200) {
-                this.onSuccess(e, response);
+                this.onSuccess(response);
             } else {
-                this.onError(e, response);
+                this.onError(response);
             }
         };
         xhr.open(method, action, true);

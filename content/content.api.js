@@ -1,4 +1,5 @@
 // const formidableMiddleware = require('express-formidable');
+const mime = require('mime');
 const path = require('path');
 const fs = require('fs');
 // const fsPromises = require('fs').promises;
@@ -58,8 +59,9 @@ class ContentApi {
             if(content) {
                 await this.checkForRevisionContent(req, content);
 
-                const mimeType = this.getMimeType(path.extname(content.path) || '');
-                switch(mimeType) {
+                // const mimeType = this.getMimeType(path.extname(content.path) || '');
+                switch(content.mimeType) {
+                    case null:
                     case 'text/html':
                         // Load session if we're using the theme
                         const SM = SessionAPI.getMiddleware();
@@ -68,7 +70,7 @@ class ContentApi {
                         });
                         return;
                     default:
-                        await this.renderData(req, res, content.data, mimeType, content.updated);
+                        await this.renderData(req, res, content.data, content.mimeType, content.updated);
                         return;
                 }
             }
@@ -101,7 +103,7 @@ class ContentApi {
             if(contentRevision.content_id !== content.id)
                 throw new Error("Revision does not belong to content");
 
-            content.data = await contentRevisionTable.fetchRevisionData(contentRevision.id);
+            // content.data = await contentRevisionTable.fetchRevisionData(contentRevision.id);
             // content.title = contentRevision.title;
             return contentRevision;
         }
@@ -131,6 +133,8 @@ class ContentApi {
                 return next();
 
             let contentRevision = await this.checkForRevisionContent(req, content);
+            if(contentRevision)
+                content.data = await contentRevisionTable.fetchRevisionData(contentRevision.id, 'UTF8');
 
             if(asJSON) {
                 const response = {
@@ -149,13 +153,13 @@ class ContentApi {
                 if(req.query.getAll || req.query.getHistory) {
                     response.history = await contentRevisionTable.fetchContentRevisionsByContentID(content.id);
                     // response.revision = await contentRevisionTable.fetchContentRevisionByID(content.id, req.query.getRevision || null);
-                    if(!contentRevision && response.history.length > 0) // Fetch latest revision? sloppy
-                        contentRevision = await contentRevisionTable.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentRevisionTable.fetchContentRevisionsByContentID(content.id))[0];
+                    // if(!contentRevision && response.history.length > 0) // Fetch latest revision? sloppy
+                        // contentRevision = await contentRevisionTable.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentRevisionTable.fetchContentRevisionsByContentID(content.id))[0];
                 }
-                if(contentRevision)
-                    response.revision = contentRevision;
+                // if(contentRevision)
+                //     response.data = contentRevision.data;
                 if(req.query.getAll) {
-                    response.parentList = await contentTable.selectContent("c.path IS NOT NULL", null, "id, path, title");
+                    // response.parentList = await contentTable.selectContent("c.path IS NOT NULL", null, "id, path, title");
                 }
 
                 res.json(response);
@@ -165,13 +169,13 @@ class ContentApi {
                 // Load session if we're using the theme
                 const SM = SessionAPI.getMiddleware();
                 SM(req, res, async () => {
-                    const mimeType = this.getMimeType(path.extname(content.path) || '');
-                    switch(mimeType) {
+                    // const mimeType = this.getMimeType(path.extname(content.path) || '');
+                    switch(content.mimeType) {
                         case 'text/html':
                             await ContentRenderer.send(req, res, content);
                             break;
                         default:
-                            if(renderableMimeTypes.indexOf(mimeType) !== -1) {
+                            if(this.isMimeTypeRenderable(content.mimeType)) {
                                 await ContentRenderer.send(req, res, Object.assign({}, content, {
                                     data: `<iframe src="${content.path}"></iframe>`
                                 }));
@@ -197,21 +201,18 @@ class ContentApi {
             const contentRevisionTable = new ContentRevisionTable(database);
             const userTable = new UserTable(database);
 
-            if(!req.session || !req.session.userID)
-                throw new Error("Must be logged in");
-            const sessionUser = await userTable.fetchUserByID(req.session.userID);
-
-            let content = await contentTable.fetchContentByID(req.params.id);
+            let content = await contentTable.fetchContentByID(req.params.id, 'c.*, NULL as data, LENGTH(data) as "length"');
+            const currentUploads = req.session.uploads || [];
 
             switch(req.method) {
                 case 'GET':
-                    let renderedData = null;
-                    const mimeType = this.getMimeType(path.extname(content.path) || '');
-                    switch(mimeType) {
-                        case 'text/html':
-                            renderedData = contentTable.fetchContentData(content.id, 'UTF8');
-                            break;
-                    }
+                    // let renderedData = null;
+                    // const mimeType = this.getMimeType(path.extname(content.path) || '');
+                    // switch(content.mimeType) {
+                    //     case 'text/html':
+                    //         // renderedData = contentTable.fetchContentData(content.id, 'UTF8');
+                    //         break;
+                    // }
                     // Render Editor
                     await ContentRenderer.send(req, res, {
                         title: `Edit Content #${content.id}`,
@@ -230,76 +231,97 @@ class ContentApi {
                 case 'OPTIONS':
 
                     let contentRevision = await this.checkForRevisionContent(req, content);
+                    if(contentRevision) {
+                        if(this.isMimeTypeEditable(content.mimeType)) {
+                            contentRevision.data = await contentRevisionTable.fetchRevisionData(contentRevision.id, 'UTF8');
+                        }
+                    }
 
                     const response = {
                         redirect: content.url,
                         message: "Content Queried Successfully",
                         editable: false,
-                        content
+                        content,
+                        contentRevision,
+                        currentUploads,
+                        isBinary: false
                     };
                     if(req.session && req.session.userID) {
-                        const database = await DatabaseManager.selectDatabaseByRequest(req);
-                        const userTable = new UserTable(database);
                         const sessionUser = await userTable.fetchUserByID(req.session.userID);
-                        if (sessionUser.isAdmin() || sessionUser.id === content.user_id)
+                        if (sessionUser.isAdmin())
                             response.editable = true;
                     }
+                    if(!response.editable)
+                        response.message = 'Administrator access required to modify content';
+
                     response.history = await contentRevisionTable.fetchContentRevisionsByContentID(content.id);
                     // response.revision = await contentRevisionTable.fetchContentRevisionByID(content.id, req.query.getRevision || null);
-                    if(!contentRevision && response.history.length > 0) // Fetch latest revision? sloppy
-                        contentRevision = await contentRevisionTable.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentRevisionTable.fetchContentRevisionsByContentID(content.id))[0];
-                    if(contentRevision)
-                        response.revision = contentRevision;
-                    response.parentList = await contentTable.selectContent("c.path IS NOT NULL", null, "id, path, title");
+                    // if(!contentRevision && response.history.length > 0) // Fetch latest revision? sloppy
+                    //     contentRevision = await contentRevisionTable.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentRevisionTable.fetchContentRevisionsByContentID(content.id))[0];
+                    // if(contentRevision)
+                    //     response.revision = contentRevision;
+                    // response.parentList = await contentTable.selectContent("c.path IS NOT NULL", null, "id, path, title");
 
-                    content.mimeType = this.getMimeType(path.extname(content.path) || '');
-                    if(editableMimeTypes.indexOf(content.mimeType) !== -1) {
+                    // content.mimeType = this.getMimeType(path.extname(content.path) || '');
+                    response.mimeType = content.mimeType;
+                    if(this.isMimeTypeEditable(content.mimeType)) {
                         content.data = await contentTable.fetchContentData(content.id, 'UTF8');
-                        content.isBinary = false;
                     } else {
-                        content.data = '[binary file]';
-                        content.isBinary = true;
+                        content.data = null; // `[Binary File]\nMime Type: ${content.mimeType}\nLength: ${this.readableByteSize(content.length)}`;
+                        response.isBinary = true;
                     }
 
                     res.json(response);
 
                     break;
                 case 'POST':
-                   // Handle POST
+                    // Handle POST
+                    let newContentData = req.body.data;
+                    switch((req.body.encoding || '').toLowerCase()) {
+                        case 'base64':
+                            newContentData = Buffer.from(newContentData,"base64");
+                            break;
+                    }
+
+                    // Check for file revision change
+
+                    if(req.body.revisionID && !this.isMimeTypeEditable(content.mimeType)) {
+                        newContentData = await contentRevisionTable.fetchRevisionData(req.body.revisionID)
+                    }
+
                     switch (req.body.action) {
                         default:
                         case 'publish':
+                            if(!req.session || !req.session.userID)
+                                throw new Error("Must be logged in");
+                            const sessionUser = await userTable.fetchUserByID(req.session.userID);
                             if(!sessionUser || !sessionUser.isAdmin())
                                 throw new Error("Not authorized");
-                            content.data = await contentTable.fetchContentData(content.id, 'UTF8');
+
+                            const oldContentData = await contentTable.fetchContentData(content.id);
+                            const contentMatches = newContentData.toString('UTF8') === oldContentData.toString('UTF8');
 
                             if(req.body.path === content.path
                                 && req.body.title === content.title
-                                && req.body.data === content.data
+                                && contentMatches
                                 && sessionUser.id === content.user_id) {
                                 return res.status(400).json({
                                     // redirect: content.url,
-                                    message: "No changes detected",
+                                    message: "Content matches. No changes detected",
                                     affectedContentRows: 0,
-                                    content: content
+                                    // content: content // causes problems
                                 });
                             }
-                            const affectedRows = await contentTable.updateContent(content.id, req.body.path, req.body.title, req.body.data, sessionUser.id);
+                            const affectedRows = await contentTable.updateContent(content.id, req.body.path, req.body.title, newContentData, sessionUser.id);
 
                             // Insert revision for old content
-                            const oldContent = content;
-                            // Refresh content
-                            content = await contentTable.fetchContentByID(content.id, '*');
-                            content.data = content.data.toString('UTF8');
-
-                            oldContent.data = await contentTable.fetchContentData(oldContent.id, 'UTF8');
-                            if(oldContent.data === content.data && oldContent.user_id === content.user_id) {
+                            if(contentMatches) {
                                 console.warn("Old content matches new. Skipping revision");
                             } else {
                                 await contentRevisionTable.insertContentRevision(
-                                    oldContent.id,
-                                    oldContent.data,       // Old Data
-                                    oldContent.user_id || -1     // Old User
+                                    content.id,
+                                    oldContentData,       // Old Data
+                                    content.user_id || -1     // Old User
                                 );
                             }
 
@@ -307,13 +329,13 @@ class ContentApi {
                                 redirect: content.url,
                                 message: "Content published successfully.<br/>Redirecting...",
                                 affectedContentRows: affectedRows,
-                                content: content
+                                // content: content // causes problems
                             });
 
                         case 'draft':
                             const insertContentRevisionID = await contentRevisionTable.insertContentRevision(
                                 content.id,
-                                req.body.data,
+                                newContentData,
                                 sessionUser.id
                             );
                             // revision = await contentRevisionTable.fetchContentRevisionByID(insertContentRevisionID);
@@ -560,20 +582,19 @@ class ContentApi {
 
                 default:
                 case 'OPTIONS':
-
-                    if(editableMimeTypes.indexOf(content.mimeType) !== -1) {
-                        content.data = await contentTable.fetchContentData(content.id, 'UTF8');
-                        content.isBinary = false;
-                    } else {
-                        content.data = '[binary file]';
-                        content.isBinary = true;
-                    }
-
                     const response = {
                         message: `Delete content ID ${content.id}?`,
                         editable: false,
-                        content
+                        content,
+                        isBinary: false
                     };
+
+                    if(this.isMimeTypeEditable(content.mimeType)) {
+                        content.data = await contentTable.fetchContentData(content.id, 'UTF8');
+                    } else {
+                        response.isBinary = true;
+                    }
+
                     if(req.session && req.session.userID) {
                         const database = await DatabaseManager.selectDatabaseByRequest(req);
                         const userTable = new UserTable(database);
@@ -664,7 +685,7 @@ class ContentApi {
 
     // TODO: render static data
     async renderStaticFile(req, res, next, filePath) {
-        const ext = path.extname(filePath);
+        // const ext = path.extname(filePath);
 
         let stats = null;
         try {
@@ -693,7 +714,8 @@ class ContentApi {
 
         try {
             const data = await this.readFileAsync(filePath);
-            await this.renderData(req, res, data, this.getMimeType(ext), stats.mtime);
+            const mimeType = mime.lookup(filePath);
+            await this.renderData(req, res, data, mimeType, stats.mtime);
             // if the file is found, set Content-type and send data
             // res.setHeader("Expires", new Date(Date.now() + 1000 * 60 * 60 * 24).toUTCString()); // Static files deserve long term caching
         } catch (err) {
@@ -715,6 +737,37 @@ class ContentApi {
         });
     }
 
+    isMimeTypeEditable(mimeType) {
+        return mimeType && [
+            'image/x-icon',
+            'text/html',
+            'text/javascript',
+            'application/json',
+            'text/css',
+            'image/svg+xml',
+            // 'application/pdf',
+            // 'application/msword',
+            'application/xml'
+        ].indexOf(mimeType.toLowerCase()) >= 0;
+    }
+
+    isMimeTypeRenderable(mimeType) {
+        return mimeType && [
+            'image/x-icon',
+            'text/html',
+            'text/javascript',
+            'application/json',
+            'text/css',
+            'image/png',
+            'image/jpeg',
+            'audio/wav',
+            'audio/mpeg',
+            'image/svg+xml',
+            'application/pdf',
+            'application/msword',
+            'application/xml'
+        ].indexOf(mimeType.toLowerCase()) >= 0;
+    }
 
     async renderError(error, req, res, json=null) {
         console.error(`${req.method} ${req.url}:`, error);
@@ -730,12 +783,6 @@ class ContentApi {
                 code: error.code,
             }, json));
         }
-    }
-
-    getMimeType(ext) {
-        if(typeof mapMimeTypes[ext] !== 'undefined')
-            return mapMimeTypes[ext];
-        return null;
     }
 
 
@@ -768,52 +815,4 @@ class ContentApi {
 
 
 module.exports = {ContentAPI: new ContentApi()};
-
-// maps file extention to MIME TYPE
-const mapMimeTypes = {
-    '': 'text/html',
-    '.htm': 'text/html',
-    '.html': 'text/html',
-    '.ico': 'image/x-icon',
-    '.js': 'text/javascript',
-    '.json': 'application/json',
-    '.css': 'text/css',
-    '.png': 'image/png',
-    '.jpg': 'image/jpeg',
-    '.wav': 'audio/wav',
-    '.mp3': 'audio/mpeg',
-    '.svg': 'image/svg+xml',
-    '.pdf': 'application/pdf',
-    '.doc': 'application/msword',
-    '.xml': 'application/xml',
-    '.rtf': 'text/rtf'
-};
-
-const editableMimeTypes = [
-    'image/x-icon',
-    'text/html',
-    'text/javascript',
-    'application/json',
-    'text/css',
-    'image/svg+xml',
-    // 'application/pdf',
-    // 'application/msword',
-    'application/xml'
-];
-
-const renderableMimeTypes = [
-    'image/x-icon',
-    'text/html',
-    'text/javascript',
-    'application/json',
-    'text/css',
-    'image/png',
-    'image/jpeg',
-    'audio/wav',
-    'audio/mpeg',
-    'image/svg+xml',
-    'application/pdf',
-    'application/msword',
-    'application/xml'
-];
 

@@ -33,26 +33,26 @@ with a primary goal for **all** of its content is transferable with other UCMS b
 * App:  Sync, backup and publish websites via desktop / mobile / 3rd party app
 * Server-wide search: Search for specific content on all sites within a server, and even on other UCMS servers
 * DB support (NOSQL etc)
-* Git-driven content management (no database)
+* Git (repository) driven content management (no database)
 * Send and receive email
 * Socket chat / IRC
 * Third-party CMS integration: Recognize databases from other CMS software like WordPress and Concrete5
 
 
 
-#### Goals
+#### Project Goals
 * Free, Easy & SSL-secure Web Hosting for everyone
-* Quick-Start Server Configuration
-* Demystify HTML for the End-User
-* Create sharable components across different CMS and website software
+* Quick-Start server configuration
+* De-mystify HTML5 for the End-User
+* Create sharable components across different CMS and websites
 * Client-side MVC - Render all GUI on the client's browser, never the server
 * Content only! No CMS-specific tags, prefixes, or support libraries on ANY rendered output
 * Minimal HTML output - use as few tags as possible and keep documents small so they render quickly
 * Maximum server performance with minimal overhead
-* Micro-MVC - Database / API / client files must exist within the same topic directory
+* Topical MVC - Database / API / client files must exist within the same topic directory
 * No server admins required - DNS SOA email authorizes administrator
-* Extremely small HTML output! Check out the source for `view-source:https://www.afoh.info/:user/:login`
-* Universal CMS / CMI: Simple SCHEMA that may be used by other CMS software without conflicts
+* Minimal HTML output! Example: `view-source:https://www.afoh.info/:user/:login`
+* Universal CMS / CMI: Common SCHEMA that may be used by other CMS software without conflicts
 
 
 

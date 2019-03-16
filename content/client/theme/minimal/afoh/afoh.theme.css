@@ -57,10 +57,38 @@ body.theme-minimal-afoh > footer {
     /* background: url(texture/footer.background.png); */
 }
 
+
+
 /** Navigation **/
+
+/** Navigation Menu Colors **/
+.theme-minimal-afoh content-nav ul.menu > li:hover > a,
+.theme-minimal-afoh content-nav ul.submenu > li > a {
+    /* background-color: #FFF; */
+}
+
 .theme-minimal-afoh content-nav {
     font-size: larger;
 }
+
+/** Page Articles & Sections **/
+body.theme-minimal > section,
+body.theme-minimal > article > section,
+body.theme-minimal > footer {
+    margin: 6px auto;
+    max-width: 800px;
+    padding: 1px 16px;
+    /* border: 1px solid #CCC; */
+}
+
+
+/** Paragraphs **/
+
+.theme-minimal p {
+    text-align: justify;
+    text-indent: 8px;
+}
+
 
 /** Nav Menu Colors **/
 content-nav ul.menu > li:hover > a,
@@ -73,11 +101,20 @@ content-nav ul.submenu > li > a {
     background: #4e85b3;
 }
 
-.theme-minimal-afoh div.themed,
-.theme-minimal-afoh > article > section.themed {
+
+
+/** Themed Containers **/
+.theme-minimal div.themed,
+.theme-minimal > article > section.themed {
     /* text-shadow: #000 1px 1px 1px; */
     background-color: #ab6428ed;
     box-shadow: 2px 2px 4px #0008;
     border-radius: 2px;
 }
 
+
+/** Images **/
+.theme-minimal img.themed {
+    width: 100%;
+    box-shadow: 0px 0px 8px #000;
+}
