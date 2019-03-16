@@ -210,17 +210,23 @@ document.addEventListener('DOMContentLoaded', function() {
                         = `<img src='data:image/png;base64,${data}' />`;
                 } else {
 
-                    const doc = new DOMParser().parseFromString(data, "text/xml");
+                    try {
+                        const doc = new DOMParser().parseFromString(data, "text/xml");
 
-                    switch (doc.firstChild.nodeName) {
-                        case 'html':
-                            previewContent.contentWindow.document.body.innerHTML = doc.body.innerHTML;
-                            break;
-                        case 'body':
-                            previewContent.contentWindow.document.body.innerHTML = doc.body.innerHTML;
-                            break;
-                        default:
-                            previewContent.contentWindow.document.body.innerHTML = data;
+                        switch (doc.firstChild.nodeName) {
+                            case 'html':
+                                previewContent.contentWindow.document.body.innerHTML = doc.body.innerHTML;
+                                break;
+                            case 'body':
+                                previewContent.contentWindow.document.body.innerHTML = doc.body.innerHTML;
+                                break;
+                            default:
+                                previewContent.contentWindow.document.body.innerHTML = data;
+                        }
+                    } catch (e) {
+                        console.warn(e.message);
+
+                        previewContent.contentWindow.document.body.innerHTML = data;
                     }
                 }
             }, 300);
@@ -282,11 +288,12 @@ Length: ${this.readableByteSize(this.state.content.length)}
                         <td><label for="data">Upload:</label></td>
                         <td>
                             <input type="file" name="dataSourceFile"/>
-                            ${this.state.currentUploads.map((upload, i) => `
                             <select name="dataSource">
+                                <option value="">Use Uploaded File</option>
+                            ${this.state.currentUploads.map((upload, i) => `
                                 <option value="temp:${upload.uploadPath}">${upload.uploadPath} (${this.readableByteSize(upload.size)})</option>
-                            </select>
                             </tr>
+                            </select>
                             `).join('')}
                         </td>
                     </tr>

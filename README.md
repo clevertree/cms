@@ -51,15 +51,15 @@ with a primary goal for **all** of its content is transferable with other UCMS b
 * Maximum server performance with minimal overhead
 * Topical MVC - Database / API / client files must exist within the same topic directory
 * No server admins required - DNS SOA email authorizes administrator
-* Minimal HTML output! Example: `view-source:https://www.afoh.info/:user/:login`
-* Universal CMS / CMI: Common SCHEMA that may be used by other CMS software without conflicts
-
-
+* Minimal HTML output! [Login Page](https://www.afoh.info/:user/:login)  (46 lines of HTML total)
+* Universal CMS / CMI: Common SCHEMA that may be shared with other CMS software
+* “Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away.” ― Antoine de Saint-Exupéry
 
 #### Client-side MVC Module Design 
 * Sharable customElements between websites
 * Server determines the client-side dependencies for each module based on it's name _automatically_
-  * Example: content-form-browser.element.js is found at [/:content/:client/form/content-form-browser.element.js]
+  * Example: [content-form-browser.element.js](https://www.afoh.info/:content/:client/form/content-form-browser.element.js) as used in
+  [Site Index](https://www.afoh.info/:content) 
   * HTML content only needs to contain the custom element tag and the dependencies will be found 
 * Encapsulated in a single client-side customElement containing:
   * Model - Requests a copy of the model from the API as it relates to the module

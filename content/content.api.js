@@ -230,22 +230,25 @@ class ContentApi {
                 default:
                 case 'OPTIONS':
 
-                    let contentRevision = await this.checkForRevisionContent(req, content);
-                    if(contentRevision) {
-                        if(this.isMimeTypeEditable(content.mimeType)) {
-                            contentRevision.data = await contentRevisionTable.fetchRevisionData(contentRevision.id, 'UTF8');
-                        }
-                    }
 
                     const response = {
                         redirect: content.url,
                         message: "Content Queried Successfully",
                         editable: false,
                         content,
-                        contentRevision,
                         currentUploads,
-                        isBinary: false
+                        isBinary: false,
+                        mimeType: content.mimeType || 'text/html'
                     };
+
+                    let contentRevision = await this.checkForRevisionContent(req, content);
+                    if(contentRevision) {
+                        if(this.isMimeTypeEditable(response.mimeType)) {
+                            contentRevision.data = await contentRevisionTable.fetchRevisionData(contentRevision.id, 'UTF8');
+                        }
+                    }
+                    response.contentRevision = contentRevision
+
                     if(req.session && req.session.userID) {
                         const sessionUser = await userTable.fetchUserByID(req.session.userID);
                         if (sessionUser.isAdmin())
@@ -263,8 +266,7 @@ class ContentApi {
                     // response.parentList = await contentTable.selectContent("c.path IS NOT NULL", null, "id, path, title");
 
                     // content.mimeType = this.getMimeType(path.extname(content.path) || '');
-                    response.mimeType = content.mimeType;
-                    if(this.isMimeTypeEditable(content.mimeType)) {
+                    if(this.isMimeTypeEditable(response.mimeType)) {
                         content.data = await contentTable.fetchContentData(content.id, 'UTF8');
                     } else {
                         content.data = null; // `[Binary File]\nMime Type: ${content.mimeType}\nLength: ${this.readableByteSize(content.length)}`;
@@ -779,7 +781,7 @@ class ContentApi {
 
 
     /** File Utils **/
-    readFileAsync (path, opts = 'utf8') {
+    readFileAsync (path, opts = null) {
         return new Promise((resolve, reject) => {
             fs.readFile(path, opts, (err, data) => {
                 err ? reject(err) : resolve(data);
