@@ -38,6 +38,7 @@ body.theme-minimal > header h1 {
 body.theme-minimal > header img.logo {
     vertical-align: top;
     max-width: 300px;
+    max-height: 100px;
     margin: 4px;
     object-fit: contain;
 }

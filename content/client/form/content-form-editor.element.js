@@ -75,11 +75,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         onChange(e) {
             switch (e.target.name) {
-                case 'revision':
-                    const revisionID = e.target.value;
+                case 'revisionID':
+                    const revisionID = parseInt(e.target.value);
                     console.log("Load Revision: " + revisionID);
-                    // this.setState({revisionID});
                     this.setState({revisionID});
+                    // this.state.revisionID = revisionID;
                     this.requestFormData();
                     break;
                 case 'editor':
@@ -113,8 +113,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 throw new Error("Invalid upload data");
 
                             const base64String = this.uint8ToBase64(e.target.result);
-                            Object.assign(this.state.content, {data: base64String, length: e.target.result.byteLength, encoding: 'base64'}); // TODO: show binary file info
-                            this.render();
+                            Object.assign(this.state.content, {data: base64String, length: e.target.result.byteLength});
+                            this.setState({encoding: 'base64'});
                             console.log("Uploaded Binary: ", this.readableByteSize(base64String.length));
                             e.target.value = "";
                         };
@@ -127,8 +127,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             if(!e.target.result)
                                 throw new Error("Invalid upload data");
                             console.log("Uploaded Text: ", this.readableByteSize(e.target.result.length));
-                            Object.assign(this.state.content, {data: e.target.result, encoding: 'UTF8'});
-                            this.render();
+                            Object.assign(this.state.content, {data: e.target.result});
+                            this.setState({encoding: 'UTF8'});
                             e.target.value = "";
                         };
                         // If mime is editable, read as text, otherwise upload as binary
@@ -155,10 +155,10 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.onload = () => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
                 response.status = xhr.status;
-                if(response.revision) {
-                    if(response.revision.data)
-                        response.content.data = response.revision.data
-                    response.content.length = response.revision.length;
+                if(response.contentRevision) {
+                    if(response.contentRevision.data)
+                        response.content.data = response.contentRevision.data;
+                    response.content.length = response.contentRevision.length;
                 }
                 this.setState({processing: false}, response);
             };
@@ -175,8 +175,9 @@ document.addEventListener('DOMContentLoaded', function() {
         onSubmit(e) {
             e.preventDefault();
             const form = e.target;
-            const formValues = Object.keys(this.state.content)
-                .map(key => key + '=' + encodeURIComponent(this.state.content[key]))
+            const formValues = Array.prototype.filter
+                .call(form ? form.elements : [], (input, i) => !!input.name && !input.disabled && (input.type !== 'checkbox' || input.checked))
+                .map((input, i) => input.name + '=' + encodeURI(input.value))
                 .join('&');
             const method = form.getAttribute('method');
             const action = form.getAttribute('action');
@@ -237,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML =
                 `<form action="${action}" method="POST" class="content content-form-editor themed">
             <input type="hidden" name="id" value="${this.state.content.id}" />
+            <input type="hidden" name="encoding" value="${this.state.encoding}" />
             <table class="content themed">
                 <caption>Editing content ID ${this.state.content.id}</caption>
                 <thead>
@@ -306,12 +308,12 @@ Length: ${this.readableByteSize(this.state.content.length)}
                         </td>
                     </tr>
                     <tr>
-                        <td><label for="revision">Revision:</label></td>
+                        <td><label for="revisionID">Revision:</label></td>
                         <td>
-                            <select name="revision" id="revision">
+                            <select name="revisionID" id="revisionID">
                                 <option value="">Load a revision</option>
                             ${this.state.history.map(revision => `
-                                <option value="${revision.id}">${new Date(revision.created).toLocaleString()}</option>
+                                <option value="${revision.id}" ${revision.id === this.state.revisionID ? ' selected' : ''}>${new Date(revision.created).toLocaleString()}</option>
                             `)}
                             </select>
                         </td>

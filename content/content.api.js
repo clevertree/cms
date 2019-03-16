@@ -133,7 +133,7 @@ class ContentApi {
 
             let contentRevision = await this.checkForRevisionContent(req, content);
             if(contentRevision)
-                content.data = contentRevisionTable.fetchRevisionData(contentRevision.id, 'UTF8');
+                content.data = await contentRevisionTable.fetchRevisionData(contentRevision.id, 'UTF8');
 
             if(asJSON) {
                 const response = {
@@ -231,7 +231,7 @@ class ContentApi {
 
                     let contentRevision = await this.checkForRevisionContent(req, content);
                     if(contentRevision) {
-                        if(this.isMimeTypeEditable(contentRevision.mimeType)) {
+                        if(this.isMimeTypeEditable(content.mimeType)) {
                             contentRevision.data = await contentRevisionTable.fetchRevisionData(contentRevision.id, 'UTF8');
                         }
                     }
@@ -241,6 +241,7 @@ class ContentApi {
                         message: "Content Queried Successfully",
                         editable: false,
                         content,
+                        contentRevision,
                         currentUploads,
                         isBinary: false
                     };
@@ -254,10 +255,10 @@ class ContentApi {
 
                     response.history = await contentRevisionTable.fetchContentRevisionsByContentID(content.id);
                     // response.revision = await contentRevisionTable.fetchContentRevisionByID(content.id, req.query.getRevision || null);
-                    if(!contentRevision && response.history.length > 0) // Fetch latest revision? sloppy
-                        contentRevision = await contentRevisionTable.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentRevisionTable.fetchContentRevisionsByContentID(content.id))[0];
-                    if(contentRevision)
-                        response.revision = contentRevision;
+                    // if(!contentRevision && response.history.length > 0) // Fetch latest revision? sloppy
+                    //     contentRevision = await contentRevisionTable.fetchContentRevisionByID(response.history[0].id); // response.history[0]; // (await contentRevisionTable.fetchContentRevisionsByContentID(content.id))[0];
+                    // if(contentRevision)
+                    //     response.revision = contentRevision;
                     // response.parentList = await contentTable.selectContent("c.path IS NOT NULL", null, "id, path, title");
 
                     // content.mimeType = this.getMimeType(path.extname(content.path) || '');
@@ -280,6 +281,13 @@ class ContentApi {
                             newContentData = Buffer.from(newContentData,"base64");
                             break;
                     }
+
+                    // Check for file revision change
+
+                    if(req.body.revisionID && !this.isMimeTypeEditable(content.mimeType)) {
+                        newContentData = await contentRevisionTable.fetchRevisionData(req.body.revisionID)
+                    }
+
                     switch (req.body.action) {
                         default:
                         case 'publish':
@@ -729,7 +737,7 @@ class ContentApi {
     }
 
     isMimeTypeEditable(mimeType) {
-        return [
+        return mimeType && [
             'image/x-icon',
             'text/html',
             'text/javascript',
@@ -743,7 +751,7 @@ class ContentApi {
     }
 
     isMimeTypeRenderable(mimeType) {
-        return [
+        return mimeType && [
             'image/x-icon',
             'text/html',
             'text/javascript',

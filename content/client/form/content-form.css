@@ -19,7 +19,7 @@ form.content textarea.editor-plain {
     width: 100%;
 }
 form.content textarea.editor-binary {
-    min-height: 60px;
+    min-height: 100px;
     width: 100%;
 }
 
