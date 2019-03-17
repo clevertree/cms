@@ -5,6 +5,7 @@
                 document.head.innerHTML += `<link href="${INCLUDE_CSS}" rel="stylesheet" >`;
         })(":content/:client/nav/content-nav.css");
     }
+    loadCSS();
 
     const DEFAULT_PATHS = '/;/article;/upload;/about';
     class ThemeDefaultNavMenu extends HTMLElement{
@@ -18,7 +19,6 @@
                 contentList: [],
                 linkList: null
             };
-            loadCSS();
             // this.state = {id:-1, flags:[]};
         }
 
@@ -134,6 +134,7 @@
 //             console.log("RENDER", this.state, menu);
             this.innerHTML =
                 `
+                <link href=":content/:client/nav/content-nav.css" rel="stylesheet" />
                 <ul class="menu">
                 ${menu.map(menuItem => `
                     <li>
