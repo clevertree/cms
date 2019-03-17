@@ -36,19 +36,24 @@ body.theme-minimal-afoh {
 .theme-minimal-afoh a {
     color: #FFF;
     /*text-decoration: none;*/
-     text-decoration-color: #CCCC;
+    text-decoration-color: #CCCC;
 }
 
 /** Header **/
 body.theme-minimal-afoh > header {
     background: linear-gradient(to bottom, #487bb3 0%, #88a9cc 1%,#487bb3 2%,#1b589b 98%,#022035 100%);
 }
+body.theme-minimal-afoh > header .title {
+    font-size: 2.5em;
+    max-width: 238px;
+    font-weight: bold;
+    margin: 5px;
+}
 
 /** Header Tags **/
 .theme-minimal-afoh h1, .theme-minimal-afoh h2,  .theme-minimal-afoh h3, .theme-minimal-afoh h4, .theme-minimal-afoh h5, .theme-minimal-afoh h6 {
-    font-family: Helvetica,serif;
     color: #fff6d4;
-     text-shadow: #000 1px 1px 1px;
+    text-shadow: #000 1px 1px 1px;
 }
 
 /** Footer **/
@@ -60,31 +65,41 @@ body.theme-minimal-afoh > footer {
 
 
 /** Navigation **/
-
-/** Navigation Menu Colors **/
-.theme-minimal-afoh content-nav ul.menu > li:hover > a,
-.theme-minimal-afoh content-nav ul.submenu > li > a {
-    /* background-color: #FFF; */
-}
-
 .theme-minimal-afoh content-nav {
     font-size: larger;
 }
 
+/** Navigation Menu Colors **/
+.theme-minimal-afoh content-nav ul.menu > li:hover > a,
+.theme-minimal-afoh content-nav ul.submenu {
+    background-color: #294a6f;
+}
+.theme-minimal-afoh content-nav ul.submenu > li:hover > a {
+    background-color: #4377b0;
+}
+
+
+
+
+
 /** Page Articles & Sections **/
-body.theme-minimal > section,
-body.theme-minimal > article > section,
-body.theme-minimal > footer {
-    margin: 6px auto;
+body.theme-minimal-afoh > article {
+    background-color: #EEC455;
+}
+
+body.theme-minimal-afoh > section,
+body.theme-minimal-afoh > article > section,
+body.theme-minimal-afoh > footer {
+    margin: 0px auto;
     max-width: 800px;
-    padding: 1px 16px;
+    padding: 12px 16px;
     /* border: 1px solid #CCC; */
 }
 
 
 /** Paragraphs **/
 
-.theme-minimal p {
+.theme-minimal-afoh p {
     max-width: 800px;
     margin: auto;
     text-align: justify;
@@ -92,10 +107,12 @@ body.theme-minimal > footer {
 }
 
 
-/** Nav Menu Colors **/
-content-nav ul.menu > li:hover > a,
-content-nav ul.submenu > li > a {
-    background-color: #CCCE;
+.theme-minimal-afoh p.themed {
+    /*text-shadow: #000 1px 1px 1px;*/
+    background-color: #0e171fa6;
+    border-radius: 4px;
+    margin: 5px 0.5em;
+    padding: 0.5em;
 }
 
 /** Page Sections **/
@@ -106,17 +123,29 @@ content-nav ul.submenu > li > a {
 
 
 /** Themed Containers **/
-.theme-minimal div.themed,
-.theme-minimal > article > section.themed {
+.theme-minimal-afoh div.themed,
+.theme-minimal-afoh > article > section.themed {
     /* text-shadow: #000 1px 1px 1px; */
     background-color: #ab6428ed;
-    box-shadow: 2px 2px 4px #0008;
+    /* box-shadow: 2px 2px 4px #0008; */
     border-radius: 2px;
 }
 
 
 /** Images **/
-.theme-minimal img.themed {
+.theme-minimal-afoh img.themed {
     width: 100%;
     box-shadow: 0px 0px 8px #000;
+}
+
+
+/** Custom Text **/
+
+.theme-minimal-afoh .page-quote {
+    display: block;
+    text-align: right;
+    text-shadow: #000 1px 1px 1px;
+    transform: scaleY(0.6);
+    font-size: larger;
+    font-weight: bold;
 }

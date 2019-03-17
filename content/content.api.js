@@ -251,7 +251,7 @@ class ContentApi {
 
                     if(req.session && req.session.userID) {
                         const sessionUser = await userTable.fetchUserByID(req.session.userID);
-                        if (sessionUser.isAdmin())
+                        if (sessionUser && sessionUser.isAdmin())
                             response.editable = true;
                     }
                     if(!response.editable)

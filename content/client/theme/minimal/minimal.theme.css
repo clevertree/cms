@@ -9,8 +9,8 @@ body.theme-minimal > header a:not(:hover),
 body.theme-minimal > footer a:not(:hover) {
     text-decoration: none;
 }
-body.theme-minimal header content-nav {
-    font-size: smaller;
+body.theme-minimal header  {
+    /* font-size: smaller; */
 }
 body.theme-minimal > footer {
     font-size: small;
