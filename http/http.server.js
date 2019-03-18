@@ -15,21 +15,30 @@ class HTTPServer {
     async configure(autoConfig=null, promptCallback=null) {
 
         // const defaultHostname     = (require('os').hostname()).toLowerCase();
+        const DEFAULT_VALUES = {
+            httpPort: 8080,
+            sslEnable: true,
+            sslPort: 8443,
+            // insecureAuth: true,
+        };
+
+        let serverConfig;
         if(autoConfig) {
-            serverConfig = autoConfig.server;
-            if(typeof serverConfig !== 'object')
+            if(typeof autoConfig.server !== 'object')
                 throw new Error("Invalid Server Settings");
+            serverConfig = Object.assign({}, DEFAULT_VALUES, autoConfig.server);
 
         } else {
             const localConfig = new LocalConfig(promptCallback);
-            const serverConfig = await localConfig.getOrCreate('server');
+            serverConfig = await localConfig.getOrCreate('server');
+            serverConfig = Object.assign({}, DEFAULT_VALUES, serverConfig);
 
             let attempts = promptCallback ? 3 : 1;
             while (attempts-- > 0) {
                 await
-                localConfig.promptValue('server.httpPort', `Please enter the Server HTTP Port`, serverConfig.httpPort || 8080, 'integer');
+                localConfig.promptValue('server.httpPort', `Please enter the Server HTTP Port`, serverConfig.httpPort, 'integer');
                 await
-                localConfig.promptValue('server.sslEnable', `Enable SSL Server with GreenLock [y or n]?`, serverConfig.sslEnable || true, 'boolean');
+                localConfig.promptValue('server.sslEnable', `Enable SSL Server with GreenLock [y or n]?`, serverConfig.sslEnable, 'boolean');
 
                 if (serverConfig.sslEnable) {
                     // Configure SSL
@@ -46,7 +55,7 @@ class HTTPServer {
                     // await localConfig.promptValue('ssl.servername', `Please enter the SSL Server Hostname`, sslConfig.servername || require('os').hostname());
 
                     await
-                    localConfig.promptValue('server.sslPort', `Please enter the Server HTTPS/SSL Port`, serverConfig.sslPort || 8443, 'integer');
+                    localConfig.promptValue('server.sslPort', `Please enter the Server HTTPS/SSL Port`, serverConfig.sslPort, 'integer');
                     // await localConfig.promptValue('server.httpChallengePort', `Please enter the Server Challenge HTTP Port`, serverConfig.httpChallengePort || serverConfig.httpPort || 8080, 'integer');
 
                     const Greenlock = require('greenlock');
@@ -143,8 +152,6 @@ class HTTPServer {
         try {
             const { ConfigManager } = require('../config/config.manager');
             await ConfigManager.autoConfigure();
-            if(!this.config)
-                await this.configure();
 
             await this.createServers();
         } catch (e) {

@@ -25,25 +25,26 @@ class DatabaseManager {
             this.db.end();
         }
 
+        const defaultHostname     = (require('os').hostname()).toLowerCase();
         const DEFAULT_VALUES = {
             host: 'localhost',
             user: 'cms_user2',
             password: 'cms_pass',
+            database: 'localhost_cms'
             // insecureAuth: true,
         };
 
         let dbConfig = null;
         if(autoConfig) {
-            dbConfig = autoConfig.database;
-            if(typeof dbConfig !== 'object')
+            if(typeof autoConfig.database !== 'object')
                 throw new Error("Invalid Database Settings");
-            dbConfig = Object.assign({}, DEFAULT_VALUES, dbConfig);
+            dbConfig = Object.assign({}, DEFAULT_VALUES, autoConfig.database);
             await this.createConnection(dbConfig);
+
         } else {
 
             const localConfig = new LocalConfig(promptCallback);
             let dbConfig = await localConfig.getOrCreate('database');
-            const defaultHostname     = (require('os').hostname()).toLowerCase();
             // const defaultDatabaseName =
             if(!dbConfig.database)
                 dbConfig.database = 'localhost_cms'; // defaultHostname.replace('.', '_') + '_cms';

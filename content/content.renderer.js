@@ -36,7 +36,7 @@ class ContentRenderer {
             }
         }
 
-        const firstTag = html.match(/<(\w+)/)[1].toLowerCase();
+        const firstTag = (html || '').match(/<(\w+)/)[1].toLowerCase();
         if(firstTag !== 'html') {
             if (firstTag !== 'body') { // TODO: finish body logic
                 const templateHTML = await contentTable.fetchContentDataByPath('/site/template.html', 'UTF8');

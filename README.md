@@ -14,7 +14,6 @@ with a primary goal for **all** of its content is transferable with other UCMS b
 
 
 #### What's Currently Working?
-* Easy interactive configuration
 * HTML-based content management with historic revisions
 * Upload files and create pages to any path
 * Host unlimited domains on a single node instance
@@ -24,6 +23,7 @@ with a primary goal for **all** of its content is transferable with other UCMS b
 * CMS API middleware can be enabled individually (example: content management @ /:content/ with no user management @ /:user/)
 * User services: Add, edit, reset / change password, list, delete
 * Content services: Add, edit, multi-upload, delete, WYSIWYG editor
+* Interactive configuration
 
 
 
@@ -41,17 +41,17 @@ with a primary goal for **all** of its content is transferable with other UCMS b
 
 
 #### Project Goals
+* De-mystify HTML5 and Web-serving for the End-User
 * Free, Easy & SSL-secure Web Hosting for everyone
 * Quick-Start server configuration
-* De-mystify HTML5 for the End-User
+* Topical MVC - Database / API / client files must exist within the same topic directory
+* Maximum server performance with minimal overhead
+* Minimal HTML output! Example: [Login Page](https://www.afoh.info/:user/:login)  (46 lines of HTML total)
+  * Use as few tags as possible and keep documents small so they render quickly
+* Content only! No CMS-specific tags, prefixes, or support libraries on ANY rendered output
+* No server admins required - DNS SOA email authorizes administrator
 * Create sharable components across different CMS and websites
 * Client-side MVC - Render all GUI on the client's browser, never the server
-* Content only! No CMS-specific tags, prefixes, or support libraries on ANY rendered output
-* Minimal HTML output - use as few tags as possible and keep documents small so they render quickly
-* Maximum server performance with minimal overhead
-* Topical MVC - Database / API / client files must exist within the same topic directory
-* No server admins required - DNS SOA email authorizes administrator
-* Minimal HTML output! [Login Page](https://www.afoh.info/:user/:login)  (46 lines of HTML total)
 * Universal CMS / CMI: Common SCHEMA that may be shared with other CMS software
 * “Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away.” ― Antoine de Saint-Exupéry
 

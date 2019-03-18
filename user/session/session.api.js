@@ -12,7 +12,6 @@ class SessionAPI {
 
     async configure(autoConfig=null, promptCallback=null) {
         if(autoConfig) {
-            dbConfig = autoConfig.database;
             this.sessionConfig = autoConfig.session || {};
             this.cookieConfig = autoConfig.cookie || {};
 
