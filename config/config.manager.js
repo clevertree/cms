@@ -30,12 +30,13 @@ class ConfigManager {
 
     async configureInteractive() {
         try {
-            console.log("Starting interactive configuration");
+            console.log("*** Starting interactive configuration ***");
             await DatabaseManager.configureInteractive();
             await SessionAPI.configureInteractive();
             await HTTPServer.configureInteractive();
             await TaskAPI.configureInteractive();
             await MailServer.configureInteractive();
+            console.log("*** Interactive configuration complete ***");
         } catch (e) {
             console.error("Interactive configuration failed: ", e);
         }

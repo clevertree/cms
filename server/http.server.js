@@ -80,15 +80,15 @@ class HTTPServer {
             let testServer = await interactiveConfig.prompt(`Would you like to test the Server Settings [y or n]?`, false, 'boolean');
             if (testServer) {
                 try {
-                    await
-                    this.createServers();
-                    await
-                    this.stop();
-                    break;
+                    await this.createServers();
+                    await this.stop();
+                    console.log("Server settings tested successfully");
                 } catch (e) {
                     console.error(e.message);
+                    continue;
                 }
             }
+            break;
         }
 
         const localConfig = new LocalConfig();
@@ -128,15 +128,22 @@ class HTTPServer {
         // appHTTP.locals.pretty = true;
         const appMiddleware = this.getMiddleware();
         appHTTP.use(appMiddleware);
-        this.httpServer = require('http').createServer(appHTTP).listen(this.serverConfig.httpPort, () => {
-            console.log(`HTTP listening on port ${this.serverConfig.httpPort}`);
+        await new Promise( ( resolve, reject ) => {
+            this.httpServer = require('http').createServer(appHTTP).listen(this.serverConfig.httpPort, () => {
+                console.log(`HTTP listening on port ${this.serverConfig.httpPort}`);
+                resolve();
+            });
         });
 
         if (this.serverConfig.sslEnable) {
 
             const appSSL = express();
-            this.sslServer = require('https').createServer(this.greenlock.tlsOptions, appSSL).listen(this.serverConfig.sslPort, () => {
-                console.log(`HTTPS listening on port ${this.serverConfig.sslPort}`);
+            this.sslServer = require('https').createServer(this.greenlock.tlsOptions, appSSL);
+            await new Promise( ( resolve, reject ) => {
+                this.sslServer.listen(this.serverConfig.sslPort, (err) => {
+                    console.log(`HTTPS listening on port ${this.serverConfig.sslPort}`);
+                    resolve();
+                });
             });
 
             appSSL.use(appMiddleware);
@@ -162,11 +169,13 @@ class HTTPServer {
             // console.log("Closing existing HTTP server ");
             this.httpServer.close();
             this.httpServer = null;
+            console.log(`HTTP stopped listening on port ${this.serverConfig.httpPort}`);
         }
         if(this.sslServer) {
             // console.log("Closing existing SSL server ");
             this.sslServer.close();
             this.sslServer = null;
+            console.log(`HTTPS stopped listening on port ${this.serverConfig.sslPort}`);
         }
 
     }

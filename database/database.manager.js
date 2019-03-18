@@ -45,7 +45,7 @@ class DatabaseManager {
             const dbConfig = await localConfig.getOrCreate('database');
             Object.assign(this.dbConfig, dbConfig);
             Object.assign(dbConfig, this.dbConfig);
-            await this.createConnection(this.dbConfig);
+            // await this.createConnection(this.dbConfig);
             await localConfig.saveAll();
         }
 
@@ -256,7 +256,8 @@ class DatabaseManager {
         if(!dbConfig)
             throw new Error("Invalid Database Config");
         if(this.db)
-            throw new Error("Database connection already exists");
+            this.db.end();
+            // throw new Error("Database connection already exists");
         const connectConfig = Object.assign({}, dbConfig);
         delete connectConfig.database;
         this.db = mysql.createConnection(connectConfig);
@@ -276,6 +277,7 @@ class DatabaseManager {
                     this.db = null;
                     reject(err);
                 } else {
+                    console.log(`DB Connection to '${connectConfig.host}' successful`);
                     resolve(this.db);
                 }
             });
@@ -300,9 +302,9 @@ class DatabaseManager {
 
     async queryAsync(sql, values) {
         // const db = this.get();
-        if(!this.db)
-            throw new Error("Database is not connected");
-        if(this.db.state === 'disconnected') {
+        // if(!this.db)
+        //     throw new Error("Database is not connected");
+        if(!this.db || this.db.state === 'disconnected') {
             this.db = null;
             await this.createConnection();
         }
