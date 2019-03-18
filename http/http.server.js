@@ -12,64 +12,80 @@ class HTTPServer {
         this.config = null;
     }
 
-    async configure(promptCallback=null) {
+    async configure(autoConfig=null, promptCallback=null) {
 
-        const localConfig = new LocalConfig(promptCallback);
-        const serverConfig = await localConfig.getOrCreate('server');
         // const defaultHostname     = (require('os').hostname()).toLowerCase();
+        if(autoConfig) {
+            serverConfig = autoConfig.server;
+            if(typeof serverConfig !== 'object')
+                throw new Error("Invalid Server Settings");
 
-        let attempts = promptCallback ? 3 : 1;
-        while(attempts-- > 0) {
-            await localConfig.promptValue('server.httpPort', `Please enter the Server HTTP Port`, serverConfig.httpPort || 8080, 'integer');
-            await localConfig.promptValue('server.sslEnable', `Enable SSL Server with GreenLock [y or n]?`, serverConfig.sslEnable || true, 'boolean');
+        } else {
+            const localConfig = new LocalConfig(promptCallback);
+            const serverConfig = await localConfig.getOrCreate('server');
 
-            if (serverConfig.sslEnable) {
-                // Configure SSL
-                // const serverConfig = await localConfig.getOrCreate('server');
-                if (!serverConfig.greenlock) serverConfig.greenlock = {};
-                if (!serverConfig.greenlock.server) serverConfig.greenlock.server = 'https://acme-v02.api.letsencrypt.org/directory';
-                // Note: If at first you don't succeed, stop and switch to staging:
-                // https://acme-staging-v02.api.letsencrypt.org/directory
-                if (!serverConfig.greenlock.version) serverConfig.greenlock.version = 'draft-11';
-                // Contribute telemetry data to the project
-                if (!serverConfig.greenlock.telemetry) serverConfig.greenlock.telemetry = true;
-                // the default servername to use when the client doesn't specify
-                // (because some IoT devices don't support servername indication)
-                // await localConfig.promptValue('ssl.servername', `Please enter the SSL Server Hostname`, sslConfig.servername || require('os').hostname());
+            let attempts = promptCallback ? 3 : 1;
+            while (attempts-- > 0) {
+                await
+                localConfig.promptValue('server.httpPort', `Please enter the Server HTTP Port`, serverConfig.httpPort || 8080, 'integer');
+                await
+                localConfig.promptValue('server.sslEnable', `Enable SSL Server with GreenLock [y or n]?`, serverConfig.sslEnable || true, 'boolean');
 
-                await localConfig.promptValue('server.sslPort', `Please enter the Server HTTPS/SSL Port`, serverConfig.sslPort || 8443, 'integer');
-                // await localConfig.promptValue('server.httpChallengePort', `Please enter the Server Challenge HTTP Port`, serverConfig.httpChallengePort || serverConfig.httpPort || 8080, 'integer');
+                if (serverConfig.sslEnable) {
+                    // Configure SSL
+                    // const serverConfig = await localConfig.getOrCreate('server');
+                    if (!serverConfig.greenlock) serverConfig.greenlock = {};
+                    if (!serverConfig.greenlock.server) serverConfig.greenlock.server = 'https://acme-v02.api.letsencrypt.org/directory';
+                    // Note: If at first you don't succeed, stop and switch to staging:
+                    // https://acme-staging-v02.api.letsencrypt.org/directory
+                    if (!serverConfig.greenlock.version) serverConfig.greenlock.version = 'draft-11';
+                    // Contribute telemetry data to the project
+                    if (!serverConfig.greenlock.telemetry) serverConfig.greenlock.telemetry = true;
+                    // the default servername to use when the client doesn't specify
+                    // (because some IoT devices don't support servername indication)
+                    // await localConfig.promptValue('ssl.servername', `Please enter the SSL Server Hostname`, sslConfig.servername || require('os').hostname());
 
-                const Greenlock = require('greenlock');
+                    await
+                    localConfig.promptValue('server.sslPort', `Please enter the Server HTTPS/SSL Port`, serverConfig.sslPort || 8443, 'integer');
+                    // await localConfig.promptValue('server.httpChallengePort', `Please enter the Server Challenge HTTP Port`, serverConfig.httpChallengePort || serverConfig.httpPort || 8080, 'integer');
 
-                this.greenlock = Greenlock.create(Object.assign({
-                    // Use the approveDomains callback to set per-domain config
-                    // (default: approve any domain that passes self-test of built-in challenges)
-                    approveDomains: (opts, certs, cb) => this.approveSSLDomains(opts, certs, cb),
+                    const Greenlock = require('greenlock');
 
-                    // If you wish to replace the default account and domain key storage plugin
-                    store: require('le-store-certbot').create({
-                        configDir: path.join(BASE_DIR, '.acme/etc'),
-                        webrootPath: '/tmp/acme-challenges'
-                    })
-                }, serverConfig.greenlock));
+                    this.greenlock = Greenlock.create(Object.assign({
+                        // Use the approveDomains callback to set per-domain config
+                        // (default: approve any domain that passes self-test of built-in challenges)
+                        approveDomains: (opts, certs, cb) => this.approveSSLDomains(opts, certs, cb),
 
-            }
+                        // If you wish to replace the default account and domain key storage plugin
+                        store: require('le-store-certbot').create({
+                            configDir: path.join(BASE_DIR, '.acme/etc'),
+                            webrootPath: '/tmp/acme-challenges'
+                        })
+                },
+                    serverConfig.greenlock
+                ))
+                    ;
 
-            this.config = serverConfig;
-            let testServer = await promptCallback(`Would you like to test the Server Settings [y or n]?`, false, 'boolean');
-            if(testServer) {
-                try {
-                    await this.createServers();
-                    await this.stop();
-                    break;
-                } catch (e) {
-                    console.error(e.message);
+                }
+
+                this.config = serverConfig;
+                let testServer = await
+                promptCallback(`Would you like to test the Server Settings [y or n]?`, false, 'boolean');
+                if (testServer) {
+                    try {
+                        await
+                        this.createServers();
+                        await
+                        this.stop();
+                        break;
+                    } catch (e) {
+                        console.error(e.message);
+                    }
                 }
             }
+            await
+            localConfig.saveAll();
         }
-        await localConfig.saveAll();
-
         return serverConfig;
     }
 

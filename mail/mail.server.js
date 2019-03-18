@@ -14,39 +14,54 @@ class MailServer {
 
     getDefaultSender() { return this.config && this.config.auth ? this.config.auth.user : null; }
 
-    async configure(promptCallback=null) {
+    async configure(autoConfig=null, promptCallback=null) {
         // console.info("Configuring Mail Client");
-        const localConfig = new LocalConfig(promptCallback);
-        const mailConfig = await localConfig.getOrCreate('mail');
-        if(typeof mailConfig.auth === "undefined")
-            mailConfig.auth = {};
+        let mailConfig;
+        if(autoConfig) {
+            mailConfig = autoConfig.server;
+            if(typeof mailConfig !== 'object')
+                throw new Error("Invalid Mail Settings");
+    // TODO test mail
+        } else {
+            const localConfig = new LocalConfig(promptCallback);
+            mailConfig = await localConfig.getOrCreate('mail');
+            if (typeof mailConfig.auth === "undefined")
+                mailConfig.auth = {};
 
-        const hostname = require('os').hostname();
-        let attempts = promptCallback ? 3 : 1;
-        while(attempts-- > 0) {
-            await localConfig.promptValue('mail.host', `Please enter the Mail Server Host`, mailConfig.host || 'mail.' + hostname);
-            await localConfig.promptValue('mail.port', `Please enter the Mail Server Port`, mailConfig.port || 587, 'number');
-            await localConfig.promptValue('mail.auth.user', `Please enter the Mail Server Username`, mailConfig.auth.user || 'mail@' + mailConfig.host.replace(/mail\./, ''), 'email');
-            await localConfig.promptValue('mail.auth.pass', `Please enter the Mail Server Password`, mailConfig.auth.pass || '', 'password');
-            let testMail = await promptCallback(`Would you like to test the Mail Settings [y or n]?`, false, 'boolean');
+            const hostname = require('os').hostname();
+            let attempts = promptCallback ? 3 : 1;
+            while (attempts-- > 0) {
+                await
+                localConfig.promptValue('mail.host', `Please enter the Mail Server Host`, mailConfig.host || 'mail.' + hostname);
+                await
+                localConfig.promptValue('mail.port', `Please enter the Mail Server Port`, mailConfig.port || 587, 'number');
+                await
+                localConfig.promptValue('mail.auth.user', `Please enter the Mail Server Username`, mailConfig.auth.user || 'mail@' + mailConfig.host.replace(/mail\./, ''), 'email');
+                await
+                localConfig.promptValue('mail.auth.pass', `Please enter the Mail Server Password`, mailConfig.auth.pass || '', 'password');
+                let testMail = await
+                promptCallback(`Would you like to test the Mail Settings [y or n]?`, false, 'boolean');
 
-            try {
-                if(testMail) {
-                    console.info(`Connecting to Mail Server '${mailConfig.host}'...`);
-                    const server = nodemailer.createTransport(smtpTransport(mailConfig));
-                    await server.verify();
-                    console.info(`Connection to Mail Server '${mailConfig.host}' verified`);
+                try {
+                    if (testMail) {
+                        console.info(`Connecting to Mail Server '${mailConfig.host}'...`);
+                        const server = nodemailer.createTransport(smtpTransport(mailConfig));
+                        await
+                        server.verify();
+                        console.info(`Connection to Mail Server '${mailConfig.host}' verified`);
+                    }
+                    if (promptCallback)
+                        await
+                    localConfig.saveAll();
+                    break;
+                } catch (e) {
+                    if (attempts <= 0)
+                        throw new Error(`Failed to connect to ${mailConfig.host}: ${e}`);
+                    console.error(`Error connecting to ${mailConfig.host}: ${e}`);
                 }
-                if(promptCallback)
-                    await localConfig.saveAll();
-                this.config = mailConfig;
-                break;
-            } catch (e) {
-                if(attempts <= 0)
-                    throw new Error(`Failed to connect to ${mailConfig.host}: ${e}`);
-                console.error(`Error connecting to ${mailConfig.host}: ${e}`);
             }
         }
+        this.config = mailConfig;
         // return mailConfig;
     }
 

@@ -18,7 +18,7 @@ class TaskAPI {
         this.taskClass = {};
     }
 
-    async configure(promptCallback=null) {
+    async configure(autoConfig=null, promptCallback=null) {
         this.taskClass = {};
         await this.addTask(require('../user/task/admin-configure.task').AdminConfigureTask);
         await this.addTask(require('../database/task/database-configure.task').DatabaseConfigureTask);

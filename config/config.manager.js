@@ -19,19 +19,31 @@ class ConfigManager {
     }
 
     async configure(interactive=false) {
+        let config = null;
         try {
-            let promptCallback = interactive === true ? this.prompt : this.autoPrompt;
-            await DatabaseManager.configure(promptCallback);
-            await SessionAPI.configure(promptCallback);
-            await HTTPServer.configure(promptCallback);
-            await TaskAPI.configure(promptCallback);
+            this.configured = null;
+            let promptCallback = this.autoPrompt;
+            if(interactive === true)
+                promptCallback = this.prompt;
+            else if(typeof interactive === 'object') {
+                promptCallback = null;
+                config = interactive;
+            }
+            await DatabaseManager.configure(config, promptCallback);
+            await SessionAPI.configure(config, promptCallback);
+            await HTTPServer.configure(config, promptCallback);
+            await TaskAPI.configure(config, promptCallback);
             // await ThemeAPI.configure(promptCallback);
-            await MailServer.configure(promptCallback);
+            await MailServer.configure(config, promptCallback);
             this.configured = true;
         } catch (e) {
             console.error("Configuration failed: ", e);
-            if(!interactive)
-                console.log("Please run $ npm start --configure")
+            if(!config) {
+                if (!interactive)
+                    console.warn("Please run $ npm start --configure")
+            } else {
+                console.warn("Auto configuration failed.")
+            }
         }
     }
 

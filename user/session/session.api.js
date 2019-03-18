@@ -10,19 +10,27 @@ class SessionAPI {
         this.sessionConfig = {};
     }
 
-    async configure(promptCallback=null) {
-        const localConfig = new LocalConfig();
-        this.cookieConfig = await localConfig.getOrCreate('cookie');
+    async configure(autoConfig=null, promptCallback=null) {
+        if(autoConfig) {
+            dbConfig = autoConfig.database;
+            this.sessionConfig = autoConfig.session || {};
+            this.cookieConfig = autoConfig.cookie || {};
 
+        } else {
+            const localConfig = new LocalConfig();
+            this.cookieConfig = await localConfig.getOrCreate('cookie');
 
-        this.sessionConfig = await localConfig.getOrCreate('session');
+            this.sessionConfig = await localConfig.getOrCreate('session');
+        }
 
         if(!this.sessionConfig.cookieName)
             this.sessionConfig.cookieName = 'session';
         if(!this.sessionConfig.secret)
             this.sessionConfig.secret = require('uuid/v4')();
 
-        await localConfig.saveAll();
+        if(!autoConfig) {
+            await localConfig.saveAll();
+        }
     }
 
     getSessionMiddleware() {
