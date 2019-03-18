@@ -16,7 +16,7 @@ class ContentTable {
     }
 
     /** Configure Table **/
-    async configure(promptCallback=null, hostname=null) {
+    async configure(hostname=null) {
         // Check for tables
         await this.queryAsync(this.getTableSQL());
 
@@ -30,6 +30,9 @@ class ContentTable {
         await this.insertDefaultContent("/",                    "Home",             __dirname + '/client/default/home.html', hostname);
         await this.insertDefaultContent("/about",               "About Us",         __dirname + '/client/default/about.html', hostname);
         await this.insertDefaultContent("/contact",             "Contact Us",       __dirname + '/client/default/contact.html', hostname);
+    }
+
+    async configureInteractive() {
 
     }
 

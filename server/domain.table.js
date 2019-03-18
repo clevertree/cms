@@ -11,7 +11,7 @@ class DomainTable  {
 
 
     /** Configure Table **/
-    async configure(promptCallback=null, hostname=null) {
+    async configure(hostname=null) {
         // Check for tables
         await this.queryAsync(this.getTableSQL());
     }

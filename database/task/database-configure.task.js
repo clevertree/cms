@@ -18,7 +18,7 @@ class DatabaseConfigureTask {
 
 
     async isActive(req, sessionUser=null) {
-        if(!DatabaseManager.multiDomain)
+        if(!DatabaseManager.isMultipleDomainMode())
             return false;
 
         let hostname = DatabaseManager.getHostnameFromRequest(req);

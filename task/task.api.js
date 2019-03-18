@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 
-const { HTTPServer } = require('../http/http.server');
+const { HTTPServer } = require('../server/http.server');
 const { DatabaseManager } = require('../database/database.manager');
 const { ContentRenderer } = require('../content/content.renderer');
 // const { UserAPI } = require('../../user/user.api');
@@ -18,10 +18,15 @@ class TaskAPI {
         this.taskClass = {};
     }
 
-    async configure(autoConfig=null, promptCallback=null) {
+    async configure(config=null) {
         this.taskClass = {};
         await this.addTask(require('../user/task/admin-configure.task').AdminConfigureTask);
         await this.addTask(require('../database/task/database-configure.task').DatabaseConfigureTask);
+
+    }
+
+    async configureInteractive() {
+        await this.configure();
     }
 
 

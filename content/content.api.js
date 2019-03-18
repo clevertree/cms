@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const multiparty = require('multiparty');
 
-const { HTTPServer } = require('../http/http.server');
+const { HTTPServer } = require('../server/http.server');
 const { DatabaseManager } = require('../database/database.manager');
 const { ContentRenderer } = require('./content.renderer');
 const { ContentTable } = require("./content.table");

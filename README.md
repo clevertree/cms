@@ -117,22 +117,48 @@ $ npm i clevertree-cms -s
 // Example: myapp.js
 
 const express = require('express');
-const { HTTPServer } = require('clevertree-cms');
+const clevertree = require('clevertree-cms');
 
 // Create Express
 const app = express();
 
+
 // Add Your App
 app.use(express.static(__dirname));
 
-// Add CMS middleware
-app.use(HTTPServer.getMiddleware());
 
-// Launch server
+
+// Add CMS middleware
+app.use(clevertree.getMiddleware({
+    database: {
+        host: 'localhost',
+        user: 'cms_user',
+        password: 'cms_pass',
+        database: 'afoh_info_cms',
+    },
+    server: {
+        httpPort: 8080,
+        sslEnable: false,
+        // sslPort: 8443,
+    },
+    mail: {
+        auth: {
+            // user: "mail@server.com",
+            // pass: "mailmail"
+        },
+        // host: "mail.server.com",
+        // port: 587
+    }
+}));
+
+
+
+// Launch your server
 const httpPort = 8080;
-require('http').createServer(app).listen(httpPort, () => {
-    console.log(`HTTP listening on port ${httpPort}`);
+app.listen(httpPort, function() {
+    console.log('Example app listening on port: ' + httpPort);
 });
+
 
 ```
 

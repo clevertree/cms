@@ -2,100 +2,101 @@
 const mysql = require('mysql');
 
 const { LocalConfig } = require('../config/local.config');
+const { InteractiveConfig } = require('../config/interactive.config');
 
 class DatabaseManager {
     constructor() {
         // this.config = null;
         this.db = null;
-        this.dbConfig = null;
-        this.primaryDatabase = null;
-        this.debug = false;
-        this.multiDomain = false;
+        this.dbConfig = {
+            host: 'localhost',
+            user: 'cms_user',
+            password: 'cms_pass',
+            database: 'localhost_cms'
+            // insecureAuth: true,
+        };
+        // this.debug = false;
+        // this.multiDomain = false;
         this.cacheHostname = {};
     }
 
-    get isConnected() { return !!this.db;}
-    get isAvailable() { return !!this.primaryDatabase;}
+    get primaryDatabase() { return this.dbConfig.database; }
 
-    getPrimaryDomainTable()       { return new (require('../http/domain.table').DomainTable)(this.primaryDatabase); }
+    isConnected() { return !!this.db;}
+    isAvailable() { return this.db && this.db.state === 'authenticated';}
+    isMultipleDomainMode() { return this.dbConfig.multiDomain === true;}
 
-    async configure(autoConfig=null, promptCallback=null) {
+    getPrimaryDomainTable()       { return new (require('../server/domain.table').DomainTable)(this.primaryDatabase); }
+    getTableClasses() {
+        return [
+            require('../user/user.table').UserTable,
+            require('../content/content.table').ContentTable,
+            require('../content/content_revision.table').ContentRevisionTable,
+            // require('../config/config.database').ConfigDatabase,
+        ];
+    }
+
+    async configure(config=null) {
+        if(config && typeof config.database === 'object') {
+            Object.assign(this.dbConfig, config.database);
+            await this.createConnection(this.dbConfig);
+        } else {
+            const localConfig = new LocalConfig();
+            const dbConfig = await localConfig.getOrCreate('database');
+            Object.assign(this.dbConfig, dbConfig);
+            Object.assign(dbConfig, this.dbConfig);
+            await this.createConnection(this.dbConfig);
+            await localConfig.saveAll();
+        }
+
+
+        const defaultHostname     = (require('os').hostname()).toLowerCase();
+        await this.configureDatabase(this.primaryDatabase, defaultHostname);
+    }
+
+    async configureInteractive() {
         if(this.db) {
             console.warn("Closing existing DB Connection");
             this.db.end();
         }
 
-        const defaultHostname     = (require('os').hostname()).toLowerCase();
-        const DEFAULT_VALUES = {
-            host: 'localhost',
-            user: 'cms_user2',
-            password: 'cms_pass',
-            database: 'localhost_cms'
-            // insecureAuth: true,
-        };
 
-        let dbConfig = null;
-        if(autoConfig) {
-            if(typeof autoConfig.database !== 'object')
-                throw new Error("Invalid Database Settings");
-            dbConfig = Object.assign({}, DEFAULT_VALUES, autoConfig.database);
-            await this.createConnection(dbConfig);
+        const localConfig = new LocalConfig();
+        let dbConfig = await localConfig.getOrCreate('database');
+        Object.assign(dbConfig, this.dbConfig);
+        const interactiveConfig = new InteractiveConfig(dbConfig);
 
-        } else {
+        let attempts = 3;
+        while(attempts-- > 0) {
+            console.info("Configuring Database");
+            await interactiveConfig.promptValue('host', `Please enter the Database Host`, dbConfig.host || 'localhost');
+            await interactiveConfig.promptValue('user', `Please enter the Database User Name`, dbConfig.user || 'cms_user');
+            await interactiveConfig.promptValue('password', `Please enter the Password for Database User '${dbConfig.user}'`, dbConfig.password || 'cms_pass', 'password');
+            await interactiveConfig.promptValue('database', `Please enter the Database Name`, dbConfig.database);
+            await interactiveConfig.promptValue('multiDomain', `Enable Multi-domain hosting (Requires admin MYSQL Privileges) [y or n]?`, dbConfig.multiDomain || false, 'boolean');
 
-            const localConfig = new LocalConfig(promptCallback);
-            let dbConfig = await localConfig.getOrCreate('database');
-            // const defaultDatabaseName =
-            if(!dbConfig.database)
-                dbConfig.database = 'localhost_cms'; // defaultHostname.replace('.', '_') + '_cms';
-
-            let attempts = promptCallback ? 3 : 1;
-            while(attempts-- > 0) {
-                if(promptCallback) {
-                    console.info("Configuring Database");
-                    await localConfig.promptValue('database.host', `Please enter the Database Host`, dbConfig.host || 'localhost');
-                    await localConfig.promptValue('database.user', `Please enter the Database User Name`, dbConfig.user || 'cms_user');
-                    await localConfig.promptValue('database.password', `Please enter the Password for Database User '${dbConfig.user}'`, dbConfig.password || 'cms_pass', 'password');
-                    await localConfig.promptValue('database.database', `Please enter the Database Name`, dbConfig.database);
-                    await localConfig.promptValue('database.multiDomain', `Enable Multi-domain hosting (Requires admin MYSQL Privileges) [y or n]?`, dbConfig.multiDomain || false, 'boolean');
-                }
-                    // dbConfig.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain === 'y';
-
-                dbConfig = Object.assign({}, DEFAULT_VALUES, dbConfig);
-
-                if(attempts <= 0) {
-                    await this.createConnection(dbConfig);
-                } else try {
-                    await this.createConnection(dbConfig);
-                } catch (e) {
-                    console.error(e.message);
-                    if(attempts <= 0)
-                        throw e;
-                    continue;
-                    // console.info("Database attempt #" + attempts);
-                }
-                break;
-            }
-
-            if(typeof dbConfig.debug !== "undefined")
-                this.debug = dbConfig.debug;
-            if(typeof dbConfig.multiDomain !== "undefined")
-                this.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain !== 'n';
-
-            if(promptCallback)
+            try {
+                await this.createConnection(dbConfig);
+                this.dbConfig = dbConfig;
                 await localConfig.saveAll();
+            } catch (e) {
+                console.error(e.message);
+                if(attempts <= 0)
+                    throw e;
+                continue;
+                // console.info("Database attempt #" + attempts);
+            }
+            break;
         }
 
-        // Configure Databases
-        this.primaryDatabase = dbConfig.database;
-        this.dbConfig = dbConfig;
 
-        await this.configureDatabase(this.primaryDatabase, defaultHostname, promptCallback);
+        await this.configure();
+
     }
 
 
 
-    async configureDatabase(database, hostname, promptCallback=null) {
+    async configureDatabase(database, hostname, interactive=false) {
         const databaseExists = await this.queryAsync(`SHOW DATABASES LIKE '${database}'`);
         if(databaseExists.length === 0) {
             console.log("Database not found: ", database);
@@ -109,19 +110,16 @@ class DatabaseManager {
         // await this.queryAsync(`USE \`${database}\``);
 
         // Configure Tables
-        const tableClasses = [
-            require('../user/user.table').UserTable,
-            require('../content/content.table').ContentTable,
-            require('../content/content_revision.table').ContentRevisionTable,
-            // require('../config/config.database').ConfigDatabase,
-        ];
+        const tableClasses = this.getTableClasses();
 
         for(let i=0; i<tableClasses.length; i++) {
             const table = new tableClasses[i](database);
-            await table.configure(promptCallback, hostname);
+            await table.configure(hostname);
+            if(interactive)
+                await table.configureInteractive();
         }
 
-        if(this.multiDomain) {
+        if(this.isMultipleDomainMode()) {
             // Configure Domain
             const domainTable = this.getPrimaryDomainTable();
             if (this.primaryDatabase === database)
@@ -155,10 +153,10 @@ class DatabaseManager {
     //         return this.db;
     //
     //
-    //     const localConfig = new LocalConfig();
-    //     if(!localConfig.has('database'))
+    //     const interactiveConfig = new InteractiveConfig();
+    //     if(!interactiveConfig.has('database'))
     //         throw new Error("Database not configured");
-    //     const dbConfig = await localConfig.getOrCreate('database');
+    //     const dbConfig = await interactiveConfig.getOrCreate('database');
     //
     //
     //     const connectConfig = Object.assign({
@@ -183,9 +181,9 @@ class DatabaseManager {
     //     if(typeof dbConfig.multiDomain !== "undefined")
     //         this.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain !== 'n';
     //
-    //     const databaseConfig = await localConfig.getOrCreate('database');
+    //     const databaseConfig = await interactiveConfig.getOrCreate('database');
     //     Object.assign(dbConfig, databaseConfig);
-    //     await localConfig.saveAll();
+    //     await interactiveConfig.saveAll();
     //     this.db = db;
     //     return db;
     // }
@@ -199,7 +197,7 @@ class DatabaseManager {
     }
 
     async selectDatabaseByHost(hostname) {
-        if(this.multiDomain && hostname) {
+        if(this.isMultipleDomainMode() && hostname) {
             // const parse = require('url').parse(req.url);
 
             if(typeof this.cacheHostname[hostname] !== "undefined")
@@ -309,7 +307,7 @@ class DatabaseManager {
             await this.createConnection();
         }
         // await this.configure();
-        return await queryAsync(this.db, sql, values, this.debug);
+        return await queryAsync(this.db, sql, values, this.dbConfig.debug);
         // if(!this.primaryDatabase)
         //     throw new Error("Database is not available");
     }

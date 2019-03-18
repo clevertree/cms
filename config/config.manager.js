@@ -1,99 +1,46 @@
 const { DatabaseManager } = require('../database/database.manager');
-const { HTTPServer } = require('../http/http.server');
+const { HTTPServer } = require('../server/http.server');
 const { TaskAPI } = require('../task/task.api');
 const { SessionAPI } = require('../user/session/session.api');
 const { MailServer } = require('../mail/mail.server');
 
 class ConfigManager {
     constructor() {
-        this.configured = false;
-
     }
 
 
-    async autoConfigure() {
-        if(this.configured === false) {
-            this.configured = null;
-            await this.configure(false);
+    async configure(config=null) {
+        if(!config && process && process.argv && process.argv.indexOf('--configure') !== -1) {
+            return await this.configureInteractive();
         }
-    }
 
-    async configure(interactive=false) {
-        let config = null;
         try {
-            this.configured = null;
-            let promptCallback = this.autoPrompt;
-            if(interactive === true)
-                promptCallback = this.prompt;
-            else if(typeof interactive === 'object') {
-                promptCallback = null;
-                config = interactive;
-            }
-            await DatabaseManager.configure(config, promptCallback);
-            await SessionAPI.configure(config, promptCallback);
-            await HTTPServer.configure(config, promptCallback);
-            await TaskAPI.configure(config, promptCallback);
-            // await ThemeAPI.configure(promptCallback);
-            await MailServer.configure(config, promptCallback);
-            this.configured = true;
+            await DatabaseManager.configure(config);
+            await SessionAPI.configure(config);
+            await HTTPServer.configure(config);
+            await TaskAPI.configure(config);
+            await MailServer.configure(config);
         } catch (e) {
-            console.error("Configuration failed: ", e);
+            console.error("Automatic configuration failed: ", e);
             if(!config) {
-                if (!interactive)
-                    console.warn("Please run $ npm start --configure")
-            } else {
-                console.warn("Auto configuration failed.")
+                console.warn("Please run $ npm start --configure")
             }
         }
     }
 
-
-    prompt(promptText, defaultValue=null, validation=null) {
-        return new Promise( ( resolve, reject ) => {
-
-            var readline = require('readline');
-
-            var rl = readline.createInterface({
-                input: process.stdin,
-                output: process.stdout
-            });
-
-            switch(validation) {
-                case 'boolean':
-                    promptText += ` [${(defaultValue ? 'y' : 'n')}]: `;
-                    break;
-                default:
-                    promptText += ` [${(defaultValue === null ? 'null' : defaultValue)}]: `;
-            }
-
-            rl.query = promptText;
-            rl.question(rl.query, function(value) {
-                rl.close();
-                value = value.trim() || defaultValue;
-                switch(validation) {
-                    case 'boolean':
-                        value = ['y', 'Y', '1', true].indexOf(value) !== -1;
-                        break;
-                }
-                resolve(value);
-            });
-
-            rl._writeToOutput = function _writeToOutput(stringToWrite) {
-                switch(validation) {
-                    case 'password':
-                        rl.output.write("\x1B[2K\x1B[200D"+rl.query+"["+((rl.line.length%2==1)?"=-":"-=")+"]");
-                        break;
-                    default:
-                        rl.output.write(stringToWrite);
-                }
-            };
-
-        });
+    async configureInteractive() {
+        try {
+            console.log("Starting interactive configuration");
+            await DatabaseManager.configureInteractive();
+            await SessionAPI.configureInteractive();
+            await HTTPServer.configureInteractive();
+            await TaskAPI.configureInteractive();
+            await MailServer.configureInteractive();
+        } catch (e) {
+            console.error("Interactive configuration failed: ", e);
+        }
     }
 
-    autoPrompt(text, defaultValue=null, validation=null) {
-        return defaultValue;
-    }
 
 }
 
