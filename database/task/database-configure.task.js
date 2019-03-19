@@ -18,12 +18,12 @@ class DatabaseConfigureTask {
 
 
     async isActive(req, sessionUser=null) {
-        // if(this.database)
-        //     return false;
+        if(!DatabaseManager.isMultipleDomainMode())
+            return false;
 
         let hostname = DatabaseManager.getHostnameFromRequest(req);
 
-        const domainTable = DatabaseManager.getPrimaryDomainDB();
+        const domainTable = DatabaseManager.getPrimaryDomainTable();
         const domain = await domainTable.fetchDomainByHostname(hostname);
         if(!domain) {
             console.warn("TODO: Domain entry missing. Shouldn't happen");

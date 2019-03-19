@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 const path = require('path');
 
-const { DNSManager } = require('../http/dns.manager');
+const { DNSManager } = require('../server/dns.manager');
 
 // const { LocalConfig } = require('../config/local.config');
 // const { ConfigManager } = require('../config/config.manager');
@@ -13,7 +13,7 @@ const { DatabaseManager } = require('../database/database.manager');
 const { ContentTable } = require("../content/content.table");
 const { UserTable } = require('./user.table');
 const { SessionAPI } = require('./session/session.api');
-// const { HTTPServer } = require('../http/http.server');
+// const { HTTPServer } = require('../server/server.server');
 
 // const { DNSManager } = require('../service/domain/dns.manager');
 const { ContentRenderer } = require('../content/content.renderer');
@@ -34,7 +34,7 @@ class UserAPI {
 
     getMiddleware() {
         const express = require('express');
-        // const localConfig = new LocalConfig(config, !config);
+        // const interactiveConfig = new InteractiveConfig(config, !config);
         // const cookieConfig = await localConfig.getOrCreate('cookie');
 
         const sessionConfig = {}; //await localConfig.getOrCreate('session');

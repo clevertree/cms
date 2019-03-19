@@ -16,7 +16,7 @@ class ContentTable {
     }
 
     /** Configure Table **/
-    async configure(promptCallback=null, hostname=null) {
+    async configure(hostname=null) {
         // Check for tables
         await this.queryAsync(this.getTableSQL());
 
@@ -30,6 +30,9 @@ class ContentTable {
         await this.insertDefaultContent("/",                    "Home",             __dirname + '/client/default/home.html', hostname);
         await this.insertDefaultContent("/about",               "About Us",         __dirname + '/client/default/about.html', hostname);
         await this.insertDefaultContent("/contact",             "Contact Us",       __dirname + '/client/default/contact.html', hostname);
+    }
+
+    async configureInteractive() {
 
     }
 
@@ -173,7 +176,7 @@ CREATE TABLE IF NOT EXISTS ${this.table} (
   \`path\` varchar(96) NOT NULL,
   \`title\` varchar(96) NOT NULL,
   \`user_id\` int(11) DEFAULT NULL,
-  \`data\` varbinary(65536) NOT NULL,
+  \`data\` BLOB NOT NULL,
   \`created\` datetime DEFAULT current_timestamp(),
   \`updated\` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (\`id\`),

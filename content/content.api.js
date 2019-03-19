@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const multiparty = require('multiparty');
 
-const { HTTPServer } = require('../http/http.server');
+const { HTTPServer } = require('../server/http.server');
 const { DatabaseManager } = require('../database/database.manager');
 const { ContentRenderer } = require('./content.renderer');
 const { ContentTable } = require("./content.table");
@@ -251,7 +251,7 @@ class ContentApi {
 
                     if(req.session && req.session.userID) {
                         const sessionUser = await userTable.fetchUserByID(req.session.userID);
-                        if (sessionUser.isAdmin())
+                        if (sessionUser && sessionUser.isAdmin())
                             response.editable = true;
                     }
                     if(!response.editable)

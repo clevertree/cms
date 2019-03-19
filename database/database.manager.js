@@ -2,69 +2,83 @@
 const mysql = require('mysql');
 
 const { LocalConfig } = require('../config/local.config');
-// const { FileManager } = require('../service/file/file.manager');
-// const { UserAPI } = require('../user/user.api');
-
-// const { ContentTable } = require('../article/article.database');
-// const { UserTable } = require('../user/user.database');
-// const { ConfigDatabase } = require('../config/config.database');
-
-// const BASE_DIR = path.resolve(path.dirname(__dirname));
+const { InteractiveConfig } = require('../config/interactive.config');
 
 class DatabaseManager {
     constructor() {
         // this.config = null;
         this.db = null;
-        this.primaryDatabase = null;
-        this.debug = false;
-        this.multiDomain = false;
+        this.dbConfig = {
+            host: 'localhost',
+            user: 'cms_user',
+            password: 'cms_pass',
+            database: 'localhost_cms'
+            // insecureAuth: true,
+        };
+        // this.debug = false;
+        // this.multiDomain = false;
         this.cacheHostname = {};
     }
 
-    get isConnected() { return !!this.db;}
-    get isAvailable() { return !!this.primaryDatabase;}
+    get primaryDatabase() { return this.dbConfig.database; }
 
-    // getArticleDB(database=null)    { return new (require('../article/article.database').ContentTable)(database); }
-    // getUserDB(database=null)       { return new (require('../user/user.database').UserTable)(database); }
-    // getConfigDB(database=null)     { return new (require('../config/config.database').ConfigDatabase)(database); }
-    getPrimaryDomainDB()       { return new (require('../http/domain.table').DomainTable)(this.primaryDatabase); }
+    isConnected() { return !!this.db;}
+    isAvailable() { return this.db && this.db.state === 'authenticated';}
+    isMultipleDomainMode() { return this.dbConfig.multiDomain === true;}
 
-    async configure(promptCallback=null) {
+    getPrimaryDomainTable()       { return new (require('../server/domain.table').DomainTable)(this.primaryDatabase); }
+    getTableClasses() {
+        return [
+            require('../user/user.table').UserTable,
+            require('../content/content.table').ContentTable,
+            require('../content/content_revision.table').ContentRevisionTable,
+            // require('../config/config.database').ConfigDatabase,
+        ];
+    }
+
+    async configure(config=null) {
+        if(config && typeof config.database === 'object') {
+            Object.assign(this.dbConfig, config.database);
+            await this.createConnection(this.dbConfig);
+        } else {
+            const localConfig = new LocalConfig();
+            const dbConfig = await localConfig.getOrCreate('database');
+            Object.assign(this.dbConfig, dbConfig);
+            Object.assign(dbConfig, this.dbConfig);
+            // await this.createConnection(this.dbConfig);
+            await localConfig.saveAll();
+        }
+
+
+        const defaultHostname     = (require('os').hostname()).toLowerCase();
+        await this.configureDatabase(this.primaryDatabase, defaultHostname);
+    }
+
+    async configureInteractive() {
         if(this.db) {
             console.warn("Closing existing DB Connection");
             this.db.end();
         }
 
-        const localConfig = new LocalConfig(promptCallback);
-        const dbConfig = await localConfig.getOrCreate('database');
-        const defaultHostname     = (require('os').hostname()).toLowerCase();
-        // const defaultDatabaseName =
-        if(!dbConfig.database)
-            dbConfig.database = 'localhost_cms'; // defaultHostname.replace('.', '_') + '_cms';
 
-        let attempts = promptCallback ? 3 : 1;
+        const localConfig = new LocalConfig();
+        let dbConfig = await localConfig.getOrCreate('database');
+        Object.assign(dbConfig, this.dbConfig);
+        const interactiveConfig = new InteractiveConfig(dbConfig);
+
+        let attempts = 3;
         while(attempts-- > 0) {
-            if(promptCallback) {
-                console.info("Configuring Database");
-                await localConfig.promptValue('database.host', `Please enter the Database Host`, dbConfig.host || 'localhost');
-                await localConfig.promptValue('database.user', `Please enter the Database User Name`, dbConfig.user || 'cms_user');
-                await localConfig.promptValue('database.password', `Please enter the Password for Database User '${dbConfig.user}'`, dbConfig.password || 'cms_pass', 'password');
-                await localConfig.promptValue('database.database', `Please enter the Database Name`, dbConfig.database);
-                await localConfig.promptValue('database.multiDomain', `Enable Multi-domain hosting (Requires admin MYSQL Privileges) [y or n]?`, dbConfig.multiDomain || false, 'boolean');
-            }
-                // dbConfig.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain === 'y';
+            console.info("Configuring Database");
+            await interactiveConfig.promptValue('host', `Please enter the Database Host`, dbConfig.host || 'localhost');
+            await interactiveConfig.promptValue('user', `Please enter the Database User Name`, dbConfig.user || 'cms_user');
+            await interactiveConfig.promptValue('password', `Please enter the Password for Database User '${dbConfig.user}'`, dbConfig.password || 'cms_pass', 'password');
+            await interactiveConfig.promptValue('database', `Please enter the Database Name`, dbConfig.database);
+            await interactiveConfig.promptValue('multiDomain', `Enable Multi-domain hosting (Requires admin MYSQL Privileges) [y or n]?`, dbConfig.multiDomain || false, 'boolean');
 
-            const connectConfig = Object.assign({
-                host: 'localhost',
-                user: 'cms_user',
-                password: 'cms_pass',
-                // insecureAuth: true,
-            }, dbConfig);
-            delete connectConfig.database;
-            if(attempts <= 0) {
-                this.db = await this.createConnection(connectConfig);
-            } else try {
-                this.db = await this.createConnection(connectConfig);
+            try {
+                await this.createConnection(dbConfig);
+                this.dbConfig = dbConfig;
+                await localConfig.saveAll();
             } catch (e) {
                 console.error(e.message);
                 if(attempts <= 0)
@@ -75,23 +89,14 @@ class DatabaseManager {
             break;
         }
 
-        if(typeof dbConfig.debug !== "undefined")
-            this.debug = dbConfig.debug;
-        if(typeof dbConfig.multiDomain !== "undefined")
-            this.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain !== 'n';
 
-        if(promptCallback)
-            await localConfig.saveAll();
+        await this.configure();
 
-        // Configure Databases
-        this.primaryDatabase = dbConfig.database;
-
-        await this.configureDatabase(this.primaryDatabase, defaultHostname, promptCallback);
     }
 
 
 
-    async configureDatabase(database, hostname, promptCallback=null) {
+    async configureDatabase(database, hostname, interactive=false) {
         const databaseExists = await this.queryAsync(`SHOW DATABASES LIKE '${database}'`);
         if(databaseExists.length === 0) {
             console.log("Database not found: ", database);
@@ -105,33 +110,32 @@ class DatabaseManager {
         // await this.queryAsync(`USE \`${database}\``);
 
         // Configure Tables
-        const tableClasses = [
-            require('../user/user.table').UserTable,
-            require('../content/content.table').ContentTable,
-            require('../content/content_revision.table').ContentRevisionTable,
-            // require('../config/config.database').ConfigDatabase,
-        ];
+        const tableClasses = this.getTableClasses();
 
         for(let i=0; i<tableClasses.length; i++) {
             const table = new tableClasses[i](database);
-            await table.configure(promptCallback, hostname);
+            await table.configure(hostname);
+            if(interactive)
+                await table.configureInteractive();
         }
 
-        // Configure Domain
-        const domainTable = this.getPrimaryDomainDB();
-        if(this.primaryDatabase === database)
-            await domainTable.configure();
-        const domain = await domainTable.fetchDomainByHostname(hostname);
-        if(!domain) {
-            await domainTable.insertDomain(hostname, database);
-            console.log(`Created domain entry: ${hostname} => ${database}`);
-        } else {
-            if(!domain.database) {
-                await domainTable.updateDomain(hostname, database);
-                console.info(`Updated domain entry: ${hostname} => ${database}`);
-
+        if(this.isMultipleDomainMode()) {
+            // Configure Domain
+            const domainTable = this.getPrimaryDomainTable();
+            if (this.primaryDatabase === database)
+                await domainTable.configure();
+            const domain = await domainTable.fetchDomainByHostname(hostname);
+            if (!domain) {
+                await domainTable.insertDomain(hostname, database);
+                console.log(`Created domain entry: ${hostname} => ${database}`);
             } else {
-                console.info(`Found domain entry: ${hostname} => ${database}`);
+                if (!domain.database) {
+                    await domainTable.updateDomain(hostname, database);
+                    console.info(`Updated domain entry: ${hostname} => ${database}`);
+
+                } else {
+                    console.info(`Found domain entry: ${hostname} => ${database}`);
+                }
             }
         }
 
@@ -149,10 +153,10 @@ class DatabaseManager {
     //         return this.db;
     //
     //
-    //     const localConfig = new LocalConfig();
-    //     if(!localConfig.has('database'))
+    //     const interactiveConfig = new InteractiveConfig();
+    //     if(!interactiveConfig.has('database'))
     //         throw new Error("Database not configured");
-    //     const dbConfig = await localConfig.getOrCreate('database');
+    //     const dbConfig = await interactiveConfig.getOrCreate('database');
     //
     //
     //     const connectConfig = Object.assign({
@@ -177,9 +181,9 @@ class DatabaseManager {
     //     if(typeof dbConfig.multiDomain !== "undefined")
     //         this.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain !== 'n';
     //
-    //     const databaseConfig = await localConfig.getOrCreate('database');
+    //     const databaseConfig = await interactiveConfig.getOrCreate('database');
     //     Object.assign(dbConfig, databaseConfig);
-    //     await localConfig.saveAll();
+    //     await interactiveConfig.saveAll();
     //     this.db = db;
     //     return db;
     // }
@@ -193,13 +197,13 @@ class DatabaseManager {
     }
 
     async selectDatabaseByHost(hostname) {
-        if(this.multiDomain && hostname) {
+        if(this.isMultipleDomainMode() && hostname) {
             // const parse = require('url').parse(req.url);
 
             if(typeof this.cacheHostname[hostname] !== "undefined")
                 return this.cacheHostname[hostname];
 
-            const domainTable = this.getPrimaryDomainDB();
+            const domainTable = this.getPrimaryDomainTable();
             const domain = await domainTable.fetchDomainByHostname(hostname);
             let database = null;
             if(domain) {
@@ -247,47 +251,65 @@ class DatabaseManager {
 
 
 
-    async createConnection(config) {
+    async createConnection(dbConfig=null) {
+        dbConfig = dbConfig || this.dbConfig;
+        if(!dbConfig)
+            throw new Error("Invalid Database Config");
+        if(this.db)
+            this.db.end();
+            // throw new Error("Database connection already exists");
+        const connectConfig = Object.assign({}, dbConfig);
+        delete connectConfig.database;
+        this.db = mysql.createConnection(connectConfig);
+        this.db.on('error', (err) => {
+            console.error("DB Error", err);
+            if(err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server was lost
+                this.db.end();
+                this.db = null;
+                console.warn("Reconnecting to database...");
+                this.createConnection(connectConfig);
+            }
+        });
         return await new Promise( ( resolve, reject ) => {
-            const db = mysql.createConnection(config);
-            db.on('error', (err) => {
-                console.error("DB Error", err);
-                // if(err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
-                //     // db.end();
-                // }
-            });
-            db.connect({}, (err) => {
+            this.db.connect({}, (err) => {
                 if (err) {
-                    console.error(`DB Connection to '${config.host}' failed`, err.message);
+                    console.error(`DB Connection to '${connectConfig.host}' failed`, err.message);
+                    this.db = null;
                     reject(err);
                 } else {
-                    resolve(db);
+                    console.log(`DB Connection to '${connectConfig.host}' successful`);
+                    resolve(this.db);
                 }
             });
         });
     }
 
 
-    async configureTable(tableName, tableSQL) {
-        // Check for table
-        try {
-            await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
-        } catch (e) {
-            if(e.code === 'ER_NO_SUCH_TABLE') {
-                await this.queryAsync(tableSQL);
-                await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
-                console.info(`Inserted table: ${tableName}`)
-            } else {
-                throw e;
-            }
-        }
-    }
+    // async configureTable(tableName, tableSQL) {
+    //     // Check for table
+    //     try {
+    //         await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
+    //     } catch (e) {
+    //         if(e.code === 'ER_NO_SUCH_TABLE') {
+    //             await this.queryAsync(tableSQL);
+    //             await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
+    //             console.info(`Inserted table: ${tableName}`)
+    //         } else {
+    //             throw e;
+    //         }
+    //     }
+    // }
 
     async queryAsync(sql, values) {
         // const db = this.get();
-        if(!this.db)
-            throw new Error("Database is not connected");
-        return await queryAsync(this.db, sql, values, this.debug);
+        // if(!this.db)
+        //     throw new Error("Database is not connected");
+        if(!this.db || this.db.state === 'disconnected') {
+            this.db = null;
+            await this.createConnection();
+        }
+        // await this.configure();
+        return await queryAsync(this.db, sql, values, this.dbConfig.debug);
         // if(!this.primaryDatabase)
         //     throw new Error("Database is not available");
     }

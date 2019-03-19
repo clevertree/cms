@@ -13,6 +13,8 @@ class ContentRenderer {
 
         if(typeof content === "string")
             content = {data: content};
+        if(!content.data)
+            throw new Error("Invalid Render Data");
 
         const hostname = require('os').hostname();
         content = Object.assign({}, {
@@ -27,20 +29,20 @@ class ContentRenderer {
         }, content);
 
         let html = content.data.toString('UTF8'); // This isn't inefficient, right?
+        const firstTag = (html || '').match(/<(\w+)/)[1].toLowerCase();
 
         let contentTable = null;
-        if(this.DatabaseManager.isAvailable) {
+        if(this.DatabaseManager.isAvailable()) {
             const database = await this.DatabaseManager.selectDatabaseByRequest(req, false);
             if (database) {
                 contentTable = new this.ContentTable(database);
             }
-        }
 
-        const firstTag = html.match(/<(\w+)/)[1].toLowerCase();
-        if(firstTag !== 'html') {
-            if (firstTag !== 'body') { // TODO: finish body logic
-                const templateHTML = await contentTable.fetchContentDataByPath('/site/template.html', 'UTF8');
-                html = templateHTML.replace(/<%-data%>/g, html);
+            if(firstTag !== 'html') {
+                if (firstTag !== 'body') { // TODO: finish body logic
+                    const templateHTML = await contentTable.fetchContentDataByPath('/site/template.html', 'UTF8');
+                    html = templateHTML.replace(/<%-data%>/g, html);
+                }
             }
         }
         html = html.replace(/<%-title%>/g, content.title);

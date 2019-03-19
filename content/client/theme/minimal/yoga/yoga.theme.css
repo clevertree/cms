@@ -52,40 +52,29 @@ body.theme-minimal-yoga .title a {
 
 
 /** Navigation **/
-
-/** Navigation Menu Colors **/
-.theme-minimal-afoh content-nav ul.menu > li:hover > a,
-.theme-minimal-afoh content-nav ul.submenu > li > a {
-    /* background-color: #FFF; */
-}
-
 .theme-minimal-afoh content-nav {
     font-size: larger;
 }
 
-body.theme-minimal-yoga header content-nav {
-    /* float: right; */
+.theme-minimal-yoga content-nav {
     font-size: smaller;
     padding: 1.3em;
-    /* min-width: 386px; */
-    /* display: block; */
 }
 
 /** Navigation Menu Colors **/
-content-nav ul.menu > li:hover > a,
-content-nav ul.submenu {
+.theme-minimal-yoga content-nav ul.menu > li:hover > a,
+.theme-minimal-yoga content-nav ul.submenu {
     background-color: #EEE8;
 }
-content-nav ul.submenu > li:hover > a {
+.theme-minimal-yoga content-nav ul.submenu > li:hover > a {
     background-color: #F8F8F8;
 }
 
-content-nav ul.menu > li > a
-/*content-nav ul.submenu > li > a*/
-{
+.theme-minimal-yoga content-nav ul.menu > li > a {
     border-top: 1px solid #EEE;
     /*border-bottom: 1px solid #CCCC;*/
 }
+
 
 /** Hyperlinks **/
 .theme-minimal-yoga a {

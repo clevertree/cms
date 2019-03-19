@@ -31,7 +31,7 @@ class DatabaseAPI {
         return (req, res, next) => {
             if(req.url.startsWith('/:database'))
                 return router(req, res, next);
-            if(DatabaseManager.isConnected)
+            if(DatabaseManager.isConnected())
                 return next();
             if(req.url === '/')
                 return routerMissingDB(req, res, next);
@@ -117,12 +117,12 @@ class DatabaseAPI {
             if (req.method === 'GET') {
                 await ContentRenderer.send(req, res, {
                     title: `Connect to Database`,
-                    content: `<database-connect></database-connect>`
+                    data: `<database-connect></database-connect>`
                 });
 
             } else {
                 // Handle POST
-                if(DatabaseManager.isAvailable)
+                if(DatabaseManager.isAvailable())
                     throw new Error("Database is already connected");
                 await DatabaseManager.configure(req.body);
 

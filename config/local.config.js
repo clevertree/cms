@@ -8,15 +8,8 @@ const fs = require('fs');
 
 // Missing database config always prompts. --configure forces all config options
 class LocalConfig {
-    constructor(promptCallback) {
-        this.promptCallback = promptCallback || function(text, defaultValue) { return defaultValue; };
+    constructor() {
         this.config = null;
-        // if(config) {
-        //     if(typeof config !== 'object')
-        //         throw new Error("Config must be an object");
-        //     this.config = config;
-        // }
-        // this.saveLocal = saveLocal;
     }
 
     async has(key) {
@@ -45,7 +38,7 @@ class LocalConfig {
                 const configJSON = await this.readFileAsync(configPath, "utf8");
                 this.config = JSON.parse(configJSON);
             } else {
-                console.info("No config file found: " + configPath);
+                // console.info("No config file found: " + configPath);
                 this.config = {}; // JSON.parse(JSON.stringify(ConfigManager.DEFAULT));
             }
         }
@@ -66,28 +59,6 @@ class LocalConfig {
         // console.info("Config file updated: " + configPath);
         await this.writeFileAsync(configPath, newConfigJSON, 'utf8');
         return true;
-    }
-
-    async promptValue(path, text, defaultValue=null, validation=null) {
-        const config = await this.getAll();
-        if(!Array.isArray(path))
-            path = path.split('.');
-        const lastPath = path.pop();
-        let target = config;
-        for(let i=0; i<path.length; i++) {
-            if(typeof target[path[i]] === "undefined")
-                target[path[i]] = {};
-            if(typeof target[path[i]] !== "object")
-                throw new Error("Invalid path: " + path.join('.'));
-            target = target[path[i]];
-        }
-        if(typeof target[lastPath] !== "undefined")
-            defaultValue = target[lastPath];
-        const value = await this.promptCallback(text, defaultValue, validation);
-        target[lastPath] = value;
-        // if(this.saveLocal)
-        //     await this.saveAll();
-        return value;
     }
 
 

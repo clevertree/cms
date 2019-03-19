@@ -6,31 +6,60 @@ const { LocalConfig } = require('../../config/local.config');
 
 class SessionAPI {
     constructor() {
-        this.cookieConfig = {};
-        this.sessionConfig = {};
+        this.cookieConfig = {
+            cookieName: 'session'
+        };
+        this.sessionConfig = {
+            cookieName: 'session',
+            secret: require('uuid/v4')()
+        };
+        this.routerSession = null;
+        this.routerCookie = null;
     }
 
-    async configure(promptCallback=null) {
-        const localConfig = new LocalConfig();
-        this.cookieConfig = await localConfig.getOrCreate('cookie');
+    async configure(config=null) {
+        if(config && typeof config.session === 'object') {
+            Object.assign(this.sessionConfig, config.session);
+        } else {
+            const localConfig = new LocalConfig();
+            const sessionConfig = await localConfig.getOrCreate('session');
+            Object.assign(this.sessionConfig, sessionConfig);
+            // Object.assign(sessionConfig, this.sessionConfig);
+            // await localConfig.saveAll()
+        }
+
+        if(config && typeof config.cookie === 'object') {
+            Object.assign(this.cookieConfig, config.cookie);
+        } else {
+            const localConfig = new LocalConfig();
+            const cookieConfig = await localConfig.getOrCreate('cookie');
+            Object.assign(this.cookieConfig, cookieConfig);
+            // Object.assign(cookieConfig, this.cookieConfig);
+            // await localConfig.saveAll()
+        }
 
 
-        this.sessionConfig = await localConfig.getOrCreate('session');
+    }
 
-        if(!this.sessionConfig.cookieName)
-            this.sessionConfig.cookieName = 'session';
-        if(!this.sessionConfig.secret)
-            this.sessionConfig.secret = require('uuid/v4')();
 
-        await localConfig.saveAll();
+    async configureInteractive() {
+        await this.configure();
     }
 
     getSessionMiddleware() {
-        return session(this.sessionConfig);
+        return (req, res, next) => {
+            if(!this.routerSession)
+                this.routerSession = session(this.sessionConfig);
+            return this.routerSession(req, res, next);
+        }
     }
 
     getCookieMiddleware() {
-        return cookieParser(this.cookieConfig);
+        return (req, res, next) => {
+            if(!this.routerCookie)
+                this.routerCookie = cookieParser(this.cookieConfig);
+            return this.routerCookie(req, res, next);
+        }
     }
 
     getMiddleware() {

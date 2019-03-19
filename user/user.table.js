@@ -1,7 +1,8 @@
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 
-const { DatabaseManager } = require('../database/database.manager');
+// const { DatabaseManager } = require('../database/database.manager');
+const { InteractiveConfig } = require('../config/interactive.config');
 // const { LocalConfig } = require('../config/local.config');
 // const { ConfigDatabase } = require("../config/config.database");
 
@@ -16,81 +17,83 @@ class UserTable  {
         this.table = tablePrefix + '`user`';
     }
 
-    async configure(promptCallback=null, hostname=null) {
+    async configure(hostname=null) {
         // Check for tables
         await this.queryAsync(this.getTableSQL());
+    }
 
+    async configureInteractive() {
         // Find admin user
         let adminUser = await this.fetchUser("u.username = 'admin' OR FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
 
         // Set up admin user
-        if(promptCallback) {
 
-            if (adminUser) {
-                console.info("Admin user found: " + adminUser.id);
-                let resetpassword = await promptCallback(`Would you like to change the admin password (Username: ${adminUser.username}) [y or n]?`, false, 'boolean');
-                if(resetpassword) {
-                    for (let i = 0; i < 4; i++) {
-                        let adminPassword = await promptCallback(`Please enter a new password for ${adminUser.username}`, "", 'password');
-                        let adminPassword2 = await promptCallback(`Please re-enter the new password for ${adminUser.username}`, "", 'password');
-                        if (!adminPassword) {
-                            console.info("Password is required");
-                            continue;
-                        }
-                        if (adminPassword !== adminPassword2) {
-                            console.error("Password mismatch");
-                            continue;
-                        }
-                        await this.updateUser(adminUser.id, null, adminPassword);
-                        console.info(`Admin user password changed (${adminUser.id}: ` + adminUser.username);
-                        break;
-                    }
-                }
+        const interactiveConfig = new InteractiveConfig();
 
-
-                if(!adminUser.isAdmin()) {
-                    await this.addFlags(adminUser.id, ['admin']);
-                    console.info(`Admin user set to admin: ${adminUser.id}`);
-                }
-            }
-
-            // Find admin user by DNS info
-            if(!adminUser && false) {
-                console.info("Querying WHOIS for admin email: " + hostname);
-                let dnsAdminEmail = await this.UserAPI.queryAdminEmailAddresses(hostname);
-                if (dnsAdminEmail) {
-                    // dnsAdminEmail.split('@')[0]
-                    adminUser = await this.createUser('admin', dnsAdminEmail, null, 'admin');
-                    console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
-                    // TODO: send email;
-                }
-            }
-
-            if(!adminUser) {
-                // Insert admin user
+        if (adminUser) {
+            console.info("Admin user found: " + adminUser.id);
+            let resetpassword = await interactiveConfig.prompt(`Would you like to change the admin password (Username: ${adminUser.username}) [y or n]?`, false, 'boolean');
+            if(resetpassword) {
                 for (let i = 0; i < 4; i++) {
-                    try {
-                        // const hostname = require('os').hostname().toLowerCase();
-                        const defaultHostname     = (require('os').hostname()).toLowerCase();
-                        let adminUsername =     await promptCallback(`Please enter an Administrator username`, 'admin');
-                        let adminEmail =        await promptCallback(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + defaultHostname);
-                        let adminPassword =     await promptCallback(`Please enter a password for ${adminUsername}`, "", 'password');
-                        let adminPassword2 =    await promptCallback(`Please re-enter a password for ${adminUsername}`, "", 'password');
-                        if (!adminPassword) {
-                            adminPassword = (await bcrypt.genSalt(10)).replace(/\W/g, '').substr(0, 8);
-                            adminPassword2 = adminPassword;
-                            console.info("Using generated password: " + adminPassword);
-                        }
-                        if (adminPassword !== adminPassword2) {
-                            console.error("Password mismatch");
-                            continue;
-                        }
-                        adminUser = await this.createUser(adminUsername, adminEmail, adminPassword, 'admin');
-                        console.info(`Admin user created (${adminUser.id}: ` + adminUsername);
-                        break;
-                    } catch (e) {
-                        console.error(e);
+                    let adminPassword = await interactiveConfig.prompt(`Please enter a new password for ${adminUser.username}`, "", 'password');
+                    let adminPassword2 = await interactiveConfig.prompt(`Please re-enter the new password for ${adminUser.username}`, "", 'password');
+                    if (!adminPassword) {
+                        console.info("Password is required");
+                        continue;
                     }
+                    if (adminPassword !== adminPassword2) {
+                        console.error("Password mismatch");
+                        continue;
+                    }
+                    await this.updateUser(adminUser.id, null, adminPassword);
+                    console.info(`Admin user password changed (${adminUser.id}: ` + adminUser.username);
+                    break;
+                }
+            }
+
+
+            if(!adminUser.isAdmin()) {
+                await this.addFlags(adminUser.id, ['admin']);
+                console.info(`Admin user set to admin: ${adminUser.id}`);
+            }
+        }
+
+        // Find admin user by DNS info
+        if(!adminUser && false) {
+            console.info("Querying WHOIS for admin email: " + hostname);
+            let dnsAdminEmail = await this.UserAPI.queryAdminEmailAddresses(hostname);
+            if (dnsAdminEmail) {
+                // dnsAdminEmail.split('@')[0]
+                adminUser = await this.createUser('admin', dnsAdminEmail, null, 'admin');
+                console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
+                // TODO: send email;
+            }
+        }
+
+        if(!adminUser) {
+            // Insert admin user
+            for (let i = 0; i < 4; i++) {
+                try {
+                    // const hostname = require('os').hostname().toLowerCase();
+                    const defaultHostname     = (require('os').hostname()).toLowerCase();
+                    let adminUsername =     await interactiveConfig.prompt(`Please enter an Administrator username`, 'admin');
+                    let adminEmail =        await interactiveConfig.prompt(`Please enter an email address for ${adminUsername}`, adminUsername + '@' + defaultHostname);
+                    let adminPassword =     await interactiveConfig.prompt(`Please enter a password for ${adminUsername}`, "", 'password');
+                    let adminPassword2 =    await interactiveConfig.prompt(`Please re-enter a password for ${adminUsername}`, "", 'password');
+                    if (!adminPassword) {
+                        adminPassword = (await bcrypt.genSalt(10)).replace(/\W/g, '').substr(0, 8);
+                        adminPassword2 = adminPassword;
+                        console.info("Using generated password: " + adminPassword);
+                    }
+                    if (adminPassword !== adminPassword2) {
+                        console.error("Password mismatch");
+                        continue;
+                    }
+                    adminUser = await this.createUser(adminUsername, adminEmail, adminPassword, 'admin');
+                    console.info(`Admin user created (${adminUser.id}: ` + adminUsername);
+                    break;
+                } catch (e) {
+                    console.error(e);
                 }
             }
         }
