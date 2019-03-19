@@ -1,3 +1,5 @@
+const readline = require('readline');
+
 class InteractiveConfig {
     constructor(config={}, interactive=true) {
         if(typeof config !== "object")
@@ -37,7 +39,6 @@ class InteractiveConfig {
             return defaultValue;
         return new Promise( ( resolve, reject ) => {
 
-            var readline = require('readline');
 
             var rl = readline.createInterface({
                 input: process.stdin,
@@ -66,7 +67,7 @@ class InteractiveConfig {
 
             rl._writeToOutput = function _writeToOutput(stringToWrite) {
                 switch(validation) {
-                    case 'password':
+                    case 'password': // TODO: fix new line bug
                         rl.output.write("\x1B[2K\x1B[200D"+rl.query+"["+((rl.line.length%2==1)?"=-":"-=")+"]");
                         break;
                     default:

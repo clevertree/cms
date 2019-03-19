@@ -25,7 +25,7 @@
 /** Background Image **/
 body.theme-minimal-afoh {
     color: #fff6d4;
-     font-family: 'Advent Pro', monospace;
+    font-family: 'Advent Pro', monospace;
     /*font-size: 16px;*/
     background: #3d9be9;
     /*margin: 0 auto;*/
@@ -84,7 +84,7 @@ body.theme-minimal-afoh > footer {
 
 /** Page Articles & Sections **/
 body.theme-minimal-afoh > article {
-    background-color: #EEC455;
+    background-color: #f5d06f;
 }
 
 body.theme-minimal-afoh > section,
@@ -117,7 +117,7 @@ body.theme-minimal-afoh > footer {
 
 /** Page Sections **/
 .theme-minimal-afoh > article > section {
-    background: #4e85b3;
+    background: #3785c5;
 }
 
 

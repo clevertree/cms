@@ -115,9 +115,9 @@ $ npm i clevertree-cms -s
 ### Use as middleware in your express server app
 ```
 // Example: myapp.js
-
 const express = require('express');
 const clevertree = require('clevertree-cms');
+
 
 // Create Express
 const app = express();
@@ -125,7 +125,6 @@ const app = express();
 
 // Add Your App
 app.use(express.static(__dirname));
-
 
 
 // Add CMS middleware
@@ -145,7 +144,7 @@ app.use(clevertree.getMiddleware({
         auth: {
             // user: "mail@server.com",
             // pass: "mailmail"
-        },
+        }
         // host: "mail.server.com",
         // port: 587
     }
@@ -158,8 +157,6 @@ const httpPort = 8080;
 app.listen(httpPort, function() {
     console.log('Example app listening on port: ' + httpPort);
 });
-
-
 ```
 
 ### Run Server
