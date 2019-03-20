@@ -22,14 +22,14 @@ class ContentTable {
 
         hostname = hostname || require('os').hostname();
 
-        await this.insertDefaultContent("/site/template.html",  "Site Template",    __dirname + '/client/default/site/template.html', hostname);
-        await this.insertDefaultContent("/site/template.js",    "Site Javascript",  __dirname + '/client/default/site/template.js');
-        await this.insertDefaultContent("/site/template.css",   "Site CSS",         __dirname + '/client/default/site/template.css');
-        await this.insertDefaultContent("/site/logo.png",       "Site Logo",        __dirname + '/client/default/site/logo.png');
-        await this.insertDefaultContent("/config/profile.json", "Profile Config",   __dirname + '/client/default/config/profile.json');
-        await this.insertDefaultContent("/",                    "Home",             __dirname + '/client/default/home.html', hostname);
-        await this.insertDefaultContent("/about",               "About Us",         __dirname + '/client/default/about.html', hostname);
-        await this.insertDefaultContent("/contact",             "Contact Us",       __dirname + '/client/default/contact.html', hostname);
+        await this.insertDefaultContent("/site/template.html",  "Site Template",    __dirname + '/default/site/template.html', hostname);
+        await this.insertDefaultContent("/site/template.js",    "Site Javascript",  __dirname + '/default/site/template.js');
+        await this.insertDefaultContent("/site/template.css",   "Site CSS",         __dirname + '/default/site/template.css');
+        await this.insertDefaultContent("/site/logo.png",       "Site Logo",        __dirname + '/default/site/logo.png');
+        await this.insertDefaultContent("/config/profile.json", "Profile Config",   __dirname + '/default/config/profile.json');
+        await this.insertDefaultContent("/",                    "Home",             __dirname + '/default/home.html', hostname);
+        await this.insertDefaultContent("/about",               "About Us",         __dirname + '/default/about.html', hostname);
+        await this.insertDefaultContent("/contact",             "Contact Us",       __dirname + '/default/contact.html', hostname);
     }
 
     async configureInteractive() {

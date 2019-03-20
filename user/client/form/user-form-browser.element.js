@@ -10,7 +10,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
     constructor() {
         super();
         this.state = {
-            users: [],
+            userList: [],
             status: null,
             message: null,
         };
@@ -124,13 +124,13 @@ class HTMLUserFormBrowserElement extends HTMLElement {
     renderResults() {
         const resultsElement = this.querySelector('tbody.results');
         let classOdd = '';
-        resultsElement.innerHTML = this.state.users.map(user => `
+        resultsElement.innerHTML = this.state.userList.map(user => `
             <tr class="results ${classOdd=classOdd===''?'odd':''}">
                 <td><a href=":user/${user.id}">${user.id}</a></td>
                 <td><a href=":user/${user.username}">${user.username}</a></td>
-                <td><a href=":user/${user.id}/:profile" class="action-edit">[&#x270D; edit]</a></td>
-                <td>${user.flags.join(', ')}<a href=":user/${user.id}/:flags" class="action-edit"> [&#x270D;]</a></td>
-                <td><a href=":user/${user.id}/:password" class="action-edit">[&#x270D; change]</a></td>
+                <td><a href=":user/${user.id}/:profile" class="action-edit">&#x270D; edit</a></td>
+                <td>${user.flags.join(', ')} <a href=":user/${user.id}/:flags" class="action-edit">&#x270D;</a></td>
+                <td><a href=":user/${user.id}/:password" class="action-edit">&#x270D; change</a></td>
             </tr>
             `).join('');``
 

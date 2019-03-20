@@ -28,15 +28,17 @@ body.theme-minimal-afoh {
     font-family: 'Advent Pro', monospace;
     /*font-size: 16px;*/
     background: #3d9be9;
-    /*margin: 0 auto;*/
+    /* margin: 0 auto; */
     /*background: url(texture/default.background.png) no-repeat fixed center;*/
 }
 
 /** Hyperlinks **/
-.theme-minimal-afoh a {
+.theme-minimal-afoh > header a,
+.theme-minimal-afoh > footer a,
+.theme-minimal-afoh > article > section a {
     color: #FFF;
     /*text-decoration: none;*/
-    text-decoration-color: #CCCC;
+    /* text-decoration-color: #CCCC; */
 }
 
 /** Header **/
@@ -94,6 +96,7 @@ body.theme-minimal-afoh > footer {
     max-width: 800px;
     padding: 12px 16px;
     /* border: 1px solid #CCC; */
+    text-shadow: #6669 1px 1px 1px;
 }
 
 
@@ -104,6 +107,7 @@ body.theme-minimal-afoh > footer {
     margin: auto;
     text-align: justify;
     text-indent: 8px;
+    /* text-shadow: #000 1px 1px 1px; */
 }
 
 

@@ -271,17 +271,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         </td>
                     </tr>
                     <tr>
-                        <td><label for="data">Content:</label></td>
+                        <td><label for="editor">Editor:</label></td>
                         <td>
-                            ${this.state.isBinary ? `
-                            <input type="hidden" name="data" id="data" value="${this.state.content.data}" />
-                            <textarea class="editor-binary editor-wysiwyg-target" disabled>[Binary File]
-Mime Type: ${this.state.mimeType || ''}
-Length: ${this.readableByteSize(this.state.content.length)}
-</textarea>
-                            ` : `
-                            <textarea class="editor-plain editor-wysiwyg-target" name="data" id="data">${this.state.content.data || ''}</textarea>
-                            `}
+                            <select name="editor" id="editor">
+                            ${[
+                    ['', 'Plain Text / HTML'],
+                    ['summernote', 'SummerNote'],
+                    ['jodit', 'Jodit (Image Uploads)'],
+                    ['trumbowyg', 'Trumbowyg'],
+                    ['pell', 'Pell'],
+                    ['froala', 'Froala (Not free)'],
+                    ['quill', 'Quill (Broken)'],
+                ].map(option => `
+                                <option value="${option[0]}"${option[0] === this.state.editor ? ' selected="selected"' : ''}>${option[1]}</option>
+                            `)}
+                            </select>
                         </td>
                     </tr>
                     <tr>
@@ -298,21 +302,18 @@ Length: ${this.readableByteSize(this.state.content.length)}
                         </td>
                     </tr>
                     <tr>
-                        <td><label for="editor">Editor:</label></td>
-                        <td>
-                            <select name="editor" id="editor">
-                            ${[
-                    ['', 'Plain Text / HTML'],
-                    ['summernote', 'SummerNote'],
-                    ['jodit', 'Jodit (Image Uploads)'],
-                    ['trumbowyg', 'Trumbowyg'],
-                    ['pell', 'Pell'],
-                    ['froala', 'Froala (Not free)'],
-                    ['quill', 'Quill (Broken)'],
-                ].map(option => `
-                                <option value="${option[0]}"${option[0] === this.state.editor ? ' selected="selected"' : ''}>${option[1]}</option>
-                            `)}
-                            </select>
+                        <td><label for="data">Content:</label></td>
+                        <td class="content-form-editor-fullscreen-top">
+                            ${this.state.isBinary ? `
+                            <input type="hidden" name="data" id="data" />
+                            <textarea class="editor-binary editor-wysiwyg-target" disabled>[Binary File]
+Mime Type: ${this.state.mimeType || ''}
+Length: ${this.readableByteSize(this.state.content.length)}
+</textarea>
+                            ` : `
+                            <textarea class="editor-plain editor-wysiwyg-target" name="data" id="data"></textarea>
+                            `}
+                            <button type="button" class="content-form-editor-toggle-fullscreen" onclick="this.form.parentNode.classList.toggle('fullscreen')">Full Screen</button>
                         </td>
                     </tr>
                     <tr>
@@ -336,17 +337,32 @@ Length: ${this.readableByteSize(this.state.content.length)}
                         </td>
                     </tr>
                 </tbody>
-                    <tfoot>
-                        <tr><td colspan="2"><hr/></td></tr>
-                        <tr>
-                            <td style="text-align: right;" colspan="2">
-                                <a href=":content/${this.state.content.id}">Back to content</a>
-                                <button type="submit" ${this.state.processing || !this.state.editable ? 'disabled="disabled"' : ''}>Publish</button>
-                            </td>
-                        </tr>
-                    </tfoot>
+                <tfoot>
+                    <tr><td colspan="2"><hr/></td></tr>
+                    <tr>
+                        <td style="text-align: right;" colspan="2">
+                            <a href=":content/${this.state.content.id}">Back to content</a>
+                            <button type="submit" ${this.state.processing || !this.state.editable ? 'disabled="disabled"' : ''}>Publish</button>
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
-        </form>`;
+        </form>
+            
+        <section>
+            <h1 style="text-align: center;">Preview</h1>
+        </section>
+
+        <iframe src="${this.state.content.path}" class="content-preview-iframe content-form-editor-fullscreen-bottom"></iframe>
+
+
+`;
+            Array.prototype.filter
+                .call(this.querySelector('form').elements , (input, i) => !!input.name && !input.disabled && (input.type !== 'checkbox' || input.checked))
+                .forEach((input, i) => {
+                    if(this.state.content[input.name])
+                        input.value = this.state.content[input.name]
+                });
 
             clearTimeout(this.renderEditorTimeout);
             this.renderEditorTimeout = setTimeout(e => this.renderWYSIWYGEditor(), 100);

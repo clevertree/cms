@@ -52,19 +52,21 @@ class UserAPI {
         router.use(express.json());
         router.use(SessionAPI.getMiddleware());
 
-        router.all('/[:]user/:userID(\\w+)',                         async (req, res, next) => await this.handleUpdateRequest('profile', req.params.userID, req, res, next));
-        router.all('/[:]user/:userID(\\w+)/[:]edit',                 async (req, res, next) => await this.handleUpdateRequest('edit', req.params.userID, req, res, next));
-        router.all('/[:]user/:userID(\\w+)/[:]profile',              async (req, res, next) => await this.handleUpdateRequest('updateprofile', req.params.userID, req, res, next));
-        router.all('/[:]user/:userID(\\w+)/[:]flags',                async (req, res, next) => await this.handleUpdateRequest('updateflags', req.params.userID, req, res, next));
-        router.all('/[:]user/:userID(\\w+)/[:]password',             async (req, res, next) => await this.handleUpdateRequest('updatepassword', req.params.userID, req, res, next));
+        router.all('/[:]user/:userID(\\w+)',                        async (req, res, next) => await this.handleUpdateRequest('profile', req.params.userID, req, res, next));
+        router.all('/[:]user/:userID(\\w+)/[:]edit',                async (req, res, next) => await this.handleUpdateRequest('edit', req.params.userID, req, res, next));
+        router.all('/[:]user/:userID(\\w+)/[:]profile',             async (req, res, next) => await this.handleUpdateRequest('updateprofile', req.params.userID, req, res, next));
+        router.all('/[:]user/:userID(\\w+)/[:]flags',               async (req, res, next) => await this.handleUpdateRequest('updateflags', req.params.userID, req, res, next));
+        router.all('/[:]user/:userID(\\w+)/[:]password',            async (req, res, next) => await this.handleUpdateRequest('updatepassword', req.params.userID, req, res, next));
         router.all('/[:]user/:userID(\\w+)/[:]resetpassword/:uuid', async (req, res) => await this.handleResetPassword(req.params.userID, req.params.uuid, req, res));
-        router.all('/[:]user/[:]login',                              async (req, res) => await this.handleLoginRequest(req, res));
+        router.all('/[:]user/[:]login',                             async (req, res) => await this.handleLoginRequest(req, res));
         // router.all('/[:]user/session',                               async (req, res) => await this.handleSessionLoginRequest(req, res));
-        router.all('/[:]user/[:]logout',                             async (req, res) => await this.handleLogoutRequest(req, res));
-        router.all('/[:]user/[:]register',                           async (req, res) => await this.handleRegisterRequest(req, res));
-        router.all('/[:]user/[:]forgotpassword',                     async (req, res, next) => await this.handleForgotPassword(req, res));
-        router.all('/[:]user(/[:]list)?',                            async (req, res) => await this.handleBrowserRequest(req, res));
+        router.all('/[:]user/[:]logout',                            async (req, res) => await this.handleLogoutRequest(req, res));
+        router.all('/[:]user/[:]register',                          async (req, res) => await this.handleRegisterRequest(req, res));
+        router.all('/[:]user/[:]forgotpassword',                    async (req, res, next) => await this.handleForgotPassword(req, res));
+        router.all('/[:]user/[:]json',                              async (req, res) => await this.renderUserListJSON(req, res));
+        router.all('/[:]user(/[:]list)?',                           async (req, res) => await this.handleUserListRequest(req, res));
 
+        router.all('/[:]user/[:]message',                           async (req, res, next) => await this.handleMessageRequest(req, res));
 
         // User Asset files
         router.get('/[:]user/[:]client/*',                          async (req, res, next) => await this.handleUserStaticFiles(req, res, next));
@@ -579,30 +581,85 @@ class UserAPI {
         }
     }
 
-    async handleBrowserRequest(req, res) {
+    async handleUserListRequest(req, res) {
         try {
 
             switch(req.method) {
                 case 'GET':
                     await ContentRenderer.send(req, res, {
                         title: `Browse Users`,
-                        data: `<user-form-browser></user-form-browser>`});
+                        data:
+                            `<user-form-browser></user-form-browser><user-form-register></user-form-register>`});
                     break;
 
+                case 'OPTIONS':
                 case 'POST':
-                    const database = await DatabaseManager.selectDatabaseByRequest(req);
-                    const userTable = new UserTable(database);
-                    // Handle POST
-                    let whereSQL = '1', values = null;
-                    if(req.body.search) {
-                        whereSQL = 'u.username LIKE ? OR u.email LIKE ? OR u.id = ?';
-                        values = ['%'+req.body.search+'%', '%'+req.body.search+'%', parseInt(req.body.search) || -1];
-                    }
-                    const users = await userTable.selectUsers(whereSQL, values, 'id, email, username, created, flags');
+                    return this.renderUserListJSON(req, res);
+            }
+        } catch (error) {
+            await this.renderError(error, req, res);
+        }
 
+    }
+
+    async renderUserListJSON(req, res) {
+        try {
+
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const userTable = new UserTable(database);
+
+            // Handle POST
+            let whereSQL = '1', values = null;
+            let search = req.body.search || req.params.search || req.query.search;
+            if(search) {
+                whereSQL = 'u.username LIKE ? OR u.email LIKE ? OR u.id = ?';
+                values = ['%'+search+'%', '%'+search+'%', parseInt(search) || -1];
+            }
+
+            let sort = (req.body.sort || req.params.sort || req.query.sort || '').toLowerCase() === 'asc' ? 'ASC' : "DESC";
+            let by = req.body.by || req.params.by || req.query.by || 'id';
+            switch(by.toLowerCase()) {
+                case 'id':
+                case 'email':
+                case 'username':
+                case 'created':
+                case 'flags':
+                    whereSQL += ` ORDER BY ${by} ${sort}`
+                    break;
+            }
+
+            const userList = await userTable.selectUsers(whereSQL, values, 'id, email, username, created, flags');
+
+            return res.json({
+                message: `${userList.length} user entr${userList.length !== 1 ? 'ies' : 'y'} queried successfully`,
+                userList
+            });
+        } catch (error) {
+            await this.renderError(error, req, res);
+        }
+
+    }
+
+    async handleMessageRequest(req, res) {
+        try {
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const userTable = new UserTable(database);
+
+            switch(req.method) {
+                case 'GET':
+                    await ContentRenderer.send(req, res, {
+                        title: `Send a Message`,
+                        data: `<user-form-message></user-form-message>`});
+                    break;
+
+                case 'OPTIONS':
+                    return this.handleUserListRequest(req, res);
+
+                case 'POST':
+                    // Handle POST
                     return res.json({
                         message: `${users.length} User${users.length !== 1 ? 's' : ''} queried successfully`,
-                        users
+                        users: userList
                     });
             }
         } catch (error) {

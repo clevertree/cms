@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserForgotpasswordElement extends HTMLElement{
+    class HTMLUserForgotPasswordElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
@@ -119,6 +119,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-form-forgotpassword', HTMLUserForgotpasswordElement);
+    customElements.define('user-form-forgotpassword', HTMLUserForgotPasswordElement);
 
 }

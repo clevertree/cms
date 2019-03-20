@@ -56,7 +56,8 @@ class ContentRenderer {
         DOM('*').each((i, elm) => {
             if(elm.name.indexOf('-') === -1)
                 return;
-            customElms.push(elm.name);
+            if(customElms.indexOf(elm.name.toLowerCase()) === -1)
+                customElms.push(elm.name.toLowerCase());
         });
 
 

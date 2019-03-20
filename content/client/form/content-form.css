@@ -26,5 +26,28 @@ form.content textarea.editor-binary {
 
 iframe.content-preview-iframe {
     width: 100%;
+    min-height: 400px;
     /* height: 100%; */
 }
+
+
+.fullscreen .content-form-editor-fullscreen-top {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 50%;
+    z-index: 10;
+}
+.fullscreen .content-form-editor-fullscreen-top > textarea {
+    width: 100%;
+    height: 100%;
+}
+.fullscreen .content-form-editor-fullscreen-bottom {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 50%;
+}
+

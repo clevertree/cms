@@ -6,33 +6,30 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserLoginFormElement extends HTMLElement {
+    class HTMLUserContactElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
-                message: "In order to start a new session please enter your username or email and password and hit 'Log in' below",
+                message: "Please fill out the form and hit submit below",
                 status: 0,
-                processing: false,
-                userID: "",
-                password: "",
-                session_save: ""
+                userList: []
             };
         }
 
         setState(newState) {
             for(let i=0; i<arguments.length; i++)
-               Object.assign(this.state, arguments[i]);
+                Object.assign(this.state, arguments[i]);
             this.render();
         }
 
         connectedCallback() {
             this.addEventListener('change', e => this.onChange(e));
             this.addEventListener('submit', e => this.onSubmit(e));
-
-            this.state.userID = this.getAttribute('userID');
-            this.render();
+            setTimeout(() => {
+                this.render();
+                this.requestFormData();
+            }, 1);
         }
-
 
         onSuccess(response) {
             console.log(response);
@@ -47,9 +44,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         onChange(e) {
-            if(typeof this.state[e.target.name] !== 'undefined')
+            if(e.target.name && typeof this.state[e.target.name] !== 'undefined') // typeof this.state.user.profile[e.target.name] !== 'undefined')
                 this.state[e.target.name] = e.target.value;
+            // console.log(this.state);
         }
+
+        requestFormData() {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = () => {
+                this.setState({processing: false}, xhr.response);
+            };
+            xhr.responseType = 'json';
+            xhr.open ('OPTIONS', '/:user/:message?sort=asc&by=id', true);
+            xhr.send ();
+            this.setState({processing: true});
+        }
+
 
         onSubmit(e) {
             e.preventDefault();
@@ -78,65 +88,67 @@ document.addEventListener('DOMContentLoaded', function() {
             this.setState({processing: true});
         }
 
-
         render() {
-            const userID = this.state.userID || null;
-            // console.log("STATE", this.state);
-            this.innerHTML =
+            console.log("STATE", this.state);
+            if(!this.innerHTML.trim())
+                this.innerHTML =
                 `
-                <form action="/:user/:login" method="POST" class="user user-form-login themed">
-                    <table class="user themed">
-                        <caption>Log In</caption>
-                        <thead>
-                            <tr>
-                                <td colspan="2">
-                                    <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                                        ${this.state.message}
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr><td colspan="2"><hr/></td></tr>
-                        </thead>
+                    <table class="themed">
+                        <caption>Contact Us</caption>
                         <tbody>
                             <tr>
-                                <td><label for="username">Username:</label></td>
+                                <td><label for="to">To:</label></td>
                                 <td>
-                                    <input type="text" name="userID" id="username" value="${userID || ''}" required />
+                                    <input name="to" id="to" list="userList" required />
+                                    <datalist id="userList"></datalist>
                                 </td>
                             </tr>
                             <tr>
-                                <td><label for="password">Password:</label></td>
-                                <td>
-                                    <input type="password" name="password" id="password" value="${this.state.password || ''}" required />
-                                </td>
+                                <td><label for="name">Your Name:</label></td>
+                                <td><input name="name" id="name" required></td>
                             </tr>
                             <tr>
-                                <td><label for="session_save">Stay logged in:</label></td>
+                                <td><label for="email">Your Email:</label></td>
+                                <td><input name="email" id="email" type="email" placeholder="your@email.com" required></td>
+                            </tr>
+                            <tr>
+                                <td><label for="message">Message:</label></td>
                                 <td>
-                                    <label>
-                                        <input type="checkbox" name="session_save" id="session_save" ${this.state.session_save ? 'checked="checked"' : ''} value="1"/>
-                                    </label>
-                                    <div style="float: right">
-                                        <a href=":user/:forgotpassword${userID ? '?userID=' + userID : ''}">Forgot Password?</a>
-                                    </div>
+                                    <textarea name="message" id="message"
+                                        placeholder="Type your message here"
+                                        required></textarea>
                                 </td>
                             </tr>
                         </tbody>
                         <tfoot>
                             <tr><td colspan="2"><hr/></td></tr>
                             <tr>
-                                <td>
-                                    <a href=":user/:register${userID ? '?userID=' + userID : ''}">Register</a>
-                                </td>
-                                <td style="text-align: right;">
-                                    <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Log In</button>
+                                <td colspan="2">
+                                    <button type="submit">Submit</button>
                                 </td>
                             </tr>
                         </tfoot>
                     </table>
-                </form>
 `;
+            let form = this.querySelector('form');
+            if(!form)
+                this.innerHTML = `
+                <form class="user user-form-message themed">
+                    ${this.innerHTML}
+                </form>`;
+            form = this.querySelector('form');
+            form.setAttribute('action', '/:user/:message');
+            form.setAttribute('method', 'POST');
+
+            const userListDL = this.querySelector('select[name=to], #userList');
+            if(userListDL) {
+                userListDL.innerHTML = this.state.userList
+                    .map(user => `<option value="${user.username}">${user.username}</option>`)
+                    .join('');
+
+            }
         }
     }
-    customElements.define('user-form-login', HTMLUserLoginFormElement);
+    customElements.define('user-form-message', HTMLUserContactElement);
+
 }

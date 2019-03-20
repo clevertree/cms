@@ -218,12 +218,6 @@ class ContentApi {
                         title: `Edit Content #${content.id}`,
                         data: `
             <content-form-editor id="${req.params.id}"></content-form-editor>
-            
-            <section>
-                <h1 style="text-align: center;">Preview</h1>
-            </section>
-
-            <iframe src="${content.path}" class="content-preview-iframe"></iframe>
     `});
                     break;
 
@@ -673,7 +667,6 @@ class ContentApi {
     async renderData(req, res, data, mimeType, lastModified) {
         res.setHeader('Last-Modified', lastModified.toUTCString());
         res.setHeader('Content-type', mimeType );
-        // res.setHeader('ETag', newETAG);
         res.send(data);
     }
 
