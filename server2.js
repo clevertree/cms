@@ -30,6 +30,9 @@ app.use(clevertree.getMiddleware({
         },
         // host: "mail.server.com",
         port: 587
+    },
+    session: {
+        secret: "my-random-string-6d4b-48c8-9b3d-9c6bfd506057"
     }
 }));
 

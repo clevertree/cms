@@ -6,16 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserMessageElement extends HTMLElement{
+    class HTMLUserMessageSendElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
                 message: "Please fill out the form and hit submit below",
                 status: 0,
-                messageID: '',
+                userList: [],
+                to: '',
             };
         }
-        get action() { return `/:user/:message/${this.state.messageID}`}
 
         setState(newState) {
             for(let i=0; i<arguments.length; i++)
@@ -27,12 +27,14 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('change', e => this.onChange(e));
             this.addEventListener('submit', e => this.onSubmit(e));
 
-            const messageID = this.getAttribute('messageID');
-            if(messageID)
-                this.setState({messageID});
+            const to = this.getAttribute('to');
+            if(to)
+                this.setState({to});
 
-            this.render();
-            this.requestFormData();
+            setTimeout(() => {
+                this.render();
+                this.requestFormData();
+            }, 1);
         }
 
         onSuccess(response) {
@@ -60,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.setState({processing: false}, response);
             };
             xhr.responseType = 'json';
-            xhr.open ('OPTIONS', this.action, true);
+            xhr.open ('OPTIONS', '/:user/:message?sort=asc&by=id', true);
             xhr.send ();
             this.setState({processing: true});
         }
@@ -74,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .map((input, i) => input.name + '=' + encodeURIComponent(input.value))
                 .join('&');
             const method = form.getAttribute('method');
-            const action = this.action;
+            const action = form.getAttribute('action');
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
@@ -94,12 +96,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
-            // TODO: display thread? display all messages?
             console.log("STATE", this.state);
-            this.innerHTML =
+            if(!this.innerHTML.trim())
+                this.innerHTML =
                 `
                     <table class="themed">
-                        <caption>Read Message</caption>
+                        <caption>Send a Message</caption>
+                        <thead>
+                            <tr>
+                                <td colspan="5" class="status">
+                                    <div class="message">Send a Message</div> 
+                                </td>
+                            </tr>
+                            <tr><td colspan="2"><hr/></td></tr>
+                        </thead>
                         <tbody>
                             <tr>
                                 <td><label for="to">To:</label></td>
@@ -139,8 +149,31 @@ document.addEventListener('DOMContentLoaded', function() {
                         </tfoot>
                     </table>
 `;
+            let form = this.querySelector('form');
+            if(!form)
+                this.innerHTML = `
+                <form class="user user-form-message-send themed">
+                    ${this.innerHTML}
+                </form>`;
+            form = this.querySelector('form');
+            form.setAttribute('action', '/:user/:message');
+            form.setAttribute('method', 'POST');
+
+            const userListDL = this.querySelector('select[name=to], #userList');
+            if(userListDL) {
+                userListDL.innerHTML = this.state.userList
+                    .map(user => `<option value="${user.username}">${user.username}</option>`)
+                    .join('');
+
+            }
+
+            const statusElement = this.querySelector('td.status');
+            statusElement.innerHTML =
+                `<div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                    ${this.state.message || "No Message"}
+                </div>`
         }
     }
-    customElements.define('user-form-message', HTMLUserMessageElement);
+    customElements.define('user-form-message-send', HTMLUserMessageSendElement);
 
 }

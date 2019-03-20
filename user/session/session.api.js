@@ -24,8 +24,8 @@ class SessionAPI {
             const localConfig = new LocalConfig();
             const sessionConfig = await localConfig.getOrCreate('session');
             Object.assign(this.sessionConfig, sessionConfig);
-            // Object.assign(sessionConfig, this.sessionConfig);
-            // await localConfig.saveAll()
+            Object.assign(sessionConfig, this.sessionConfig);
+            await localConfig.saveAll()
         }
 
         if(config && typeof config.cookie === 'object') {
@@ -34,8 +34,8 @@ class SessionAPI {
             const localConfig = new LocalConfig();
             const cookieConfig = await localConfig.getOrCreate('cookie');
             Object.assign(this.cookieConfig, cookieConfig);
-            // Object.assign(cookieConfig, this.cookieConfig);
-            // await localConfig.saveAll()
+            Object.assign(cookieConfig, this.cookieConfig);
+            await localConfig.saveAll()
         }
 
 

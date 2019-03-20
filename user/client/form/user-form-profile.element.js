@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <tr>
                             <td><label>Flags:</label></td>
                             <td>[${(this.state.user.flags || ['none']).join(', ')}]</td>
-                            <td>${this.state.editable ? `<a href=":user/${this.state.user.id}/:flags" class="icon-edit" title="Edit Flags">[&#x270D;]</a>` : ''}</td>
+                            <td>${this.state.editable ? `<a href="${this.state.src}/:flags" class="icon-edit" title="Edit Flags">[&#x270D;]</a>` : ''}</td>
                         </tr>
                         <tr>
                             <td><label>Email:</label></td>
@@ -84,9 +84,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <td>
                                     ${this.state.user.profile[profileField.name] || 'null'}
                                 </td>
-                                <td>${this.state.editable ? `<a href=":user/${this.state.user.id}/:profile" class="icon-edit" title="Edit Profile">[&#x270D;]</a>` : ''}</td>
+                                <td>${this.state.editable ? `<a href="${this.state.src}/:profile" class="icon-edit" title="Edit Profile">[&#x270D;]</a>` : ''}</td>
                             </tr>
                         `).join('')}
+                        <tr>
+                            <td colspan="2" style="text-align: center;"><a href="${this.state.src}/:message">Send a Message</a></td>
+                        </tr>
                     ` : `
                         <tr>
                             <th colspan="2">

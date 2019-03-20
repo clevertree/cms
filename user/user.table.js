@@ -129,8 +129,11 @@ class UserTable  {
         return users[0] || null;
     }
     async fetchUserByID(userID, selectSQL='u.*,null as password') {
+        return await this.fetchUser('? IN (u.id)', userID, selectSQL);
+    }
+    async fetchUserByKey(userID, selectSQL='u.*,null as password') {
         if(!isNaN(parseInt(userID)) && isFinite(userID)) {
-            return await this.fetchUser('? IN (u.id)', userID, selectSQL);
+            return await this.fetchUserByID(userID, selectSQL);
         } else {
             return await this.fetchUser('? IN (u.email, u.username)', [userID, userID], selectSQL);
         }
@@ -193,7 +196,7 @@ class UserTable  {
     async addFlags(userID, flags) {
         if(!Array.isArray(flags))
             flags = flags.split(',').map(flag => flag.trim());
-        const updateUser = await this.fetchUserByID(userID);
+        const updateUser = await this.fetchUserByKey(userID);
         for(let i=0; i<updateUser.flags.length; i++) {
             const userFlag = updateUser.flags[i];
             if(flags.indexOf(userFlag) === -1)
@@ -205,7 +208,7 @@ class UserTable  {
     async removeFlags(userID, flags) {
         if(!Array.isArray(flags))
             flags = flags.split(',').map(flag => flag.trim());
-        const updateUser = await this.fetchUserByID(userID);
+        const updateUser = await this.fetchUserByKey(userID);
         const newFlags = updateUser.flags.filter(flag => flags.indexOf(flag) !== -1);
         return await this.updateUser(updateUser.id, null, null, null, newFlags);
     }

@@ -12,6 +12,7 @@ const { DatabaseManager } = require('../database/database.manager');
 // const { ContentAPI } = require('../content/content.api');
 const { ContentTable } = require("../content/content.table");
 const { UserTable } = require('./user.table');
+const { UserMessageTable } = require('./user_message.table');
 const { SessionAPI } = require('./session/session.api');
 // const { HTTPServer } = require('../server/server.server');
 
@@ -66,7 +67,9 @@ class UserAPI {
         router.all('/[:]user/[:]json',                              async (req, res) => await this.renderUserListJSON(req, res));
         router.all('/[:]user(/[:]list)?',                           async (req, res) => await this.handleUserListRequest(req, res));
 
-        router.all('/[:]user/[:]message',                           async (req, res, next) => await this.handleMessageRequest(req, res));
+        router.all('/[:]user/[:]message/:messageID(\\d+)',          async (req, res, next) => await this.handleMessageRequest(req.params.messageID, req, res));
+        router.all('/[:]user/[:]message',                           async (req, res, next) => await this.handleMessageSendRequest(null, req, res));
+        router.all('/[:]user/:userID(\\w+)/[:]message',             async (req, res, next) => await this.handleMessageSendRequest(req.params.userID, req, res));
 
         // User Asset files
         router.get('/[:]user/[:]client/*',                          async (req, res, next) => await this.handleUserStaticFiles(req, res, next));
@@ -124,7 +127,7 @@ class UserAPI {
 
         const database = await DatabaseManager.selectDatabaseByRequest(req);
         const userTable = new UserTable(database);
-        const user = await userTable.fetchUserByID(userID);
+        const user = await userTable.fetchUserByKey(userID);
         if(!user)
             throw new Error("User not found: " + userID);
 
@@ -150,7 +153,7 @@ class UserAPI {
         const userTable = new UserTable(database);
         if(!userID)
             throw new Error("Invalid User ID");
-        const user = await userTable.fetchUserByID(userID);
+        const user = await userTable.fetchUserByKey(userID);
         if(!user)
             throw new Error("User not found: " + userID);
         if(typeof flags === 'string') {
@@ -176,7 +179,7 @@ class UserAPI {
             throw new Error("Invalid User ID");
         const database = await DatabaseManager.selectDatabaseByRequest(req);
         const userTable = new UserTable(database);
-        const user = await userTable.fetchUserByID(userID, 'u.*');
+        const user = await userTable.fetchUserByKey(userID, 'u.*');
         if(!user)
             throw new Error("User not found: " + userID);
         const encryptedPassword = user.password;
@@ -204,8 +207,8 @@ class UserAPI {
     }
 
     async register(req, username, email, password, password_confirm) {
-        username = UserAPI.sanitizeInput(username, 'username');
-        email = UserAPI.sanitizeInput(email, 'email');
+        username = this.sanitizeInput(username, 'username');
+        email = this.sanitizeInput(email, 'email');
 
         if(!username)
             throw new Error("username is required");
@@ -240,7 +243,7 @@ class UserAPI {
 
         const database = await DatabaseManager.selectDatabaseByRequest(req);
         const userTable = new UserTable(database);
-        const sessionUser = await userTable.fetchUserByID(userID, 'u.*');
+        const sessionUser = await userTable.fetchUserByKey(userID, 'u.*');
         if(!sessionUser)
             throw new Error("User not found: " + userID);
         const encryptedPassword = sessionUser.password;
@@ -287,7 +290,7 @@ class UserAPI {
         try {
             await DatabaseManager.selectDatabaseByRequest(req);
             if(req.method === 'GET') {
-                const userID = UserAPI.sanitizeInput(req.query.userID || null, 'email');
+                const userID = this.sanitizeInput(req.query.userID || null, 'email');
                 // Render Editor Form
                 await ContentRenderer.send(req, res, {
                     title: `Log in`,
@@ -380,7 +383,7 @@ class UserAPI {
 
     async handleForgotPassword(req, res) {
         try {
-            const userID = UserAPI.sanitizeInput(req.query.userID || null);
+            const userID = this.sanitizeInput(req.query.userID || null, 'email');
             const database = await DatabaseManager.selectDatabaseByRequest(req);
             const userTable = new UserTable(database);
 
@@ -403,7 +406,7 @@ class UserAPI {
                     // console.log("Log in Request", req.body);
                     if(!req.body.userID)
                         throw new Error("userID is required");
-                    const user = await userTable.fetchUserByID(req.body.userID, 'u.*');
+                    const user = await userTable.fetchUserByKey(req.body.userID, 'u.*');
 
                     await this.sendResetPasswordRequestEmail(req, user);
 
@@ -424,7 +427,7 @@ class UserAPI {
 
             const database = await DatabaseManager.selectDatabaseByRequest(req);
             const userTable = new UserTable(database);
-            const user = await userTable.fetchUserByID(userID);
+            const user = await userTable.fetchUserByKey(userID);
             if(!user)
                 throw new Error("User was not found: " + userID);
 
@@ -479,14 +482,14 @@ class UserAPI {
 
     async handleUpdateRequest(type, userID, req, res, next) {
         try {
-            userID = UserAPI.sanitizeInput(userID);
+            userID = this.sanitizeInput(userID, 'email');
             const database = await DatabaseManager.selectDatabaseByRequest(req);
             const userTable = new UserTable(database);
-            let user = await userTable.fetchUserByID(userID, 'u.*');
+            let user = await userTable.fetchUserByKey(userID, 'u.*');
             if(!user)
                 return next();
 
-            // const user = await this.userTable.fetchUserByID(userID);
+            // const user = await this.userTable.fetchUserByKey(userID);
             switch(req.method) {
                 case 'GET':
                     if(type === 'edit') {
@@ -605,61 +608,125 @@ class UserAPI {
     async renderUserListJSON(req, res) {
         try {
 
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userTable = new UserTable(database);
-
-            // Handle POST
-            let whereSQL = '1', values = null;
-            let search = req.body.search || req.params.search || req.query.search;
-            if(search) {
-                whereSQL = 'u.username LIKE ? OR u.email LIKE ? OR u.id = ?';
-                values = ['%'+search+'%', '%'+search+'%', parseInt(search) || -1];
-            }
-
-            let sort = (req.body.sort || req.params.sort || req.query.sort || '').toLowerCase() === 'asc' ? 'ASC' : "DESC";
-            let by = req.body.by || req.params.by || req.query.by || 'id';
-            switch(by.toLowerCase()) {
-                case 'id':
-                case 'email':
-                case 'username':
-                case 'created':
-                case 'flags':
-                    whereSQL += ` ORDER BY ${by} ${sort}`
-                    break;
-            }
-
-            const userList = await userTable.selectUsers(whereSQL, values, 'id, email, username, created, flags');
-
-            return res.json({
-                message: `${userList.length} user entr${userList.length !== 1 ? 'ies' : 'y'} queried successfully`,
-                userList
-            });
+            return res.json(
+                await this.searchUserList(req)
+            );
         } catch (error) {
             await this.renderError(error, req, res);
         }
 
     }
 
-    async handleMessageRequest(req, res) {
+    async searchUserList(req) {
+
+        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const userTable = new UserTable(database);
+
+        // Handle POST
+        let whereSQL = '1', values = null;
+        let search = req.body.search || req.params.search || req.query.search;
+        if(search) {
+            whereSQL = 'u.username LIKE ? OR u.email LIKE ? OR u.id = ?';
+            values = ['%'+search+'%', '%'+search+'%', parseInt(search) || -1];
+        }
+
+        let sort = (req.body.sort || req.params.sort || req.query.sort || '').toLowerCase() === 'asc' ? 'ASC' : "DESC";
+        let by = req.body.by || req.params.by || req.query.by || 'id';
+        switch(by.toLowerCase()) {
+            case 'id':
+            case 'email':
+            case 'username':
+            case 'created':
+            case 'flags':
+                whereSQL += ` ORDER BY ${by} ${sort}`
+                break;
+        }
+
+        const userList = await userTable.selectUsers(whereSQL, values, 'id, email, username, created, flags');
+
+        return {
+            message: `${userList.length} user entr${userList.length !== 1 ? 'ies' : 'y'} queried successfully`,
+            userList
+        };
+    }
+
+    async handleMessageSendRequest(userID, req, res) {
         try {
             const database = await DatabaseManager.selectDatabaseByRequest(req);
             const userTable = new UserTable(database);
+            const userMessageTable = new UserMessageTable(database);
 
             switch(req.method) {
                 case 'GET':
                     await ContentRenderer.send(req, res, {
                         title: `Send a Message`,
-                        data: `<user-form-message></user-form-message>`});
+                        data: `<user-form-message-send${userID ? ` to="${userID}"` : ''}></user-form-message-send>`});
                     break;
 
                 case 'OPTIONS':
-                    return this.handleUserListRequest(req, res);
+                    const searchJSON = await this.searchUserList(req);
+                    searchJSON.message = "Send a message";
+                    return res.json(searchJSON);
 
                 case 'POST':
                     // Handle POST
+                    const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
+
+                    // TODO: for loop
+                    const toUser = await userTable.fetchUserByKey(req.body.to); // TODO: test match against userID
+                    if(!toUser)
+                        throw new Error("User not found: " + req.body.to);
+
+                    const from = this.sanitizeInput(req.body.from, 'email') ;
+                    const subject = this.sanitizeInput(req.body.subject, 'text') ;
+                    let body = this.sanitizeInput(req.body.body, 'text') ;
+                    const parent_id = req.body.parent_id ? parseInt(req.body.parent_id) : null;
+                    if(from)
+                        body = `From: ${from}\n\n` + body;
+
+                    const userMessage = await userMessageTable.insertUserMessage(toUser.id, subject, body, parent_id, sessionUser ? sessionUser.id : null);
+
+                    // TODO: send an email
+
                     return res.json({
-                        message: `${users.length} User${users.length !== 1 ? 's' : ''} queried successfully`,
-                        users: userList
+                        redirect: userMessage.url,
+                        message: `Message sent to ${toUser.username} successfully. Redirecting...`,
+                        insertID: userMessage.id
+                    });
+            }
+        } catch (error) {
+            await this.renderError(error, req, res);
+        }
+
+    }
+    async handleMessageRequest(messageID, req, res) {
+        try {
+            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const userTable = new UserTable(database);
+            const userMessageTable = new UserMessageTable(database);
+
+            switch(req.method) {
+                case 'GET':
+                    await ContentRenderer.send(req, res, {
+                        title: `Message: ${messageID}`,
+                        data: `<user-form-message${messageID ? ` messageID="${messageID}"` : ''}></user-form-message-send>`});
+                    break;
+
+                case 'OPTIONS':
+                    const message = await userMessageTable.fetchUserMessageByID(messageID);;
+                    // searchJSON.message = `Message: ${messageID}`;
+                    return res.json(message);
+
+                case 'POST':
+                    // Handle POST
+                    const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
+
+                    // TODO: Delete Message
+
+                    return res.json({
+                        redirect: userMessage.url,
+                        message: `Message sent to ${toUser.username} successfully. Redirecting...`,
+                        insertID: userMessage.id
                     });
             }
         } catch (error) {
@@ -669,20 +736,6 @@ class UserAPI {
     }
 
 
-    async getSessionHTML(req, article) {
-        let sessionHTML = '';
-        if(req.session) {
-            while (req.session.messages && req.session.messages.length > 0) {
-                const sessionMessage = req.session.messages.pop();
-                sessionHTML = `
-                    <section class="message">
-                        ${sessionMessage}
-                    </section>
-                    ${sessionHTML}`;
-            }
-        }
-        return sessionHTML;
-    }
 
     async queryAdminEmailAddresses(database=null, hostname=null) {
         let dnsAdminEmails = hostname ? await DNSManager.queryHostAdminEmailAddresses(hostname) : [];
@@ -713,14 +766,17 @@ class UserAPI {
         }
     }
 
-    static sanitizeInput(input, type=null) {
+    sanitizeInput(input, type=null) {
         switch(type) {
             case 'username':
                 input = (input || '').replace(/[^\w._]/g, '');
                 break;
-            default:
             case 'email':
-                input = (input || '').replace(/[^\w@._]/g, '');
+                input = (input || '').replace(/[^\w@._<>'" ]/g, '');
+                break;
+            default:
+            case 'text':
+                input=input.replace(/<\w+>/g,'').replace(/<\/\w+>/g,'').trim();
                 break;
         }
         return input
