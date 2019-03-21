@@ -30,9 +30,9 @@ class DatabaseManager {
     getTableClasses() {
         return [
             require('../user/user.table').UserTable,
-            require('../user/user_message.table').UserMessageTable,
+            require('../user/message/user-message.table').UserMessageTable,
             require('../content/content.table').ContentTable,
-            require('../content/content_revision.table').ContentRevisionTable,
+            require('../content/content-revision.table').ContentRevisionTable,
             // require('../config/config.database').ConfigDatabase,
         ];
     }

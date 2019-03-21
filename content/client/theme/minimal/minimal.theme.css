@@ -160,7 +160,7 @@ body.theme-minimal > footer {
 
 .theme-minimal table.themed td:first-child {
     vertical-align: top;
-    padding-top: 6px;
+    padding: 3px;
 }
 .theme-minimal table.themed td:first-child > label {
     text-align: right;

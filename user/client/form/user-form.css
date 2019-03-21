@@ -18,3 +18,22 @@ form.user textarea {
 form.user textarea[name=description] {
     min-height: 200px;
 }
+
+
+
+/** user-form-message **/
+form.user-form-message .body-content {
+    white-space: pre;
+    max-width: 1200px;
+    max-height: 400px;
+    overflow: auto;
+}
+form.user-form-message textarea[name=reply] {
+    min-height: 200px;
+}
+form.user-form-message button[type=submit] {
+    padding: 0.5em;
+    margin: 0.5em;
+    float: right
+
+}

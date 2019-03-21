@@ -12,7 +12,7 @@ const { DatabaseManager } = require('../database/database.manager');
 // const { ContentAPI } = require('../content/content.api');
 const { ContentTable } = require("../content/content.table");
 const { UserTable } = require('./user.table');
-const { UserMessageTable } = require('./user_message.table');
+const { UserMessageTable } = require('./message/user-message.table');
 const { SessionAPI } = require('./session/session.api');
 // const { HTTPServer } = require('../server/server.server');
 
@@ -28,7 +28,6 @@ class UserAPI {
 
     constructor() {
         this.resetPasswordRequests = {
-            'aa196dc0-f51f-4a79-a858-53c3b3b03097': 101
         };
     }
 
@@ -67,9 +66,10 @@ class UserAPI {
         router.all('/[:]user/[:]json',                              async (req, res) => await this.renderUserListJSON(req, res));
         router.all('/[:]user(/[:]list)?',                           async (req, res) => await this.handleUserListRequest(req, res));
 
-        router.all('/[:]user/[:]message/:messageID(\\d+)',          async (req, res, next) => await this.handleMessageRequest(req.params.messageID, req, res));
-        router.all('/[:]user/[:]message',                           async (req, res, next) => await this.handleMessageSendRequest(null, req, res));
-        router.all('/[:]user/:userID(\\w+)/[:]message',             async (req, res, next) => await this.handleMessageSendRequest(req.params.userID, req, res));
+        // router.all('/[:]user/[:]message/:messageID(\\d+)',          async (req, res, next) => await this.handleMessageRequest(req.params.messageID, req, res));
+        // router.all('/[:]user/[:]message',                           async (req, res, next) => await this.handleMessageSendRequest(null, req, res));
+        // router.all('/[:]user/:userID(\\w+)/[:]message',             async (req, res, next) => await this.handleMessageSendRequest(req.params.userID, req, res));
+        router.use(require('./message/user-message.api').UserMessageAPI.getMiddleware());
 
         // User Asset files
         router.get('/[:]user/[:]client/*',                          async (req, res, next) => await this.handleUserStaticFiles(req, res, next));
@@ -650,92 +650,6 @@ class UserAPI {
         };
     }
 
-    async handleMessageSendRequest(userID, req, res) {
-        try {
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userTable = new UserTable(database);
-            const userMessageTable = new UserMessageTable(database);
-
-            switch(req.method) {
-                case 'GET':
-                    await ContentRenderer.send(req, res, {
-                        title: `Send a Message`,
-                        data: `<user-form-message-send${userID ? ` to="${userID}"` : ''}></user-form-message-send>`});
-                    break;
-
-                case 'OPTIONS':
-                    const searchJSON = await this.searchUserList(req);
-                    searchJSON.message = "Send a message";
-                    return res.json(searchJSON);
-
-                case 'POST':
-                    // Handle POST
-                    const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
-
-                    // TODO: for loop
-                    const toUser = await userTable.fetchUserByKey(req.body.to); // TODO: test match against userID
-                    if(!toUser)
-                        throw new Error("User not found: " + req.body.to);
-
-                    const from = this.sanitizeInput(req.body.from, 'email') ;
-                    const subject = this.sanitizeInput(req.body.subject, 'text') ;
-                    let body = this.sanitizeInput(req.body.body, 'text') ;
-                    const parent_id = req.body.parent_id ? parseInt(req.body.parent_id) : null;
-                    if(from)
-                        body = `From: ${from}\n\n` + body;
-
-                    const userMessage = await userMessageTable.insertUserMessage(toUser.id, subject, body, parent_id, sessionUser ? sessionUser.id : null);
-
-                    // TODO: send an email
-
-                    return res.json({
-                        redirect: userMessage.url,
-                        message: `Message sent to ${toUser.username} successfully. Redirecting...`,
-                        insertID: userMessage.id
-                    });
-            }
-        } catch (error) {
-            await this.renderError(error, req, res);
-        }
-
-    }
-    async handleMessageRequest(messageID, req, res) {
-        try {
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
-            const userTable = new UserTable(database);
-            const userMessageTable = new UserMessageTable(database);
-
-            switch(req.method) {
-                case 'GET':
-                    await ContentRenderer.send(req, res, {
-                        title: `Message: ${messageID}`,
-                        data: `<user-form-message${messageID ? ` messageID="${messageID}"` : ''}></user-form-message-send>`});
-                    break;
-
-                case 'OPTIONS':
-                    const message = await userMessageTable.fetchUserMessageByID(messageID);;
-                    // searchJSON.message = `Message: ${messageID}`;
-                    return res.json(message);
-
-                case 'POST':
-                    // Handle POST
-                    const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
-
-                    // TODO: Delete Message
-
-                    return res.json({
-                        redirect: userMessage.url,
-                        message: `Message sent to ${toUser.username} successfully. Redirecting...`,
-                        insertID: userMessage.id
-                    });
-            }
-        } catch (error) {
-            await this.renderError(error, req, res);
-        }
-
-    }
-
-
 
     async queryAdminEmailAddresses(database=null, hostname=null) {
         let dnsAdminEmails = hostname ? await DNSManager.queryHostAdminEmailAddresses(hostname) : [];
@@ -776,7 +690,7 @@ class UserAPI {
                 break;
             default:
             case 'text':
-                input=input.replace(/<\w+>/g,'').replace(/<\/\w+>/g,'').trim();
+                input=input.replace(/<[^>]+>/g,'').replace(/<\/[^>]+>/g,'').trim();
                 break;
         }
         return input

@@ -3,7 +3,7 @@
 class ContentRevisionTable {
     constructor(dbName) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
-        this.table = tablePrefix + '`content_revision`';
+        this.table = tablePrefix + '`content-revision`';
     }
 
     /** Configure Table **/
@@ -87,11 +87,11 @@ CREATE TABLE IF NOT EXISTS ${this.table} (
   \`data\` BLOB DEFAULT NULL,
   \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (\`id\`),
-  KEY \`idx:content_revision.content_id\` (\`content_id\` ASC),
-  KEY \`idx:content_revision.user_id\` (\`user_id\` ASC),
+  KEY \`idx:content-revision.content_id\` (\`content_id\` ASC),
+  KEY \`idx:content-revision.user_id\` (\`user_id\` ASC),
 
-  CONSTRAINT \`fk:content_revision.content_id\` FOREIGN KEY (\`content_id\`) REFERENCES \`content\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT \`fk:content_revision.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT \`fk:content-revision.content_id\` FOREIGN KEY (\`content_id\`) REFERENCES \`content\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT \`fk:content-revision.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 `
     }

@@ -10,12 +10,14 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
-                message: "Please fill out the form and hit submit below",
-                status: 0,
-                messageID: '',
+                id: '',
+                to: null,
+                from: null,
+                subject: null,
+                body: null
             };
         }
-        get action() { return `/:user/:message/${this.state.messageID}`}
+        get action() { return `/:user/:message/${this.state.id}`}
 
         setState(newState) {
             for(let i=0; i<arguments.length; i++)
@@ -29,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const messageID = this.getAttribute('messageID');
             if(messageID)
-                this.setState({messageID});
+                this.setState({id: messageID});
 
             this.render();
             this.requestFormData();
@@ -57,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+                this.processHeaderTags(response);
                 this.setState({processing: false}, response);
             };
             xhr.responseType = 'json';
@@ -65,6 +68,28 @@ document.addEventListener('DOMContentLoaded', function() {
             this.setState({processing: true});
         }
 
+        processHeaderTags(response) {
+            const splitPos = response.body.indexOf("\n\n");
+            if(splitPos <= 0)
+                return;
+            const headerString = response.body.substring(0, splitPos);
+            if(!headerString)
+                return;
+
+            response.body = response.body.substring(splitPos+2);
+            response.headers = [];
+            headerString
+                .split(/\n/g)
+                .forEach(header => {
+                    const split = header.split(/:/);
+                    if(split.length > 1)
+                        response.headers[split[0].trim().toLowerCase()] = split[1].trim();
+                });
+            if(response.headers.from && !this.state.from)
+                this.state.from = response.headers.from;
+            if(response.headers.to && !this.state.to)
+                this.state.to = response.headers.to;
+        }
 
         onSubmit(e) {
             e.preventDefault();
@@ -73,12 +98,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
                 .map((input, i) => input.name + '=' + encodeURIComponent(input.value))
                 .join('&');
-            const method = form.getAttribute('method');
+            const method = 'POST'; // form.getAttribute('method');
             const action = this.action;
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
-                const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+                const response = typeof xhr.response === 'object' ? xhr.response || {message: "No Response"} : {message: xhr.response};
                 this.setState({processing: false, status: xhr.status}, response);
                 if(xhr.status === 200) {
                     this.onSuccess(response);
@@ -98,46 +123,39 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("STATE", this.state);
             this.innerHTML =
                 `
+                <form action="${this.action}" method="POST" class="user user-form-message themed">
                     <table class="themed">
-                        <caption>Read Message</caption>
+                        <caption>Read Message #${this.state.id}</caption>
                         <tbody>
-                            <tr>
+                             <tr>
                                 <td><label for="to">To:</label></td>
-                                <td>
-                                    <input name="to" id="to" list="userList" value="${this.state.to}" required />
-                                    <datalist id="userList"></datalist>
-                                </td>
+                                <td class="user-form-message-to">${this.state.to}</td>
                             </tr>
                             <tr>
-                                <td><label for="name">Your Name:</label></td>
-                                <td><input name="name" id="name" required></td>
-                            </tr>
-                            <tr>
-                                <td><label for="from">Your Email:</label></td>
-                                <td><input name="from" id="from" type="email" placeholder="your@email.com" required></td>
+                                <td><label for="name">From:</label></td>
+                                <td class="user-form-message-form">${this.state.from}</td>
                             </tr>
                             <tr>
                                 <td><label for="subject">Subject:</label></td>
-                                <td><input name="subject" id="subject" type="text" placeholder="Message Subject" required></td>
+                                <td>${this.state.subject}</td>
                             </tr>
+                            <tr><td colspan="2"><hr/></td></tr>
                             <tr>
-                                <td><label for="body">Message:</label></td>
-                                <td>
-                                    <textarea name="body" id="body"
-                                        placeholder="Type your message here"
-                                        required></textarea>
+                                <td colspan="2">
+                                    <div class="body-content">${(this.state.body||'').replace(/<[^>]+>/g,'').replace(/<\/[^>]+>/g,'')}</div>
                                 </td>
                             </tr>
                         </tbody>
                         <tfoot>
-                            <tr><td colspan="2"><hr/></td></tr>
                             <tr>
                                 <td colspan="2">
-                                    <button type="submit">Submit</button>
+                                    <textarea name="reply"></textarea>
+                                    <button type="submit">Reply</button>
                                 </td>
                             </tr>
                         </tfoot>
                     </table>
+                </form>
 `;
         }
     }

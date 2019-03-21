@@ -105,7 +105,7 @@ class ContentTable {
         }
 
         // Content is being updated, so store old data as a revision.
-        const { ContentRevisionTable } = require('./content_revision.table');
+        const { ContentRevisionTable } = require('./content-revision.table');
         const contentRevisionTable = new ContentRevisionTable(this.database);
         await contentRevisionTable.insertContentRevision(
             existingContent.id,
