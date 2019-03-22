@@ -85,4 +85,4 @@ class InteractiveConfig {
 //     debug: true,
 // };
 
-exports.InteractiveConfig = InteractiveConfig;
+module.exports = InteractiveConfig;

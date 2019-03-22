@@ -1,5 +1,5 @@
 table.user {
-    width: 600px;
+    /* width: 600px; messes up responsive */
 }
 
 
@@ -22,16 +22,22 @@ form.user textarea[name=description] {
 
 
 /** user-form-message **/
-form.user-form-message .body-content {
-    white-space: pre;
-    max-width: 1200px;
+
+user-form-message table.user {
+    min-width: 90%;
+    /*margin: auto;*/
+}
+user-form-message form.user .body-content {
+    white-space: pre-wrap;
+    /* max-width: 764px; */
     max-height: 400px;
     overflow: auto;
 }
-form.user-form-message textarea[name=reply] {
+user-form-message form.user textarea[name=reply] {
     min-height: 200px;
+    /* min-width: 703px; */
 }
-form.user-form-message button[type=submit] {
+user-form-message form.user button[type=submit] {
     padding: 0.5em;
     margin: 0.5em;
     float: right

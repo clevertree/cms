@@ -1,20 +1,20 @@
 
 const mysql = require('mysql');
 
-const { LocalConfig } = require('../config/local.config');
-const { InteractiveConfig } = require('../config/interactive.config');
+const LocalConfig = require('../config/LocalConfig');
+const InteractiveConfig = require('../config/InteractiveConfig');
 
 class DatabaseManager {
-    constructor() {
+    constructor(dbConfig) {
         // this.config = null;
         this.db = null;
-        this.dbConfig = {
+        this.dbConfig = Object.assign({
             host: 'localhost',
             user: 'cms_user',
             password: 'cms_pass',
             database: 'localhost_cms'
             // insecureAuth: true,
-        };
+        }, dbConfig||{});
         // this.debug = false;
         // this.multiDomain = false;
         this.cacheHostname = {};
@@ -26,13 +26,13 @@ class DatabaseManager {
     isAvailable() { return this.db && this.db.state === 'authenticated';}
     isMultipleDomainMode() { return this.dbConfig.multiDomain === true;}
 
-    getPrimaryDomainTable()       { return new (require('../server/domain.table').DomainTable)(this.primaryDatabase); }
+    getPrimaryDomainTable()       { return new (require('../server/DomainTable'))(this.primaryDatabase); }
     getTableClasses() {
         return [
-            require('../user/user.table').UserTable,
-            require('../user/message/user-message.table').UserMessageTable,
-            require('../content/content.table').ContentTable,
-            require('../content/content-revision.table').ContentRevisionTable,
+            require('../user/UserTable'),
+            require('../user/message/UserMessageTable'),
+            require('../content/ContentTable'),
+            require('../content/ContentRevisionTable'),
             // require('../config/config.database').ConfigDatabase,
         ];
     }
@@ -142,7 +142,7 @@ class DatabaseManager {
 
 
         // Init Task Manager
-        // const { TaskAPI } = require('../service/task/task.manager');
+        // const TaskAPI = require('../service/task/task.manager');
         // await TaskAPI.configure(database);
 
     }

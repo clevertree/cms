@@ -98,8 +98,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
                 .map((input, i) => input.name + '=' + encodeURIComponent(input.value))
                 .join('&');
-            const method = 'POST'; // form.getAttribute('method');
-            const action = this.action;
+            const method = form.getAttribute('method');
+            const action = form.getAttribute('action');
 
             const xhr = new XMLHttpRequest();
             xhr.onload = (e) => {
@@ -123,8 +123,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("STATE", this.state);
             this.innerHTML =
                 `
-                <form action="${this.action}" method="POST" class="user user-form-message themed">
-                    <table class="themed">
+                <form action="${this.action}/:reply" method="POST" class="user user-form-message themed">
+                    <table class="user themed">
                         <caption>Read Message #${this.state.id}</caption>
                         <tbody>
                              <tr>
@@ -142,18 +142,26 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tr><td colspan="2"><hr/></td></tr>
                             <tr>
                                 <td colspan="2">
-                                    <div class="body-content">${(this.state.body||'').replace(/<[^>]+>/g,'').replace(/<\/[^>]+>/g,'')}</div>
+                                    <div class="body-content">${(this.state.body||'').replace("<", "&lt;")}</div>
                                 </td>
                             </tr>
                         </tbody>
-                        <tfoot>
+                    </table>
+                </form>
+                <form action="${this.action}/:reply" method="POST" class="user user-form-message-reply themed">
+                    <table class="user themed">
+                        <tbody>
                             <tr>
                                 <td colspan="2">
-                                    <textarea name="reply"></textarea>
+                                    <textarea name="reply" placeholder="Enter your reply here"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
                                     <button type="submit">Reply</button>
                                 </td>
                             </tr>
-                        </tfoot>
+                        </tbody>
                     </table>
                 </form>
 `;

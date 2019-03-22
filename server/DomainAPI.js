@@ -1,14 +1,14 @@
 const express = require('express');
 
-const { DatabaseManager } = require('../database/database.manager');
-const { ContentRenderer } = require('../content/content.renderer');
-const { DomainTable } = require("./domain.table");
-// const { ContentTable } = require("../article/article.database");
-const { UserTable } = require("../user/user.table");
-const { UserAPI } = require('../user/user.api');
-const { SessionAPI } = require('../user/session/session.api');
+const DatabaseManager = require('../database/DatabaseManager');
+const ContentRenderer = require('../content/ContentRenderer');
+const { domainTable } = require("./DomainTable");
+// const ContentTable = require("../article/article.database");
+const UserTable = require("../user/UserTable");
+const UserAPI = require('../user/UserAPI');
+const SessionAPI = require('../user/session/SessionAPI');
 
-class DomainAPI {
+class domainAPI {
     constructor() {
         this.router = null;
     }
@@ -30,7 +30,7 @@ class DomainAPI {
         const router = express.Router();
         router.use(express.urlencoded({ extended: true }));
         router.use(express.json());
-        router.use(SessionAPI.getMiddleware());
+        router.use(new SessionAPI.getMiddleware());
 
         // Handle Domain requests
         router.get('/[:]domain/[:]json',                    async (req, res) => await this.renderDomainJSON(req, res));
@@ -41,9 +41,9 @@ class DomainAPI {
 
     async renderDomainJSON(req, res) {
         try {
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const database = await req.server.selectDatabaseByRequest(req);
             const userTable = new UserTable(database);
-            const domainTable = new DomainTable(database);
+            const domainTable = new domainTable(database);
             const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
             if(!sessionUser || !sessionUser.isAdmin())
                 throw new Error("Not authorized");
@@ -77,9 +77,9 @@ class DomainAPI {
             });
             } else {
                 // Handle POST
-                const database = await DatabaseManager.selectDatabaseByRequest(req);
+                const database = await req.server.selectDatabaseByRequest(req);
                 const userTable = new UserTable(database);
-                const domainTable = new DomainTable(database);
+                const domainTable = new domainTable(database);
 
                 const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
                 if(!sessionUser || !sessionUser.isAdmin())
@@ -131,5 +131,5 @@ class DomainAPI {
 }
 
 
-module.exports = {DomainAPI: new DomainAPI()};
+module.exports = {domainAPI: new domainAPI()};
 

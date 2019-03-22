@@ -1,2 +1,2 @@
-const { HTTPServer } = require('./server/http.server');
+const HTTPServer = require('./server/HTTPServer');
 HTTPServer.listen();

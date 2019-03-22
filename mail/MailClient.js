@@ -1,16 +1,16 @@
 const nodemailer = require('nodemailer');
 const smtpTransport = require("nodemailer-smtp-transport");
 
-const { LocalConfig } = require('../config/local.config');
-const { InteractiveConfig } = require('../config/interactive.config');
-// const { DatabaseManager } = require('../database/database.manager');
+const LocalConfig = require('../config/LocalConfig');
+const InteractiveConfig = require('../config/InteractiveConfig');
+// const DatabaseManager = require('../database/database.manager');
 
 // const BASE_DIR = path.resolve(path.dirname(__dirname));
 
-class MailServer {
-    constructor() {
+class MailClient {
+    constructor(config) {
         this.server = null;
-        this.mailConfig = {};
+        this.mailConfig = config.mail.client;
     }
 
     getDefaultSender() { return this.mailConfig && this.mailConfig.auth ? this.mailConfig.auth.user : null; }
@@ -95,4 +95,4 @@ class MailServer {
     }
 }
 
-exports.MailServer = new MailServer();
+module.exports = MailClient;

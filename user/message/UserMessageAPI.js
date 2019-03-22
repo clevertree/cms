@@ -1,8 +1,8 @@
-const { UserAPI } = require('../user.api');
-const { DatabaseManager } = require('../../database/database.manager');
-const { UserTable } = require('../user.table');
-const { UserMessageTable } = require('./user-message.table');
-const { ContentRenderer } = require('../../content/content.renderer');
+const UserAPI = require('../UserAPI');
+const DatabaseManager = require('../../database/DatabaseManager');
+const UserTable = require('../UserTable');
+const UserMessageTable = require('./UserMessageTable');
+const ContentRenderer = require('../../content/ContentRenderer');
 
 
 class UserMessageAPI {
@@ -17,7 +17,8 @@ class UserMessageAPI {
         const router = express.Router();
 
         router.all('/[:]user/[:]message/:messageID(\\d+)',          async (req, res, next) => await this.userMessageRequest(req.params.messageID, req, res));
-        router.all('/[:]user/[:]message',                           async (req, res, next) => await this.userMessageSendRequest(null, req, res));
+        router.all('/[:]user/[:]message/:messageID(\\d+)/:reply',   async (req, res, next) => await this.userMessageSendRequest(null, req.params.messageID, req, res));
+        router.all('/[:]user/[:]message',                           async (req, res, next) => await this.userMessageSendRequest(null, null, req, res));
         router.all('/[:]user/:userID(\\w+)/[:]message',             async (req, res, next) => await this.userMessageSendRequest(req.params.userID, req, res));
 
         return (req, res, next) => {
@@ -25,11 +26,29 @@ class UserMessageAPI {
         }
     }
 
+    async sendMessage(database, to, from, subject, body, parent_id) {
+        const userTable = new UserTable(database);
+        const UserMessageTable = new UserMessageTable(database);
+        const toUser = await userTable.fetchUserByKey(to);
+        if(!toUser)
+            throw new Error("User not found: " + to);
+        const fromUser = await userTable.fetchUserByKey(from);
+        if(!fromUser) {
+            from = UserAPI.sanitizeInput(from, 'email') ;
+            body = `From: ${from}\n\n` + body;
+        }
+
+
+        const userMessage = await UserMessageTable.insertUserMessage(toUser.id, subject, body, parent_id, fromUser ? fromUser.id : null);
+        return userMessage;
+        // TODO: send an email
+    }
+
     async userMessageRequest(messageID, req, res) {
         try {
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const database = await req.server.selectDatabaseByRequest(req);
             const userTable = new UserTable(database);
-            const userMessageTable = new UserMessageTable(database);
+            const UserMessageTable = new UserMessageTable(database);
 
             switch(req.method) {
                 case 'GET':
@@ -39,7 +58,7 @@ class UserMessageAPI {
                     break;
 
                 case 'OPTIONS':
-                    const userMessage = await userMessageTable.fetchUserMessageByID(messageID);
+                    const userMessage = await UserMessageTable.fetchUserMessageByID(messageID);
                     // searchJSON.message = `Message: ${messageID}`;
                     return res.json(userMessage);
 
@@ -47,6 +66,13 @@ class UserMessageAPI {
                     // Handle POST
                     const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
 
+                    const userMessageReply = await this.sendMessage(database,
+                        req.body.to,
+                        sessionUser ? sessionUser.id : req.body.from,
+                        req.body.subject,
+                        req.body.body,
+                        req.body.parent_id ? parseInt(req.body.parent_id) : null
+                    );
                     // TODO: Delete Message + reply
 
                     return res.json({
@@ -62,11 +88,11 @@ class UserMessageAPI {
     }
 
 
-    async userMessageSendRequest (userID, req, res) {
+    async userMessageSendRequest (userID, messageID, req, res) {
         try {
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const database = await req.server.selectDatabaseByRequest(req);
             const userTable = new UserTable(database);
-            const userMessageTable = new UserMessageTable(database);
+            const UserMessageTable = new UserMessageTable(database);
 
             switch(req.method) {
                 case 'GET':
@@ -84,25 +110,18 @@ class UserMessageAPI {
                     // Handle POST
                     const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
 
-                    // TODO: for loop
-                    const toUser = await userTable.fetchUserByKey(req.body.to); // TODO: test match against userID
-                    if(!toUser)
-                        throw new Error("User not found: " + req.body.to);
-
-                    const from = UserAPI.sanitizeInput(req.body.from, 'email') ;
-                    const subject = UserAPI.sanitizeInput(req.body.subject, 'text') ;
-                    let body = UserAPI.sanitizeInput(req.body.body, 'text') ;
-                    const parent_id = req.body.parent_id ? parseInt(req.body.parent_id) : null;
-                    if(from)
-                        body = `From: ${from}\n\n` + body;
-
-                    const userMessage = await userMessageTable.insertUserMessage(toUser.id, subject, body, parent_id, sessionUser ? sessionUser.id : null);
-
-                    // TODO: send an email
+                    const userMessage = await this.sendMessage(database,
+                        req.body.to,
+                        sessionUser ? sessionUser.id : req.body.from,
+                        req.body.subject,
+                        req.body.body,
+                        req.body.parent_id ? parseInt(req.body.parent_id) : null
+                        );
+                    // UserMessageTable.insertUserMessage(toUser.id, subject, body, parent_id, sessionUser ? sessionUser.id : null);
 
                     return res.json({
                         redirect: userMessage.url,
-                        message: `Message sent to ${toUser.username} successfully. Redirecting...`,
+                        message: `Message sent to ${req.body.to} successfully. Redirecting...`,
                         insertID: userMessage.id
                     });
             }
@@ -112,4 +131,4 @@ class UserMessageAPI {
     }
 
 }
-module.exports = { UserMessageAPI: new UserMessageAPI() };
+module.exports = UserMessageAPI;

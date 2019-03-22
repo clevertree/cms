@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const ContentRow = require('./ContentRow');
 
 // Init
 class ContentTable {
@@ -8,10 +9,12 @@ class ContentTable {
         this.database = database;
         this.table = tablePrefix + '`content`';
     }
-
+    get ContentRevisionTable () {
+        return require('./ContentRevisionTable').ContentRevisionTable;
+    }
     /** SQL Query Method **/
     async queryAsync(SQL, values) {
-        const DatabaseManager = require('../database/database.manager').DatabaseManager;
+        const DatabaseManager = require('../database/DatabaseManager').DatabaseManager;
         return await DatabaseManager.queryAsync(SQL, values);
     }
 
@@ -105,9 +108,7 @@ class ContentTable {
         }
 
         // Content is being updated, so store old data as a revision.
-        const { ContentRevisionTable } = require('./content-revision.table');
-        const contentRevisionTable = new ContentRevisionTable(this.database);
-        await contentRevisionTable.insertContentRevision(
+        await this.ContentRevisionTable.insertContentRevision(
             existingContent.id,
             existingContent.data,
             existingContent.user_id || -1
@@ -190,24 +191,4 @@ CREATE TABLE IF NOT EXISTS ${this.table} (
 
 }
 
-class ContentRow {
-
-    constructor(row) {
-        Object.assign(this, row);
-    }
-
-
-    get mimeType() {
-        const ext = path.extname(this.path);
-        if(!ext)
-            return null;
-        const mime = require('mime');
-        return mime.lookup(ext);
-    }
-
-
-    get url() { return this.path || `/:content/${this.id}/`}
-    // hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
-}
-
-module.exports = {ContentTable, ContentRow};
+module.exports = ContentTable;

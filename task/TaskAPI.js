@@ -1,33 +1,25 @@
 const express = require('express');
 const path = require('path');
 
-const { HTTPServer } = require('../server/http.server');
-const { DatabaseManager } = require('../database/database.manager');
-const { ContentRenderer } = require('../content/content.renderer');
-// const { UserAPI } = require('../../user/user.api');
+const HTTPServer = require('../server/HTTPServer');
+const DatabaseManager = require('../database/DatabaseManager');
+const ContentRenderer = require('../content/ContentRenderer');
+// const UserAPI = require('../../user/user.api');
 // const { ContentAPI } = require('../content/content.api');
-const { UserTable } = require("../user/user.table");
-const { SessionAPI } = require('../user/session/session.api');
+const UserTable = require("../user/UserTable");
+const SessionAPI = require('../user/session/SessionAPI');
 // TODO: approve all drafts
 
 const DIR_TASK = path.resolve(__dirname);
 
 class TaskAPI {
-    get ContentAPI() { return require('../content/content.api').ContentAPI; }
+    get ContentAPI() { return require('../content/ContentAPI').ContentAPI; }
     constructor() {
         this.taskClass = {};
+        this.addTask(require('../user/task/AdminConfigureTask').AdminConfigureTask);
+        this.addTask(require('../database/task/DatabaseConfigureTask').databaseConfigureTask);
     }
 
-    async configure(config=null) {
-        this.taskClass = {};
-        await this.addTask(require('../user/task/admin-configure.task').AdminConfigureTask);
-        await this.addTask(require('../database/task/database-configure.task').DatabaseConfigureTask);
-
-    }
-
-    async configureInteractive() {
-        await this.configure();
-    }
 
 
     getMiddleware() {
@@ -36,7 +28,7 @@ class TaskAPI {
         const router = express.Router();
         router.use(express.urlencoded({ extended: true }));
         router.use(express.json());
-        router.use(SessionAPI.getMiddleware());
+        router.use(new SessionAPI.getMiddleware());
 
         // Handle Task requests
         // router.get('/[:]task/:taskName/[:]json',        async (req, res) => await this.renderTaskJSON(req.params.taskName || null, req, res));
@@ -137,7 +129,7 @@ class TaskAPI {
     }
 
 
-    async addTask(taskClass) {
+    addTask(taskClass) {
         let taskName = taskClass.toString();
         if(taskClass.getTaskName)
             taskName = taskClass.getTaskName();

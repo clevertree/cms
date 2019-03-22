@@ -2,7 +2,7 @@ const cookieParser = require('cookie-parser');
 const session = require('client-sessions');
 const express = require('express');
 
-const { LocalConfig } = require('../../config/local.config');
+const LocalConfig = require('../../config/LocalConfig');
 
 class SessionAPI {
     constructor() {
@@ -41,7 +41,6 @@ class SessionAPI {
 
     }
 
-
     async configureInteractive() {
         await this.configure();
     }
@@ -75,5 +74,5 @@ class SessionAPI {
 }
 
 
-module.exports = {SessionAPI: new SessionAPI()};
+module.exports = SessionAPI;
 

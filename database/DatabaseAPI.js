@@ -1,10 +1,10 @@
 const express = require('express');
 
-const { DatabaseManager } = require('./database.manager');
-const { UserAPI } = require('../user/user.api');
-const { UserTable } = require('../user/user.table');
-const { ContentRenderer } = require('../content/content.renderer');
-const { SessionAPI } = require('../user/session/session.api');
+const DatabaseManager = require('./DatabaseManager');
+const UserAPI = require('../user/UserAPI');
+const UserTable = require('../user/UserTable');
+const ContentRenderer = require('../content/ContentRenderer');
+const SessionAPI = require('../user/session/SessionAPI');
 class DatabaseAPI {
     constructor() {
     }
@@ -15,7 +15,7 @@ class DatabaseAPI {
         let router = express.Router();
         router.use(express.urlencoded({ extended: true }));
         router.use(express.json());
-        router.use(SessionAPI.getMiddleware());
+        router.use(new SessionAPI.getMiddleware());
 
         // Handle Database requests
         router.get('/[:]database/[:]json',                    async (req, res) => await this.renderDatabaseJSON(req, res));
@@ -41,7 +41,7 @@ class DatabaseAPI {
 
     async renderDatabaseJSON(req, res) {
         try {
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const database = await req.server.selectDatabaseByRequest(req);
             const userTable = new UserTable(database);
             const databaseDB = DatabaseManager.getDatabaseDB(database);
             const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
@@ -77,7 +77,7 @@ class DatabaseAPI {
                 });
             } else {
                 // Handle POST
-                const database = await DatabaseManager.selectDatabaseByRequest(req);
+                const database = await req.server.selectDatabaseByRequest(req);
                 const userTable = new UserTable(database);
                 const databaseDB = DatabaseManager.getDatabaseDB(database);
 
@@ -155,5 +155,5 @@ class DatabaseAPI {
 }
 
 
-module.exports = {DatabaseAPI: new DatabaseAPI()};
+module.exports = DatabaseAPI;
 

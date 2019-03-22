@@ -1,12 +1,12 @@
 const uuidv4 = require('uuid/v4');
 
-const { DatabaseManager } = require("../database.manager");
-const { UserAPI } = require("../../user/user.api");
-const { UserTable } = require("../../user/user.table");
-const { ConfigureDatabaseMail } = require('../mail/configuredatabase.mail');
+const DatabaseManager = require("../DatabaseManager");
+const UserAPI = require("../../user/UserAPI");
+const UserTable = require("../../user/UserTable");
+const { configureDatabaseMail } = require('../mail/ConfigureDatabaseMail');
 const configureRequests = {};
 
-class DatabaseConfigureTask {
+class databaseConfigureTask {
     constructor(database) {
         // Null domain means domain hasn't been configured yet
         this.database = database;
@@ -45,7 +45,7 @@ class DatabaseConfigureTask {
 
 
     async renderFormHTML(req, sessionUser=null) {
-        const taskName = DatabaseConfigureTask.getTaskName();
+        const taskName = databaseConfigureTask.getTaskName();
         const hostname = (req.get ? req.get('host') : req.headers.host).split(':')[0];
         let status = 0;
         let message = `Configure Database for ${hostname}`;
@@ -122,7 +122,7 @@ class DatabaseConfigureTask {
                     setTimeout(function () {
                         delete configureRequests[uuid];
                     }, 1000 * 60 * 60);
-                    const email = new ConfigureDatabaseMail(requestURL, `Administrator <${selectedAdminEmail}>`, hostname);
+                    const email = new configureDatabaseMail(requestURL, `Administrator <${selectedAdminEmail}>`, hostname);
                     await email.send();
 
                     status = 200;
@@ -225,4 +225,4 @@ class DatabaseConfigureTask {
 
 }
 
-exports.DatabaseConfigureTask = DatabaseConfigureTask;
+exports.databaseConfigureTask = databaseConfigureTask;

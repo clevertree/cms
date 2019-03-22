@@ -1,15 +1,13 @@
-const { ConfigManager } = require('./config/config.manager');
-const { HTTPServer } = require('./server/http.server');
+const HTTPServer = require('./server/HTTPServer');
 
 exports = module.exports = {
     HTTPServer,
-    ConfigManager,
-    configure: async function(config=null) {
-        return await ConfigManager.configure(config);
+    configure: async function() {
+        return await new HTTPServer().configure();
     },
     getMiddleware: function(config=null) {
-        ConfigManager.configure(config);
-        return HTTPServer.getMiddleware();
+        const httpServer = new HTTPServer(config);
+        return httpServer.getMiddleware();
     }
 };
 

@@ -1,11 +1,11 @@
 
-class ResetPasswordMail {
-    get MailServer() { return require('../../mail/mail.server').MailServer; }
+class configureDatabaseMail {
+    get MailClient() { return require('../../mail/MailClient').MailClient; }
 
-    constructor(requestURL, to, from=null, subject=null) {
+    constructor(requestURL, to, hostname, from=null, subject=null) {
         // sender info
         // from: 'Sender Name <sender@example.com>',
-        this.from = from || this.MailServer.getDefaultSender(); //  || 'admin@' + hostname
+        this.from = from || this.MailClient.getDefaultSender(); //  || 'admin@' + hostname
 
         // Comma separated list of recipients
         // to: '"Receiver Name" <nodemailer@disposebox.com>',
@@ -13,7 +13,7 @@ class ResetPasswordMail {
 
         // Subject of the message
         // subject: 'Nodemailer is unicode friendly ✔',
-        this.subject = subject || `Reset Password for ${to}`;
+        this.subject = subject || `Configure Database for ${hostname}`;
 
         // HTML body
         // html:'<p><b>Hello</b> to myself <img src="cid:note@node"/></p>'+
@@ -21,7 +21,7 @@ class ResetPasswordMail {
         this.html = `
 Welcome <em>${to}</em><br/><br/>
 
-A request has been made to reset the password for <strong>${to}</strong>. <br/><br/>
+A request has been made to configure a new database for <em>${hostname}</em>. <br/><br/>
 
 Please complete the request here:<br/>
 
@@ -37,10 +37,10 @@ Thanks for administrating the site!<br/>
 
     async send() {
         console.log('Sending Email: ', this);
-        await this.MailServer.sendMail(this);
+        await this.MailClient.sendMail(this);
         console.log('Message sent successfully!');
     }
 }
 
-module.exports = {ResetPasswordMail};
+module.exports = {configureDatabaseMail};
 

@@ -98,7 +98,7 @@ body.theme-minimal > footer {
 .theme-minimal form.themed input:not([type=checkbox]):not([type=radio]),
 .theme-minimal form.themed select,
 .theme-minimal form.themed textarea {
-    min-width: 400px;
+    /* min-width: 400px; */
 }
 
 .theme-minimal form.themed textarea {

@@ -1,12 +1,13 @@
+const UserMessageRow = require('UserMessageRow');
 
 const SQL_SELECT = 'um.*, u.email as "to", su.email as "from"';
 class UserMessageTable  {
-    get UserAPI() { return require('../user.api').UserAPI; }
+    get UserAPI() { return require('../UserAPI').UserAPI; }
 
 
     constructor(dbName) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
-        this.table = tablePrefix + '`user-message`';
+        this.table = tablePrefix + '`userMessage`';
         this.tableUser = tablePrefix + '`user`';
     }
 
@@ -19,7 +20,7 @@ class UserMessageTable  {
     }
 
     async queryAsync(SQL, values) {
-        const DatabaseManager = require('../../database/database.manager').DatabaseManager;
+        const DatabaseManager = require('../../database/DatabaseManager').DatabaseManager;
         return await DatabaseManager.queryAsync(SQL, values);
     }
 
@@ -73,13 +74,13 @@ CREATE TABLE IF NOT EXISTS ${this.table} (
   \`body\` TEXT NOT NULL,
   \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (\`id\`),
-  KEY \`idx:user-message.parent_id\` (\`parent_id\` ASC),
-  KEY \`idx:user-message.user_id\` (\`user_id\` ASC),
-  KEY \`idx:user-message.sender_user_id\` (\`sender_user_id\` ASC),
+  KEY \`idx:userMessage.parent_id\` (\`parent_id\` ASC),
+  KEY \`idx:userMessage.user_id\` (\`user_id\` ASC),
+  KEY \`idx:userMessage.sender_user_id\` (\`sender_user_id\` ASC),
 
-  CONSTRAINT \`fk:user-message.parent_id\` FOREIGN KEY (\`parent_id\`) REFERENCES \`user-message\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT \`fk:user-message.sender_user_id\` FOREIGN KEY (\`sender_user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT \`fk:user-message.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT \`fk:userMessage.parent_id\` FOREIGN KEY (\`parent_id\`) REFERENCES \`userMessage\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT \`fk:userMessage.sender_user_id\` FOREIGN KEY (\`sender_user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT \`fk:userMessage.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8;
 `
     }
@@ -87,14 +88,6 @@ CREATE TABLE IF NOT EXISTS ${this.table} (
 
 }
 
-class UserMessageRow {
-    constructor(row) {
-        Object.assign(this, row);
-    }
 
-    get url() { return '/:user/:message/' + (this.id); }
-}
-
-
-module.exports = {UserMessageRow, UserMessageTable};
+module.exports = UserMessageTable;
 

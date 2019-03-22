@@ -1,16 +1,17 @@
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 
-// const { DatabaseManager } = require('../database/database.manager');
-const { InteractiveConfig } = require('../config/interactive.config');
-// const { LocalConfig } = require('../config/local.config');
+// const DatabaseManager = require('../database/database.manager');
+const InteractiveConfig = require('../config/InteractiveConfig');
+const UserRow = require("../user/UserRow");
+// const LocalConfig = require('../config/local.config');
 // const { ConfigDatabase } = require("../config/config.database");
 
 
-// const { ConfigManager } = require('../config/config.manager');
+// const ConfigManager = require('../config/config.manager');
 
 class UserTable  {
-    get UserAPI() { return require('./user.api').UserAPI; }
+    get UserAPI() { return require('./UserAPI').UserAPI; }
 
     constructor(dbName) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
@@ -100,7 +101,7 @@ class UserTable  {
     }
 
     async queryAsync(SQL, values) {
-        const DatabaseManager = require('../database/database.manager').DatabaseManager;
+        const DatabaseManager = require('../database/DatabaseManager').DatabaseManager;
         return await DatabaseManager.queryAsync(SQL, values);
     }
 
@@ -233,20 +234,6 @@ CREATE TABLE IF NOT EXISTS ${this.table} (
 
 }
 
-class UserRow {
 
-    constructor(row) {
-        Object.assign(this, row);
-        this.profile = this.profile ? JSON.parse(this.profile) : {};
-        this.flags = this.flags.split(',');
-    }
-
-    get url() { return '/:user/' + (this.username || this.id); }
-    hasFlag(flag) { return this.flags && this.flags.indexOf(flag) !== -1; }
-    isAdmin() { return this.hasFlag('admin'); }
-    // isGuest() { return this.hasFlag('guest'); }
-}
-
-
-module.exports = {UserRow, UserTable};
+module.exports = UserTable;
 

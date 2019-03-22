@@ -4,27 +4,27 @@ const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 const path = require('path');
 
-const { DNSManager } = require('../server/dns.manager');
+const DNSManager = require('../server/DNSManager');
 
-// const { LocalConfig } = require('../config/local.config');
-// const { ConfigManager } = require('../config/config.manager');
-const { DatabaseManager } = require('../database/database.manager');
+// const LocalConfig = require('../config/local.config');
+// const ConfigManager = require('../config/config.manager');
+// const DatabaseManager = require('../database/DatabaseManager');
 // const { ContentAPI } = require('../content/content.api');
-const { ContentTable } = require("../content/content.table");
-const { UserTable } = require('./user.table');
-const { UserMessageTable } = require('./message/user-message.table');
-const { SessionAPI } = require('./session/session.api');
-// const { HTTPServer } = require('../server/server.server');
+const ContentTable = require("../content/ContentTable");
+const UserTable = require('./UserTable');
+const UserMessageTable = require('./message/UserMessageTable');
+const SessionAPI = require('./session/SessionAPI');
+// const HTTPServer = require('../server/server.server');
 
 // const { DNSManager } = require('../service/domain/dns.manager');
-const { ContentRenderer } = require('../content/content.renderer');
-const { TaskAPI } = require('../task/task.api');
-const { ResetPasswordMail } = require("./mail/resetpassword.mail");
+const ContentRenderer = require('../content/ContentRenderer');
+const TaskAPI = require('../task/TaskAPI');
+const { ResetPasswordMail } = require("./mail/ResetPasswordMail");
 
 const DIR_USER = path.resolve(__dirname);
 
 class UserAPI {
-    get ContentAPI() { return require('../content/content.api').ContentAPI; }
+    get ContentAPI() { return require('../content/ContentAPI'); }
 
     constructor() {
         this.resetPasswordRequests = {
@@ -50,7 +50,7 @@ class UserAPI {
         // API Routes
         router.use(express.urlencoded({ extended: true }));
         router.use(express.json());
-        router.use(SessionAPI.getMiddleware());
+        router.use(new SessionAPI.getMiddleware());
 
         router.all('/[:]user/:userID(\\w+)',                        async (req, res, next) => await this.handleUpdateRequest('profile', req.params.userID, req, res, next));
         router.all('/[:]user/:userID(\\w+)/[:]edit',                async (req, res, next) => await this.handleUpdateRequest('edit', req.params.userID, req, res, next));
@@ -69,7 +69,8 @@ class UserAPI {
         // router.all('/[:]user/[:]message/:messageID(\\d+)',          async (req, res, next) => await this.handleMessageRequest(req.params.messageID, req, res));
         // router.all('/[:]user/[:]message',                           async (req, res, next) => await this.handleMessageSendRequest(null, req, res));
         // router.all('/[:]user/:userID(\\w+)/[:]message',             async (req, res, next) => await this.handleMessageSendRequest(req.params.userID, req, res));
-        router.use(require('./message/user-message.api').UserMessageAPI.getMiddleware());
+        const UserMessageAPI = require('./message/UserMessageAPI');
+        router.use(new UserMessageAPI().getMiddleware());
 
         // User Asset files
         router.get('/[:]user/[:]client/*',                          async (req, res, next) => await this.handleUserStaticFiles(req, res, next));
@@ -125,7 +126,7 @@ class UserAPI {
         if(!profile)
             throw new Error("Invalid Profile");
 
-        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const database = await req.server.selectDatabaseByRequest(req);
         const userTable = new UserTable(database);
         const user = await userTable.fetchUserByKey(userID);
         if(!user)
@@ -149,7 +150,7 @@ class UserAPI {
     }
 
     async updateFlags(req, userID, flags) {
-        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const database = await req.server.selectDatabaseByRequest(req);
         const userTable = new UserTable(database);
         if(!userID)
             throw new Error("Invalid User ID");
@@ -177,7 +178,7 @@ class UserAPI {
     async updatePassword(req, userID, password_old, password_new, password_confirm) {
         if(!userID)
             throw new Error("Invalid User ID");
-        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const database = await req.server.selectDatabaseByRequest(req);
         const userTable = new UserTable(database);
         const user = await userTable.fetchUserByKey(userID, 'u.*');
         if(!user)
@@ -223,7 +224,7 @@ class UserAPI {
         if(password !== password_confirm && password_confirm !== null)
             throw new Error("Confirm & Password do not match");
 
-        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const database = await req.server.selectDatabaseByRequest(req);
         const userTable = new UserTable(database);
         const user = await userTable.createUser(username, email, password);
 
@@ -241,7 +242,7 @@ class UserAPI {
         if(!password)
             throw new Error("Password is required");
 
-        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const database = await req.server.selectDatabaseByRequest(req);
         const userTable = new UserTable(database);
         const sessionUser = await userTable.fetchUserByKey(userID, 'u.*');
         if(!sessionUser)
@@ -261,7 +262,7 @@ class UserAPI {
             req.session.setDuration(1000 * 60 * 60 * 24 * 14) // 2 weeks;
         }
 
-        const activeTasks = await TaskAPI.getActiveTasks(req, database, sessionUser);
+        const activeTasks = await new TaskAPI().getActiveTasks(req, database, sessionUser);
         const activeTaskList = Object.values(activeTasks);
         let activeTaskHTML = '';
         if(activeTaskList.length > 0)
@@ -274,7 +275,7 @@ class UserAPI {
 
 
     async logout(req, res) {
-        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const database = await req.server.selectDatabaseByRequest(req);
         const userTable = new UserTable(database);
         if(req.session.user_session) {
             await userTable.deleteUserSessionByID(req.session.user_session);
@@ -288,7 +289,7 @@ class UserAPI {
 
     async handleLoginRequest(req, res, next) {
         try {
-            await DatabaseManager.selectDatabaseByRequest(req);
+            await req.server.selectDatabaseByRequest(req);
             if(req.method === 'GET') {
                 const userID = this.sanitizeInput(req.query.userID || null, 'email');
                 // Render Editor Form
@@ -339,7 +340,7 @@ class UserAPI {
 
     async handleRegisterRequest(req, res) {
         try {
-            await DatabaseManager.selectDatabaseByRequest(req);
+            await req.server.selectDatabaseByRequest(req);
             if(req.method === 'GET') {
                 // Render Editor Form
                 await ContentRenderer.send(req, res, {
@@ -384,7 +385,7 @@ class UserAPI {
     async handleForgotPassword(req, res) {
         try {
             const userID = this.sanitizeInput(req.query.userID || null, 'email');
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const database = await req.server.selectDatabaseByRequest(req);
             const userTable = new UserTable(database);
 
             switch(req.method) {
@@ -425,7 +426,7 @@ class UserAPI {
     async handleResetPassword(userID, uuid, req, res) {
         try {
 
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const database = await req.server.selectDatabaseByRequest(req);
             const userTable = new UserTable(database);
             const user = await userTable.fetchUserByKey(userID);
             if(!user)
@@ -483,7 +484,7 @@ class UserAPI {
     async handleUpdateRequest(type, userID, req, res, next) {
         try {
             userID = this.sanitizeInput(userID, 'email');
-            const database = await DatabaseManager.selectDatabaseByRequest(req);
+            const database = await req.server.selectDatabaseByRequest(req);
             const userTable = new UserTable(database);
             let user = await userTable.fetchUserByKey(userID, 'u.*');
             if(!user)
@@ -619,7 +620,7 @@ class UserAPI {
 
     async searchUserList(req) {
 
-        const database = await DatabaseManager.selectDatabaseByRequest(req);
+        const database = await req.server.selectDatabaseByRequest(req);
         const userTable = new UserTable(database);
 
         // Handle POST
@@ -690,6 +691,7 @@ class UserAPI {
                 break;
             default:
             case 'text':
+                input=input.replace("<", "&lt;");
                 input=input.replace(/<[^>]+>/g,'').replace(/<\/[^>]+>/g,'').trim();
                 break;
         }
@@ -704,7 +706,7 @@ class UserAPI {
 }
 
 
-module.exports = {UserAPI: new UserAPI()};
+module.exports = UserAPI;
 
 function encodeHTML(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');

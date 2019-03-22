@@ -1,8 +1,8 @@
-const { DatabaseManager } = require('../database/database.manager');
+const DatabaseManager = require('../database/DatabaseManager');
 
-// const { ConfigManager } = require('../config/config.manager');
+// const ConfigManager = require('../config/config.manager');
 
-class DomainTable  {
+class domainTable  {
     constructor(dbName, debug=false) {
         if(!dbName)
             throw new Error("Database name is required");
@@ -18,7 +18,7 @@ class DomainTable  {
 
     /** SQL Query Method **/
     async queryAsync(SQL, values) {
-        const DatabaseManager = require('../database/database.manager').DatabaseManager;
+        const DatabaseManager = require('../database/DatabaseManager').DatabaseManager;
         return await DatabaseManager.queryAsync(SQL, values);
     }
 
@@ -86,5 +86,5 @@ class DomainRow {
 }
 
 
-module.exports = {DomainRow, DomainTable};
+module.exports = {DomainRow, domainTable};
 

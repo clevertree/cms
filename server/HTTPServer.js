@@ -1,38 +1,52 @@
 const path = require('path');
 const express = require('express');
 
-const { LocalConfig } = require('../config/local.config');
-const { InteractiveConfig } = require('../config/interactive.config');
+const LocalConfig = require('../config/LocalConfig');
+const InteractiveConfig = require('../config/InteractiveConfig');
+
+const SessionAPI = require('../session/SessionAPI');
+const DatabaseAPI = require('../database/DatabaseAPI');
+const UserAPI = require('../user/UserAPI');
+const ContentAPI = require('../content/ContentAPI');
+const TaskAPI = require('../task/TaskAPI');
+const MailClient = require('../mail/MailClient');
 
 const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
 
 class HTTPServer {
-    constructor() {
+    constructor(config) {
+        if(!config) {
+            const localConfig = new LocalConfig();
+            config = localConfig.getAll();
+            if(!config.database)
+                config.database = {};
+        } else {
+            config.server = Object.assign({
+                httpPort: 8080,
+                sslEnable: false,
+                sslPort: 8443,
+            }, config.server || {})
+        }
+        this.dbClient = new DatabaseManager(config);
+        this.mailClient = new MailClient(config);
+        this.API = {
+            'session': new SessionAPI(config),
+            'database': new DatabaseAPI(config),
+            'user': new UserAPI(config),
+            'content': new ContentAPI(config),
+            'task': new TaskAPI(config),
+        }
+        this.sessionAPI = new DatabaseAPI(config);
         this.httpServer = null;
         this.sslServer = null;
-        this.serverConfig = {
-            httpPort: 8080,
-            sslEnable: false,
-            sslPort: 8443,
-            // insecureAuth: true,
-        };
+        this.serverConfig = config.server;
     }
 
-    async configure(config=null) {
-        if(config && typeof config.database === 'object') {
-            Object.assign(this.serverConfig, config.database);
-        } else {
-            const localConfig = new LocalConfig();
-            const serverConfig = await localConfig.getOrCreate('server');
-            Object.assign(this.serverConfig, serverConfig);
-            Object.assign(serverConfig, this.serverConfig);
-            await localConfig.saveAll();
-        }
+    async selectDatabaseByRequest(req, orThrowError=true) {
+        return await this.dbClient.selectDatabaseByRequest(req, orThrowError);
     }
 
-
-    async configureInteractive() {
-        await this.configure();
+    async configure() {
 
         // const defaultHostname     = (require('os').hostname()).toLowerCase();
         let serverConfig = Object.assign({}, this.serverConfig);
@@ -102,19 +116,12 @@ class HTTPServer {
 
 
     getMiddleware() {
-        const { DatabaseAPI } = require('../database/database.api');
-        const { UserAPI } = require('../user/user.api');
-        const { ContentAPI } = require('../content/content.api');
-        const { TaskAPI } = require('../task/task.api');
-
         const router = express.Router();
             // Routes
-        router.use(DatabaseAPI.getMiddleware());
-        router.use(UserAPI.getMiddleware());
-        router.use(ContentAPI.getMiddleware());
-        router.use(TaskAPI.getMiddleware());
+        router.use(Object.values(this.API));
 
         return (req, res, next) => {
+            req.server = this;
             return router(req, res, next);
         };
     }
@@ -154,8 +161,12 @@ class HTTPServer {
 
     async listen() {
         try {
-            const { ConfigManager } = require('../config/config.manager');
-            await ConfigManager.configure(); // TODO: pass config?
+
+            if(process && process.argv && process.argv.indexOf('--configure') !== -1) {
+                await this.configure();
+            }
+            // const ConfigManager = require('../config/ConfigManager');
+            // await ConfigManager.configure(); // TODO: pass config?
 
             await this.createServers();
         } catch (e) {
@@ -211,4 +222,4 @@ class HTTPServer {
 
 }
 
-exports.HTTPServer = new HTTPServer();
+module.exports = HTTPServer;

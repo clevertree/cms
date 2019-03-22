@@ -1,9 +1,10 @@
+const ContentRevisionRow = require('./ContentRevisionRow');
 // TODO: user_id isn't available during insert
 // Init
 class ContentRevisionTable {
     constructor(dbName) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
-        this.table = tablePrefix + '`content-revision`';
+        this.table = tablePrefix + '`contentRevision`';
     }
 
     /** Configure Table **/
@@ -18,7 +19,7 @@ class ContentRevisionTable {
 
     /** SQL Query Method **/
     async queryAsync(SQL, values) {
-        const DatabaseManager = require('../database/database.manager').DatabaseManager;
+        const DatabaseManager = require('../database/DatabaseManager').DatabaseManager;
         return await DatabaseManager.queryAsync(SQL, values);
     }
 
@@ -87,11 +88,11 @@ CREATE TABLE IF NOT EXISTS ${this.table} (
   \`data\` BLOB DEFAULT NULL,
   \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (\`id\`),
-  KEY \`idx:content-revision.content_id\` (\`content_id\` ASC),
-  KEY \`idx:content-revision.user_id\` (\`user_id\` ASC),
+  KEY \`idx:contentRevision.content_id\` (\`content_id\` ASC),
+  KEY \`idx:contentRevision.user_id\` (\`user_id\` ASC),
 
-  CONSTRAINT \`fk:content-revision.content_id\` FOREIGN KEY (\`content_id\`) REFERENCES \`content\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT \`fk:content-revision.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT \`fk:contentRevision.content_id\` FOREIGN KEY (\`content_id\`) REFERENCES \`content\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT \`fk:contentRevision.user_id\` FOREIGN KEY (\`user_id\`) REFERENCES \`user\` (\`id\`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 `
     }
@@ -99,7 +100,7 @@ CREATE TABLE IF NOT EXISTS ${this.table} (
 }
 
 
-class ContentRevisionRow {
+class contentRevisionRow {
 
     constructor(row) {
         Object.assign(this, row);
@@ -107,5 +108,5 @@ class ContentRevisionRow {
 
 }
 
-module.exports = {ContentRevisionTable, ContentRevisionRow};
+module.exports = {ContentRevisionTable: ContentRevisionTable, contentRevisionRow};
 

@@ -1,11 +1,11 @@
 
 class CreateAdminMail {
-    get MailServer() { return require('../../mail/mail.server').MailServer; }
+    get MailClient() { return require('../../mail/MailClient').MailClient; }
 
     constructor(requestURL, to, hostname, from=null, subject=null) {
         // sender info
         // from: 'Sender Name <sender@example.com>',
-        this.from = from || this.MailServer.getDefaultSender(); //  || 'admin@' + hostname
+        this.from = from || this.MailClient.getDefaultSender(); //  || 'admin@' + hostname
 
         // Comma separated list of recipients
         // to: '"Receiver Name" <nodemailer@disposebox.com>',
@@ -37,10 +37,10 @@ Thanks for administrating the site!<br/>
 
     async send() {
         console.log('Sending Email: ', this);
-        await this.MailServer.sendMail(this);
+        await this.MailClient.sendMail(this);
         console.log('Message sent successfully!');
     }
 }
 
-module.exports = {CreateAdminMail};
+module.exports = CreateAdminMail;
 
