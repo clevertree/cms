@@ -212,9 +212,9 @@ class databaseConfigureTask {
                         <tr>
                             <td colspan="2" style="text-align: right;">
                                 ${requestUUID ? `
-                                <button type="submit">Create Domain Database</button>
+                                <button type="submit" class="themed">Create Domain Database</button>
                                 ` : `
-                                <button type="submit">Send Validation Email</button>
+                                <button type="submit" class="themed">Send Validation Email</button>
                                 `}
                             </td>
                         </tr>

@@ -26,25 +26,25 @@ class ContentAPI {
 
         const router = express.Router();
         const PM = [express.urlencoded({ extended: true }), express.json()];
-        const SM = new SessionAPI().getMiddleware();
+        // const SM = new SessionAPI().getMiddleware();
         // const FM = multiparty.multipartyExpress();
         // Handle Content requests
-        // router.use(                                             SM, async (req, res, next) => await this.renderContentByPath(req, res,next));
+        // router.use(                                             async (req, res, next) => await this.renderContentByPath(req, res,next));
 //['/[\\w/_-]+', '/'],
-        router.get('/[:]content/:id/[:]json',                   SM, async (req, res, next) => await this.renderContentByID(true, req, res, next));
-        router.get(['/[:]content/:id/view', '/[:]content/:id'], SM, async (req, res, next) => await this.renderContentByID(false, req, res, next));
-        router.get('/[:]content/[:]json',                       SM, async (req, res) => await this.renderContentListJSON(req, res));
+        router.get('/[:]content/:id/[:]json',                       async (req, res, next) => await this.renderContentByID(true, req, res, next));
+        router.get(['/[:]content/:id/view', '/[:]content/:id'],     async (req, res, next) => await this.renderContentByID(false, req, res, next));
+        router.get('/[:]content/[:]json',                           async (req, res) => await this.renderContentListJSON(req, res));
         // TODO: sync
 
-        router.all('/[:]content/:id/[:]edit',                   SM, PM, async (req, res) => await this.renderContentEditorByID(req, res));
-        router.all('/[:]content/:id/[:]delete',                 SM, PM, async (req, res) => await this.renderContentDeleteByID(req, res));
-        router.all('/[:]content/[:]add',                        SM, PM, async (req, res) => await this.renderContentAdd(req, res));
-        router.all('/[:]content/[:]upload',                     SM, PM, async (req, res) => await this.renderContentUpload(req, res));
-        router.all(['/[:]content', '/[:]content/[:]list'],      SM, PM, async (req, res) => await this.renderContentList(req, res));
+        router.all('/[:]content/:id/[:]edit',                       PM, async (req, res) => await this.renderContentEditorByID(req, res));
+        router.all('/[:]content/:id/[:]delete',                     PM, async (req, res) => await this.renderContentDeleteByID(req, res));
+        router.all('/[:]content/[:]add',                            PM, async (req, res) => await this.renderContentAdd(req, res));
+        router.all('/[:]content/[:]upload',                         PM, async (req, res) => await this.renderContentUpload(req, res));
+        router.all(['/[:]content', '/[:]content/[:]list'],          PM, async (req, res) => await this.renderContentList(req, res));
 
 
         // User Asset files
-        router.get('/[:]content/[:]client/*',                      async (req, res, next) => await this.handleContentStaticFiles(req, res, next));
+        router.get('/[:]content/[:]client/*',                       async (req, res, next) => await this.handleContentStaticFiles(req, res, next));
 
 
         return async (req, res, next) => {
@@ -59,10 +59,10 @@ class ContentAPI {
                     case null:
                     case 'text/html':
                         // Load session if we're using the theme
-                        const SM = new SessionAPI().getMiddleware();
-                        SM(req, res, async () => {
-                            await ContentRenderer.send(req, res, content);
-                        });
+                        // const SM = new SessionAPI().getMiddleware();
+                        // SM(req, res, async () => {
+                        await ContentRenderer.send(req, res, content);
+                        // });
                         return;
                     default:
                         await this.renderData(req, res, content.data, content.mimeType, content.updated);
@@ -162,26 +162,26 @@ class ContentAPI {
             } else {
 
                 // Load session if we're using the theme
-                const SM = new SessionAPI().getMiddleware();
-                SM(req, res, async () => {
+                // const SM = new SessionAPI().getMiddleware();
+                // SM(req, res, async () => {
                     // const mimeType = this.getMimeType(path.extname(content.path) || '');
-                    switch(content.mimeType) {
-                        case 'text/html':
-                            await ContentRenderer.send(req, res, content);
-                            break;
-                        default:
-                            // if(this.isMimeTypeRenderable(content.mimeType)) {
-                                await ContentRenderer.send(req, res, Object.assign({}, content, {
-                                    data: `<iframe src="${content.path}" style="width: 100%; height: 100%; border: 0;"></iframe>`
-                                }));
-                            // } else {
-                            //     await ContentRenderer.send(req, res, Object.assign({}, content, {
-                            //         data: `<section><div class="message"><a href="${content.path}">Download (${content.title})</a></div></section>`
-                            //     }));
-                            // }
-                            break;
-                    }
-                });
+                switch(content.mimeType) {
+                    case 'text/html':
+                        await ContentRenderer.send(req, res, content);
+                        break;
+                    default:
+                        // if(this.isMimeTypeRenderable(content.mimeType)) {
+                            await ContentRenderer.send(req, res, Object.assign({}, content, {
+                                data: `<iframe src="${content.path}" style="width: 100%; height: 100%; border: 0;"></iframe>`
+                            }));
+                        // } else {
+                        //     await ContentRenderer.send(req, res, Object.assign({}, content, {
+                        //         data: `<section><div class="message"><a href="${content.path}">Download (${content.title})</a></div></section>`
+                        //     }));
+                        // }
+                        break;
+                }
+                // });
             }
         } catch (error) {
             await this.renderError(error, req, res, asJSON ? {} : null);

@@ -111,8 +111,8 @@ body.theme-minimal > footer {
     /*margin: 0 0px 4px 0px;*/
 }
 
-.theme-minimal form.themed input[type=submit],
-.theme-minimal form.themed button[type=submit] {
+.theme-minimal form.themed input[type=submit].themed,
+.theme-minimal form.themed button.themed {
     padding: 0.5em 1em;
     font-weight: bold;
     font-size: medium;
@@ -165,7 +165,7 @@ body.theme-minimal > footer {
 .theme-minimal table.themed td:first-child > label {
     text-align: right;
     display: block;
-    white-space: nowrap;
+    /* white-space: nowrap; */
 }
 
 

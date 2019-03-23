@@ -1,5 +1,6 @@
 table.user {
-    /* width: 600px; messes up responsive */
+    width: 100%;
+    max-width: 700px;
 }
 
 
@@ -42,4 +43,17 @@ user-form-message form.user button[type=submit] {
     margin: 0.5em;
     float: right
 
+}
+
+
+/** Form Width**/
+user-form-login table.user,
+user-form-logout table.user,
+user-form-register table.user,
+user-form-forgotpassword table.user,
+user-form-updateprofile table.user,
+user-form-updateflags table.user,
+user-form-updatepassword table.user,
+user-form-resetpassword table.user {
+    /*max-width: 580px;*/
 }

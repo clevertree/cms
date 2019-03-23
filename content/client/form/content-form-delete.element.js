@@ -134,7 +134,9 @@ class HTMLContentDeleteFormElement extends HTMLElement {
                     <tr>
                         <td style="text-align: right;" colspan="2">
                             <a href=":content/${this.state.content.id}">Back to content</a>
-                            <button type="submit" ${!this.state.editable ? 'disabled="disabled"' : ''}>Delete Content</button>
+                            <button type="submit" class="themed" ${!this.state.editable ? 'disabled="disabled"' : ''}>
+                                Delete Content
+                            </button>
                         </td>
                     </tr>
                 </tfoot>

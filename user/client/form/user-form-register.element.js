@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <a href=":user/:login${this.state.userID ? '?userID=' + this.state.userID : ''}">Back to Login</a>
                                 </td>
                                 <td style="text-align: right;">
-                                    <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Register</button>
+                                    <button type="submit" class="themed" ${this.state.processing ? 'disabled="disabled"' : null}>Register</button>
                                 </td>
                             </tr>
                         </tfoot>

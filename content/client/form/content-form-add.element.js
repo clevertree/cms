@@ -231,7 +231,9 @@ class HTMLContentFormAddElement extends HTMLElement {
                         <tr><td colspan="3"><hr/></td></tr>
                         <tr>
                             <td colspan="3" style="text-align: right;">
-                                <button type="submit" ${this.state.processing || !this.state.editable ? 'disabled="disabled"' : ''}>Add New Page${this.state.content.length > 0 ? 's' : ''}</button>
+                                <button type="submit" class="themed" ${this.state.processing || !this.state.editable ? 'disabled="disabled"' : ''}>
+                                    Add New Page${this.state.content.length > 0 ? 's' : ''}
+                                </button>
                             </td>
                         </tr>
                     </tfoot>            

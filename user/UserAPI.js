@@ -41,7 +41,7 @@ class UserAPI {
         // API Routes
         router.use(express.urlencoded({ extended: true }));
         router.use(express.json());
-        router.use(new SessionAPI().getMiddleware());
+        // router.use(new SessionAPI().getMiddleware());
 
         router.all('/[:]user/:userID(\\w+)',                        async (req, res, next) => await this.handleUpdateRequest('profile', req.params.userID, req, res, next));
         router.all('/[:]user/:userID(\\w+)/[:]edit',                async (req, res, next) => await this.handleUpdateRequest('edit', req.params.userID, req, res, next));

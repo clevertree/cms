@@ -165,7 +165,7 @@ class HTMLContentFormUploadElement extends HTMLElement {
                     <tr><td colspan="2"><hr/></td></tr>
                     <tr>
                         <td colspan="2" style="text-align: right;">
-                            <button type="submit">Upload</button>
+                            <button type="submit" class="themed">Upload</button>
                         </td>
                     </tr>
                 </tfoot>            
@@ -202,7 +202,7 @@ class HTMLContentFormUploadElement extends HTMLElement {
                     <tr><td colspan="3"><hr/></td></tr>
                     <tr>
                         <td colspan="3" style="text-align: right;">
-                            <button type="submit">Discard Selected Files</button>
+                            <button type="submit" class="themed">Discard Selected Files</button>
                         </td>
                     </tr>
                 </tfoot>      

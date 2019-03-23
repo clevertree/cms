@@ -342,7 +342,9 @@ Length: ${this.readableByteSize(this.state.content.length)}
                     <tr>
                         <td style="text-align: right;" colspan="2">
                             <a href=":content/${this.state.content.id}">Back to content</a>
-                            <button type="submit" ${this.state.processing || !this.state.editable ? 'disabled="disabled"' : ''}>Publish</button>
+                            <button type="submit" class="themed" ${this.state.processing || !this.state.editable ? 'disabled="disabled"' : ''}>
+                                Publish
+                            </button>
                         </td>
                     </tr>
                 </tfoot>

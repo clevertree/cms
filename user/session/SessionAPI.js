@@ -2,42 +2,42 @@ const cookieParser = require('cookie-parser');
 const session = require('client-sessions');
 const express = require('express');
 
-const LocalConfig = require('../../config/LocalConfig');
+// const LocalConfig = require('../../config/LocalConfig');
 
 class SessionAPI {
-    constructor() {
-        this.cookieConfig = {
-            cookieName: 'session'
-        };
-        this.sessionConfig = {
-            cookieName: 'session',
-            secret: require('uuid/v4')()
-        };
-        this.routerSession = null;
-        this.routerCookie = null;
+    constructor(config) {
+        if(!config.cookie)
+            config.cookie = {};
+        if(!config.session)
+            config.session = {};
+        if(!config.session.cookieName)
+            config.session.cookieName = 'session';
+        if(!config.session.secret)
+            config.session.secret = require('uuid/v4')();
+        this.cookieConfig = config.cookie;
+        this.sessionConfig = config.session;
     }
 
     async configure(config=null) {
-        if(config && typeof config.session === 'object') {
-            Object.assign(this.sessionConfig, config.session);
-        } else {
-            const localConfig = new LocalConfig();
-            const sessionConfig = await localConfig.getOrCreate('session');
-            Object.assign(this.sessionConfig, sessionConfig);
-            Object.assign(sessionConfig, this.sessionConfig);
-            await localConfig.saveAll()
-        }
-
-        if(config && typeof config.cookie === 'object') {
-            Object.assign(this.cookieConfig, config.cookie);
-        } else {
-            const localConfig = new LocalConfig();
-            const cookieConfig = await localConfig.getOrCreate('cookie');
-            Object.assign(this.cookieConfig, cookieConfig);
-            Object.assign(cookieConfig, this.cookieConfig);
-            await localConfig.saveAll()
-        }
-
+        // if(config && typeof config.session === 'object') {
+        //     Object.assign(this.sessionConfig, config.session);
+        // } else {
+        //     const localConfig = new LocalConfig();
+        //     const sessionConfig = await localConfig.getOrCreate('session');
+        //     Object.assign(this.sessionConfig, sessionConfig);
+        //     Object.assign(sessionConfig, this.sessionConfig);
+        //     await localConfig.saveAll()
+        // }
+        //
+        // if(config && typeof config.cookie === 'object') {
+        //     Object.assign(this.cookieConfig, config.cookie);
+        // } else {
+        //     const localConfig = new LocalConfig();
+        //     const cookieConfig = await localConfig.getOrCreate('cookie');
+        //     Object.assign(this.cookieConfig, cookieConfig);
+        //     Object.assign(cookieConfig, this.cookieConfig);
+        //     await localConfig.saveAll()
+        // }
 
     }
 

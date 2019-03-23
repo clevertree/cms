@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <button onclick="location.href=':user/:login'" type="button">Go Back to log in</button>
                                 </td>
                                 <td style="text-align: right;">
-                                    <button type="submit">Submit</button>
+                                    <button type="submit" class="themed">Submit</button>
                                 </td>
                             </tr>
                         </tfoot>

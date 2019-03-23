@@ -5,7 +5,6 @@ const UserRow = require('./UserRow');
 const InteractiveConfig = require('../config/InteractiveConfig');
 
 class UserTable  {
-    get UserAPI() { return require('./UserAPI').UserAPI; }
 
     constructor(dbName, dbClient) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';

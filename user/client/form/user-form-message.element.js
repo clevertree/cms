@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </tr>
                             <tr>
                                 <td colspan="2">
-                                    <button type="submit">Reply</button>
+                                    <button type="submit" class="themed">Reply</button>
                                 </td>
                             </tr>
                         </tbody>

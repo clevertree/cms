@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tr><td colspan="2"><hr/></td></tr>
                             <tr>
                                 <td colspan="2">
-                                    <button type="submit">Submit</button>
+                                    <button type="submit" class="themed">Submit</button>
                                 </td>
                             </tr>
                         </tfoot>

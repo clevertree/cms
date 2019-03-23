@@ -11,15 +11,16 @@ const DatabaseAPI = require("../database/DatabaseAPI");
 const UserAPI = require("../user/UserAPI");
 const ContentAPI = require("../content/ContentAPI");
 const TaskAPI = require("../task/TaskAPI");
-// const SessionAPI = require("../user/session/SessionAPI");
+const SessionAPI = require("../user/session/SessionAPI");
 
 
 const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
 
 class HTTPServer {
     constructor(config) {
+        let localConfig = null;
         if(!config) {
-            const localConfig = new LocalConfig();
+            localConfig = new LocalConfig();
             config = localConfig.getAll();
         }
 
@@ -32,7 +33,7 @@ class HTTPServer {
         this.dbClient = new DatabaseClient(config);
         this.mailClient = new MailClient(config);
         this.api = {
-            // 'session': new SessionAPI(config),
+            session: new SessionAPI(config),
             database: new DatabaseAPI(config),
             user: new UserAPI(config),
             content: new ContentAPI(config),
@@ -41,6 +42,8 @@ class HTTPServer {
         this.httpServer = null;
         this.sslServer = null;
         this.serverConfig = config.server;
+        if(localConfig)
+            localConfig.saveAll();
     }
 
     async selectDatabaseByRequest(req, orThrowError=true) {
@@ -120,6 +123,7 @@ class HTTPServer {
     getMiddleware() {
         const router = express.Router();
             // Routes
+        router.use(this.api.session.getMiddleware());
         router.use(this.api.database.getMiddleware());
         router.use(this.api.content.getMiddleware());
         router.use(this.api.user.getMiddleware());

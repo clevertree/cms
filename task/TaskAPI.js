@@ -26,7 +26,7 @@ class TaskAPI {
         const router = express.Router();
         router.use(express.urlencoded({ extended: true }));
         router.use(express.json());
-        router.use(new SessionAPI().getMiddleware());
+        // router.use(new SessionAPI().getMiddleware());
 
         // Handle Task requests
         // router.get('/[:]task/:taskName/[:]json',        async (req, res) => await this.renderTaskJSON(req.params.taskName || null, req, res));

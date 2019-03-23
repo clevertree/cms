@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <a href=":database">Database Status</a>
                                 </td>
                                 <td style="text-align: right;">
-                                    <button type="submit">Manage</button>
+                                    <button type="submit" class="themed">Manage</button>
                                 </td>
                             </tr>
                         </tfoot>

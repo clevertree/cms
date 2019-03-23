@@ -15,7 +15,7 @@ class DatabaseAPI {
         let router = express.Router();
         router.use(express.urlencoded({ extended: true }));
         router.use(express.json());
-        router.use(new SessionAPI().getMiddleware());
+        // router.use(new SessionAPI().getMiddleware());
 
         // Handle Database requests
         router.get('/[:]database/[:]json',                    async (req, res) => await this.renderDatabaseJSON(req, res));

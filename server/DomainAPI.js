@@ -27,7 +27,7 @@ class domainAPI {
         const router = express.Router();
         router.use(express.urlencoded({ extended: true }));
         router.use(express.json());
-        router.use(new SessionAPI().getMiddleware());
+        // router.use(new SessionAPI().getMiddleware());
 
         // Handle Domain requests
         router.get('/[:]domain/[:]json',                    async (req, res) => await this.renderDomainJSON(req, res));
