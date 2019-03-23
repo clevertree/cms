@@ -10,15 +10,21 @@ class DomainTable  {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
         this.table = tablePrefix + '`domain`';
         this.dbClient = dbClient;
+        this.dbName = dbName;
     }
 
 
-    /** Configure Table **/
-    async configure(hostname=null) {
+    /** Initiate Table **/
+    async init(dbClient) {
         // Check for tables
-        await this.dbClient.queryAsync(this.getTableSQL());
+        if (dbClient.isMultipleDomainMode() && dbClient.primaryDatabase === this.dbName)
+            await this.dbClient.queryAsync(this.getTableSQL());
     }
 
+    /** Interactive Configuration **/
+    async configure(hostname=null) {
+
+    }
 
     /** Domain Table **/
 

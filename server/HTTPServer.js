@@ -47,6 +47,7 @@ class HTTPServer {
         return await this.dbClient.selectDatabaseByRequest(req, orThrowError);
     }
 
+
     async configure() {
 
         // const defaultHostname     = (require('os').hostname()).toLowerCase();
@@ -141,6 +142,7 @@ class HTTPServer {
     async createServers() {
         await this.stop();
 
+        await this.dbClient.init();
 
         // var redir = require('redirect-https')();
         const appHTTP = express();

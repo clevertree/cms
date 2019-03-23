@@ -1,10 +1,17 @@
-
 const mysql = require('mysql');
 
 const LocalConfig = require('../config/LocalConfig');
 const InteractiveConfig = require('../config/InteractiveConfig');
 
-class DatabaseClient {
+const Tables = {
+    UserTable:              require('../user/UserTable'),
+    UserMessageTable:       require('../user/message/UserMessageTable'),
+    ContentTable:           require('../content/ContentTable'),
+    ContentRevisionTable:   require('../content/revision/ContentRevisionTable'),
+    DomainTable:            require('../server/DomainTable'),
+};
+
+class DatabaseManager {
     constructor(config) {
         // this.config = null;
         this.db = null;
@@ -18,6 +25,7 @@ class DatabaseClient {
         // this.debug = false;
         // this.multiDomain = false;
         this.cacheHostname = {};
+        this.initiated = false;
     }
 
     get primaryDatabase() { return this.dbConfig.database; }
@@ -27,22 +35,43 @@ class DatabaseClient {
     isMultipleDomainMode() { return this.dbConfig.multiDomain === true;}
 
     getPrimaryDomainTable()       { return new (require('../server/DomainTable'))(this.primaryDatabase); }
-    getTableClasses() {
-        return [
-            require('../user/UserTable'),
-            require('../user/message/UserMessageTable'),
-            require('../content/ContentTable'),
-            require('../content/revision/ContentRevisionTable'),
-            // require('../config/config.database').ConfigDatabase,
-        ];
+
+
+    async init() {
+        await this.initDatabase(this.primaryDatabase);
     }
 
-    async configure() {
-        if(this.db) {
-            console.warn("Closing existing DB Connection");
-            this.db.end();
+    async initDatabase(database) {
+        if(this.initiated === null)
+            throw new Error("Database is initializing");
+        this.initiated = null;
+
+        // Initiate Connection
+        await this.createConnection();
+
+        // Initiate Database
+        const databaseExists = await this.queryAsync(`SHOW DATABASES LIKE '${database}'`);
+        if(databaseExists.length === 0) {
+            console.log("Database not found: ", database);
+            await this.queryAsync(`CREATE SCHEMA \`${database}\``);
+            console.log(`Created new schema: \`${database}\``);
+        } else {
+            console.info("Database found: ", database);
         }
 
+
+        // Initiate Tables
+        const tableClasses = Object.values(Tables);
+
+        for(let i=0; i<tableClasses.length; i++) {
+            const table = new tableClasses[i](database, this);
+            await table.init(this);
+        }
+        this.initiated = true;
+    }
+
+    /** Configure Interactively **/
+    async configure() {
         const localConfig = new LocalConfig();
         let dbConfig = await localConfig.getOrCreate('database');
         Object.assign(dbConfig, this.dbConfig);
@@ -73,52 +102,42 @@ class DatabaseClient {
 
         const defaultHostname     = (require('os').hostname()).toLowerCase();
         await this.configureDatabase(this.primaryDatabase, defaultHostname);
-        // Configure all databases?
+        // Configure all databases? no, only primary
     }
 
 
 
-    async configureDatabase(database, hostname, interactive=false) {
-        const databaseExists = await this.queryAsync(`SHOW DATABASES LIKE '${database}'`);
-        if(databaseExists.length === 0) {
-            console.log("Database not found: ", database);
-            await this.queryAsync(`CREATE SCHEMA \`${database}\``);
-            console.log(`Created new schema: \`${database}\``);
-        } else {
-            console.info("Database found: ", database);
-        }
-
+    /** Configure Database Interactively **/
+    async configureDatabase(database, hostname) {
 
         // await this.queryAsync(`USE \`${database}\``);
 
         // Configure Tables
-        const tableClasses = this.getTableClasses();
+        const tableClasses = Object.values(Tables);
 
         for(let i=0; i<tableClasses.length; i++) {
             const table = new tableClasses[i](database);
             await table.configure(hostname);
-            if(interactive)
-                await table.configureInteractive();
         }
 
         if(this.isMultipleDomainMode()) {
             // Configure Domain
-            const DomainTable = this.getPrimaryDomainTable();
-            if (this.primaryDatabase === database)
-                await DomainTable.configure();
-            const domain = await DomainTable.fetchDomainByHostname(hostname);
-            if (!domain) {
-                await DomainTable.insertDomain(hostname, database);
-                console.log(`Created domain entry: ${hostname} => ${database}`);
-            } else {
-                if (!domain.database) {
-                    await DomainTable.updateDomain(hostname, database);
-                    console.info(`Updated domain entry: ${hostname} => ${database}`);
-
-                } else {
-                    console.info(`Found domain entry: ${hostname} => ${database}`);
-                }
-            }
+            // const DomainTable = this.getPrimaryDomainTable();
+            // if (this.primaryDatabase === database)
+            //     await DomainTable.configure();
+            // const domain = await DomainTable.fetchDomainByHostname(hostname);
+            // if (!domain) {
+            //     await DomainTable.insertDomain(hostname, database);
+            //     console.log(`Created domain entry: ${hostname} => ${database}`);
+            // } else {
+            //     if (!domain.database) {
+            //         await DomainTable.updateDomain(hostname, database);
+            //         console.info(`Updated domain entry: ${hostname} => ${database}`);
+            //
+            //     } else {
+            //         console.info(`Found domain entry: ${hostname} => ${database}`);
+            //     }
+            // }
         }
 
 
@@ -196,9 +215,12 @@ class DatabaseClient {
         dbConfig = dbConfig || this.dbConfig;
         if(!dbConfig)
             throw new Error("Invalid Database Config");
-        if(this.db)
+        if(this.db) {
+            console.warn("Closing existing DB Connection");
             this.db.end();
-            // throw new Error("Database connection already exists");
+        }
+
+        // throw new Error("Database connection already exists");
         const connectConfig = Object.assign({}, dbConfig);
         delete connectConfig.database;
         this.db = mysql.createConnection(connectConfig);
@@ -227,14 +249,14 @@ class DatabaseClient {
 
 
     async queryAsync(sql, values) {
-        // const db = this.get();
-        // if(!this.db)
-        //     throw new Error("Database is not connected");
+
         if(!this.db || this.db.state === 'disconnected') {
             this.db = null;
+            if(this.initiated === false)
+                await this.init();           // Lazy Load
             await this.createConnection();
         }
-        // await this.configure();
+
         return await queryAsync(this.db, sql, values, this.dbConfig.debug);
         // if(!this.primaryDatabase)
         //     throw new Error("Database is not available");
@@ -259,4 +281,4 @@ function queryAsync(db, sql, values, debug) {
     });
 }
 
-module.exports = DatabaseClient;
+module.exports = DatabaseManager;

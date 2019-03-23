@@ -13,12 +13,13 @@ class UserTable  {
         this.dbClient = dbClient;
     }
 
-    async configure(hostname=null) {
+    async init() {
         // Check for tables
         await this.dbClient.queryAsync(this.getTableSQL());
     }
 
-    async configureInteractive() {
+    async configure(hostname=null) {
+
         // Find admin user
         let adminUser = await this.fetchUser("u.username = 'admin' OR FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
 
@@ -55,16 +56,16 @@ class UserTable  {
         }
 
         // Find admin user by DNS info
-        if(!adminUser && false) {
-            console.info("Querying WHOIS for admin email: " + hostname);
-            let dnsAdminEmail = await this.UserAPI.queryAdminEmailAddresses(hostname);
-            if (dnsAdminEmail) {
-                // dnsAdminEmail.split('@')[0]
-                adminUser = await this.createUser('admin', dnsAdminEmail, null, 'admin');
-                console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
-                // TODO: send email;
-            }
-        }
+        // if(!adminUser && false) {
+        //     console.info("Querying WHOIS for admin email: " + hostname);
+        //     let dnsAdminEmail = await this.UserAPI.queryAdminEmailAddresses(hostname);
+        //     if (dnsAdminEmail) {
+        //         // dnsAdminEmail.split('@')[0]
+        //         adminUser = await this.createUser('admin', dnsAdminEmail, null, 'admin');
+        //         console.info(`Admin user created from DNS info (${adminUser.id}: ` + dnsAdminEmail);
+        //         // TODO: send email;
+        //     }
+        // }
 
         if(!adminUser) {
             // Insert admin user

@@ -4,20 +4,20 @@ const ContentRevisionRow = require('./ContentRevisionRow');
 class ContentRevisionTable {
     constructor(dbName, dbClient) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
-        this.table = tablePrefix + '`contentRevision`';
+        this.table = tablePrefix + '`content-revision`';
         this.dbClient = dbClient;
     }
 
-    /** Configure Table **/
-    async configure(hostname=null) {
+    /** Initiate Table **/
+    async init() {
         // Check for tables
         await this.dbClient.queryAsync(this.getTableSQL());
     }
 
-    async configureInteractive() {
+    /** Interactive Configuration **/
+    async configure(hostname=null) {
 
     }
-
 
     /** Content Revision **/
     async selectContentRevision(whereSQL, values, selectSQL = '*, NULL as data') {

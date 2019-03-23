@@ -17,11 +17,14 @@ class ContentTable {
         return new ContentRevisionTable(this.dbName, this.dbClient);
     }
 
-    /** Configure Table **/
-    async configure(hostname=null) {
+    /** Initiate Table **/
+    async init() {
         // Check for tables
         await this.dbClient.queryAsync(this.getTableSQL());
+    }
 
+    /** Interactive Configuration **/
+    async configure(hostname=null) {
         hostname = hostname || require('os').hostname();
 
         await this.insertDefaultContent("/site/template.html",  "Site Template",    __dirname + '/default/site/template.html', hostname);

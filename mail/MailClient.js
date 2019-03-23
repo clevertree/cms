@@ -8,12 +8,12 @@ const InteractiveConfig = require('../config/InteractiveConfig');
 
 class MailClient {
     constructor(config) {
-        this.server = null;
         if(!config.mail)
             config.mail = {};
         if(!config.mail.client)
             config.mail.client = {};
         this.mailConfig = config.mail.client;
+        // this.transport = null;
     }
 
     getDefaultSender() { return this.mailConfig && this.mailConfig.auth ? this.mailConfig.auth.user : null; }
@@ -43,7 +43,7 @@ class MailClient {
                     console.info(`Connecting to Mail Server '${mailClientConfig.host}'...`);
                     const server = nodemailer.createTransport(smtpTransport(mailClientConfig));
                     await
-                    server.verify();
+                        server.verify();
                     console.info(`Connection to Mail Server '${mailClientConfig.host}' verified`);
                 }
                 break;
@@ -68,16 +68,16 @@ class MailClient {
             throw new Error("Mail client is not configured");
         if(!data.from)
             data.from = this.mailConfig.auth.user;
-        const server = nodemailer.createTransport(smtpTransport(this.mailConfig));
-        return await server.sendMail(data)
+        const transport = nodemailer.createTransport(smtpTransport(this.mailConfig));
+        return await transport.sendMail(data)
     }
 
-    async listen() {
-        const mailConfig = await this.configure();
-        this.server = nodemailer.createTransport(smtpTransport(mailConfig));
-        // await this.server.verify();
-        // console.log(`Connection to Mail Server '${mailConfig.host}' successful`);
-    }
+    // async listen() {
+    //     const mailConfig = await this.configure();
+    //     this.transport = nodemailer.createTransport(smtpTransport(mailConfig));
+    //     // await this.transport.verify();
+    //     // console.log(`Connection to Mail Server '${mailConfig.host}' successful`);
+    // }
 }
 
 module.exports = MailClient;

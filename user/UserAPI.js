@@ -10,12 +10,12 @@ const ContentRenderer = require("../content/ContentRenderer");
 const ContentTable = require("../content/ContentTable");
 const SessionAPI = require("../user/session/SessionAPI");
 const TaskAPI = require("../task/TaskAPI");
+const ContentAPI = require("../content/ContentAPI");
 const ResetPasswordMail = require("./mail/ResetPasswordMail");
 
 const DIR_USER = path.resolve(__dirname);
 
 class UserAPI {
-    get ContentAPI() { return require('../content/ContentAPI'); }
 
     constructor() {
         this.resetPasswordRequests = {
@@ -81,7 +81,7 @@ class UserAPI {
         const assetPath = req.url.substr(routePrefix.length);
 
         const staticFile = path.resolve(DIR_USER + '/client/' + assetPath);
-        await this.ContentAPI.renderStaticFile(req, res, next, staticFile);
+        await new ContentAPI().renderStaticFile(req, res, next, staticFile);
     }
 
 
@@ -131,7 +131,7 @@ class UserAPI {
             if(typeof profile[profileField.name] === "undefined")
                 continue;
             let value = profile[profileField.name];
-            value = encodeHTML(value);
+            value = this.sanitizeInput(value);
             newProfile[profileField.name] = value;
         }
 
@@ -658,7 +658,7 @@ class UserAPI {
 
     async renderError(error, req, res, json=null) {
         console.error(`${req.method} ${req.url}:`, error);
-        res.status(400);
+        res.status(error.status || 400);
         if(error.redirect) {
             res.redirect(error.redirect);
         } else if(req.method === 'GET' && !json) {
@@ -682,7 +682,7 @@ class UserAPI {
                 break;
             default:
             case 'text':
-                input=input.replace("<", "&lt;");
+                input=input.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
                 input=input.replace(/<[^>]+>/g,'').replace(/<\/[^>]+>/g,'').trim();
                 break;
         }
@@ -699,6 +699,3 @@ class UserAPI {
 
 module.exports = UserAPI;
 
-function encodeHTML(s) {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
-}

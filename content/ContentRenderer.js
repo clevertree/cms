@@ -32,7 +32,7 @@ class ContentRenderer {
         const firstTag = (html || '').match(/<(\w+)/)[1].toLowerCase();
 
         let contentTable = null;
-        if(req.server.db.isAvailable()) {
+        if(req.server.dbClient.isAvailable()) {
             // const database = await req.server.selectDatabaseByRequest(req, false);
             if (req.database) {
                 contentTable = new ContentTable(req.database, req.server.dbClient);
@@ -114,7 +114,10 @@ class ContentRenderer {
     }
 
 }
-ContentRenderer.send = new ContentRenderer().send;
+ContentRenderer.send = function(req, res, content) {
+    const renderer = new ContentRenderer();
+    renderer.send(req, res, content);
+}
 module.exports = ContentRenderer;
 
 const CUSTOM_ELEMENT_SOURCE = {

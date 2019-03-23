@@ -1,3 +1,6 @@
+const path = require('path');
+const mime = require('mime');
+
 class ContentRow {
 
     constructor(row) {
@@ -9,7 +12,6 @@ class ContentRow {
         const ext = path.extname(this.path);
         if(!ext)
             return null;
-        const mime = require('mime');
         return mime.lookup(ext);
     }
 

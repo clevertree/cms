@@ -28,12 +28,14 @@ class LocalConfig {
     getAll() {
         if(!this.config) {
             const configPath = path.resolve(process.cwd() + '/.config.json');
-            if (fs.accessSync(configPath)) {
+            try {
+                fs.accessSync(configPath);
                 const configJSON = fs.readFileSync(configPath, "utf8");
                 this.config = JSON.parse(configJSON);
-            } else {
-                // console.info("No config file found: " + configPath);
+            } catch (e) {
+                console.info(e.message || "No config file found: " + configPath);
                 this.config = {}; // JSON.parse(JSON.stringify(ConfigManager.DEFAULT));
+
             }
         }
         return this.config;

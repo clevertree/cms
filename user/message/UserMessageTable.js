@@ -1,26 +1,26 @@
-const {
-    UserMessageRow
-} = require('../../');
+const UserMessageRow = require('./UserMessageRow');
 
 const SQL_SELECT = 'um.*, u.email as "to", su.email as "from"';
 class UserMessageTable  {
-    get UserAPI() { return require('../UserAPI').UserAPI; }
-
 
     constructor(dbName, dbClient) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
-        this.table = tablePrefix + '`userMessage`';
+        this.table = tablePrefix + '`user-message`';
         this.tableUser = tablePrefix + '`user`';
         this.dbClient = dbClient;
     }
 
-    async configure(hostname=null) {
+    /** Initiate Table **/
+    async init() {
         // Check for tables
         await this.dbClient.queryAsync(this.getTableSQL());
     }
 
-    async configureInteractive() {
+    /** Interactive Configuration **/
+    async configure(hostname=null) {
+
     }
+
 
     /** User Table **/
 

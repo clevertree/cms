@@ -1,6 +1,6 @@
 const UserTable = require("../../user/UserTable");
 const UserAPI = require("../../user/UserAPI");
-const UserMessageTable = require("../../user/message/UserMessageTable");
+const UserMessageTable = require("./UserMessageTable");
 const ContentRenderer = require("../../content/ContentRenderer");
 
 
@@ -59,6 +59,8 @@ class UserMessageAPI {
 
                 case 'OPTIONS':
                     const userMessage = await userMessageTable.fetchUserMessageByID(messageID);
+                    if(!userMessage)
+                        throw Object.assign(new Error("Message not found: " + messageID), {status: 404});
                     // searchJSON.message = `Message: ${messageID}`;
                     return res.json(userMessage);
 
@@ -82,7 +84,7 @@ class UserMessageAPI {
                     });
             }
         } catch (error) {
-            await UserAPI.renderError(error, req, res);
+            await this.renderError(error, req, res);
         }
 
     }
@@ -126,9 +128,24 @@ class UserMessageAPI {
                     });
             }
         } catch (error) {
-            await UserAPI.renderError(error, req, res);
+            await this.renderError(error, req, res);
         }
     }
 
+    async renderError(error, req, res, json=null) {
+        console.error(`${req.method} ${req.url}:`, error);
+        res.status(error.status || 400);
+        if(error.redirect) {
+            res.redirect(error.redirect);
+        } else if(req.method === 'GET' && !json) {
+            await ContentRenderer.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
+        } else {
+            res.json(Object.assign({}, {
+                message: error.message,
+                error: error.stack,
+                code: error.code,
+            }, json));
+        }
+    }
 }
 module.exports = UserMessageAPI;
