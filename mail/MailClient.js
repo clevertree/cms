@@ -3,37 +3,22 @@ const smtpTransport = require("nodemailer-smtp-transport");
 
 const LocalConfig = require('../config/LocalConfig');
 const InteractiveConfig = require('../config/InteractiveConfig');
-// const DatabaseManager = require('../database/database.manager');
 
 // const BASE_DIR = path.resolve(path.dirname(__dirname));
 
 class MailClient {
     constructor(config) {
         this.server = null;
+        if(!config.mail)
+            config.mail = {};
+        if(!config.mail.client)
+            config.mail.client = {};
         this.mailConfig = config.mail.client;
     }
 
     getDefaultSender() { return this.mailConfig && this.mailConfig.auth ? this.mailConfig.auth.user : null; }
 
-    async configure(config=null) {
-        if(config && typeof config.mail === 'object') {
-            Object.assign(this.mailConfig, config.database);
-        } else {
-            const localConfig = new LocalConfig();
-            const mailConfig = await localConfig.getOrCreate('mail');
-            Object.assign(this.mailConfig, mailConfig);
-            Object.assign(mailConfig, this.mailConfig);
-            await localConfig.saveAll()
-            if(typeof this.mailConfig.client !== 'object') {
-                console.warn("Mail settings not provided. Please configure mail client via browser administration");
-            }
-        }
-    }
-
-
-    async configureInteractive() {
-        await this.configure();
-
+    async configure() {
         // console.info("Configuring Mail Client");
         let mailConfig = Object.assign({}, this.mailConfig);
         const interactiveConfig = new InteractiveConfig(mailConfig);

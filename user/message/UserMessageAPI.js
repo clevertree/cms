@@ -1,8 +1,7 @@
-const UserAPI = require('../UserAPI');
-const DatabaseManager = require('../../database/DatabaseManager');
-const UserTable = require('../UserTable');
-const UserMessageTable = require('./UserMessageTable');
-const ContentRenderer = require('../../content/ContentRenderer');
+const UserTable = require("../../user/UserTable");
+const UserAPI = require("../../user/UserAPI");
+const UserMessageTable = require("../../user/message/UserMessageTable");
+const ContentRenderer = require("../../content/ContentRenderer");
 
 
 class UserMessageAPI {
@@ -22,13 +21,15 @@ class UserMessageAPI {
         router.all('/[:]user/:userID(\\w+)/[:]message',             async (req, res, next) => await this.userMessageSendRequest(req.params.userID, req, res));
 
         return (req, res, next) => {
+            if(!req.url.startsWith('/:user'))
+                return next();
             return router(req, res, next);
         }
     }
 
-    async sendMessage(database, to, from, subject, body, parent_id) {
-        const userTable = new UserTable(database);
-        const UserMessageTable = new UserMessageTable(database);
+    async sendMessage(req, to, from, subject, body, parent_id) {
+        const userTable = new UserTable(req.database, req.server.dbClient);
+        const userMessageTable = new UserMessageTable(req.database, req.server.dbClient);
         const toUser = await userTable.fetchUserByKey(to);
         if(!toUser)
             throw new Error("User not found: " + to);
@@ -39,16 +40,15 @@ class UserMessageAPI {
         }
 
 
-        const userMessage = await UserMessageTable.insertUserMessage(toUser.id, subject, body, parent_id, fromUser ? fromUser.id : null);
+        const userMessage = await userMessageTable.insertUserMessage(toUser.id, subject, body, parent_id, fromUser ? fromUser.id : null);
         return userMessage;
         // TODO: send an email
     }
 
     async userMessageRequest(messageID, req, res) {
         try {
-            const database = await req.server.selectDatabaseByRequest(req);
-            const userTable = new UserTable(database);
-            const UserMessageTable = new UserMessageTable(database);
+            const userTable = new UserTable(req.database, req.server.dbClient);
+            const userMessageTable = new UserMessageTable(req.database, req.server.dbClient);
 
             switch(req.method) {
                 case 'GET':
@@ -58,7 +58,7 @@ class UserMessageAPI {
                     break;
 
                 case 'OPTIONS':
-                    const userMessage = await UserMessageTable.fetchUserMessageByID(messageID);
+                    const userMessage = await userMessageTable.fetchUserMessageByID(messageID);
                     // searchJSON.message = `Message: ${messageID}`;
                     return res.json(userMessage);
 
@@ -66,7 +66,7 @@ class UserMessageAPI {
                     // Handle POST
                     const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
 
-                    const userMessageReply = await this.sendMessage(database,
+                    const userMessageReply = await this.sendMessage(req,
                         req.body.to,
                         sessionUser ? sessionUser.id : req.body.from,
                         req.body.subject,
@@ -90,9 +90,9 @@ class UserMessageAPI {
 
     async userMessageSendRequest (userID, messageID, req, res) {
         try {
-            const database = await req.server.selectDatabaseByRequest(req);
-            const userTable = new UserTable(database);
-            const UserMessageTable = new UserMessageTable(database);
+            // const database = await req.server.selectDatabaseByRequest(req);
+            const userTable = new UserTable(req.database, req.server.dbClient);
+            // const userMessageTable = new UserMessageTable(req.database, req.server.dbClient);
 
             switch(req.method) {
                 case 'GET':
@@ -110,7 +110,7 @@ class UserMessageAPI {
                     // Handle POST
                     const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
 
-                    const userMessage = await this.sendMessage(database,
+                    const userMessage = await this.sendMessage(req,
                         req.body.to,
                         sessionUser ? sessionUser.id : req.body.from,
                         req.body.subject,

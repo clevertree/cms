@@ -1,27 +1,23 @@
 const ContentRevisionRow = require('./ContentRevisionRow');
+
 // TODO: user_id isn't available during insert
-// Init
 class ContentRevisionTable {
-    constructor(dbName) {
+    constructor(dbName, dbClient) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
         this.table = tablePrefix + '`contentRevision`';
+        this.dbClient = dbClient;
     }
 
     /** Configure Table **/
     async configure(hostname=null) {
         // Check for tables
-        await this.queryAsync(this.getTableSQL());
+        await this.dbClient.queryAsync(this.getTableSQL());
     }
 
     async configureInteractive() {
 
     }
 
-    /** SQL Query Method **/
-    async queryAsync(SQL, values) {
-        const DatabaseManager = require('../database/DatabaseManager').DatabaseManager;
-        return await DatabaseManager.queryAsync(SQL, values);
-    }
 
     /** Content Revision **/
     async selectContentRevision(whereSQL, values, selectSQL = '*, NULL as data') {
@@ -31,7 +27,7 @@ class ContentRevisionTable {
           WHERE ${whereSQL}
           `;
 
-        const results = await this.queryAsync(SQL, values);
+        const results = await this.dbClient.queryAsync(SQL, values);
         return results.map(result => new ContentRevisionRow(result))
     }
 
@@ -73,7 +69,7 @@ class ContentRevisionTable {
           INSERT INTO ${this.table}
           SET ?
         `;
-        const results = await this.queryAsync(SQL, {content_id, user_id, data});
+        const results = await this.dbClient.queryAsync(SQL, {content_id, user_id, data});
         return results.insertId;
     }
 
@@ -99,14 +95,5 @@ CREATE TABLE IF NOT EXISTS ${this.table} (
 
 }
 
-
-class contentRevisionRow {
-
-    constructor(row) {
-        Object.assign(this, row);
-    }
-
-}
-
-module.exports = {ContentRevisionTable: ContentRevisionTable, contentRevisionRow};
+module.exports = ContentRevisionTable;
 

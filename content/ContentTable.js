@@ -1,27 +1,26 @@
 const path = require('path');
 const fs = require('fs');
+
 const ContentRow = require('./ContentRow');
+const ContentRevisionTable = require('./revision/ContentRevisionTable');
 
 // Init
 class ContentTable {
-    constructor(database) {
-        const tablePrefix = database ? `\`${database}\`.` : '';
-        this.database = database;
+    constructor(dbName, dbClient) {
+        this.dbName = dbName;
+        const tablePrefix = dbName ? `\`${dbName}\`.` : '';
         this.table = tablePrefix + '`content`';
+        this.dbClient = dbClient;
     }
+    
     get ContentRevisionTable () {
-        return require('./ContentRevisionTable').ContentRevisionTable;
-    }
-    /** SQL Query Method **/
-    async queryAsync(SQL, values) {
-        const DatabaseManager = require('../database/DatabaseManager').DatabaseManager;
-        return await DatabaseManager.queryAsync(SQL, values);
+        return new ContentRevisionTable(this.dbName, this.dbClient);
     }
 
     /** Configure Table **/
     async configure(hostname=null) {
         // Check for tables
-        await this.queryAsync(this.getTableSQL());
+        await this.dbClient.queryAsync(this.getTableSQL());
 
         hostname = hostname || require('os').hostname();
 
@@ -35,9 +34,6 @@ class ContentTable {
         await this.insertDefaultContent("/contact",             "Contact Us",       __dirname + '/default/contact.html', hostname);
     }
 
-    async configureInteractive() {
-
-    }
 
     async insertDefaultContent(renderPath, contentTitle, filePath, replaceHostname=false) {
         if(await this.fetchContentByPath(renderPath))
@@ -59,7 +55,7 @@ class ContentTable {
           FROM ${this.table} c
           WHERE ${whereSQL}`;
 
-        const results = await this.queryAsync(SQL, values);
+        const results = await this.dbClient.queryAsync(SQL, values);
         return results ? results.map(result => new ContentRow(result)) : null;
     }
     async fetchContent(whereSQL, values, selectSQL='c.*, NULL as data') {
@@ -128,7 +124,7 @@ class ContentTable {
           INSERT INTO ${this.table}
           SET ?
         `;
-        const results = await this.queryAsync(SQL, set);
+        const results = await this.dbClient.queryAsync(SQL, set);
         return results.insertId;
     }
 
@@ -144,7 +140,7 @@ class ContentTable {
           SET ?, updated = UTC_TIMESTAMP()
           WHERE c.id = ?
         `;
-        const results = await this.queryAsync(SQL, [set, id]);
+        const results = await this.dbClient.queryAsync(SQL, [set, id]);
         return results.affectedRows;
     }
 
@@ -153,7 +149,7 @@ class ContentTable {
           DELETE FROM ${this.table}
           WHERE id = ?
         `;
-        const results = await this.queryAsync(SQL, [id]);
+        const results = await this.dbClient.queryAsync(SQL, [id]);
         return results.affectedRows;
     }
 

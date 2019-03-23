@@ -1,12 +1,9 @@
 const express = require('express');
 
-const DatabaseManager = require('../database/DatabaseManager');
 const ContentRenderer = require('../content/ContentRenderer');
-const { domainTable } = require("./DomainTable");
-// const ContentTable = require("../article/article.database");
 const UserTable = require("../user/UserTable");
-const UserAPI = require('../user/UserAPI');
-const SessionAPI = require('../user/session/SessionAPI');
+const SessionAPI = require("../user/session/SessionAPI");
+
 
 class domainAPI {
     constructor() {
@@ -30,7 +27,7 @@ class domainAPI {
         const router = express.Router();
         router.use(express.urlencoded({ extended: true }));
         router.use(express.json());
-        router.use(new SessionAPI.getMiddleware());
+        router.use(new SessionAPI().getMiddleware());
 
         // Handle Domain requests
         router.get('/[:]domain/[:]json',                    async (req, res) => await this.renderDomainJSON(req, res));
@@ -42,8 +39,8 @@ class domainAPI {
     async renderDomainJSON(req, res) {
         try {
             const database = await req.server.selectDatabaseByRequest(req);
-            const userTable = new UserTable(database);
-            const domainTable = new domainTable(database);
+            const userTable = new UserTable(req.database, req.server.dbClient);
+            const DomainTable = new DomainTable(database);
             const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
             if(!sessionUser || !sessionUser.isAdmin())
                 throw new Error("Not authorized");
@@ -54,8 +51,8 @@ class domainAPI {
                 whereSQL = 'd.name LIKE ?';
                 values = ['%'+req.body.search+'%'];
             }
-            const domainList = await domainTable.selectDomains(whereSQL, values);
-            const domain = await domainTable.parseDomainValues(domainList);
+            const domainList = await DomainTable.selectDomains(whereSQL, values);
+            const domain = await DomainTable.parseDomainValues(domainList);
 
             return res.json({
                 message: `${domainList.length} Domain${domainList.length !== 1 ? 's' : ''} queried successfully`,
@@ -78,8 +75,8 @@ class domainAPI {
             } else {
                 // Handle POST
                 const database = await req.server.selectDatabaseByRequest(req);
-                const userTable = new UserTable(database);
-                const domainTable = new domainTable(database);
+                const userTable = new UserTable(req.database, req.server.dbClient);
+                const DomainTable = new DomainTable(database);
 
                 const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
                 if(!sessionUser || !sessionUser.isAdmin())
@@ -88,7 +85,7 @@ class domainAPI {
                 let domainChanges = req.body, domainUpdateList=[];
                 for(let domainName in domainChanges) {
                     if(domainChanges.hasOwnProperty(domainName)) {
-                        const domainEntry = await domainTable.fetchDomainValue(domainName)
+                        const domainEntry = await DomainTable.fetchDomainValue(domainName)
                         if(!domainEntry)
                             throw new Error("Domain entry not found: " + domainName);
                         if(domainChanges[domainName] !== domainEntry)
@@ -96,11 +93,11 @@ class domainAPI {
                     }
                 }
                 for(let i=0; i<domainUpdateList.length; i++) {
-                    await domainTable.updateDomainValue(domainUpdateList[i][0], domainUpdateList[i][1])
+                    await DomainTable.updateDomainValue(domainUpdateList[i][0], domainUpdateList[i][1])
                 }
 
 
-                const domainList = await domainTable.selectDomains('1');
+                const domainList = await DomainTable.selectDomains('1');
                 return res.json({
                     message: `<div class='success'>${domainUpdateList.length} Domain${domainUpdateList.length !== 1 ? 's' : ''} updated successfully</div>`,
                     domainList

@@ -1,11 +1,11 @@
 
-class configureDatabaseMail {
-    get MailClient() { return require('../../mail/MailClient').MailClient; }
+class ConfigureDatabaseMail {
+    constructor(mailClient, requestURL, to, hostname, from=null, subject=null) {
+        this.mailClient = mailClient;
 
-    constructor(requestURL, to, hostname, from=null, subject=null) {
         // sender info
         // from: 'Sender Name <sender@example.com>',
-        this.from = from || this.MailClient.getDefaultSender(); //  || 'admin@' + hostname
+        this.from = from || this.mailClient.getDefaultSender(); //  || 'admin@' + hostname
 
         // Comma separated list of recipients
         // to: '"Receiver Name" <nodemailer@disposebox.com>',
@@ -37,10 +37,10 @@ Thanks for administrating the site!<br/>
 
     async send() {
         console.log('Sending Email: ', this);
-        await this.MailClient.sendMail(this);
+        await this.mailClient.sendMail(this);
         console.log('Message sent successfully!');
     }
 }
 
-module.exports = {configureDatabaseMail};
+module.exports = ConfigureDatabaseMail;
 

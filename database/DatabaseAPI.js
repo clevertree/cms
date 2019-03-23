@@ -1,10 +1,10 @@
 const express = require('express');
 
-const DatabaseManager = require('./DatabaseManager');
-const UserAPI = require('../user/UserAPI');
 const UserTable = require('../user/UserTable');
 const ContentRenderer = require('../content/ContentRenderer');
-const SessionAPI = require('../user/session/SessionAPI');
+const SessionAPI = require("../user/session/SessionAPI");
+
+
 class DatabaseAPI {
     constructor() {
     }
@@ -15,11 +15,11 @@ class DatabaseAPI {
         let router = express.Router();
         router.use(express.urlencoded({ extended: true }));
         router.use(express.json());
-        router.use(new SessionAPI.getMiddleware());
+        router.use(new SessionAPI().getMiddleware());
 
         // Handle Database requests
         router.get('/[:]database/[:]json',                    async (req, res) => await this.renderDatabaseJSON(req, res));
-        router.all('/[:]database(/[:]edit)?',                 async (req, res) => await this.renderDatabaseManager(req, res));
+        router.all('/[:]database(/[:]edit)?',                 async (req, res) => await this.renderDatabaseClient(req, res));
         router.all('/[:]database/[:]connect',                 async (req, res) => await this.renderDatabaseConnectForm(req, res));
 
         const routerMissingDB = express.Router();
@@ -31,7 +31,7 @@ class DatabaseAPI {
         return (req, res, next) => {
             if(req.url.startsWith('/:database'))
                 return router(req, res, next);
-            if(DatabaseManager.isConnected())
+            if(req.server.dbClient.isConnected())
                 return next();
             if(req.url === '/')
                 return routerMissingDB(req, res, next);
@@ -41,9 +41,9 @@ class DatabaseAPI {
 
     async renderDatabaseJSON(req, res) {
         try {
-            const database = await req.server.selectDatabaseByRequest(req);
-            const userTable = new UserTable(database);
-            const databaseDB = DatabaseManager.getDatabaseDB(database);
+            // const database = await req.server.selectDatabaseByRequest(req);
+            const userTable = new UserTable(req.database, req.server.dbClient);
+            const databaseDB = req.server.dbClient.getDatabaseDB(req);
             const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
             if(!sessionUser || !sessionUser.isAdmin())
                 throw new Error("Not authorized");
@@ -67,7 +67,7 @@ class DatabaseAPI {
         }
     }
 
-    async renderDatabaseManager(req, res) {
+    async renderDatabaseClient(req, res) {
         try {
 
             if (req.method === 'GET') {
@@ -78,8 +78,8 @@ class DatabaseAPI {
             } else {
                 // Handle POST
                 const database = await req.server.selectDatabaseByRequest(req);
-                const userTable = new UserTable(database);
-                const databaseDB = DatabaseManager.getDatabaseDB(database);
+                const userTable = new UserTable(req.database, req.server.dbClient);
+                const databaseDB = req.server.dbClient.getDatabaseDB(database);
 
                 const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
                 if(!sessionUser || !sessionUser.isAdmin())
@@ -122,9 +122,9 @@ class DatabaseAPI {
 
             } else {
                 // Handle POST
-                if(DatabaseManager.isAvailable())
+                if(req.server.dbClient.isAvailable())
                     throw new Error("Database is already connected");
-                await DatabaseManager.configure(req.body);
+                // await DatabaseClient.configure(req.body);
 
                 return res.json({
                     redirect: '/:database',

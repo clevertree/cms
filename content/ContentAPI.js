@@ -1,20 +1,15 @@
-// const formidableMiddleware = require('express-formidable');
 const mime = require('mime');
 const path = require('path');
 const fs = require('fs');
-// const fsPromises = require('fs').promises;
-// const etag = require('etag');
 
 const multiparty = require('multiparty');
 
-const HTTPServer = require('../server/HTTPServer');
-const DatabaseManager = require('../database/DatabaseManager');
+
 const ContentRenderer = require('./ContentRenderer');
 const ContentTable = require("./ContentTable");
-const ContentRevisionTable = require("./ContentRevisionTable");
+const ContentRevisionTable = require("./revision/ContentRevisionTable");
 const UserTable = require("../user/UserTable");
-const UserAPI = require('../user/UserAPI');
-const SessionAPI = require('../user/session/SessionAPI');
+const SessionAPI = require("../user/session/SessionAPI");
 
 const DIR_CONTENT = path.resolve(__dirname);
 
@@ -31,7 +26,7 @@ class ContentAPI {
 
         const router = express.Router();
         const PM = [express.urlencoded({ extended: true }), express.json()];
-        const SM = new SessionAPI.getMiddleware();
+        const SM = new SessionAPI().getMiddleware();
         // const FM = multiparty.multipartyExpress();
         // Handle Content requests
         // router.use(                                             SM, async (req, res, next) => await this.renderContentByPath(req, res,next));
@@ -53,8 +48,8 @@ class ContentAPI {
 
 
         return async (req, res, next) => {
-            const database = await req.server.selectDatabaseByRequest(req);
-            const ContentTable = new ContentTable(database);
+            // const database = await req.server.selectDatabaseByRequest(req);
+            const ContentTable = new ContentTable(req.database, req.server.dbClient);
             const content = await ContentTable.fetchContentByPath(req.url, '*');
             if(content) {
                 await this.checkForRevisionContent(req, content);
@@ -64,7 +59,7 @@ class ContentAPI {
                     case null:
                     case 'text/html':
                         // Load session if we're using the theme
-                        const SM = new SessionAPI.getMiddleware();
+                        const SM = new SessionAPI().getMiddleware();
                         SM(req, res, async () => {
                             await ContentRenderer.send(req, res, content);
                         });
@@ -93,10 +88,10 @@ class ContentAPI {
 
     async checkForRevisionContent(req, content) {
         if(typeof req.query.r !== 'undefined') {
-            const database = await req.server.selectDatabaseByRequest(req);
-            const ContentRevisionTable = new ContentRevisionTable(database);
+            // const database = await req.server.selectDatabaseByRequest(req);
+            const contentRevisionTable = new ContentRevisionTable(req.database, req.server.dbClient);
             const contentRevisionID = parseInt(req.query.r);
-            const contentRevision = await ContentRevisionTable.fetchContentRevisionByID(contentRevisionID);
+            const contentRevision = await contentRevisionTable.fetchContentRevisionByID(contentRevisionID);
             if(!contentRevision)
                 throw new Error("Content Revision ID not found: " + contentRevisionID);
 
@@ -114,7 +109,7 @@ class ContentAPI {
     //     // TODO: parse session middleware only if content was found
     //     try {
     //         const database = await req.server.selectDatabaseByRequest(req);
-    //         const ContentTable = new ContentTable(database);
+    //         const ContentTable = new ContentTable(req.database, req.server.dbClient);
     //         const content = await ContentTable.fetchContentByPath(req.url, '*');
     //         if(!content)
     //             return next();
@@ -125,9 +120,9 @@ class ContentAPI {
     //     }
     async renderContentByID(asJSON, req, res, next) {
         try {
-            const database = await req.server.selectDatabaseByRequest(req);
-            const ContentTable = new ContentTable(database);
-            const ContentRevisionTable = new ContentRevisionTable(database);
+            // const database = await req.server.selectDatabaseByRequest(req);
+            const ContentTable = new ContentTable(req.database, req.server.dbClient);
+            const ContentRevisionTable = new ContentRevisionTable(req.database, req.server.dbClient);
             const content = await ContentTable.fetchContentByID(req.params.id, '*');
             if(!content)
                 return next();
@@ -144,8 +139,8 @@ class ContentAPI {
                     content
                 };
                 if(req.session && req.session.userID) {
-                    const database = await req.server.selectDatabaseByRequest(req);
-                    const userTable = new UserTable(database);
+                    // const database = await req.server.selectDatabaseByRequest(req);
+                    const userTable = new UserTable(req.database, req.server.dbClient);
                     const sessionUser = await userTable.fetchUserByID(req.session.userID);
                     if (sessionUser.isAdmin() || sessionUser.id === content.user_id)
                         response.editable = true;
@@ -167,7 +162,7 @@ class ContentAPI {
             } else {
 
                 // Load session if we're using the theme
-                const SM = new SessionAPI.getMiddleware();
+                const SM = new SessionAPI().getMiddleware();
                 SM(req, res, async () => {
                     // const mimeType = this.getMimeType(path.extname(content.path) || '');
                     switch(content.mimeType) {
@@ -196,10 +191,10 @@ class ContentAPI {
 
     async renderContentEditorByID(req, res) {
         try {
-            const database = await req.server.selectDatabaseByRequest(req);
-            const ContentTable = new ContentTable(database);
-            const ContentRevisionTable = new ContentRevisionTable(database);
-            const userTable = new UserTable(database);
+            // const database = await req.server.selectDatabaseByRequest(req);
+            const ContentTable = new ContentTable(req.database, req.server.dbClient);
+            const ContentRevisionTable = new ContentRevisionTable(req.database, req.server.dbClient);
+            const userTable = new UserTable(req.database, req.server.dbClient);
 
             let content = await ContentTable.fetchContentByID(req.params.id, 'c.*, NULL as data, LENGTH(data) as "length"');
             const currentUploads = req.session.uploads || [];
@@ -350,10 +345,10 @@ class ContentAPI {
 
     async renderContentAdd(req, res) {
         try {
-            const database = await req.server.selectDatabaseByRequest(req);
-            const ContentTable = new ContentTable(database);
-            // const ContentRevisionTable = new ContentRevisionTable(database);
-            const userTable = new UserTable(database);
+            // const database = await req.server.selectDatabaseByRequest(req);
+            const ContentTable = new ContentTable(req.database, req.server.dbClient);
+            // const ContentRevisionTable = new ContentRevisionTable(req.database, req.server.dbClient);
+            const userTable = new UserTable(req.database, req.server.dbClient);
 
             const currentUploads = req.session.uploads || [];
             let sessionUser = null;
@@ -451,8 +446,8 @@ class ContentAPI {
     async renderContentUpload(req, res) {
         try {
             // const database = await req.server.selectDatabaseByRequest(req);
-            // const ContentTable = new ContentTable(database);
-            // const userTable = new UserTable(database);
+            // const ContentTable = new ContentTable(req.database, req.server.dbClient);
+            // const userTable = new UserTable(req.database, req.server.dbClient);
             if(!req.session)
                 throw new Error("Session is not available");
 
@@ -551,9 +546,9 @@ class ContentAPI {
 
     async renderContentDeleteByID(req, res) {
         try {
-            const database = await req.server.selectDatabaseByRequest(req);
-            const ContentTable = new ContentTable(database);
-            const userTable = new UserTable(database);
+            // const database = await req.server.selectDatabaseByRequest(req);
+            const ContentTable = new ContentTable(req.database, req.server.dbClient);
+            const userTable = new UserTable(req.database, req.server.dbClient);
 
 
             let content = await ContentTable.fetchContentByID(req.params.id);
@@ -584,8 +579,8 @@ class ContentAPI {
                     }
 
                     if(req.session && req.session.userID) {
-                        const database = await req.server.selectDatabaseByRequest(req);
-                        const userTable = new UserTable(database);
+                        // const database = await req.server.selectDatabaseByRequest(req);
+                        const userTable = new UserTable(req.database, req.server.dbClient);
                         const sessionUser = await userTable.fetchUserByID(req.session.userID);
                         if (sessionUser.isAdmin() || sessionUser.id === content.user_id)
                             response.editable = true;
@@ -642,8 +637,8 @@ class ContentAPI {
     async renderContentListJSON(req, res) {
         try {
 
-            const database = await req.server.selectDatabaseByRequest(req);
-            const ContentTable = new ContentTable(database);
+            // const database = await req.server.selectDatabaseByRequest(req);
+            const ContentTable = new ContentTable(req.database, req.server.dbClient);
 
             // Handle POST
             let whereSQL = '1', values = null;

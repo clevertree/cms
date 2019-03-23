@@ -1,2 +1,3 @@
 const HTTPServer = require('./server/HTTPServer');
-HTTPServer.listen();
+const server = new HTTPServer();
+server.listen();

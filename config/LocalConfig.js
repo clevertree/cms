@@ -1,12 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 
-// const { FileManager } = require('../file/file.manager');
-// const ConfigManager = require('./config.manager');promptCallback
-
-// const BASE_DIR = path.resolve(path.dirname(__dirname));
-
-// Missing database config always prompts. --configure forces all config options
 class LocalConfig {
     constructor() {
         this.config = null;
@@ -34,7 +28,7 @@ class LocalConfig {
     getAll() {
         if(!this.config) {
             const configPath = path.resolve(process.cwd() + '/.config.json');
-            if (fs.access(configPath)) {
+            if (fs.accessSync(configPath)) {
                 const configJSON = fs.readFileSync(configPath, "utf8");
                 this.config = JSON.parse(configJSON);
             } else {

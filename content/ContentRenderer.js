@@ -1,10 +1,10 @@
-const { JSDOM } = require('jsdom');
+// const { JSDOM } = require('jsdom');
 const cheerio = require('cheerio');
 const beautify_html = require('js-beautify').html;
 
+const ContentTable = require("./ContentTable");
+
 class ContentRenderer {
-    get DatabaseManager() { return require('../database/DatabaseManager').DatabaseManager; }
-    get ContentTable() { return require('./ContentTable').ContentTable; }
     constructor() {
     }
 
@@ -31,16 +31,16 @@ class ContentRenderer {
         let html = content.data.toString('UTF8'); // This isn't inefficient, right?
         const firstTag = (html || '').match(/<(\w+)/)[1].toLowerCase();
 
-        let ContentTable = null;
-        if(this.DatabaseManager.isAvailable()) {
-            const database = await this.DatabaseManager.selectDatabaseByRequest(req, false);
-            if (database) {
-                ContentTable = new this.ContentTable(database);
+        let contentTable = null;
+        if(req.server.db.isAvailable()) {
+            // const database = await req.server.selectDatabaseByRequest(req, false);
+            if (req.database) {
+                contentTable = new ContentTable(req.database, req.server.dbClient);
             }
 
             if(firstTag !== 'html') {
                 if (firstTag !== 'body') { // TODO: finish body logic
-                    const templateHTML = await ContentTable.fetchContentDataByPath('/site/template.html', 'UTF8');
+                    const templateHTML = await contentTable.fetchContentDataByPath('/site/template.html', 'UTF8');
                     html = templateHTML.replace(/<%-data%>/g, html);
                 }
             }
@@ -115,7 +115,7 @@ class ContentRenderer {
 
 }
 ContentRenderer.send = new ContentRenderer().send;
-module.exports = new ContentRenderer();
+module.exports = ContentRenderer;
 
 const CUSTOM_ELEMENT_SOURCE = {
     // 'config-editor':        '/:config/:client/config-editor.element.js',

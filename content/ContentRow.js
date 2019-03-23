@@ -1,4 +1,4 @@
-class contentRow {
+class ContentRow {
 
     constructor(row) {
         Object.assign(this, row);
@@ -18,4 +18,4 @@ class contentRow {
     // hasFlag(flag) { return this.flags.indexOf(flag) !== -1; }
 }
 
-module.exports = contentRow;
+module.exports = ContentRow;

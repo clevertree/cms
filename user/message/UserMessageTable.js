@@ -1,27 +1,25 @@
-const UserMessageRow = require('UserMessageRow');
+const {
+    UserMessageRow
+} = require('../../');
 
 const SQL_SELECT = 'um.*, u.email as "to", su.email as "from"';
 class UserMessageTable  {
     get UserAPI() { return require('../UserAPI').UserAPI; }
 
 
-    constructor(dbName) {
+    constructor(dbName, dbClient) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
         this.table = tablePrefix + '`userMessage`';
         this.tableUser = tablePrefix + '`user`';
+        this.dbClient = dbClient;
     }
 
     async configure(hostname=null) {
         // Check for tables
-        await this.queryAsync(this.getTableSQL());
+        await this.dbClient.queryAsync(this.getTableSQL());
     }
 
     async configureInteractive() {
-    }
-
-    async queryAsync(SQL, values) {
-        const DatabaseManager = require('../../database/DatabaseManager').DatabaseManager;
-        return await DatabaseManager.queryAsync(SQL, values);
     }
 
     /** User Table **/
@@ -35,7 +33,7 @@ class UserMessageTable  {
           WHERE ${whereSQL}
           `;
 
-        const results = await this.queryAsync(SQL, values);
+        const results = await this.dbClient.queryAsync(SQL, values);
         return results.map(result => new UserMessageRow(result))
     }
 
@@ -52,7 +50,7 @@ class UserMessageTable  {
         if(!subject) throw new Error("Invalid subject");
         let SQL = `
           INSERT INTO ${this.table} SET ?`;
-        const result = await this.queryAsync(SQL, {
+        const result = await this.dbClient.queryAsync(SQL, {
             user_id, subject, body, parent_id, sender_user_id
         });
         if(!result.insertId)

@@ -4,8 +4,8 @@ const mysql = require('mysql');
 const LocalConfig = require('../config/LocalConfig');
 const InteractiveConfig = require('../config/InteractiveConfig');
 
-class DatabaseManager {
-    constructor(dbConfig) {
+class DatabaseClient {
+    constructor(config) {
         // this.config = null;
         this.db = null;
         this.dbConfig = Object.assign({
@@ -14,7 +14,7 @@ class DatabaseManager {
             password: 'cms_pass',
             database: 'localhost_cms'
             // insecureAuth: true,
-        }, dbConfig||{});
+        }, config.database||{});
         // this.debug = false;
         // this.multiDomain = false;
         this.cacheHostname = {};
@@ -32,35 +32,16 @@ class DatabaseManager {
             require('../user/UserTable'),
             require('../user/message/UserMessageTable'),
             require('../content/ContentTable'),
-            require('../content/ContentRevisionTable'),
+            require('../content/revision/ContentRevisionTable'),
             // require('../config/config.database').ConfigDatabase,
         ];
     }
 
-    async configure(config=null) {
-        if(config && typeof config.database === 'object') {
-            Object.assign(this.dbConfig, config.database);
-            await this.createConnection(this.dbConfig);
-        } else {
-            const localConfig = new LocalConfig();
-            const dbConfig = await localConfig.getOrCreate('database');
-            Object.assign(this.dbConfig, dbConfig);
-            Object.assign(dbConfig, this.dbConfig);
-            // await this.createConnection(this.dbConfig);
-            await localConfig.saveAll();
-        }
-
-
-        const defaultHostname     = (require('os').hostname()).toLowerCase();
-        await this.configureDatabase(this.primaryDatabase, defaultHostname);
-    }
-
-    async configureInteractive() {
+    async configure() {
         if(this.db) {
             console.warn("Closing existing DB Connection");
             this.db.end();
         }
-
 
         const localConfig = new LocalConfig();
         let dbConfig = await localConfig.getOrCreate('database');
@@ -90,9 +71,9 @@ class DatabaseManager {
             break;
         }
 
-
-        await this.configure();
-
+        const defaultHostname     = (require('os').hostname()).toLowerCase();
+        await this.configureDatabase(this.primaryDatabase, defaultHostname);
+        // Configure all databases?
     }
 
 
@@ -122,16 +103,16 @@ class DatabaseManager {
 
         if(this.isMultipleDomainMode()) {
             // Configure Domain
-            const domainTable = this.getPrimaryDomainTable();
+            const DomainTable = this.getPrimaryDomainTable();
             if (this.primaryDatabase === database)
-                await domainTable.configure();
-            const domain = await domainTable.fetchDomainByHostname(hostname);
+                await DomainTable.configure();
+            const domain = await DomainTable.fetchDomainByHostname(hostname);
             if (!domain) {
-                await domainTable.insertDomain(hostname, database);
+                await DomainTable.insertDomain(hostname, database);
                 console.log(`Created domain entry: ${hostname} => ${database}`);
             } else {
                 if (!domain.database) {
-                    await domainTable.updateDomain(hostname, database);
+                    await DomainTable.updateDomain(hostname, database);
                     console.info(`Updated domain entry: ${hostname} => ${database}`);
 
                 } else {
@@ -148,47 +129,6 @@ class DatabaseManager {
     }
 
 
-
-    // async get() {
-    //     if(this.db)
-    //         return this.db;
-    //
-    //
-    //     const interactiveConfig = new InteractiveConfig();
-    //     if(!interactiveConfig.has('database'))
-    //         throw new Error("Database not configured");
-    //     const dbConfig = await interactiveConfig.getOrCreate('database');
-    //
-    //
-    //     const connectConfig = Object.assign({
-    //         host: 'localhost',
-    //         user: 'cms_user',
-    //         password: 'cms_pass',
-    //         // insecureAuth: true,
-    //     }, dbConfig);
-    //     delete connectConfig.database;
-    //     const db = await this.createConnection(connectConfig);
-    //
-    //     // Configure Databases
-    //     let defaultHostname     = (require('os').hostname()).toLowerCase();
-    //     this.primaryDatabase = dbConfig.database;
-    //     if(!this.primaryDatabase)
-    //         this.primaryDatabase = defaultHostname.replace('.', '_') + '_cms';
-    //
-    //     await this.configureDatabase(this.primaryDatabase, defaultHostname, true);
-    //
-    //     if(typeof dbConfig.debug !== "undefined")
-    //         this.debug = dbConfig.debug;
-    //     if(typeof dbConfig.multiDomain !== "undefined")
-    //         this.multiDomain = dbConfig.multiDomain && dbConfig.multiDomain !== 'n';
-    //
-    //     const databaseConfig = await interactiveConfig.getOrCreate('database');
-    //     Object.assign(dbConfig, databaseConfig);
-    //     await interactiveConfig.saveAll();
-    //     this.db = db;
-    //     return db;
-    // }
-
     getHostnameFromRequest(req) {
         let hostname = req.get ? req.get('host') : req.headers.host;
         if(!hostname)
@@ -204,13 +144,13 @@ class DatabaseManager {
             if(typeof this.cacheHostname[hostname] !== "undefined")
                 return this.cacheHostname[hostname];
 
-            const domainTable = this.getPrimaryDomainTable();
-            const domain = await domainTable.fetchDomainByHostname(hostname);
+            const DomainTable = this.getPrimaryDomainTable();
+            const domain = await DomainTable.fetchDomainByHostname(hostname);
             let database = null;
             if(domain) {
                 database = domain.database;
             } else {
-                await domainTable.insertDomain(hostname, null);
+                await DomainTable.insertDomain(hostname, null);
             }
             if(database) {
                 const databaseResult = await this.queryAsync(`SHOW DATABASES LIKE '${database}'`);
@@ -286,21 +226,6 @@ class DatabaseManager {
     }
 
 
-    // async configureTable(tableName, tableSQL) {
-    //     // Check for table
-    //     try {
-    //         await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
-    //     } catch (e) {
-    //         if(e.code === 'ER_NO_SUCH_TABLE') {
-    //             await this.queryAsync(tableSQL);
-    //             await this.queryAsync(`SHOW COLUMNS FROM ${tableName}`);
-    //             console.info(`Inserted table: ${tableName}`)
-    //         } else {
-    //             throw e;
-    //         }
-    //     }
-    // }
-
     async queryAsync(sql, values) {
         // const db = this.get();
         // if(!this.db)
@@ -334,4 +259,4 @@ function queryAsync(db, sql, values, debug) {
     });
 }
 
-exports.DatabaseManager = new DatabaseManager();
+module.exports = DatabaseClient;

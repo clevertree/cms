@@ -1,26 +1,21 @@
 const bcrypt = require('bcryptjs');
 const uuidv4 = require('uuid/v4');
 
-// const DatabaseManager = require('../database/database.manager');
+const UserRow = require('./UserRow');
 const InteractiveConfig = require('../config/InteractiveConfig');
-const UserRow = require("../user/UserRow");
-// const LocalConfig = require('../config/local.config');
-// const { ConfigDatabase } = require("../config/config.database");
-
-
-// const ConfigManager = require('../config/config.manager');
 
 class UserTable  {
     get UserAPI() { return require('./UserAPI').UserAPI; }
 
-    constructor(dbName) {
+    constructor(dbName, dbClient) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
         this.table = tablePrefix + '`user`';
+        this.dbClient = dbClient;
     }
 
     async configure(hostname=null) {
         // Check for tables
-        await this.queryAsync(this.getTableSQL());
+        await this.dbClient.queryAsync(this.getTableSQL());
     }
 
     async configureInteractive() {
@@ -100,11 +95,6 @@ class UserTable  {
         }
     }
 
-    async queryAsync(SQL, values) {
-        const DatabaseManager = require('../database/DatabaseManager').DatabaseManager;
-        return await DatabaseManager.queryAsync(SQL, values);
-    }
-
     /** User Table **/
 
     async selectUsers(whereSQL, values, selectSQL='u.*,null as password') {
@@ -114,7 +104,7 @@ class UserTable  {
           WHERE ${whereSQL}
           `;
 
-        const results = await this.queryAsync(SQL, values);
+        const results = await this.dbClient.queryAsync(SQL, values);
         return results.map(result => new UserRow(result))
     }
     // async searchUsers(search, selectSQL='u.*,null as password') {
@@ -167,7 +157,7 @@ class UserTable  {
         }
         let SQL = `
           INSERT INTO ${this.table} SET ?`;
-        await this.queryAsync(SQL, {
+        await this.dbClient.queryAsync(SQL, {
             username,
             email,
             password,
@@ -190,7 +180,7 @@ class UserTable  {
         if(flags)   set.flags = Array.isArray(flags) ? flags.join(',') : flags;
         let SQL = `UPDATE ${this.table} SET ? WHERE id = ?`;
 
-        return (await this.queryAsync(SQL, [set, userID]))
+        return (await this.dbClient.queryAsync(SQL, [set, userID]))
             .affectedRows;
     }
 

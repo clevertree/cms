@@ -1,25 +1,19 @@
-const DatabaseManager = require('../database/DatabaseManager');
 
 // const ConfigManager = require('../config/config.manager');
 
-class domainTable  {
-    constructor(dbName, debug=false) {
-        if(!dbName)
-            throw new Error("Database name is required");
-        this.table = `\`${dbName}\`\.domain`;
+class DomainTable {
+    constructor(dbName, dbClient) {
+        this.dbName = dbName;
+        const tablePrefix = dbName ? `\`${dbName}\`.` : '';
+        this.table = tablePrefix + '`domain`';
+        this.dbClient = dbClient;
     }
 
 
     /** Configure Table **/
     async configure(hostname=null) {
         // Check for tables
-        await this.queryAsync(this.getTableSQL());
-    }
-
-    /** SQL Query Method **/
-    async queryAsync(SQL, values) {
-        const DatabaseManager = require('../database/DatabaseManager').DatabaseManager;
-        return await DatabaseManager.queryAsync(SQL, values);
+        await this.dbClient.queryAsync(this.getTableSQL());
     }
 
 
@@ -32,7 +26,7 @@ class domainTable  {
           WHERE ${whereSQL}
           `;
 
-        const results = await this.queryAsync(SQL, values);
+        const results = await this.dbClient.queryAsync(SQL, values);
         return results.map(result => new DomainRow(result))
     }
     async fetchDomain(whereSQL, values, selectSQL='d.*') {
@@ -49,7 +43,7 @@ class domainTable  {
           INSERT INTO ${this.table}
           SET ?
         `;
-        const results = await this.queryAsync(SQL, {hostname, database});
+        const results = await this.dbClient.queryAsync(SQL, {hostname, database});
         return results.insertId;
     }
 
@@ -60,7 +54,7 @@ class domainTable  {
           SET \`database\` = ? where \`hostname\` = ?
           LIMIT 1;
         `;
-        const results = await this.queryAsync(SQL, [database, hostname]);
+        const results = await this.dbClient.queryAsync(SQL, [database, hostname]);
         return results.affectedRows;
     }
 
@@ -79,12 +73,6 @@ CREATE TABLE IF NOT EXISTS ${this.table} (
 
 }
 
-class DomainRow {
-    constructor(row) {
-        Object.assign(this, row);
-    }
-}
 
-
-module.exports = {DomainRow, domainTable};
+module.exports = DomainTable;
 

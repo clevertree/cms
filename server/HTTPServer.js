@@ -4,12 +4,15 @@ const express = require('express');
 const LocalConfig = require('../config/LocalConfig');
 const InteractiveConfig = require('../config/InteractiveConfig');
 
-const SessionAPI = require('../session/SessionAPI');
-const DatabaseAPI = require('../database/DatabaseAPI');
-const UserAPI = require('../user/UserAPI');
-const ContentAPI = require('../content/ContentAPI');
-const TaskAPI = require('../task/TaskAPI');
+const DatabaseClient = require('../database/DatabaseClient');
 const MailClient = require('../mail/MailClient');
+
+const DatabaseAPI = require("../database/DatabaseAPI");
+const UserAPI = require("../user/UserAPI");
+const ContentAPI = require("../content/ContentAPI");
+const TaskAPI = require("../task/TaskAPI");
+// const SessionAPI = require("../user/session/SessionAPI");
+
 
 const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
 
@@ -18,25 +21,23 @@ class HTTPServer {
         if(!config) {
             const localConfig = new LocalConfig();
             config = localConfig.getAll();
-            if(!config.database)
-                config.database = {};
-        } else {
-            config.server = Object.assign({
-                httpPort: 8080,
-                sslEnable: false,
-                sslPort: 8443,
-            }, config.server || {})
         }
-        this.dbClient = new DatabaseManager(config);
+
+        config.server = Object.assign({
+            httpPort: 8080,
+            sslEnable: false,
+            sslPort: 8443,
+        }, config.server || {});
+
+        this.dbClient = new DatabaseClient(config);
         this.mailClient = new MailClient(config);
-        this.API = {
-            'session': new SessionAPI(config),
-            'database': new DatabaseAPI(config),
-            'user': new UserAPI(config),
-            'content': new ContentAPI(config),
-            'task': new TaskAPI(config),
-        }
-        this.sessionAPI = new DatabaseAPI(config);
+        this.api = {
+            // 'session': new SessionAPI(config),
+            database: new DatabaseAPI(config),
+            user: new UserAPI(config),
+            content: new ContentAPI(config),
+            task: new TaskAPI(config),
+        };
         this.httpServer = null;
         this.sslServer = null;
         this.serverConfig = config.server;
@@ -118,12 +119,23 @@ class HTTPServer {
     getMiddleware() {
         const router = express.Router();
             // Routes
-        router.use(Object.values(this.API));
+        router.use(this.api.database.getMiddleware());
+        router.use(this.api.content.getMiddleware());
+        router.use(this.api.user.getMiddleware());
+        router.use(this.api.task.getMiddleware());
 
-        return (req, res, next) => {
-            req.server = this;
-            return router(req, res, next);
-        };
+        if(this.dbClient.isMultipleDomainMode())
+            return async (req, res, next) => {
+                req.server = this;
+                req.database = await this.dbClient.selectDatabaseByRequest(req);
+                router(req, res, next);
+            };
+        else
+            return (req, res, next) => {
+                req.server = this;
+                req.database = this.dbClient.primaryDatabase;
+                router(req, res, next);
+            }
     }
 
     async createServers() {

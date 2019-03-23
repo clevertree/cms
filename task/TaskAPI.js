@@ -1,14 +1,12 @@
 const express = require('express');
 const path = require('path');
 
-const HTTPServer = require('../server/HTTPServer');
-const DatabaseManager = require('../database/DatabaseManager');
-const ContentRenderer = require('../content/ContentRenderer');
-// const UserAPI = require('../../user/user.api');
-// const { ContentAPI } = require('../content/content.api');
-const UserTable = require("../user/UserTable");
-const SessionAPI = require('../user/session/SessionAPI');
 // TODO: approve all drafts
+
+const UserTable = require("../user/UserTable");
+const ContentRenderer = require("../content/ContentRenderer");
+const SessionAPI = require("../user/session/SessionAPI");
+
 
 const DIR_TASK = path.resolve(__dirname);
 
@@ -28,7 +26,7 @@ class TaskAPI {
         const router = express.Router();
         router.use(express.urlencoded({ extended: true }));
         router.use(express.json());
-        router.use(new SessionAPI.getMiddleware());
+        router.use(new SessionAPI().getMiddleware());
 
         // Handle Task requests
         // router.get('/[:]task/:taskName/[:]json',        async (req, res) => await this.renderTaskJSON(req.params.taskName || null, req, res));
@@ -57,10 +55,10 @@ class TaskAPI {
 
     async renderTaskManager(taskName, req, res) {
         try {
-            const database = await DatabaseManager.selectDatabaseByRequest(req, false);
+            // const database = await req.server.selectDatabaseByRequest(req, false);
             let sessionUser = null;
             if(database) {
-                const userTable = new UserTable(database);
+                const userTable = new UserTable(req.database, req.server.dbClient);
                 sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
             }
             // const task = await this.getTaskClass(taskName);
@@ -82,7 +80,7 @@ class TaskAPI {
                     let taskForms = {};
                     let taskCount = 0;
                     if (!taskName) {
-                        const activeTasks = await this.getActiveTasks(req, database, sessionUser);
+                        const activeTasks = await this.getActiveTasks(req, sessionUser);
                         for(let taskName in activeTasks) {
                             if(activeTasks.hasOwnProperty(taskName)) {
                                 const task = activeTasks[taskName];
@@ -91,7 +89,7 @@ class TaskAPI {
                             }
                         }
                     } else {
-                        const task = this.getTask(taskName, database);
+                        const task = this.getTask(req, taskName);
                         taskForms[taskName] = await task.renderFormHTML(req, sessionUser);
                         taskCount++;
                     }
@@ -151,11 +149,11 @@ class TaskAPI {
 
     getTasks() { return Object.values(this.taskClass); }
 
-    async getActiveTasks(req, database, sessionUser=null) {
+    async getActiveTasks(req, sessionUser=null) {
         const activeTasks = {};
         for(const taskName in this.taskClass) {
             if(this.taskClass.hasOwnProperty(taskName)) {
-                const task = this.getTask(taskName, database);
+                const task = this.getTask(taskName, req.database);
                 if(await task.isActive(req, sessionUser)) {
                     activeTasks[taskName] = task;
                 }
@@ -198,5 +196,5 @@ class TaskAPI {
 }
 
 
-module.exports = {TaskAPI: new TaskAPI()};
+module.exports = TaskAPI;
 

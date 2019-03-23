@@ -1,6 +1,6 @@
 const uuidv4 = require('uuid/v4');
 
-// const DatabaseManager = require("../../database/database.manager");
+// const DatabaseClient = require("../../database/database.manager");
 const UserAPI = require("../UserAPI");
 const UserTable = require("../UserTable");
 const CreateAdminMail = require('../mail/CreateAdminMail');

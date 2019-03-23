@@ -1,9 +1,9 @@
 const uuidv4 = require('uuid/v4');
 
-const DatabaseManager = require("../DatabaseManager");
 const UserAPI = require("../../user/UserAPI");
 const UserTable = require("../../user/UserTable");
-const { configureDatabaseMail } = require('../mail/ConfigureDatabaseMail');
+const ConfigureDatabaseMail = require('../mail/ConfigureDatabaseMail');
+
 const configureRequests = {};
 
 class databaseConfigureTask {
@@ -18,13 +18,13 @@ class databaseConfigureTask {
 
 
     async isActive(req, sessionUser=null) {
-        if(!DatabaseManager.isMultipleDomainMode())
+        if(!req.server.dbClient.isMultipleDomainMode())
             return false;
 
-        let hostname = DatabaseManager.getHostnameFromRequest(req);
+        let hostname = req.server.dbClient.getHostnameFromRequest(req);
 
-        const domainTable = DatabaseManager.getPrimaryDomainTable();
-        const domain = await domainTable.fetchDomainByHostname(hostname);
+        const DomainTable = req.server.dbClient.getPrimaryDomainTable();
+        const domain = await DomainTable.fetchDomainByHostname(hostname);
         if(!domain) {
             console.warn("TODO: Domain entry missing. Shouldn't happen");
             return false;
@@ -33,7 +33,7 @@ class databaseConfigureTask {
             return true;
 
         // TODO: check to see if database exists. If the domain entry is missing, then it's active
-        const databaseResult = await DatabaseManager.queryAsync(`SHOW DATABASES LIKE '${domain.database}'`);
+        const databaseResult = await req.server.dbClient.queryAsync(`SHOW DATABASES LIKE '${domain.database}'`);
         if(databaseResult.length > 0)
             return false;
 
@@ -89,8 +89,8 @@ class databaseConfigureTask {
                             throw new Error("Field is required: database");
                         const database = req.body.database;
 
-                        await DatabaseManager.configureDatabase(database, hostname, null);
-                        const userTable = new UserTable(database);
+                        await DatabaseClient.configureDatabase(database, hostname, null);
+                        const userTable = new UserTable(req.database, req.server.dbClient);
                         const adminUser = await userTable.createUser(req.body.username || 'admin', requestData.adminEmail, req.body.password, 'admin');
 
                         // await UserAPI.sendResetPasswordRequestEmail(req, adminUser);
@@ -122,7 +122,7 @@ class databaseConfigureTask {
                     setTimeout(function () {
                         delete configureRequests[uuid];
                     }, 1000 * 60 * 60);
-                    const email = new configureDatabaseMail(requestURL, `Administrator <${selectedAdminEmail}>`, hostname);
+                    const email = new ConfigureDatabaseMail(req.server.mailClient, requestURL, `Administrator <${selectedAdminEmail}>`, hostname);
                     await email.send();
 
                     status = 200;

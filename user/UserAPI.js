@@ -5,21 +5,12 @@ const uuidv4 = require('uuid/v4');
 const path = require('path');
 
 const DNSManager = require('../server/DNSManager');
-
-// const LocalConfig = require('../config/local.config');
-// const ConfigManager = require('../config/config.manager');
-// const DatabaseManager = require('../database/DatabaseManager');
-// const { ContentAPI } = require('../content/content.api');
+const UserTable = require("../user/UserTable");
+const ContentRenderer = require("../content/ContentRenderer");
 const ContentTable = require("../content/ContentTable");
-const UserTable = require('./UserTable');
-const UserMessageTable = require('./message/UserMessageTable');
-const SessionAPI = require('./session/SessionAPI');
-// const HTTPServer = require('../server/server.server');
-
-// const { DNSManager } = require('../service/domain/dns.manager');
-const ContentRenderer = require('../content/ContentRenderer');
-const TaskAPI = require('../task/TaskAPI');
-const { ResetPasswordMail } = require("./mail/ResetPasswordMail");
+const SessionAPI = require("../user/session/SessionAPI");
+const TaskAPI = require("../task/TaskAPI");
+const ResetPasswordMail = require("./mail/ResetPasswordMail");
 
 const DIR_USER = path.resolve(__dirname);
 
@@ -50,7 +41,7 @@ class UserAPI {
         // API Routes
         router.use(express.urlencoded({ extended: true }));
         router.use(express.json());
-        router.use(new SessionAPI.getMiddleware());
+        router.use(new SessionAPI().getMiddleware());
 
         router.all('/[:]user/:userID(\\w+)',                        async (req, res, next) => await this.handleUpdateRequest('profile', req.params.userID, req, res, next));
         router.all('/[:]user/:userID(\\w+)/[:]edit',                async (req, res, next) => await this.handleUpdateRequest('edit', req.params.userID, req, res, next));
@@ -107,9 +98,9 @@ class UserAPI {
         return req.session.messages.pop();
     }
 
-    async fetchProfileConfig(database) {
+    async fetchProfileConfig(req) {
         const path = '/config/profile.json';
-        const configDB = new ContentTable(database);
+        const configDB = new ContentTable(req.database, req.server.dbClient);
         const content = await configDB.fetchContentByPath(path, '*');
         if(!content)
             throw new Error("Profile content not found: " + path);
@@ -126,13 +117,13 @@ class UserAPI {
         if(!profile)
             throw new Error("Invalid Profile");
 
-        const database = await req.server.selectDatabaseByRequest(req);
-        const userTable = new UserTable(database);
+        // const database = await req.server.selectDatabaseByRequest(req);
+        const userTable = new UserTable(req.database, req.server.dbClient);
         const user = await userTable.fetchUserByKey(userID);
         if(!user)
             throw new Error("User not found: " + userID);
 
-        const profileConfig = await this.fetchProfileConfig(database);
+        const profileConfig = await this.fetchProfileConfig(req);
 
         const newProfile = Object.assign({}, user.profile || {});
         for(var i=0; i<profileConfig.length; i++) {
@@ -150,8 +141,8 @@ class UserAPI {
     }
 
     async updateFlags(req, userID, flags) {
-        const database = await req.server.selectDatabaseByRequest(req);
-        const userTable = new UserTable(database);
+        // const database = await req.server.selectDatabaseByRequest(req);
+        const userTable = new UserTable(req.database, req.server.dbClient);
         if(!userID)
             throw new Error("Invalid User ID");
         const user = await userTable.fetchUserByKey(userID);
@@ -178,8 +169,8 @@ class UserAPI {
     async updatePassword(req, userID, password_old, password_new, password_confirm) {
         if(!userID)
             throw new Error("Invalid User ID");
-        const database = await req.server.selectDatabaseByRequest(req);
-        const userTable = new UserTable(database);
+        // const database = await req.server.selectDatabaseByRequest(req);
+        const userTable = new UserTable(req.database, req.server.dbClient);
         const user = await userTable.fetchUserByKey(userID, 'u.*');
         if(!user)
             throw new Error("User not found: " + userID);
@@ -224,8 +215,8 @@ class UserAPI {
         if(password !== password_confirm && password_confirm !== null)
             throw new Error("Confirm & Password do not match");
 
-        const database = await req.server.selectDatabaseByRequest(req);
-        const userTable = new UserTable(database);
+        // const database = await req.server.selectDatabaseByRequest(req);
+        const userTable = new UserTable(req.database, req.server.dbClient);
         const user = await userTable.createUser(username, email, password);
 
         await this.login(req, user.id, password);
@@ -242,8 +233,8 @@ class UserAPI {
         if(!password)
             throw new Error("Password is required");
 
-        const database = await req.server.selectDatabaseByRequest(req);
-        const userTable = new UserTable(database);
+        // const database = await req.server.selectDatabaseByRequest(req);
+        const userTable = new UserTable(req.database, req.server.dbClient);
         const sessionUser = await userTable.fetchUserByKey(userID, 'u.*');
         if(!sessionUser)
             throw new Error("User not found: " + userID);
@@ -262,7 +253,7 @@ class UserAPI {
             req.session.setDuration(1000 * 60 * 60 * 24 * 14) // 2 weeks;
         }
 
-        const activeTasks = await new TaskAPI().getActiveTasks(req, database, sessionUser);
+        const activeTasks = await new TaskAPI().getActiveTasks(req, sessionUser);
         const activeTaskList = Object.values(activeTasks);
         let activeTaskHTML = '';
         if(activeTaskList.length > 0)
@@ -275,11 +266,11 @@ class UserAPI {
 
 
     async logout(req, res) {
-        const database = await req.server.selectDatabaseByRequest(req);
-        const userTable = new UserTable(database);
-        if(req.session.user_session) {
-            await userTable.deleteUserSessionByID(req.session.user_session);
-        }
+        // const database = await req.server.selectDatabaseByRequest(req);
+        // const userTable = new UserTable(req.database, req.server.dbClient);
+        // if(req.session.user_session) {
+        //     await userTable.deleteUserSessionByID(req.session.user_session);
+        // }
         req.session.reset();
         res.clearCookie('session_save');
         this.addSessionMessage(req,`<div class='success'>User has been logged out</div>`);
@@ -289,7 +280,7 @@ class UserAPI {
 
     async handleLoginRequest(req, res, next) {
         try {
-            await req.server.selectDatabaseByRequest(req);
+            // await req.server.selectDatabaseByRequest(req);
             if(req.method === 'GET') {
                 const userID = this.sanitizeInput(req.query.userID || null, 'email');
                 // Render Editor Form
@@ -340,7 +331,7 @@ class UserAPI {
 
     async handleRegisterRequest(req, res) {
         try {
-            await req.server.selectDatabaseByRequest(req);
+            // await req.server.selectDatabaseByRequest(req);
             if(req.method === 'GET') {
                 // Render Editor Form
                 await ContentRenderer.send(req, res, {
@@ -385,8 +376,8 @@ class UserAPI {
     async handleForgotPassword(req, res) {
         try {
             const userID = this.sanitizeInput(req.query.userID || null, 'email');
-            const database = await req.server.selectDatabaseByRequest(req);
-            const userTable = new UserTable(database);
+            // const database = await req.server.selectDatabaseByRequest(req);
+            const userTable = new UserTable(req.database, req.server.dbClient);
 
             switch(req.method) {
                 case 'GET':
@@ -426,8 +417,8 @@ class UserAPI {
     async handleResetPassword(userID, uuid, req, res) {
         try {
 
-            const database = await req.server.selectDatabaseByRequest(req);
-            const userTable = new UserTable(database);
+            // const database = await req.server.selectDatabaseByRequest(req);
+            const userTable = new UserTable(req.database, req.server.dbClient);
             const user = await userTable.fetchUserByKey(userID);
             if(!user)
                 throw new Error("User was not found: " + userID);
@@ -484,8 +475,8 @@ class UserAPI {
     async handleUpdateRequest(type, userID, req, res, next) {
         try {
             userID = this.sanitizeInput(userID, 'email');
-            const database = await req.server.selectDatabaseByRequest(req);
-            const userTable = new UserTable(database);
+            // const database = await req.server.selectDatabaseByRequest(req);
+            const userTable = new UserTable(req.database, req.server.dbClient);
             let user = await userTable.fetchUserByKey(userID, 'u.*');
             if(!user)
                 return next();
@@ -532,7 +523,7 @@ class UserAPI {
                         }
                     }
 
-                    response.profileConfig = await this.fetchProfileConfig(database);
+                    response.profileConfig = await this.fetchProfileConfig(req);
 
                     res.json(response);
 
@@ -620,8 +611,8 @@ class UserAPI {
 
     async searchUserList(req) {
 
-        const database = await req.server.selectDatabaseByRequest(req);
-        const userTable = new UserTable(database);
+        // const database = await req.server.selectDatabaseByRequest(req);
+        const userTable = new UserTable(req.database, req.server.dbClient);
 
         // Handle POST
         let whereSQL = '1', values = null;
@@ -655,7 +646,7 @@ class UserAPI {
     async queryAdminEmailAddresses(database=null, hostname=null) {
         let dnsAdminEmails = hostname ? await DNSManager.queryHostAdminEmailAddresses(hostname) : [];
         if(database) {
-            const userTable = new UserTable(database);
+            const userTable = new UserTable(req.database, req.server.dbClient);
             let adminUsers = await userTable.selectUsers("FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
             for(let i=0; i<adminUsers.length; i++) {
                 dnsAdminEmails.push(adminUsers[i].email);

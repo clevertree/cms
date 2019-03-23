@@ -41,9 +41,7 @@ class SessionAPI {
 
     }
 
-    async configureInteractive() {
-        await this.configure();
-    }
+
 
     getSessionMiddleware() {
         return (req, res, next) => {
