@@ -618,25 +618,27 @@ class UserAPI {
 
         // Handle POST
         let whereSQL = '1', values = null;
+
         let search = req.body.search || req.params.search || req.query.search;
         if(search) {
             whereSQL = 'u.username LIKE ? OR u.email LIKE ? OR u.id = ?';
             values = ['%'+search+'%', '%'+search+'%', parseInt(search) || -1];
         }
 
-        let sort = (req.body.sort || req.params.sort || req.query.sort || '').toLowerCase() === 'asc' ? 'ASC' : "DESC";
-        let by = req.body.by || req.params.by || req.query.by || 'id';
-        switch(by.toLowerCase()) {
+        let sort = (req.body.sort || req.params.sort || req.query.sort || '').toLowerCase() === 'desc' ? 'DESC' : "ASC";
+        let by = (req.body.by || req.params.by || req.query.by || 'id').toLowerCase();
+        let orderBySQL = null;
+        switch(by) {
             case 'id':
             case 'email':
             case 'username':
             case 'created':
             case 'flags':
-                whereSQL += ` ORDER BY ${by} ${sort}`
+                orderBySQL = `${by} ${sort}`;
                 break;
         }
 
-        const userList = await userTable.selectUsers(whereSQL, values, 'id, email, username, created, flags');
+        const userList = await userTable.selectUsers(whereSQL, values, null, null, orderBySQL);
 
         return {
             message: `${userList.length} user entr${userList.length !== 1 ? 'ies' : 'y'} queried successfully`,

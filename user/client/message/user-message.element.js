@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                this.processHeaderTags(response);
+                // this.processHeaderTags(response);
                 this.setState({processing: false}, response);
             };
             xhr.responseType = 'json';
@@ -69,28 +69,28 @@ document.addEventListener('DOMContentLoaded', function() {
             this.setState({processing: true});
         }
 
-        processHeaderTags(response) {
-            const splitPos = response.body.indexOf("\n\n");
-            if(splitPos <= 0)
-                return;
-            const headerString = response.body.substring(0, splitPos);
-            if(!headerString)
-                return;
-
-            response.body = response.body.substring(splitPos+2);
-            response.headers = [];
-            headerString
-                .split(/\n/g)
-                .forEach(header => {
-                    const split = header.split(/:/);
-                    if(split.length > 1)
-                        response.headers[split[0].trim().toLowerCase()] = split[1].trim();
-                });
-            if(response.headers.from && !this.state.from)
-                this.state.from = response.headers.from;
-            if(response.headers.to && !this.state.to)
-                this.state.to = response.headers.to;
-        }
+        // processHeaderTags(response) {
+        //     const splitPos = response.body.indexOf("\n\n");
+        //     if(splitPos <= 0)
+        //         return;
+        //     const headerString = response.body.substring(0, splitPos);
+        //     if(!headerString)
+        //         return;
+        //
+        //     response.body = response.body.substring(splitPos+2);
+        //     response.headers = [];
+        //     headerString
+        //         .split(/\n/g)
+        //         .forEach(header => {
+        //             const split = header.split(/:/);
+        //             if(split.length > 1)
+        //                 response.headers[split[0].trim().toLowerCase()] = split[1].trim();
+        //         });
+        //     if(response.headers.from && !this.state.from)
+        //         this.state.from = response.headers.from;
+        //     if(response.headers.to && !this.state.to)
+        //         this.state.to = response.headers.to;
+        // }
 
         onSubmit(e) {
             e.preventDefault();
@@ -136,10 +136,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <td><label for="name">From:</label></td>
                                 <td class="user-message-form">${this.state.from}</td>
                             </tr>
+                            ${this.state.subject ? `
                             <tr>
                                 <td><label for="subject">Subject:</label></td>
                                 <td>${this.state.subject}</td>
                             </tr>
+                            ` : ``}
                             <tr><td colspan="2"><hr/></td></tr>
                             <tr>
                                 <td colspan="2">

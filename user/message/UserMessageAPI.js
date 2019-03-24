@@ -152,7 +152,7 @@ class UserMessageAPI {
 
                 case 'OPTIONS':
                     const searchJSON = await new UserAPI().searchUserList(req);
-                    searchJSON.message = "Send a message";
+                    // searchJSON.message = "Send a message";
                     return res.json(searchJSON);
 
                 case 'POST':

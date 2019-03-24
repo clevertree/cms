@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         constructor() {
             super();
             this.state = {
-                message: "Please fill out the form and hit submit below",
+                message: null,
                 status: 0,
                 userList: [],
                 to: '',
@@ -59,10 +59,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+                if(xhr.status === 200)
+                    delete response.message;
+                if(!this.state.to && response.userList[0])
+                    this.state.to = response.userList[0].username;
                 this.setState({processing: false}, response);
             };
             xhr.responseType = 'json';
-            xhr.open ('OPTIONS', '/:user/:message?sort=asc&by=id', true);
+            xhr.open ('OPTIONS', '/:user/:message', true);
             xhr.send ();
             this.setState({processing: true});
         }
@@ -71,10 +75,21 @@ document.addEventListener('DOMContentLoaded', function() {
         onSubmit(e) {
             e.preventDefault();
             const form = e.target;
-            const formValues = Array.prototype.filter
+            let request = {
+                to: form.elements.to ? form.elements.to.value : this.state.to,
+                subject: form.elements.subject ? form.elements.subject.value : '',
+                body: form.elements.body ? form.elements.body.value : '',
+            };
+            Array.prototype.filter
                 .call(form ? form.elements : [], (input, i) => !!input.name && (input.type !== 'checkbox' || input.checked))
-                .map((input, i) => input.name + '=' + encodeURIComponent(input.value))
+                .filter((input, i) => typeof request[input.name] === "undefined")
+                .forEach((input, i) => request.body += "\n\n" + input.name + ':\n' +input.value);
+
+            const formValues = Object.keys(request)
+                .map((key, i) => key + '=' + encodeURIComponent(request[key]))
                 .join('&');
+
+
             const method = form.getAttribute('method');
             const action = form.getAttribute('action');
 
@@ -100,15 +115,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if(!this.innerHTML.trim())
                 this.innerHTML =
                 `
-                    <table class="themed">
+                    <table class="user themed">
                         <caption>Send a Message</caption>
                         <thead>
                             <tr>
                                 <td colspan="5" class="status">
-                                    <div class="message">Send a Message</div> 
                                 </td>
                             </tr>
-                            <tr><td colspan="2"><hr/></td></tr>
                         </thead>
                         <tbody>
                             <tr>
@@ -167,11 +180,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
             }
 
-            const statusElement = this.querySelector('td.status');
-            statusElement.innerHTML =
-                `<div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                    ${this.state.message || "No Message"}
-                </div>`
+            let statusElement = this.querySelector('div.status,td.status');
+            if(!statusElement) {
+                this.innerHTML = `<div class="status"></div>` + this.innerHTML;
+                statusElement = this.querySelector('div.status,td.status');
+            }
+            if(this.state.message)
+                statusElement.innerHTML =
+                    `<div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                        ${this.state.message}
+                    </div>`
         }
     }
     customElements.define('user-message-send', HTMLUserMessageSendElement);

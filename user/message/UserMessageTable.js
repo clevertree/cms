@@ -2,6 +2,7 @@ const UserMessageRow = require('./UserMessageRow');
 
 const SQL_SELECT = 'um.*, u.username as "to", su.username as "from"';
 const SQL_SELECT_LIST = 'um.*, NULL as body, u.username as "to", su.username as "from"';
+const SQL_ORDER = 'um.id DESC';
 class UserMessageTable  {
 
     constructor(dbName, dbClient) {
@@ -38,7 +39,7 @@ class UserMessageTable  {
         return results.map(result => new UserMessageRow(result))
     }
 
-    async selectUserMessageByUserID(userID, groupBy=null, orderBy=null, limit=25, selectSQL=SQL_SELECT_LIST) {
+    async selectUserMessageByUserID(userID, groupBy=null, orderBy=SQL_ORDER, limit=25, selectSQL=SQL_SELECT_LIST) {
         let whereSQL = "um.user_id = ?";
         if(groupBy)
             whereSQL += " GROUP BY " + groupBy;
@@ -58,7 +59,7 @@ class UserMessageTable  {
 
     async insertUserMessage(user_id, subject, body, sender_user_id) {
         if(!user_id) throw new Error("Invalid User ID");
-        if(!subject) throw new Error("Invalid subject");
+        if(!subject) subject = ""; // throw new Error("Invalid subject");
         let SQL = `
           INSERT INTO ${this.table} SET ?`;
         const result = await this.dbClient.queryAsync(SQL, {
@@ -68,7 +69,7 @@ class UserMessageTable  {
             throw new Error("Message failed to insert");
 
         const message = await this.fetchUserMessageByID(result.insertId);
-        console.info("Message Created", message);
+        // console.info("Message Created", message);
         return message;
     }
 

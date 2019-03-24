@@ -159,13 +159,17 @@ body.theme-minimal > footer {
 /** Labels **/
 
 .theme-minimal table.themed td:first-child {
-    vertical-align: top;
-    padding: 3px;
+    /* vertical-align: top; */
+    /* padding: 3px; */
+    /* width: 20%; */
 }
 .theme-minimal table.themed td:first-child > label {
     text-align: right;
     display: block;
+    padding: 3px;
+    /* vertical-align: top; */
     /* white-space: nowrap; */
+    max-width: 232px;
 }
 
 

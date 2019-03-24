@@ -97,7 +97,15 @@ class UserTable  {
 
     /** User Table **/
 
-    async selectUsers(whereSQL, values, selectSQL='u.*,null as password') {
+    async selectUsers(whereSQL, values, selectSQL=null, groupBy=null, orderBy='u.id DESC', limit=25) {
+        selectSQL = selectSQL || 'u.*,null as password';
+        if(groupBy)
+            whereSQL += " GROUP BY " + groupBy;
+        if(orderBy)
+            whereSQL += " ORDER BY " + orderBy;
+        whereSQL += " LIMIT " + limit;
+
+
         let SQL = `
           SELECT ${selectSQL}
           FROM ${this.table} u

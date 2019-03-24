@@ -18,7 +18,7 @@ form.user textarea {
 }
 
 form.user textarea[name=description] {
-    min-height: 200px;
+    /*min-height: 200px;*/
 }
 
 
@@ -46,6 +46,10 @@ user-message form.user button[type=submit] {
 
 }
 
+/** Table **/
+table.user td:first-child {
+    width: 20%;
+}
 
 /** Form Width**/
 user-form-login table.user,
