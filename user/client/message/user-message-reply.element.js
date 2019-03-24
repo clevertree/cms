@@ -6,16 +6,20 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserMessageSendElement extends HTMLElement{
+    class HTMLUserMessageReplyElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
-                message: "Please fill out the form and hit submit below",
+                message: null,
                 status: 0,
                 userList: [],
-                to: '',
+                id: null,
+                subject: null,
+                replyBody: null,
             };
         }
+        get actionJSON() { return `/:user/:message/${this.state.id}/:json`}
+        get action() { return `/:user/:message/`}
 
         setState(newState) {
             for(let i=0; i<arguments.length; i++)
@@ -27,9 +31,10 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('change', e => this.onChange(e));
             this.addEventListener('submit', e => this.onSubmit(e));
 
-            const to = this.getAttribute('to');
-            if(to)
-                this.setState({to});
+            const messageID = this.getAttribute('messageID');
+            if(messageID)
+                this.setState({id: messageID});
+
 
             setTimeout(() => {
                 this.render();
@@ -59,10 +64,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
+                if(response.subject)
+                    response.subject = 'RE: ' + response.subject.replace(/^RE:\s*/, '');
+                response.body = '';
                 this.setState({processing: false}, response);
             };
             xhr.responseType = 'json';
-            xhr.open ('OPTIONS', '/:user/:message?sort=asc&by=id', true);
+            xhr.open ('GET', this.actionJSON, true);
             xhr.send ();
             this.setState({processing: true});
         }
@@ -97,83 +105,48 @@ document.addEventListener('DOMContentLoaded', function() {
 
         render() {
             console.log("STATE", this.state);
-            if(!this.innerHTML.trim())
                 this.innerHTML =
                 `
-                    <table class="themed">
-                        <caption>Send a Message</caption>
+                <form action="${this.action}" method="POST" class="user user-message themed">
+                    <input type="hidden" name="to" value="${this.state.sender_user_id}" />
+                    <table class="user themed">
+                        ${this.state.message ? `
                         <thead>
                             <tr>
-                                <td colspan="5" class="status">
-                                    <div class="message">Send a Message</div> 
+                                <td>
+                                    <div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
+                                        ${this.state.message}
+                                    </div>
                                 </td>
                             </tr>
                             <tr><td colspan="2"><hr/></td></tr>
                         </thead>
+                        ` : ``}
                         <tbody>
                             <tr>
-                                <td><label for="to">To:</label></td>
                                 <td>
-                                    <input name="to" id="to" list="userList" value="${this.state.to}" required />
-                                    <datalist id="userList"></datalist>
+                                    <input name="subject" placeholder="Enter your subject here" value="${this.state.subject}" />
                                 </td>
                             </tr>
                             <tr>
-                                <td><label for="name">Your Name:</label></td>
-                                <td><input name="name" id="name" required></td>
-                            </tr>
-                            <tr>
-                                <td><label for="from">Your Email:</label></td>
-                                <td><input name="from" id="from" type="email" placeholder="your@email.com" required></td>
-                            </tr>
-                            <tr>
-                                <td><label for="subject">Subject:</label></td>
-                                <td><input name="subject" id="subject" type="text" placeholder="Message Subject" required></td>
-                            </tr>
-                            <tr>
-                                <td><label for="body">Message:</label></td>
                                 <td>
-                                    <textarea name="body" id="body"
-                                        placeholder="Type your message here"
-                                        required></textarea>
+                                    <textarea name="body" placeholder="Enter your reply here" required>${this.state.replyBody||''}</textarea>
                                 </td>
                             </tr>
                         </tbody>
                         <tfoot>
-                            <tr><td colspan="2"><hr/></td></tr>
+                            <tr><td><hr/></td></tr>
                             <tr>
-                                <td colspan="2">
-                                    <button type="submit" class="themed">Submit</button>
+                                <td style="text-align: right;">
+                                    <button type="submit" class="themed">Submit Reply</button>
                                 </td>
                             </tr>
                         </tfoot>
                     </table>
+                </form>
 `;
-            let form = this.querySelector('form');
-            if(!form)
-                this.innerHTML = `
-                <form class="user user-form-message-send themed">
-                    ${this.innerHTML}
-                </form>`;
-            form = this.querySelector('form');
-            form.setAttribute('action', '/:user/:message');
-            form.setAttribute('method', 'POST');
-
-            const userListDL = this.querySelector('select[name=to], #userList');
-            if(userListDL) {
-                userListDL.innerHTML = this.state.userList
-                    .map(user => `<option value="${user.username}">${user.username}</option>`)
-                    .join('');
-
-            }
-
-            const statusElement = this.querySelector('td.status');
-            statusElement.innerHTML =
-                `<div class="${this.state.status === 200 ? 'success' : (!this.state.status ? 'message' : 'error')} status-${this.state.status}">
-                    ${this.state.message || "No Message"}
-                </div>`
         }
     }
-    customElements.define('user-form-message-send', HTMLUserMessageSendElement);
+    customElements.define('user-message-reply', HTMLUserMessageReplyElement);
 
 }

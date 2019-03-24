@@ -6,18 +6,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserMessageElement extends HTMLElement{
+    class HTMLUserMessageListElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
-                id: '',
-                to: null,
-                from: null,
-                subject: null,
-                body: null
+                messageList: []
             };
         }
-        get action() { return `/:user/:message/${this.state.id}`}
+        get action() { return `/:user/:message/:list`; }
 
         setState(newState) {
             for(let i=0; i<arguments.length; i++)
@@ -59,36 +55,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
-                this.processHeaderTags(response);
                 this.setState({processing: false}, response);
             };
             xhr.responseType = 'json';
             xhr.open ('OPTIONS', this.action, true);
             xhr.send ();
             this.setState({processing: true});
-        }
-
-        processHeaderTags(response) {
-            const splitPos = response.body.indexOf("\n\n");
-            if(splitPos <= 0)
-                return;
-            const headerString = response.body.substring(0, splitPos);
-            if(!headerString)
-                return;
-
-            response.body = response.body.substring(splitPos+2);
-            response.headers = [];
-            headerString
-                .split(/\n/g)
-                .forEach(header => {
-                    const split = header.split(/:/);
-                    if(split.length > 1)
-                        response.headers[split[0].trim().toLowerCase()] = split[1].trim();
-                });
-            if(response.headers.from && !this.state.from)
-                this.state.from = response.headers.from;
-            if(response.headers.to && !this.state.to)
-                this.state.to = response.headers.to;
         }
 
         onSubmit(e) {
@@ -121,52 +93,69 @@ document.addEventListener('DOMContentLoaded', function() {
         render() {
             // TODO: display thread? display all messages?
             console.log("STATE", this.state);
+            let searchField = this.querySelector('input[name=search]');
+            const selectionStart = searchField ? searchField.selectionStart : null;
             this.innerHTML =
                 `
-                <form action="${this.action}/:reply" method="POST" class="user user-form-message themed">
+                <form action="${this.action}" method="POST" class="user user-message themed">
                     <table class="user themed">
-                        <caption>Read Message #${this.state.id}</caption>
-                        <tbody>
-                             <tr>
-                                <td><label for="to">To:</label></td>
-                                <td class="user-form-message-to">${this.state.to}</td>
-                            </tr>
+                        <caption>Messages</caption>
+                        <thead>
                             <tr>
-                                <td><label for="name">From:</label></td>
-                                <td class="user-form-message-form">${this.state.from}</td>
-                            </tr>
-                            <tr>
-                                <td><label for="subject">Subject:</label></td>
-                                <td>${this.state.subject}</td>
-                            </tr>
-                            <tr><td colspan="2"><hr/></td></tr>
-                            <tr>
-                                <td colspan="2">
-                                    <div class="body-content">${(this.state.body||'').replace("<", "&lt;")}</div>
+                                <td colspan="5">
+                                    <input type="text" name="search" placeholder="Search Users" value="${this.state.search||''}"/>
                                 </td>
+                            </tr>
+                            <tr><td colspan="5"><hr/></td></tr>
+                            <tr>
+                                <th>ID</th>
+                                <th>From</th>
+                                <th>Subject</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="results">
+                            <tr>
+                                <th colspan="5">No Results</th>
                             </tr>
                         </tbody>
-                    </table>
-                </form>
-                <form action="${this.action}/:reply" method="POST" class="user user-form-message-reply themed">
-                    <table class="user themed">
-                        <tbody>
+                        <tfoot>
+                            <tr><td colspan="5"><hr/></td></tr>
                             <tr>
-                                <td colspan="2">
-                                    <textarea name="reply" placeholder="Enter your reply here"></textarea>
+                                <td colspan="5" class="status">
+                                    <div class="message">Message Browser</div> 
                                 </td>
                             </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <button type="submit" class="themed">Reply</button>
-                                </td>
-                            </tr>
-                        </tbody>
+                        </tfoot>
                     </table>
-                </form>
-`;
+                </form>`;
+            searchField = this.querySelector('input[name=search]');
+            searchField.focus();
+            if(selectionStart)
+                searchField.selectionStart = selectionStart;
+            this.renderResults();
+        }
+
+        renderResults() {
+            const resultsElement = this.querySelector('tbody.results');
+            let classOdd = '';
+            resultsElement.innerHTML = this.state.messageList.map(message => `
+            <tr class="results ${classOdd=classOdd===''?'odd':''}">
+                <td><a href=":user/:message/${message.id}">${message.id}</a></td>
+                <td><a href=":user/${message.from}">${message.from}</a></td>
+                <td><a href=":user/:message/${message.id}">${message.subject}</a></td>
+                <td>${new Date(message.created).toLocaleString("en-US")}</td>
+                <td></td>
+            </tr>
+            `).join('');
+
+            const statusElement = this.querySelector('td.status');
+            statusElement.innerHTML = this.state.message
+                ? this.state.message
+                : `Message Browser`;
         }
     }
-    customElements.define('user-form-message', HTMLUserMessageElement);
+    customElements.define('user-message-list', HTMLUserMessageListElement);
 
 }

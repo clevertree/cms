@@ -2,7 +2,7 @@ const express = require('express');
 
 const ContentRenderer = require('../content/ContentRenderer');
 const UserTable = require("../user/UserTable");
-const SessionAPI = require("../user/session/SessionAPI");
+// const SessionAPI = require("../user/session/SessionAPI");
 
 
 class domainAPI {

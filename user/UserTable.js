@@ -132,18 +132,18 @@ class UserTable  {
     async fetchUserByEmail(email, selectSQL='u.*,null as password') {
         return await this.fetchUser('u.email = ? LIMIT 1', email, selectSQL);
     }
-    async fetchSessionUser(req, selectSQL='u.*,null as password') {
-
-        const sessionUser = await this.fetchUserByID(req.session.userID, selectSQL);
-        if(!sessionUser) {
-            console.warn("Session user is missing. Logging out");
-            delete req.session.userID;
-            if(typeof req.session.messages === 'undefined')
-                req.session.messages = [];
-            req.session.messages.push("<div class='error'>Session user is missing. Logging out</div>");
-        }
-        return sessionUser;
-    }
+    // async fetchSessionUser(req, selectSQL='u.*,null as password') {
+    //
+    //     const sessionUser = await this.fetchUserByID(req.session.userID, selectSQL);
+    //     if(!sessionUser) {
+    //         console.warn("Session user is missing. Logging out");
+    //         delete req.session.userID;
+    //         if(typeof req.session.messages === 'undefined')
+    //             req.session.messages = [];
+    //         req.session.messages.push("<div class='error'>Session user is missing. Logging out</div>");
+    //     }
+    //     return sessionUser;
+    // }
     // async fetchGuestUser(selectSQL='u.*,null as password') { return await this.fetchUser('FIND_IN_SET(\'guest\', u.flags) LIMIT 1', null, selectSQL); }
 
     async createUser(username, email, password, flags='') {

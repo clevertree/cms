@@ -9,6 +9,7 @@ table.user .icon-edit {
 }
 
 form.user select,
+form.user input:not([type]),
 form.user input[type=text],
 form.user input[type=password],
 form.user input[type=email],
@@ -22,23 +23,23 @@ form.user textarea[name=description] {
 
 
 
-/** user-form-message **/
+/** user-message **/
 
-user-form-message table.user {
-    min-width: 90%;
+user-message table.user {
+    /* min-width: 90%; */
     /*margin: auto;*/
 }
-user-form-message form.user .body-content {
+user-message form.user .body-content {
     white-space: pre-wrap;
     /* max-width: 764px; */
     max-height: 400px;
     overflow: auto;
 }
-user-form-message form.user textarea[name=reply] {
+user-message form.user textarea[name=reply] {
     min-height: 200px;
     /* min-width: 703px; */
 }
-user-form-message form.user button[type=submit] {
+user-message form.user button[type=submit] {
     padding: 0.5em;
     margin: 0.5em;
     float: right

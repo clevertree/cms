@@ -8,6 +8,9 @@ class SessionAPI {
     constructor(config) {
         if(!config.cookie)
             config.cookie = {};
+        if(typeof config.cookie.expires === "undefined")
+            config.cookie.expires = false;
+
         if(!config.session)
             config.session = {};
         if(!config.session.cookieName)

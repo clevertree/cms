@@ -2,7 +2,7 @@ const express = require('express');
 
 const UserTable = require('../user/UserTable');
 const ContentRenderer = require('../content/ContentRenderer');
-const SessionAPI = require("../user/session/SessionAPI");
+// const SessionAPI = require("../user/session/SessionAPI");
 
 
 class DatabaseAPI {

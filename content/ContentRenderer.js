@@ -137,7 +137,7 @@ const CUSTOM_ELEMENT_SOURCE = {
     //
     // 'task-manager':         '/:task/:client/task-manager.element.js',
     //
-    // 'user-form-browser':         '/:user/:client/user-form-browser.element.js',
+    // 'user-list':         '/:user/:client/user-list.element.js',
     // 'user-form-forgotpassword':  '/:user/:client/user-form-forgotpassword.element.js',
     // 'user-form-login':           '/:user/:client/user-form-login.element.js',
     // 'user-form-logout':          '/:user/:client/user-form-logout.element.js',

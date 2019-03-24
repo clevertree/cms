@@ -15,9 +15,10 @@ class UserMessageAPI {
 
         const router = express.Router();
 
+        router.all('/[:]user/[:]message/:messageID(\\d+)/[:]json',  async (req, res, next) => await this.renderMessageJSON(req.params.messageID, req, res));
         router.all('/[:]user/[:]message/:messageID(\\d+)',          async (req, res, next) => await this.userMessageRequest(req.params.messageID, req, res));
-        router.all('/[:]user/[:]message/:messageID(\\d+)/:reply',   async (req, res, next) => await this.userMessageSendRequest(null, req.params.messageID, req, res));
         router.all('/[:]user/[:]message',                           async (req, res, next) => await this.userMessageSendRequest(null, null, req, res));
+        router.all('/[:]user/[:]message/[:]list',                   async (req, res, next) => await this.userMessageListRequest(req, res));
         router.all('/[:]user/:userID(\\w+)/[:]message',             async (req, res, next) => await this.userMessageSendRequest(req.params.userID, req, res));
 
         return (req, res, next) => {
@@ -27,62 +28,108 @@ class UserMessageAPI {
         }
     }
 
-    async sendMessage(req, to, from, subject, body, parent_id) {
+    async sendMessage(req, to, from, subject, body) {
         const userTable = new UserTable(req.database, req.server.dbClient);
         const userMessageTable = new UserMessageTable(req.database, req.server.dbClient);
-        const toUser = await userTable.fetchUserByKey(to);
+        let fromUser=null, toUser = await userTable.fetchUserByKey(to);
         if(!toUser)
-            throw new Error("User not found: " + to);
-        const fromUser = await userTable.fetchUserByKey(from);
-        if(!fromUser) {
-            from = UserAPI.sanitizeInput(from, 'email') ;
-            body = `From: ${from}\n\n` + body;
+            throw new Error("'To' User not found: " + to);
+        if(from) {
+            fromUser = await userTable.fetchUserByKey(from);
+            if (!fromUser)
+                throw new Error("'From' User not found: " + from);
         }
 
 
-        const userMessage = await userMessageTable.insertUserMessage(toUser.id, subject, body, parent_id, fromUser ? fromUser.id : null);
+        const userMessage = await userMessageTable.insertUserMessage(toUser.id, subject, body, fromUser ? fromUser.id : null);
         return userMessage;
         // TODO: send an email
     }
 
-    async userMessageRequest(messageID, req, res) {
+    async userMessageListRequest(req, res) {
         try {
             const userTable = new UserTable(req.database, req.server.dbClient);
             const userMessageTable = new UserMessageTable(req.database, req.server.dbClient);
+            switch(req.method) {
+                case 'GET':
+                    await ContentRenderer.send(req, res, {
+                        title: `Messages`,
+                        data: `
+<user-message-list></user-message-list>
+`});
+                    break;
 
+                default:
+                    switch(req.method) {
+                        case 'OPTIONS':
+                            if(!req.session || !req.session.userID)
+                                throw new Error("Must be logged in");
+
+                            const sessionUser = await userTable.fetchUserByID(req.session.userID);
+                            if(!sessionUser)
+                                throw new Error("Session User Not Found: " + req.session.userID);
+                            // searchJSON.message = `Message: ${messageID}`;
+                            const messageList = await userMessageTable.selectUserMessageByUserID(sessionUser.id);
+
+                            return res.json({
+                                message: `${messageList.length} message entr${messageList.length !== 1 ? 'ies' : 'y'} queried successfully`,
+                                messageList
+                            });
+
+                        default:
+                        case 'POST':
+                            // Handle POST
+                            // const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
+                            throw new Error("TODO");
+
+                    }
+            }
+        } catch (error) {
+            await this.renderError(error, req, res);
+        }
+    }
+
+    async userMessageRequest(messageID, req, res) {
+        try {
             switch(req.method) {
                 case 'GET':
                     await ContentRenderer.send(req, res, {
                         title: `Message: ${messageID}`,
-                        data: `<user-form-message${messageID ? ` messageID="${messageID}"` : ''}></user-form-message-send>`});
+                        data: `
+<user-message messageID="${messageID}"></user-message>
+<user-message-reply messageID="${messageID}"></user-message-reply>
+`});
                     break;
 
-                case 'OPTIONS':
-                    const userMessage = await userMessageTable.fetchUserMessageByID(messageID);
-                    if(!userMessage)
-                        throw Object.assign(new Error("Message not found: " + messageID), {status: 404});
-                    // searchJSON.message = `Message: ${messageID}`;
-                    return res.json(userMessage);
+                default:
+                    switch(req.method) {
+                        case 'OPTIONS':
+                            // searchJSON.message = `Message: ${messageID}`;
+                            return await this.renderMessageJSON(req, res);
 
-                case 'POST':
-                    // Handle POST
-                    const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
+                        default:
+                        case 'POST':
+                            // Handle POST
+                            // const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
+                            throw new Error("TODO");
 
-                    const userMessageReply = await this.sendMessage(req,
-                        req.body.to,
-                        sessionUser ? sessionUser.id : req.body.from,
-                        req.body.subject,
-                        req.body.body,
-                        req.body.parent_id ? parseInt(req.body.parent_id) : null
-                    );
-                    // TODO: Delete Message + reply
-
-                    return res.json({
-                        redirect: userMessage.url,
-                        message: `Message sent to ${toUser.username} successfully. Redirecting...`,
-                        insertID: userMessage.id
-                    });
+                    }
             }
+        } catch (error) {
+            await this.renderError(error, req, res);
+        }
+
+    }
+
+    async renderMessageJSON(messageID, req, res) {
+        try {
+            // const userTable = new UserTable(req.database, req.server.dbClient);
+            const userMessageTable = new UserMessageTable(req.database, req.server.dbClient);
+            const userMessage = await userMessageTable.fetchUserMessageByID(messageID);
+            if (!userMessage)
+                throw Object.assign(new Error("Message not found: " + messageID), {status: 404});
+
+            return res.json(userMessage);
         } catch (error) {
             await this.renderError(error, req, res);
         }
@@ -100,25 +147,26 @@ class UserMessageAPI {
                 case 'GET':
                     await ContentRenderer.send(req, res, {
                         title: `Send a Message`,
-                        data: `<user-form-message-send${userID ? ` to="${userID}"` : ''}></user-form-message-send>`});
+                        data: `<user-message-send${userID ? ` to="${userID}"` : ''}></user-message-send>`});
                     break;
 
                 case 'OPTIONS':
-                    const searchJSON = await UserAPI.searchUserList(req);
+                    const searchJSON = await new UserAPI().searchUserList(req);
                     searchJSON.message = "Send a message";
                     return res.json(searchJSON);
 
                 case 'POST':
                     // Handle POST
                     const sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
+                    const subject = this.sanitizeInput(req.body.subject);
+                    const body = this.sanitizeInput(req.body.body);
 
                     const userMessage = await this.sendMessage(req,
                         req.body.to,
-                        sessionUser ? sessionUser.id : req.body.from,
-                        req.body.subject,
-                        req.body.body,
-                        req.body.parent_id ? parseInt(req.body.parent_id) : null
-                        );
+                        sessionUser ? sessionUser.id : null,
+                        subject,
+                        body,
+                    );
                     // UserMessageTable.insertUserMessage(toUser.id, subject, body, parent_id, sessionUser ? sessionUser.id : null);
 
                     return res.json({
@@ -132,20 +180,12 @@ class UserMessageAPI {
         }
     }
 
+    sanitizeInput(input, type=null) {
+        return new UserAPI().sanitizeInput(input, type);
+    }
+
     async renderError(error, req, res, json=null) {
-        console.error(`${req.method} ${req.url}:`, error);
-        res.status(error.status || 400);
-        if(error.redirect) {
-            res.redirect(error.redirect);
-        } else if(req.method === 'GET' && !json) {
-            await ContentRenderer.send(req, res, `<section class='error'><pre>${error.stack}</pre></section>`);
-        } else {
-            res.json(Object.assign({}, {
-                message: error.message,
-                error: error.stack,
-                code: error.code,
-            }, json));
-        }
+        return new UserAPI().renderError(error, req, res, json);
     }
 }
 module.exports = UserMessageAPI;

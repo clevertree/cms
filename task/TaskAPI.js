@@ -5,13 +5,13 @@ const path = require('path');
 
 const UserTable = require("../user/UserTable");
 const ContentRenderer = require("../content/ContentRenderer");
-const SessionAPI = require("../user/session/SessionAPI");
+// const SessionAPI = require("../user/session/SessionAPI");
+const ContentAPI = require("../content/ContentAPI");
 
 
 const DIR_TASK = path.resolve(__dirname);
 
 class TaskAPI {
-    get ContentAPI() { return require('../content/ContentAPI').ContentAPI; }
     constructor() {
         this.taskClass = {};
         this.addTask(require('../user/task/AdminConfigureTask').AdminConfigureTask);
@@ -49,7 +49,7 @@ class TaskAPI {
         const assetPath = req.url.substr(routePrefix.length);
 
         const staticFile = path.resolve(DIR_TASK + '/client/' + assetPath);
-        await this.ContentAPI.renderStaticFile(req, res, next, staticFile);
+        await new ContentAPI().renderStaticFile(req, res, next, staticFile);
     }
 
 
@@ -57,7 +57,7 @@ class TaskAPI {
         try {
             // const database = await req.server.selectDatabaseByRequest(req, false);
             let sessionUser = null;
-            if(database) {
+            if(req.database) {
                 const userTable = new UserTable(req.database, req.server.dbClient);
                 sessionUser = req.session && req.session.userID ? await userTable.fetchUserByID(req.session.userID) : null;
             }

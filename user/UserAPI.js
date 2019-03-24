@@ -8,8 +8,8 @@ const DNSManager = require('../server/DNSManager');
 const UserTable = require("../user/UserTable");
 const ContentRenderer = require("../content/ContentRenderer");
 const ContentTable = require("../content/ContentTable");
-const SessionAPI = require("../user/session/SessionAPI");
-const TaskAPI = require("../task/TaskAPI");
+// const SessionAPI = require("../user/session/SessionAPI");
+// const TaskAPI = require("../task/TaskAPI");
 const ContentAPI = require("../content/ContentAPI");
 const ResetPasswordMail = require("./mail/ResetPasswordMail");
 
@@ -36,7 +36,6 @@ class UserAPI {
         sessionConfig.cookieName = 'session';
 
         const router = express.Router();
-        // TODO: handle session_save login
         // router.use(async (req, res, next) => await this.checkForSessionLogin(req, res, next));
         // API Routes
         router.use(express.urlencoded({ extended: true }));
@@ -86,17 +85,17 @@ class UserAPI {
 
 
     /** Session **/
-    addSessionMessage(req, message) {
-        if(typeof req.session.messages === 'undefined')
-            req.session.messages = [];
-        req.session.messages.push(message)
-    }
-
-    popSessionMessage(req) {
-        if(typeof req.session.messages === 'undefined' || req.session.messages.length === 0)
-            return null;
-        return req.session.messages.pop();
-    }
+    // addSessionMessage(req, message) {
+    //     if(typeof req.session.messages === 'undefined')
+    //         req.session.messages = [];
+    //     req.session.messages.push(message)
+    // }
+    //
+    // popSessionMessage(req) {
+    //     if(typeof req.session.messages === 'undefined' || req.session.messages.length === 0)
+    //         return null;
+    //     return req.session.messages.pop();
+    // }
 
     async fetchProfileConfig(req) {
         const path = '/config/profile.json';
@@ -250,15 +249,16 @@ class UserAPI {
         req.session.userID = sessionUser.id;
 
         if(saveSession) {
+            // TODO:
             req.session.setDuration(1000 * 60 * 60 * 24 * 14) // 2 weeks;
         }
 
-        const activeTasks = await new TaskAPI().getActiveTasks(req, sessionUser);
-        const activeTaskList = Object.values(activeTasks);
-        let activeTaskHTML = '';
-        if(activeTaskList.length > 0)
-            activeTaskHTML = `<br/><a href=":task">You have ${activeTaskList.length} available task${activeTaskList.length > 1 ? 's' : ''}</a>`;
-        this.addSessionMessage(req,`<div class='success'>Login Successful: ${sessionUser.username}${activeTaskHTML}</div>`);
+        // const activeTasks = await new TaskAPI().getActiveTasks(req, sessionUser);
+        // const activeTaskList = Object.values(activeTasks);
+        // let activeTaskHTML = '';
+        // if(activeTaskList.length > 0)
+        //     activeTaskHTML = `<br/><a href=":task">You have ${activeTaskList.length} available task${activeTaskList.length > 1 ? 's' : ''}</a>`;
+        // this.addSessionMessage(req,`<div class='success'>Login Successful: ${sessionUser.username}${activeTaskHTML}</div>`);
 
         return sessionUser;
     }
@@ -272,9 +272,8 @@ class UserAPI {
         //     await userTable.deleteUserSessionByID(req.session.user_session);
         // }
         req.session.reset();
-        res.clearCookie('session_save');
-        this.addSessionMessage(req,`<div class='success'>User has been logged out</div>`);
-        // TODO: destroy db session
+        // res.clearCookie('session_save');
+        // this.addSessionMessage(req,`<div class='success'>User has been logged out</div>`);
     }
 
 
@@ -584,7 +583,10 @@ class UserAPI {
                     await ContentRenderer.send(req, res, {
                         title: `Browse Users`,
                         data:
-                            `<user-form-browser></user-form-browser><user-form-register></user-form-register>`});
+                            `
+<user-list></user-list>
+<user-form-register></user-form-register>
+`});
                     break;
 
                 case 'OPTIONS':

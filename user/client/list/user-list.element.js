@@ -81,7 +81,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
         let searchField = this.querySelector('input[name=search]');
         const selectionStart = searchField ? searchField.selectionStart : null;
         this.innerHTML =
-            `<form action="/:user/:list" method="POST" class="user user-form-browser themed">
+            `<form action="/:user/:list" method="POST" class="user user-list themed">
                 <table class="user themed">
                     <caption>Browse Users</caption>
                     <thead>
@@ -132,7 +132,7 @@ class HTMLUserFormBrowserElement extends HTMLElement {
                 <td>${user.flags.join(', ')} <a href=":user/${user.id}/:flags" class="action-edit">&#x270D;</a></td>
                 <td><a href=":user/${user.id}/:password" class="action-edit">&#x270D; change</a></td>
             </tr>
-            `).join('');``
+            `).join('');
 
         const statusElement = this.querySelector('td.status');
         statusElement.innerHTML = this.state.message
@@ -155,4 +155,4 @@ class HTMLUserFormBrowserElement extends HTMLElement {
 //     // isGuest() { return this.hasFlag('guest'); }
 // };
 
-customElements.define('user-form-browser', HTMLUserFormBrowserElement);
+customElements.define('user-list', HTMLUserFormBrowserElement);

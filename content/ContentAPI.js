@@ -9,7 +9,7 @@ const ContentRenderer = require('./ContentRenderer');
 const ContentTable = require("./ContentTable");
 const ContentRevisionTable = require("./revision/ContentRevisionTable");
 const UserTable = require("../user/UserTable");
-const SessionAPI = require("../user/session/SessionAPI");
+// const SessionAPI = require("../user/session/SessionAPI");
 
 const DIR_CONTENT = path.resolve(__dirname);
 
