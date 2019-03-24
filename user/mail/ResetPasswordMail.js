@@ -39,7 +39,7 @@ Thanks for administrating the site!<br/>
     async send() {
         console.log('Sending Email: ', this);
         await this.mailClient.sendMail(this);
-        console.log('Message sent successfully!');
+        console.log(this.constructor.name + 'sent successfully!');
     }
 }
 

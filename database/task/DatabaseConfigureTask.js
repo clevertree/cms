@@ -91,7 +91,7 @@ class databaseConfigureTask {
 
                         await DatabaseClient.configureDatabase(database, hostname, null);
                         const userTable = new UserTable(req.database, req.server.dbClient);
-                        const adminUser = await userTable.createUser(req.body.username || 'admin', requestData.adminEmail, req.body.password, 'admin');
+                        const adminUser = await userTable.createUser(req.body.username || 'admin', requestData.adminEmail, req.body.password, 'admin, email');
 
                         // await UserAPI.sendResetPasswordRequestEmail(req, adminUser);
 

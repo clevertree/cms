@@ -16,12 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 status: 0,
                 processing: false,
                 editable: false,
+                flagList: [],
                 user: {id: -1, flags:[]}
             };
-            this.flags = {
-                admin: 'Admin',
-                debug: 'Debug',
-            }
             // this.state = {id:-1, flags:[]};
         }
 
@@ -67,7 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     newFlags.push(elm.name);
             }
             this.state.user.flags = newFlags;
-            console.log(this.state.user.flags);
+            this.render();
+            // console.log(this.state.user.flags);
         }
 
         requestFormData() {
@@ -111,8 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
-            // console.log("STATE", this.state.user);
-            const userFlags = this.state.user.flags || [];
+            console.log("STATE", this.state);
             this.innerHTML =
                 `
                 <form action="${this.state.src}/:flags" method="POST" class="user user-form-updateflags themed">
@@ -140,11 +137,15 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tr>
                                 <td><label>Flags:</label></td>
                                 <td>
-                                    ${Object.keys(this.flags).map(flagName => `
+                                    ${Object.keys(this.state.flagList).map(flagName => `
                                     <label>
-                                        <input type="checkbox" class="themed" name="${flagName.toLowerCase()}" value="1" ${userFlags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" />
-                                        ${this.flags[flagName]}
+                                        <input type="checkbox" class="themed" name="${flagName}" value="1" 
+                                            ${this.state.user.flags.indexOf(flagName) !== -1 ? 'checked="checked"' : null}" 
+                                            ${flagName.indexOf(':') !== -1 && this.state.user.flags.indexOf(flagName.split(':')[0]) === -1 ? 'disabled="disabled"' : null}" 
+                                            />
+                                        ${this.state.flagList[flagName]}
                                     </label>
+                                    <br/>
                                     `).join('')}
                                 </td>
                             </tr>

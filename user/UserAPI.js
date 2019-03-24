@@ -509,6 +509,7 @@ class UserAPI {
                         switch(type) {
                             case 'updateflags':
                                 response.editable = (sessionUser.isAdmin());
+                                response.flagList = UserTable.FLAG_LIST;
                                 break;
                             case 'updatepassword':
                                 response.require_old_password = user.id === sessionUser.id;
@@ -517,12 +518,12 @@ class UserAPI {
                             case 'profile':
                             case 'updateprofile':
                             default:
+                                response.profileConfig = await this.fetchProfileConfig(req);
                                 response.editable = (sessionUser.isAdmin() || sessionUser.id === user.id);
                                 break;
                         }
                     }
 
-                    response.profileConfig = await this.fetchProfileConfig(req);
 
                     res.json(response);
 

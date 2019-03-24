@@ -40,8 +40,15 @@ class UserMessageAPI {
                 throw new Error("'From' User not found: " + from);
         }
 
-
         const userMessage = await userMessageTable.insertUserMessage(toUser.id, subject, body, fromUser ? fromUser.id : null);
+
+        if(toUser.emailCanReceive()) {
+            const MessageNotificationMail = require('./mail/MessageNotificationMail');
+            const requestURL = req.protocol + '://' + req.get('host') + userMessage.url;
+            const mail = new MessageNotificationMail(req.server.mailClient, requestURL, userMessage, toUser.emailInsecure());
+            await mail.send();
+        }
+
         return userMessage;
         // TODO: send an email
     }
@@ -123,11 +130,24 @@ class UserMessageAPI {
 
     async renderMessageJSON(messageID, req, res) {
         try {
+            if(!req.session || !req.session.userID)
+                throw new Error("Must be logged in");
+
+            const userTable = new UserTable(req.database, req.server.dbClient);
+            const sessionUser = await userTable.fetchUserByID(req.session.userID);
+            if(!sessionUser)
+                throw new Error("Session User Not Found: " + req.session.userID);
+
             // const userTable = new UserTable(req.database, req.server.dbClient);
             const userMessageTable = new UserMessageTable(req.database, req.server.dbClient);
             const userMessage = await userMessageTable.fetchUserMessageByID(messageID);
             if (!userMessage)
                 throw Object.assign(new Error("Message not found: " + messageID), {status: 404});
+
+            if(!sessionUser.isAdmin()) {
+                if (userMessage.user_id !== sessionUser.id)
+                    throw new Error("Invalid Authorization to view")
+            }
 
             return res.json(userMessage);
         } catch (error) {

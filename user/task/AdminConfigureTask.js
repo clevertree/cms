@@ -67,7 +67,7 @@ class AdminConfigureTask {
                         delete adminRequests[requestUUID];
 
                         const userTable = new UserTable(this.database, req.server.dbClient);
-                        const adminUser = await userTable.createUser(req.body.username || 'admin', requestData.adminEmail, req.body.password, 'admin');
+                        const adminUser = await userTable.createUser(req.body.username || 'admin', requestData.adminEmail, req.body.password, 'admin, email');
 
                         // await UserAPI.sendResetPasswordRequestEmail(req, adminUser);
 

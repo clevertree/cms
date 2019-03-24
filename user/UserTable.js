@@ -1,9 +1,15 @@
 const bcrypt = require('bcryptjs');
-const uuidv4 = require('uuid/v4');
+// const uuidv4 = require('uuid/v4');
 
 const UserRow = require('./UserRow');
 const InteractiveConfig = require('../config/InteractiveConfig');
 
+const FLAG_LIST = {
+    'admin':        "Administrator",
+    'debug':        "Debugger",
+    'email':        "Email: Receive an email notification",
+    'email:view':   "Email: View message content in Email"
+};
 class UserTable  {
 
     constructor(dbName, dbClient) {
@@ -15,6 +21,7 @@ class UserTable  {
     async init() {
         // Check for tables
         await this.dbClient.queryAsync(this.getTableSQL());
+        await this.dbClient.queryAsync(this.getTableUpgradeSQL());
     }
 
     async configure(hostname=null) {
@@ -85,7 +92,7 @@ class UserTable  {
                         console.error("Password mismatch");
                         continue;
                     }
-                    adminUser = await this.createUser(adminUsername, adminEmail, adminPassword, 'admin');
+                    adminUser = await this.createUser(adminUsername, adminEmail, adminPassword, 'admin, email');
                     console.info(`Admin user created (${adminUser.id}: ` + adminUsername);
                     break;
                 } catch (e) {
@@ -221,7 +228,7 @@ CREATE TABLE IF NOT EXISTS ${this.table} (
   \`password\` varchar(256) DEFAULT NULL,
   \`profile\` TEXT DEFAULT NULL,
   \`created\` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  \`flags\` SET("admin", "debug"),
+  \`flags\` SET("${Object.keys(FLAG_LIST).join('", "')}"),
   PRIMARY KEY (\`id\`),
   UNIQUE KEY \`uk.user.email\` (\`email\`),
   UNIQUE KEY \`uk.user.username\` (\`username\`)
@@ -229,9 +236,15 @@ CREATE TABLE IF NOT EXISTS ${this.table} (
 `
     }
 
+    getTableUpgradeSQL() {
+        return `
+ALTER TABLE ${this.table} 
+CHANGE COLUMN \`flags\` \`flags\` SET("${Object.keys(FLAG_LIST).join('", "')}") NULL DEFAULT NULL ;
+`
+    }
 
 }
-
+UserTable.FLAG_LIST = FLAG_LIST;
 
 module.exports = UserTable;
 

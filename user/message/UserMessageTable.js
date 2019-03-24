@@ -1,7 +1,7 @@
 const UserMessageRow = require('./UserMessageRow');
 
-const SQL_SELECT = 'um.*, u.username as "to", su.username as "from"';
-const SQL_SELECT_LIST = 'um.*, NULL as body, u.username as "to", su.username as "from"';
+const SQL_SELECT = 'um.*, u.email as "to", su.email as "from", u.username as "to_username", su.username as "from_username"';
+const SQL_SELECT_LIST = SQL_SELECT + ', NULL as body';
 const SQL_ORDER = 'um.id DESC';
 class UserMessageTable  {
 
