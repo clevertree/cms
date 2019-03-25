@@ -1,8 +1,11 @@
 # Clevertree CMS
-Content Management System
 
+```
+“Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away.” 
+Antoine de Saint-Exupéry
+```
 
-## Project Introduction
+## Introduction
 Clevertree CMS is a light-weight and high performance **UCMS** (_Universal Content Management System_)
 with a primary goal for **all** of its content is transferable with other UCMS by the *simplest possible interface*.
 
@@ -21,7 +24,7 @@ with a primary goal for **all** of its content is transferable with other UCMS b
 * Request administrator access by setting the domain's SOA email
 * Can be used stand-alone, or as a middleware within another NodeJS app
 * CMS API middleware can be enabled individually (example: content management @ /:content/ with no user management @ /:user/)
-* User services: Add, edit, reset / change password, list, delete
+* User services: Add, edit, reset / change password, list, delete, private message
 * Content services: Add, edit, multi-upload, delete, WYSIWYG editor
 * Interactive configuration
 
@@ -53,14 +56,13 @@ with a primary goal for **all** of its content is transferable with other UCMS b
 * Create sharable components across different CMS and websites
 * Client-side MVC - Render all GUI on the client's browser, never the server
 * Universal CMS / CMI: Common SCHEMA that may be shared with other CMS software
-* “Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away.” ― Antoine de Saint-Exupéry
 
-#### Client-side MVC Module Design 
+#### Client-side Sharable customElements 
 * Sharable customElements between websites
-* Server determines the client-side dependencies for each module based on it's name _automatically_
-  * Example: [content-form-browser.element.js](https://www.afoh.info/:content/:client/form/content-form-browser.element.js) as used in
-  [Site Index](https://www.afoh.info/:content) 
-  * HTML content only needs to contain the custom element tag and the dependencies will be found 
+* Server determines the client-side dependencies for each customElement based on it's name _automatically_. Examples:
+  * [<user-message></user-message>](https://www.afoh.info/:user/:client/message/user-message.element.js) is found at `https://www.afoh.info/:user/:client/message/user-message.element.js`
+  * [<content-nav></content-nav>](https://www.afoh.info/:content/:client/nav/content-nav.element.js) is found at `https://www.afoh.info/:content/:client/nav/content-nav.element.js`
+* End-user HTML content only needs to contain the customElement tag and the dependencies will be found 
 * Encapsulated in a single client-side customElement containing:
   * Model - Requests a copy of the model from the API as it relates to the module
   * View - Renders the client side module responsively based on the model data
@@ -72,7 +74,7 @@ with a primary goal for **all** of its content is transferable with other UCMS b
 * Javascript/NodeJS Programmer!
 * CSS Designer
 * Publicist
-
+* QA
 
 
 ### Sites Powered by CleverTree CMS
@@ -141,12 +143,14 @@ app.use(clevertree.getMiddleware({
         // sslPort: 8443,
     },
     mail: {
-        auth: {
-            // user: "mail@server.com",
-            // pass: "mailmail"
+        client: {
+            auth: {
+                // user: "mail@server.com",
+                // pass: "mailmail"
+            }
+            // host: "mail.server.com",
+            // port: 587
         }
-        // host: "mail.server.com",
-        // port: 587
     },
     session: {
         secret: "my-random-string-6d4b-48c8-9b3d-9c6bfd506057"

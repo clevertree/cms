@@ -24,12 +24,14 @@ app.use(clevertree.getMiddleware({
         // sslPort: 8443,
     },
     mail: {
-        auth: {
-            // user: "mail@server.com",
-            // pass: "mailmail"
-        },
-        // host: "mail.server.com",
-        port: 587
+        client: {
+            auth: {
+                // user: "mail@server.com",
+                // pass: "mailmail"
+            },
+            // host: "mail.server.com",
+            // port: 587
+        }
     },
     session: {
         secret: "my-random-string-6d4b-48c8-9b3d-9c6bfd506057"

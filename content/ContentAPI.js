@@ -631,9 +631,14 @@ class ContentAPI {
             // Handle POST
             let whereSQL = '1', values = null;
             const search = req.body ? req.body.search : (req.query ? req.query.search : null);
+            let paths = req.body ? req.body.paths : (req.query ? req.query.paths : null);
             if(search) {
                 whereSQL = 'c.title LIKE ? OR c.data LIKE ? OR c.path LIKE ? OR c.id = ?';
                 values = ['%'+search+'%', '%'+search+'%', '%'+search+'%', parseInt(search)];
+            } else if(paths) {
+                paths = paths.split(',').filter(path => path !== '/');
+                whereSQL = paths.map(path => 'c.path LIKE ?').join(' OR ');
+                values = paths.map(path => path + '%');
             }
             const contentList = await contentTable.selectContent(whereSQL, values, 'id, path, title');
 

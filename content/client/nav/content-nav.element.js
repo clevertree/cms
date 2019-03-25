@@ -23,8 +23,6 @@
         }
 
         setState(newState) {
-            if(this.state.linkList === null)
-                this.state.linkList = Array.prototype.slice.call(this.querySelectorAll('a[href]'));
             for(let i=0; i<arguments.length; i++)
                Object.assign(this.state, arguments[i]);
             this.render();
@@ -49,13 +47,19 @@
         }
 
         requestFormData() {
+            if(this.state.linkList === null) {
+                this.state.linkList = Array.prototype.slice.call(this.querySelectorAll('a[href]:not([data-submenu])'));
+                this.state.linkSubList = Array.prototype.slice.call(this.querySelectorAll('a[href][data-submenu]'));
+            }
+            let params = '?paths=' + this.state.linkList.map(elm => elm.getAttribute('href')).join(',');
+
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
                 this.setState({processing: false}, response);
             };
             xhr.responseType = 'json';
-            xhr.open ('GET', this.state.src, true);
+            xhr.open ('GET', this.state.src + params, true);
             xhr.send ();
             this.setState({processing: true});
         }
@@ -66,6 +70,13 @@
                 menu = this.state.linkList.map(aElm => {
                     const rootPath = aElm.pathname;
                     let submenu = [];
+                    for (let i=0; i<this.state.linkSubList.length; i++) {
+                        const link = this.state.linkSubList[i];
+                        const href = link.getAttribute('data-submenu');
+                        if(href.startsWith(rootPath))
+                            submenu.push(link.outerHTML);
+                    }
+
                     // const menuEntry = {title:null, path: rootPath, content: null, submenu: []};
                     for (let i = 0; i < this.state.contentList.length; i++) {
                         const contentEntry = this.state.contentList[i];
