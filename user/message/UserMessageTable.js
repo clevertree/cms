@@ -7,7 +7,7 @@ class UserMessageTable  {
 
     constructor(dbName, dbClient) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
-        this.table = tablePrefix + '`user-message`';
+        this.table = tablePrefix + '`user_message`';
         this.tableUser = tablePrefix + '`user`';
         this.dbClient = dbClient;
     }

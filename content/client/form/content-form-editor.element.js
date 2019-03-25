@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 revisionID: null,
                 editor: sessionStorage.getItem("content-form-editor:editor"),
                 content: {id: -1},
+                contentString: null,
                 revision: {},
                 history: [],
                 // parentList: [],
@@ -41,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('change', e => this.onChange(e));
             this.addEventListener('submit', e => this.onSubmit(e));
             this.addEventListener('keyup', e => this.onKeyUp(e));
+            window.addEventListener('beforeunload', e => this.onBeforeUnload(e));
 
             const contentID = this.getAttribute('id');
             if (contentID) {
@@ -137,7 +139,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     break;
             }
-            // TODO: warn user about unsaved data
+        }
+
+        onBeforeUnload(e) {
+            if(this.state.contentString && (this.state.contentString !== JSON.stringify(this.state.content))) {
+                e = e || window.event;
+                e.returnValue = "Unpublished changes will be lost";
+                return e.returnValue;
+            }
+
         }
 
         uint8ToBase64(buffer) {
@@ -151,6 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         requestFormData() {
             const form = this.querySelector('form');
+            const action = form.getAttribute('action');
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
@@ -160,13 +171,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         response.content.data = response.contentRevision.data;
                     response.content.length = response.contentRevision.length;
                 }
+                response.contentString = JSON.stringify(response.content);
                 this.setState({processing: false}, response);
             };
             xhr.responseType = 'json';
             let params = '?t=' + new Date().getTime();
             if (this.state.revisionID)
                 params += `&r=${this.state.revisionID}`;
-            xhr.open('OPTIONS', form.getAttribute('action') + params, true);
+            xhr.open('OPTIONS', action + params, true);
             xhr.send();
             this.setState({processing: true});
         }
@@ -271,6 +283,35 @@ document.addEventListener('DOMContentLoaded', function() {
                         </td>
                     </tr>
                     <tr>
+                        <td><label for="data">Content:</label></td>
+                        <td class="content-form-editor-fullscreen-top">
+                            ${this.state.isBinary ? `
+                            <input type="hidden" name="data" id="data" />
+                            <textarea class="editor-binary editor-wysiwyg-target" disabled>[Binary File]
+Mime Type: ${this.state.mimeType || ''}
+Length: ${this.readableByteSize(this.state.content.length)}
+</textarea>
+                            ` : `
+                            <textarea class="editor-plain editor-wysiwyg-target" name="data" id="data"></textarea>
+                            `}
+                            <button type="button" class="content-form-editor-toggle-fullscreen" onclick="this.form.parentNode.classList.toggle('fullscreen')">Full Screen</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="data">Upload:</label></td>
+                        <td>
+                            <input type="file" name="dataSourceFile"/>
+                            ${false ? `
+                                <select name="dataSource">
+                                <option value="">Use Uploaded File</option>
+                                ${this.state.currentUploads.map((upload, i) => `
+                                    <option value="temp:${upload.uploadPath}">${upload.uploadPath} (${this.readableByteSize(upload.size)})</option>
+                                `).join('')}
+                                </select>
+                            ` : ``}
+                        </td>
+                    </tr>
+                    <tr>
                         <td><label for="editor">Editor:</label></td>
                         <td>
                             <select name="editor" id="editor">
@@ -289,34 +330,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         </td>
                     </tr>
                     <tr>
-                        <td><label for="data">Upload:</label></td>
-                        <td>
-                            <input type="file" name="dataSourceFile"/>
-                            <select name="dataSource">
-                                <option value="">Use Uploaded File</option>
-                            ${this.state.currentUploads.map((upload, i) => `
-                                <option value="temp:${upload.uploadPath}">${upload.uploadPath} (${this.readableByteSize(upload.size)})</option>
-                            </tr>
-                            </select>
-                            `).join('')}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><label for="data">Content:</label></td>
-                        <td class="content-form-editor-fullscreen-top">
-                            ${this.state.isBinary ? `
-                            <input type="hidden" name="data" id="data" />
-                            <textarea class="editor-binary editor-wysiwyg-target" disabled>[Binary File]
-Mime Type: ${this.state.mimeType || ''}
-Length: ${this.readableByteSize(this.state.content.length)}
-</textarea>
-                            ` : `
-                            <textarea class="editor-plain editor-wysiwyg-target" name="data" id="data"></textarea>
-                            `}
-                            <button type="button" class="content-form-editor-toggle-fullscreen" onclick="this.form.parentNode.classList.toggle('fullscreen')">Full Screen</button>
-                        </td>
-                    </tr>
-                    <tr>
                         <td><label for="revisionID">Revision:</label></td>
                         <td>
                             <select name="revisionID" id="revisionID">
@@ -327,7 +340,7 @@ Length: ${this.readableByteSize(this.state.content.length)}
                             </select>
                         </td>
                     </tr>
-                    <tr>
+                    ${false ? `<tr>
                         <td><label for="action">Preview:</label></td>
                         <td>
                             <select name="action" id="action">
@@ -335,7 +348,7 @@ Length: ${this.readableByteSize(this.state.content.length)}
                                 <option value="draft">Save as Unpublished Draft</option>
                             </select>
                         </td>
-                    </tr>
+                    </tr>` : ``}
                 </tbody>
                 <tfoot>
                     <tr><td colspan="2"><hr/></td></tr>
@@ -355,7 +368,7 @@ Length: ${this.readableByteSize(this.state.content.length)}
             <h1 style="text-align: center;">Preview</h1>
         </section>
 
-        <iframe src="${this.state.content.path}" class="content-preview-iframe content-form-editor-fullscreen-bottom"></iframe>
+        <iframe ${this.state.content.path ? `src="${this.state.content.path}"` : ''} class="content-preview-iframe content-form-editor-fullscreen-bottom"></iframe>
 
 
 `;

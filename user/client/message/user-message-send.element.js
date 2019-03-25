@@ -14,7 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 status: 0,
                 userList: [],
                 to: '',
+                from: '',
             };
+            this.originalInnerHTML = null;
         }
 
         setState(newState) {
@@ -29,9 +31,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const to = this.getAttribute('to');
             if(to)
-                this.setState({to});
+                this.state.to = to;
 
             setTimeout(() => {
+                this.originalInnerHTML = this.innerHTML.trim();
                 this.render();
                 this.requestFormData();
             }, 1);
@@ -111,10 +114,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render() {
-            console.log("STATE", this.state);
-            if(!this.innerHTML.trim())
+            if(this.originalInnerHTML) {
+                this.innerHTML = this.originalInnerHTML;
+            } else {
                 this.innerHTML =
-                `
+                    `
                     <table class="user themed">
                         <caption>Send a Message</caption>
                         <thead>
@@ -131,14 +135,16 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <datalist id="userList"></datalist>
                                 </td>
                             </tr>
+                            ${!this.state.isLoggedIn ? `
                             <tr>
                                 <td><label for="name">Your Name:</label></td>
                                 <td><input name="name" id="name" required></td>
                             </tr>
                             <tr>
                                 <td><label for="from">Your Email:</label></td>
-                                <td><input name="from" id="from" type="email" placeholder="your@email.com" required></td>
+                                <td><input name="from" id="from" type="email" value="${this.state.from}" placeholder="your@email.com" required></td>
                             </tr>
+                            ` : ``}
                             <tr>
                                 <td><label for="subject">Subject:</label></td>
                                 <td><input name="subject" id="subject" type="text" placeholder="Message Subject" required></td>
@@ -162,6 +168,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         </tfoot>
                     </table>
 `;
+                console.log("STATE", this.state);
+            }
             let form = this.querySelector('form');
             if(!form)
                 this.innerHTML = `

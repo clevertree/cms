@@ -59,8 +59,6 @@ class UserAPI {
         // router.all('/[:]user/[:]message/:messageID(\\d+)',          async (req, res, next) => await this.handleMessageRequest(req.params.messageID, req, res));
         // router.all('/[:]user/[:]message',                           async (req, res, next) => await this.handleMessageSendRequest(null, req, res));
         // router.all('/[:]user/:userID(\\w+)/[:]message',             async (req, res, next) => await this.handleMessageSendRequest(req.params.userID, req, res));
-        const UserMessageAPI = require('./message/UserMessageAPI');
-        router.use(new UserMessageAPI().getMiddleware());
 
         // User Asset files
         router.get('/[:]user/[:]client/*',                          async (req, res, next) => await this.handleUserStaticFiles(req, res, next));
@@ -367,7 +365,7 @@ class UserAPI {
         let to = `${user.profile && user.profile.name ? user.profile.name : user.username} <${user.email}>`;
 
         const mail = new ResetPasswordMail(recoveryUrl, to);
-        await mail.send();
+        await mail.send(req.server.mailClient);
 
         return recoveryUrl;
     }
@@ -602,10 +600,11 @@ class UserAPI {
 
     async renderUserListJSON(req, res) {
         try {
-
-            return res.json(
-                await this.searchUserList(req)
-            );
+            const userList = await this.searchUserList(req)
+            return res.json({
+                message: `${userList.length} user entr${userList.length !== 1 ? 'ies' : 'y'} queried successfully`,
+                userList
+            });
         } catch (error) {
             await this.renderError(error, req, res);
         }
@@ -639,12 +638,7 @@ class UserAPI {
                 break;
         }
 
-        const userList = await userTable.selectUsers(whereSQL, values, null, null, orderBySQL);
-
-        return {
-            message: `${userList.length} user entr${userList.length !== 1 ? 'ies' : 'y'} queried successfully`,
-            userList
-        };
+        return await userTable.selectUsers(whereSQL, values, null, null, orderBySQL);
     }
 
 

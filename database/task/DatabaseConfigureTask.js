@@ -122,8 +122,8 @@ class databaseConfigureTask {
                     setTimeout(function () {
                         delete configureRequests[uuid];
                     }, 1000 * 60 * 60);
-                    const email = new ConfigureDatabaseMail(req.server.mailClient, requestURL, `Administrator <${selectedAdminEmail}>`, hostname);
-                    await email.send();
+                    const mail = new ConfigureDatabaseMail(requestURL, `Administrator <${selectedAdminEmail}>`, hostname);
+                    await mail.send(req.server.mailClient);
 
                     status = 200;
                     message = `A request to configure the database for ${hostname} has been sent to ${selectedAdminEmail}`;

@@ -4,7 +4,7 @@ const ContentRevisionRow = require('./ContentRevisionRow');
 class ContentRevisionTable {
     constructor(dbName, dbClient) {
         const tablePrefix = dbName ? `\`${dbName}\`.` : '';
-        this.table = tablePrefix + '`content-revision`';
+        this.table = tablePrefix + '`content_revision`';
         this.dbClient = dbClient;
     }
 

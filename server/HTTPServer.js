@@ -4,20 +4,12 @@ const express = require('express');
 const LocalConfig = require('../config/LocalConfig');
 const InteractiveConfig = require('../config/InteractiveConfig');
 
-const DatabaseClient = require('../database/DatabaseClient');
-const MailClient = require('../mail/MailClient');
-
-const DatabaseAPI = require("../database/DatabaseAPI");
-const UserAPI = require("../user/UserAPI");
-const ContentAPI = require("../content/ContentAPI");
-const TaskAPI = require("../task/TaskAPI");
-const SessionAPI = require("../user/session/SessionAPI");
-
 
 const BASE_DIR = path.resolve(path.dirname(path.dirname(__dirname)));
 
 class HTTPServer {
     constructor(config) {
+        const classes = require('../');
         let localConfig = null;
         if(!config) {
             localConfig = new LocalConfig();
@@ -30,15 +22,15 @@ class HTTPServer {
             sslPort: 8443,
         }, config.server || {});
 
-        this.dbClient = new DatabaseClient(config);
-        this.mailClient = new MailClient(config);
-        this.api = {
-            session: new SessionAPI(config),
-            database: new DatabaseAPI(config),
-            user: new UserAPI(config),
-            content: new ContentAPI(config),
-            task: new TaskAPI(config),
-        };
+        this.dbClient = new classes.DatabaseClient(config);
+        this.mailClient = new classes.MailClient(config);
+
+        this.api = {};
+        for(let apiKey in classes.API) {
+            if(classes.API.hasOwnProperty(apiKey)) {
+                this.api[apiKey] = new classes.API[apiKey](config);
+            }
+        }
         this.httpServer = null;
         this.sslServer = null;
         this.serverConfig = config.server;
@@ -122,12 +114,13 @@ class HTTPServer {
 
     getMiddleware() {
         const router = express.Router();
-            // Routes
-        router.use(this.api.session.getMiddleware());
-        router.use(this.api.database.getMiddleware());
-        router.use(this.api.content.getMiddleware());
-        router.use(this.api.user.getMiddleware());
-        router.use(this.api.task.getMiddleware());
+
+        // Routes
+        for(let apiKey in this.api) {
+            if(this.api.hasOwnProperty(apiKey)) {
+                router.use(this.api[apiKey].getMiddleware());
+            }
+        }
 
         if(this.dbClient.isMultipleDomainMode())
             return async (req, res, next) => {
@@ -239,5 +232,6 @@ class HTTPServer {
 
 
 }
-
+// Static shortcut
+HTTPServer.listen = function(config) { return new HTTPServer(config).listen()};
 module.exports = HTTPServer;

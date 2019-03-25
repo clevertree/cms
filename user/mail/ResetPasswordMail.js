@@ -1,12 +1,12 @@
 
 class ResetPasswordMail {
 
-    constructor(mailClient, requestURL, to, from=null, subject=null) {
-        this.mailClient = mailClient;
+    constructor(requestURL, to, from=null, subject=null) {
+        // this.mailClient = mailClient;
 
         // sender info
         // from: 'Sender Name <sender@example.com>',
-        this.from = from || this.mailClient.getDefaultSender(); //  || 'admin@' + hostname
+        // this.from = from || this.mailClient.getDefaultSender(); //  || 'admin@' + hostname
 
         // Comma separated list of recipients
         // to: '"Receiver Name" <nodemailer@disposebox.com>',
@@ -36,9 +36,11 @@ Thanks for administrating the site!<br/>
         this.text = this.html.replace(/(<([^>]+)>)/ig,"");
     }
 
-    async send() {
+    async send(mailClient) {
+        if(!this.from)
+            this.from = mailClient.getDefaultSender(); //  || 'admin@' + hostname
         console.log('Sending Email: ', this);
-        await this.mailClient.sendMail(this);
+        await mailClient.sendMail(this);
         console.log(this.constructor.name + 'sent successfully!');
     }
 }

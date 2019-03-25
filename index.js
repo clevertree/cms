@@ -1,6 +1,7 @@
 
 const classes = {
-
+    API: {},
+    Task: {},
 
     InteractiveConfig:      require('./config/InteractiveConfig'),
     LocalConfig:            require('./config/LocalConfig'),
@@ -38,9 +39,8 @@ const classes = {
 
     SessionAPI:             require('./user/session/SessionAPI'),
 
-    task: {
-        DatabaseConfigureTask:  require('./database/task/DatabaseConfigureTask'),
-    },
+    DatabaseConfigureTask:  require('./database/task/DatabaseConfigureTask'),
+    AdminConfigureTask:  require('./user/task/AdminConfigureTask'),
 
     version:                require('././package.json').version,
 
@@ -51,6 +51,20 @@ const classes = {
         const httpServer = new classes.HTTPServer(config);
         return httpServer.getMiddleware();
     }
+};
+
+classes.API = {
+    session:                classes.SessionAPI,
+    database:               classes.DatabaseAPI,
+    user:                   classes.UserAPI,
+    userMessage:            classes.UserMessageAPI,
+    content:                classes.ContentAPI,
+    task:                   classes.TaskAPI,
+};
+
+classes.Task = {
+    'database-configure':   classes.DatabaseConfigureTask,
+    'admin-configure':      classes.AdminConfigureTask,
 };
 
 module.exports = classes;

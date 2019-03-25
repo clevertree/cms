@@ -98,7 +98,7 @@ class AdminConfigureTask {
                         delete adminRequests[uuid];
                     }, 1000 * 60 * 60);
                     const email = new CreateAdminMail(requestURL, `Administrator <${selectedAdminEmail}>`, hostname);
-                    await email.send();
+                    await email.send(req.server.mailClient);
 
                     status = 200;
                     message = `A request to create an admin account for ${hostname} has been sent to ${selectedAdminEmail}`;

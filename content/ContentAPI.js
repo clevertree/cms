@@ -105,19 +105,6 @@ class ContentAPI {
         return null;
     }
 
-    // async renderContentByPath(req, res, next) {
-    //     // TODO: parse session middleware only if content was found
-    //     try {
-    //         const database = await req.server.selectDatabaseByRequest(req);
-    //         const contentTable = new ContentTable(req.database, req.server.dbClient);
-    //         const content = await contentTable.fetchContentByPath(req.url, '*');
-    //         if(!content)
-    //             return next();
-    //
-    //         await this.renderContent(req, res, content);
-    //     } catch (error) {
-    //         await this.renderError(error, req, res);
-    //     }
     async renderContentByID(asJSON, req, res, next) {
         try {
             // const database = await req.server.selectDatabaseByRequest(req);
@@ -166,6 +153,7 @@ class ContentAPI {
                 // SM(req, res, async () => {
                     // const mimeType = this.getMimeType(path.extname(content.path) || '');
                 switch(content.mimeType) {
+                    case null:
                     case 'text/html':
                         await ContentRenderer.send(req, res, content);
                         break;
@@ -236,7 +224,7 @@ class ContentAPI {
                             contentRevision.data = await contentRevisionTable.fetchRevisionData(contentRevision.id, 'UTF8');
                         }
                     }
-                    response.contentRevision = contentRevision
+                    response.contentRevision = contentRevision;
 
                     if(req.session && req.session.userID) {
                         const sessionUser = await userTable.fetchUserByID(req.session.userID);
