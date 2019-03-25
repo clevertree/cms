@@ -21,7 +21,7 @@ with a primary goal for **all** of its content is transferable with other UCMS b
 * Request administrator access by setting the domain's SOA email
 * Can be used stand-alone, or as a middleware within another NodeJS app
 * CMS API middleware can be enabled individually (example: content management @ /:content/ with no user management @ /:user/)
-* User services: Add, edit, reset / change password, list, delete
+* User services: Add, edit, reset / change password, list, delete, private message
 * Content services: Add, edit, multi-upload, delete, WYSIWYG editor
 * Interactive configuration
 

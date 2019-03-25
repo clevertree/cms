@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <td><label>Email:</label></td>
                             <td colspan="2">${this.state.user.email}</td>
                         </tr>
-                        <tr><td colspan="2"><hr/></td></tr>
+                        <tr><td colspan="3"><hr/></td></tr>
                         ${(this.state.profileConfig || []).map(profileField => `
                             <tr>
                                 <td><label>${profileField.title || profileField.name}:</label></td>
@@ -88,7 +88,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <td>${this.state.editable ? `<a href="${this.state.src}/:profile" class="icon-edit" title="Edit Profile">[&#x270D;]</a>` : ''}</td>
                             </tr>
                         `).join('')}
-                        <tr><td colspan="2"><hr/></td></tr>
+                        <tr>
+                            <td><label>Password:</label></td>
+                            <td colspan="2"><a href="${this.state.src}/:password">Edit</a></td>
+                        </tr>
+                        <tr><td colspan="3"><hr/></td></tr>
                         <tr>
                             <td colspan="2" style="text-align: center;"><a href="${this.state.src}/:message">Send a Message</a></td>
                         </tr>
