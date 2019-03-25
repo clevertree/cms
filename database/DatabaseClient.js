@@ -25,7 +25,6 @@ class DatabaseManager {
         // this.debug = false;
         // this.multiDomain = false;
         this.cacheHostname = {};
-        this.initiated = false;
     }
 
     get primaryDatabase() { return this.dbConfig.database; }
@@ -34,7 +33,7 @@ class DatabaseManager {
     isAvailable() { return this.db && this.db.state === 'authenticated';}
     isMultipleDomainMode() { return this.dbConfig.multiDomain === true;}
 
-    getPrimaryDomainTable()       { return new (require('../server/DomainTable'))(this.primaryDatabase); }
+    getPrimaryDomainTable()       { return new (require('../server/DomainTable'))(this.primaryDatabase, this); }
 
 
     async init() {
@@ -42,10 +41,6 @@ class DatabaseManager {
     }
 
     async initDatabase(database) {
-        if(this.initiated === null)
-            throw new Error("Database is initializing");
-        this.initiated = null;
-
         // Initiate Connection
         await this.createConnection();
 
@@ -65,9 +60,8 @@ class DatabaseManager {
 
         for(let i=0; i<tableClasses.length; i++) {
             const table = new tableClasses[i](database, this);
-            await table.init(this);
+            await table.init();
         }
-        this.initiated = true;
     }
 
     /** Configure Interactively **/
@@ -109,6 +103,8 @@ class DatabaseManager {
 
     /** Configure Database Interactively **/
     async configureDatabase(database, hostname, interactive=false) {
+
+        await this.initDatabase(database);
 
         // await this.queryAsync(`USE \`${database}\``);
 
@@ -163,30 +159,32 @@ class DatabaseManager {
             if(typeof this.cacheHostname[hostname] !== "undefined")
                 return this.cacheHostname[hostname];
 
-            const DomainTable = this.getPrimaryDomainTable();
-            const domain = await DomainTable.fetchDomainByHostname(hostname);
+            const domainTable = new Tables.DomainTable(this.primaryDatabase, this);
+            const domain = await domainTable.fetchDomainByHostname(hostname);
             let database = null;
             if(domain) {
                 database = domain.database;
             } else {
-                await DomainTable.insertDomain(hostname, null);
+                await domainTable.insertDomain(hostname, null);
             }
             if(database) {
                 const databaseResult = await this.queryAsync(`SHOW DATABASES LIKE '${database}'`);
                 if(databaseResult.length === 0) {
                     console.warn(`Database entry for ${hostname} does not correspond with an existing database: ${database}`);
-                    database = null;
+                    // database = null;
+                    await this.configureDatabase(database, hostname); // Once configured manually, databases can be auto configured from then on.
                 }
             }
-            if(!database && hostname === 'localhost')
+            if(!database && hostname === 'localhost') {
                 database = this.primaryDatabase;
+                await domainTable.updateDomain(hostname, database);
+            }
             if(!database) {
                 // Redirect user
                 throw Object.assign(new Error("Database has not been configured for " + hostname), {
                     redirect: '/:task/database-configure'
                 });
             }
-            await this.configureDatabase(database, hostname); // Once configured manually, databases can be auto configured from then on.
             this.cacheHostname[hostname] = database;
             return database;
         } else {
@@ -252,8 +250,8 @@ class DatabaseManager {
 
         if(!this.db || this.db.state === 'disconnected') {
             this.db = null;
-            if(this.initiated === false)
-                await this.init();           // Lazy Load
+            // if(this.initiated === false)
+            //     await this.init();           // Lazy Load
             await this.createConnection();
         }
 

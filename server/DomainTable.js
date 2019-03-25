@@ -11,9 +11,9 @@ class DomainTable  {
 
 
     /** Initiate Table **/
-    async init(dbClient) {
+    async init() {
         // Check for tables
-        if (dbClient.isMultipleDomainMode() && dbClient.primaryDatabase === this.dbName)
+        if (this.dbClient.isMultipleDomainMode() && this.dbClient.primaryDatabase === this.dbName)
             await this.dbClient.queryAsync(this.getTableSQL());
     }
 

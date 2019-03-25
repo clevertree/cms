@@ -177,7 +177,7 @@ class HTTPServer {
 
     async listen() {
         try {
-
+            // Calling .listen configures all components
             if(process && process.argv && process.argv.indexOf('--configure') !== -1) {
                 await this.configure(true);
             } else {
