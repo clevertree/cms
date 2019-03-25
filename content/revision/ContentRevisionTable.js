@@ -15,7 +15,7 @@ class ContentRevisionTable {
     }
 
     /** Interactive Configuration **/
-    async configure(hostname=null) {
+    async configure(hostname, interactive=false) {
 
     }
 

@@ -4,6 +4,8 @@ const fs = require('fs');
 const ContentRow = require('./ContentRow');
 const ContentRevisionTable = require('./revision/ContentRevisionTable');
 
+const InteractiveConfig = require('../config/InteractiveConfig');
+
 // Init
 class ContentTable {
     constructor(dbName, dbClient) {
@@ -24,17 +26,21 @@ class ContentTable {
     }
 
     /** Interactive Configuration **/
-    async configure(hostname=null) {
+    async configure(hostname, interactive=false) {
         hostname = hostname || require('os').hostname();
 
-        await this.insertDefaultContent("/site/template.html",  "Site Template",    __dirname + '/default/site/template.html', hostname);
-        await this.insertDefaultContent("/site/template.js",    "Site Javascript",  __dirname + '/default/site/template.js');
-        await this.insertDefaultContent("/site/template.css",   "Site CSS",         __dirname + '/default/site/template.css');
-        await this.insertDefaultContent("/site/logo.png",       "Site Logo",        __dirname + '/default/site/logo.png');
-        await this.insertDefaultContent("/config/profile.json", "Profile Config",   __dirname + '/default/config/profile.json');
-        await this.insertDefaultContent("/",                    "Home",             __dirname + '/default/home.html', hostname);
-        await this.insertDefaultContent("/about",               "About Us",         __dirname + '/default/about.html', hostname);
-        await this.insertDefaultContent("/contact",             "Contact Us",       __dirname + '/default/contact.html', hostname);
+        const interactiveConfig = new InteractiveConfig({}, interactive);
+        let insertDefaultContent = await interactiveConfig.prompt(`Would you like to insert default site content for ${hostname} [y or n]?`, true, 'boolean');
+        if(insertDefaultContent) {
+            await this.insertDefaultContent("/site/template.html",  "Site Template",    __dirname + '/default/site/template.html', hostname);
+            await this.insertDefaultContent("/site/template.js",    "Site Javascript",  __dirname + '/default/site/template.js');
+            await this.insertDefaultContent("/site/template.css",   "Site CSS",         __dirname + '/default/site/template.css');
+            await this.insertDefaultContent("/site/logo.png",       "Site Logo",        __dirname + '/default/site/logo.png');
+            await this.insertDefaultContent("/config/profile.json", "Profile Config",   __dirname + '/default/config/profile.json');
+            await this.insertDefaultContent("/",                    "Home",             __dirname + '/default/home.html', hostname);
+            await this.insertDefaultContent("/about",               "About Us",         __dirname + '/default/about.html', hostname);
+            await this.insertDefaultContent("/contact",             "Contact Us",       __dirname + '/default/contact.html', hostname);
+        }
     }
 
 

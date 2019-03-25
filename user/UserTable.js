@@ -24,14 +24,14 @@ class UserTable  {
         await this.dbClient.queryAsync(this.getTableUpgradeSQL());
     }
 
-    async configure(hostname=null) {
+    async configure(hostname, interactive=false) {
 
         // Find admin user
         let adminUser = await this.fetchUser("u.username = 'admin' OR FIND_IN_SET('admin', u.flags) ORDER BY u.id ASC LIMIT 1 ");
 
         // Set up admin user
 
-        const interactiveConfig = new InteractiveConfig();
+        const interactiveConfig = new InteractiveConfig({}, interactive);
 
         if (adminUser) {
             console.info("Admin user found: " + adminUser.id);
@@ -110,7 +110,8 @@ class UserTable  {
             whereSQL += " GROUP BY " + groupBy;
         if(orderBy)
             whereSQL += " ORDER BY " + orderBy;
-        whereSQL += " LIMIT " + limit;
+        if(limit)
+            whereSQL += " LIMIT " + limit;
 
 
         let SQL = `
@@ -131,7 +132,7 @@ class UserTable  {
     // }
 
     async fetchUser(whereSQL, values, selectSQL='u.*,null as password') {
-        const users = await this.selectUsers(whereSQL, values, selectSQL);
+        const users = await this.selectUsers(whereSQL, values, selectSQL, null, null, null);
         return users[0] || null;
     }
     async fetchUserByID(userID, selectSQL='u.*,null as password') {

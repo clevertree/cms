@@ -75,7 +75,7 @@ with a primary goal for **all** of its content is transferable with other UCMS b
 * Javascript/NodeJS Programmer!
 * CSS Designer
 * Publicist
-* QA
+* Quality Advocate
 
 
 ### Sites Powered by CleverTree CMS

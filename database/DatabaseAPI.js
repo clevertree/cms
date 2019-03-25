@@ -9,6 +9,8 @@ class DatabaseAPI {
     constructor() {
     }
 
+    async configure(interactive=false) {
+    }
 
     getMiddleware() {
         // Configure Routes

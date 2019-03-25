@@ -18,6 +18,8 @@ class TaskAPI {
         this.addTask(require('../database/task/DatabaseConfigureTask').databaseConfigureTask);
     }
 
+    async configure(interactive=false) {
+    }
 
 
     getMiddleware() {

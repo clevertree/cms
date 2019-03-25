@@ -22,6 +22,9 @@ class UserAPI {
         };
     }
 
+    async configure(interactive=false) {
+    }
+
 
     getMiddleware() {
         const express = require('express');

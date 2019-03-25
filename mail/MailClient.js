@@ -18,39 +18,36 @@ class MailClient {
 
     getDefaultSender() { return this.mailConfig && this.mailConfig.auth ? this.mailConfig.auth.user : null; }
 
-    async configure() {
+    async configure(interactive=false) {
         // console.info("Configuring Mail Client");
         let mailConfig = Object.assign({}, this.mailConfig);
-        const interactiveConfig = new InteractiveConfig(mailConfig);
+        const interactiveConfig = new InteractiveConfig(mailConfig, interactive);
 
-        if (typeof mailConfig.client === "undefined")
-            mailConfig.client = {};
-        let mailClientConfig = mailConfig.client;
-        if (typeof mailClientConfig.auth === "undefined")
-            mailClientConfig.auth = {};
+        if (typeof mailConfig.auth === "undefined")
+            mailConfig.auth = {};
 
         const hostname = require('os').hostname();
         let attempts = 3;
         while (attempts-- > 0) {
-            await interactiveConfig.promptValue('client.host', `Please enter the Mail Server Host`, mailClientConfig.host || 'mail.' + hostname);
-            await interactiveConfig.promptValue('client.port', `Please enter the Mail Server Port`, mailClientConfig.port || 587, 'number');
-            await interactiveConfig.promptValue('client.auth.user', `Please enter the Mail Server Username`, mailClientConfig.auth.user || 'mail@' + mailClientConfig.host.replace(/mail\./, ''), 'email');
-            await interactiveConfig.promptValue('client.auth.pass', `Please enter the Mail Server Password`, mailClientConfig.auth.pass || '', 'password');
+            await interactiveConfig.promptValue('client.host', `Please enter the Mail Server Host`, mailConfig.host || 'mail.' + hostname);
+            await interactiveConfig.promptValue('client.port', `Please enter the Mail Server Port`, mailConfig.port || 587, 'number');
+            await interactiveConfig.promptValue('client.auth.user', `Please enter the Mail Server Username`, mailConfig.auth.user || 'mail@' + mailConfig.host.replace(/mail\./, ''), 'email');
+            await interactiveConfig.promptValue('client.auth.pass', `Please enter the Mail Server Password`, mailConfig.auth.pass || '', 'password');
             let testMail = await interactiveConfig.prompt(`Would you like to test the Mail Settings [y or n]?`, false, 'boolean');
 
             try {
                 if (testMail) {
-                    console.info(`Connecting to Mail Server '${mailClientConfig.host}'...`);
-                    const server = nodemailer.createTransport(smtpTransport(mailClientConfig));
+                    console.info(`Connecting to Mail Server '${mailConfig.host}'...`);
+                    const server = nodemailer.createTransport(smtpTransport(mailConfig));
                     await
                         server.verify();
-                    console.info(`Connection to Mail Server '${mailClientConfig.host}' verified`);
+                    console.info(`Connection to Mail Server '${mailConfig.host}' verified`);
                 }
                 break;
             } catch (e) {
                 if (attempts <= 0)
-                    throw new Error(`Failed to connect to ${mailClientConfig.host}: ${e}`);
-                console.error(`Error connecting to ${mailClientConfig.host}: ${e}`);
+                    throw new Error(`Failed to connect to ${mailConfig.host}: ${e}`);
+                console.error(`Error connecting to ${mailConfig.host}: ${e}`);
             }
         }
         this.mailConfig = mailConfig;

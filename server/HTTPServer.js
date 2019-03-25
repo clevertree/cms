@@ -43,11 +43,18 @@ class HTTPServer {
     }
 
 
-    async configure() {
+    async configure(interactive=false) {
+        await this.dbClient.configure(interactive);
+        await this.mailClient.configure(interactive);
+        for(let apiKey in this.api) {
+            if(this.api.hasOwnProperty(apiKey)) {
+                await this.api[apiKey].configure(interactive);
+            }
+        }
 
         // const defaultHostname     = (require('os').hostname()).toLowerCase();
         let serverConfig = Object.assign({}, this.serverConfig);
-        const interactiveConfig = new InteractiveConfig(serverConfig);
+        const interactiveConfig = new InteractiveConfig(serverConfig, interactive);
 
         let attempts = 3;
         while (attempts-- > 0) {
@@ -106,8 +113,6 @@ class HTTPServer {
         const allConfig = await localConfig.getAll();
         allConfig.server = serverConfig;
         await localConfig.saveAll();
-
-        return serverConfig;
     }
 
 
@@ -174,7 +179,9 @@ class HTTPServer {
         try {
 
             if(process && process.argv && process.argv.indexOf('--configure') !== -1) {
-                await this.configure();
+                await this.configure(true);
+            } else {
+                await this.configure(false);
             }
             // const ConfigManager = require('../config/ConfigManager');
             // await ConfigManager.configure(); // TODO: pass config?

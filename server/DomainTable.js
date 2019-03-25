@@ -1,9 +1,5 @@
-const {
-    DomainRow
-} = require('../');
+const DomainRow = require('./DomainRow');
 
-
-// const ConfigManager = require('../config/config.manager');
 
 class DomainTable  {
     constructor(dbName, dbClient) {
@@ -22,7 +18,7 @@ class DomainTable  {
     }
 
     /** Interactive Configuration **/
-    async configure(hostname=null) {
+    async configure(hostname, interactive=false) {
 
     }
 

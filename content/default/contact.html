@@ -2,45 +2,47 @@
     <section class="themed" style="max-width: 800px; margin: 0 auto; padding: 1em 2em 2em 2em; text-align: justify;">
         <h2>Contact Us</h2>
         <user-message-send>
-            <form class="themed">
-                <table class="themed">
-                    <caption>Contact Us</caption>
-                    <tbody>
+            <form class="user user-message-send themed" action="/:user/:message" method="POST">
+
+                <table class="user themed">
+                    <caption>Send us a message</caption>
+                    <thead>
                     <tr>
-                        <td><label for="name">Name:</label></td>
-                        <td><input name="name" id="name" required></td>
-                    </tr>
-                    <tr>
-                        <td><label for="name">Email:</label></td>
-                        <td><input name="email" id="email" type="email" required></td>
-                    </tr>
-                    <tr>
-                        <td><label for="zip_code">Zipcode:</label></td>
-                        <td><input name="zip_code" id="zip_code"></td>
-                    </tr>
-                    <tr>
-                        <td><label for="availability">Availability:</label></td>
-                        <td><input name="availability" id="availability" placeholder="ex. Tuesdays, Weekends, Part time"
-                                   required></td>
-                    </tr>
-                    <tr>
-                        <td><label for="organization">Organizations:</label></td>
-                        <td>
-                            <textarea name="organization" id="organization"
-                                      placeholder="Are you part of any other relevant organizations? If so, feel free to tell us"></textarea>
+                        <td colspan="5" class="status">
                         </td>
                     </tr>
+                    </thead>
+                    <tbody>
                     <tr>
-                        <td><label for="description">Description:</label></td>
+                        <td><label for="to">To:</label></td>
                         <td>
-                            <textarea name="description" id="description"
-                                      placeholder="Tell us a little about yourself and how you'd like to help AFOH"
-                                      required></textarea>
+                            Admin
+                            <input name="to" id="to" type="hidden" value="admin">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><label for="name">Your Name:</label></td>
+                        <td><input name="name" id="name" required=""></td>
+                    </tr>
+                    <tr>
+                        <td><label for="from">Your Email:</label></td>
+                        <td><input name="from" id="from" type="email" placeholder="your@email.com" required></td>
+                    </tr>
+
+                    <tr>
+                        <td><label for="subject">Subject:</label></td>
+                        <td><input name="subject" id="subject" type="text" placeholder="ex. Question about this site" required></td>
+                    </tr>
+                    <tr>
+                        <td><label for="body">Message:</label></td>
+                        <td>
+                            <textarea name="body" id="body" placeholder="Type your message here" required=""></textarea>
                         </td>
                     </tr>
                     </tbody>
                     <tfoot>
-                    <tr><td colspan="2"><hr/></td></tr>
+                    <tr><td colspan="2"><hr></td></tr>
                     <tr>
                         <td colspan="2">
                             <button type="submit" class="themed">Submit</button>

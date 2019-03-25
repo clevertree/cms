@@ -71,11 +71,11 @@ class DatabaseManager {
     }
 
     /** Configure Interactively **/
-    async configure() {
+    async configure(interactive=false) {
         const localConfig = new LocalConfig();
         let dbConfig = await localConfig.getOrCreate('database');
         Object.assign(dbConfig, this.dbConfig);
-        const interactiveConfig = new InteractiveConfig(dbConfig);
+        const interactiveConfig = new InteractiveConfig(dbConfig, interactive);
 
         let attempts = 3;
         while(attempts-- > 0) {
@@ -101,14 +101,14 @@ class DatabaseManager {
         }
 
         const defaultHostname     = (require('os').hostname()).toLowerCase();
-        await this.configureDatabase(this.primaryDatabase, defaultHostname);
+        await this.configureDatabase(this.primaryDatabase, defaultHostname, interactive);
         // Configure all databases? no, only primary
     }
 
 
 
     /** Configure Database Interactively **/
-    async configureDatabase(database, hostname) {
+    async configureDatabase(database, hostname, interactive=false) {
 
         // await this.queryAsync(`USE \`${database}\``);
 
@@ -116,8 +116,8 @@ class DatabaseManager {
         const tableClasses = Object.values(Tables);
 
         for(let i=0; i<tableClasses.length; i++) {
-            const table = new tableClasses[i](database);
-            await table.configure(hostname);
+            const table = new tableClasses[i](database, this);
+            await table.configure(hostname, interactive);
         }
 
         if(this.isMultipleDomainMode()) {
