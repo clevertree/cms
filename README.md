@@ -133,11 +133,11 @@ app.use(clevertree.getMiddleware({
         host: 'localhost',
         user: 'cms_user',
         password: 'cms_pass',
-        database: 'afoh_info_cms',
+        database: 'afoh_info_cms'
     },
     server: {
         httpPort: 8080,
-        sslEnable: false,
+        sslEnable: false
         // sslPort: 8443,
     },
     mail: {
@@ -147,6 +147,9 @@ app.use(clevertree.getMiddleware({
         }
         // host: "mail.server.com",
         // port: 587
+    },
+    session: {
+        secret: "my-random-string-6d4b-48c8-9b3d-9c6bfd506057"
     }
 }));
 

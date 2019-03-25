@@ -99,21 +99,23 @@ document.addEventListener('DOMContentLoaded', function() {
                         </thead>
                         <tbody>
                             <tr>
-                                <td><label>Username:</label></td>
+                                <td><label for="username">Username:</label></td>
                                 <td>
-                                    <input type="text" name="userID" value="${userID || ''}" required />
+                                    <input type="text" name="userID" id="username" value="${userID || ''}" required />
                                 </td>
                             </tr>
                             <tr>
-                                <td><label>Password:</label></td>
+                                <td><label for="password">Password:</label></td>
                                 <td>
-                                    <input type="password" name="password" value="${this.state.password || ''}" required />
+                                    <input type="password" name="password" id="password" value="${this.state.password || ''}" required />
                                 </td>
                             </tr>
                             <tr>
-                                <td><label>Stay logged in:</label></td>
+                                <td><label for="session_save">Stay logged in:</label></td>
                                 <td>
-                                    <input type="checkbox" name="session_save" ${this.state.session_save ? 'checked="checked"' : ''} value="1"/>
+                                    <label>
+                                        <input type="checkbox" name="session_save" id="session_save" ${this.state.session_save ? 'checked="checked"' : ''} value="1"/>
+                                    </label>
                                     <div style="float: right">
                                         <a href=":user/:forgotpassword${userID ? '?userID=' + userID : ''}">Forgot Password?</a>
                                     </div>
@@ -127,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <a href=":user/:register${userID ? '?userID=' + userID : ''}">Register</a>
                                 </td>
                                 <td style="text-align: right;">
-                                    <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Log In</button>
+                                    <button type="submit" class="themed" ${this.state.processing ? 'disabled="disabled"' : null}>Log In</button>
                                 </td>
                             </tr>
                         </tfoot>

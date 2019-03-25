@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 {
-    class HTMLUserForgotpasswordElement extends HTMLElement{
+    class HTMLUserForgotPasswordElement extends HTMLElement{
         constructor() {
             super();
             this.state = {
@@ -107,10 +107,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tr><td colspan="2"><hr/></td></tr>
                             <tr>
                                 <td>
-                                    <button onclick="location.href=':user/:login'" type="button">Go Back</button>
+                                    <button onclick="location.href=':user/:login'" type="button" class="themed">Go Back</button>
                                 </td>
                                 <td style="text-align: right;">
-                                    <button type="submit">Submit</button>
+                                    <button type="submit" class="themed">Submit</button>
                                 </td>
                             </tr>
                         </tfoot>
@@ -119,6 +119,6 @@ document.addEventListener('DOMContentLoaded', function() {
 `;
         }
     }
-    customElements.define('user-form-forgotpassword', HTMLUserForgotpasswordElement);
+    customElements.define('user-form-forgotpassword', HTMLUserForgotPasswordElement);
 
 }

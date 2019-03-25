@@ -85,8 +85,7 @@ body.theme-minimal > footer {
 
 
 /** Form Inputs **/
-
-.theme-minimal form.themed input,
+.theme-minimal form.themed input:not([type=checkbox]):not([type=radio]),
 .theme-minimal form.themed select,
 .theme-minimal form.themed textarea,
 .theme-minimal form.themed button {
@@ -96,18 +95,24 @@ body.theme-minimal > footer {
     border-width: 1px;
     font-size: large;
 }
+.theme-minimal form.themed input:not([type=checkbox]):not([type=radio]),
+.theme-minimal form.themed select,
 .theme-minimal form.themed textarea {
-    /* min-height: 100px; */
-}
-.theme-minimal form.themed input[type=checkbox] {
-    width: 16px;
-    height: 16px;
-    vertical-align: middle;
-    margin: 0 0px 4px 0px;
+    /* min-width: 400px; */
 }
 
-.theme-minimal form.themed input[type=submit],
-.theme-minimal form.themed button[type=submit] {
+.theme-minimal form.themed textarea {
+     min-height: 100px;
+}
+.theme-minimal form.themed input[type=checkbox] {
+    width: 1.5em;
+    height: 1.5em;
+    /*vertical-align: middle;*/
+    /*margin: 0 0px 4px 0px;*/
+}
+
+.theme-minimal form.themed input[type=submit].themed,
+.theme-minimal form.themed button.themed {
     padding: 0.5em 1em;
     font-weight: bold;
     font-size: medium;
@@ -126,12 +131,13 @@ body.theme-minimal > footer {
 .theme-minimal table.themed {
     margin: 1em auto;
     padding: 1em;
-    border-radius: 0px 0px 4px 4px;
+    border-radius: 4px;
     background: #CCC;
     color: #000;
     font-family: monospace;
     box-shadow: #777 1px 1px 2px;
 }
+
 
 .theme-minimal table.themed > caption {
     color: #333;
@@ -152,9 +158,18 @@ body.theme-minimal > footer {
 
 /** Labels **/
 
+.theme-minimal table.themed td:first-child {
+    /* vertical-align: top; */
+    /* padding: 3px; */
+    /* width: 20%; */
+}
 .theme-minimal table.themed td:first-child > label {
     text-align: right;
     display: block;
+    padding: 3px;
+    /* vertical-align: top; */
+    /* white-space: nowrap; */
+    max-width: 232px;
 }
 
 

@@ -111,6 +111,7 @@
             const userID = (document.head.querySelector('meta[name="session:userID"]') || {}).content || null;
 
             if(userID) {
+                menuSubMenu.push(`<a href='/:user/:message/:list'>Inbox</a>`);
                 menuSubMenu.push(`<a href='/:user/${userID}'>My Profile</a>`);
                 menuSubMenu.push(`<a href='/:user/${userID}/:edit'>Edit Profile</a>`);
                 menuSubMenu.push(`<a href='/:user/:logout'>Log Out</a>`);
@@ -120,10 +121,12 @@
                 menuSubMenu.push(`<a href='/:user/:register'>Register</a>`);
             }
             menuSubMenu.push('<hr/>');
-            menuSubMenu.push(`<a href='/:user'>Browse Users</a>`);
-            menuSubMenu.push(`<a href='/:task'>Browse Tasks</a>`);
+            menuSubMenu.push(`<a href='/:task'>Task List</a>`);
+
+            menuSubMenu.push('<hr/>');
+            menuSubMenu.push(`<a href='/:user'>User Index</a>`);
             menuSubMenu.push(`<a href='/:content'>Site Index</a>`);
-            menuSubMenu.push(`<a href='/:config'>Configure Site</a>`);
+            // menuSubMenu.push(`<a href='/:config'>Configure Site</a>`);
 
 
             return menu;
@@ -132,9 +135,10 @@
         render() {
             const menu = this.buildMenu();
 //             console.log("RENDER", this.state, menu);
+//         <link href=":content/:client/nav/content-nav.css" rel="stylesheet" />
+
             this.innerHTML =
                 `
-                <link href=":content/:client/nav/content-nav.css" rel="stylesheet" />
                 <ul class="menu">
                 ${menu.map(menuItem => `
                     <li>

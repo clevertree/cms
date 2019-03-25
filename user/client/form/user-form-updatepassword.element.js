@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <td>
                                 </td>
                                 <td style="text-align: right;">
-                                    <button type="submit" ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>Update Password</button>
+                                    <button type="submit" class="themed" ${this.state.processing || this.state.editable === false ? 'disabled="disabled"' : null}>Update Password</button>
                                 </td>
                             </tr>
                         </tfoot>

@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <td>
                                 </td>
                                 <td style="text-align: right;">
-                                    <button type="submit" ${this.state.processing ? 'disabled="disabled"' : null}>Log Out</button>
+                                    <button type="submit" class="themed" ${this.state.processing ? 'disabled="disabled"' : null}>Log Out</button>
                                 </td>
                             </tr>
                         </tfoot>

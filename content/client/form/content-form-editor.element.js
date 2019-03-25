@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 revisionID: null,
                 editor: sessionStorage.getItem("content-form-editor:editor"),
                 content: {id: -1},
+                contentString: null,
                 revision: {},
                 history: [],
                 // parentList: [],
@@ -41,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.addEventListener('change', e => this.onChange(e));
             this.addEventListener('submit', e => this.onSubmit(e));
             this.addEventListener('keyup', e => this.onKeyUp(e));
+            window.addEventListener('beforeunload', e => this.onBeforeUnload(e));
 
             const contentID = this.getAttribute('id');
             if (contentID) {
@@ -137,7 +139,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     break;
             }
-            // TODO: warn user about unsaved data
+        }
+
+        onBeforeUnload(e) {
+            if(this.state.contentString && (this.state.contentString !== JSON.stringify(this.state.content))) {
+                e = e || window.event;
+                e.returnValue = "Unpublished changes will be lost";
+                return e.returnValue;
+            }
+
         }
 
         uint8ToBase64(buffer) {
@@ -151,6 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         requestFormData() {
             const form = this.querySelector('form');
+            const action = form.getAttribute('action');
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
                 const response = typeof xhr.response === 'object' ? xhr.response : {message: xhr.response};
@@ -160,19 +171,22 @@ document.addEventListener('DOMContentLoaded', function() {
                         response.content.data = response.contentRevision.data;
                     response.content.length = response.contentRevision.length;
                 }
+                response.contentString = JSON.stringify(response.content);
                 this.setState({processing: false}, response);
             };
             xhr.responseType = 'json';
             let params = '?t=' + new Date().getTime();
             if (this.state.revisionID)
                 params += `&r=${this.state.revisionID}`;
-            xhr.open('OPTIONS', form.getAttribute('action') + params, true);
+            xhr.open('OPTIONS', action + params, true);
             xhr.send();
             this.setState({processing: true});
         }
 
 
         onSubmit(e) {
+            this.state.contentString = JSON.stringify(this.state.content);
+            
             e.preventDefault();
             const form = e.target;
             const formValues = Array.prototype.filter
@@ -272,29 +286,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     </tr>
                     <tr>
                         <td><label for="data">Content:</label></td>
-                        <td>
+                        <td class="content-form-editor-fullscreen-top">
                             ${this.state.isBinary ? `
-                            <input type="hidden" name="data" id="data" value="${this.state.content.data}" />
+                            <input type="hidden" name="data" id="data" />
                             <textarea class="editor-binary editor-wysiwyg-target" disabled>[Binary File]
 Mime Type: ${this.state.mimeType || ''}
 Length: ${this.readableByteSize(this.state.content.length)}
 </textarea>
                             ` : `
-                            <textarea class="editor-plain editor-wysiwyg-target" name="data" id="data">${this.state.content.data || ''}</textarea>
+                            <textarea class="editor-plain editor-wysiwyg-target" name="data" id="data"></textarea>
                             `}
+                            <button type="button" class="content-form-editor-toggle-fullscreen" onclick="this.form.parentNode.classList.toggle('fullscreen')">Full Screen</button>
                         </td>
                     </tr>
                     <tr>
                         <td><label for="data">Upload:</label></td>
                         <td>
                             <input type="file" name="dataSourceFile"/>
-                            <select name="dataSource">
+                            ${false ? `
+                                <select name="dataSource">
                                 <option value="">Use Uploaded File</option>
-                            ${this.state.currentUploads.map((upload, i) => `
-                                <option value="temp:${upload.uploadPath}">${upload.uploadPath} (${this.readableByteSize(upload.size)})</option>
-                            </tr>
-                            </select>
-                            `).join('')}
+                                ${this.state.currentUploads.map((upload, i) => `
+                                    <option value="temp:${upload.uploadPath}">${upload.uploadPath} (${this.readableByteSize(upload.size)})</option>
+                                `).join('')}
+                                </select>
+                            ` : ``}
                         </td>
                     </tr>
                     <tr>
@@ -326,7 +342,7 @@ Length: ${this.readableByteSize(this.state.content.length)}
                             </select>
                         </td>
                     </tr>
-                    <tr>
+                    ${false ? `<tr>
                         <td><label for="action">Preview:</label></td>
                         <td>
                             <select name="action" id="action">
@@ -334,19 +350,36 @@ Length: ${this.readableByteSize(this.state.content.length)}
                                 <option value="draft">Save as Unpublished Draft</option>
                             </select>
                         </td>
-                    </tr>
+                    </tr>` : ``}
                 </tbody>
-                    <tfoot>
-                        <tr><td colspan="2"><hr/></td></tr>
-                        <tr>
-                            <td style="text-align: right;" colspan="2">
-                                <a href=":content/${this.state.content.id}">Back to content</a>
-                                <button type="submit" ${this.state.processing || !this.state.editable ? 'disabled="disabled"' : ''}>Publish</button>
-                            </td>
-                        </tr>
-                    </tfoot>
+                <tfoot>
+                    <tr><td colspan="2"><hr/></td></tr>
+                    <tr>
+                        <td style="text-align: right;" colspan="2">
+                            <a href=":content/${this.state.content.id}">Back to content</a>
+                            <button type="submit" class="themed" ${this.state.processing || !this.state.editable ? 'disabled="disabled"' : ''}>
+                                Publish
+                            </button>
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
-        </form>`;
+        </form>
+            
+        <section>
+            <h1 style="text-align: center;">Preview</h1>
+        </section>
+
+        <iframe ${this.state.content.path ? `src="${this.state.content.path}"` : ''} class="content-preview-iframe content-form-editor-fullscreen-bottom"></iframe>
+
+
+`;
+            Array.prototype.filter
+                .call(this.querySelector('form').elements , (input, i) => !!input.name && !input.disabled && (input.type !== 'checkbox' || input.checked))
+                .forEach((input, i) => {
+                    if(this.state.content[input.name])
+                        input.value = this.state.content[input.name]
+                });
 
             clearTimeout(this.renderEditorTimeout);
             this.renderEditorTimeout = setTimeout(e => this.renderWYSIWYGEditor(), 100);

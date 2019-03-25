@@ -1,5 +1,6 @@
 table.user {
-    width: 600px;
+    width: 100%;
+    max-width: 700px;
 }
 
 
@@ -8,6 +9,7 @@ table.user .icon-edit {
 }
 
 form.user select,
+form.user input:not([type]),
 form.user input[type=text],
 form.user input[type=password],
 form.user input[type=email],
@@ -16,5 +18,47 @@ form.user textarea {
 }
 
 form.user textarea[name=description] {
+    /*min-height: 200px;*/
+}
+
+
+
+/** user-message **/
+
+user-message table.user {
+    /* min-width: 90%; */
+    /*margin: auto;*/
+}
+user-message form.user .body-content {
+    white-space: pre-wrap;
+    /* max-width: 764px; */
+    max-height: 400px;
+    overflow: auto;
+}
+user-message form.user textarea[name=reply] {
     min-height: 200px;
+    /* min-width: 703px; */
+}
+user-message form.user button[type=submit] {
+    padding: 0.5em;
+    margin: 0.5em;
+    float: right
+
+}
+
+/** Table **/
+table.user td:first-child {
+    width: 20%;
+}
+
+/** Form Width**/
+user-form-login table.user,
+user-form-logout table.user,
+user-form-register table.user,
+user-form-forgotpassword table.user,
+user-form-updateprofile table.user,
+user-form-updateflags table.user,
+user-form-updatepassword table.user,
+user-form-resetpassword table.user {
+    /*max-width: 580px;*/
 }
