@@ -185,6 +185,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
         onSubmit(e) {
+            this.state.contentString = JSON.stringify(this.state.content);
+            
             e.preventDefault();
             const form = e.target;
             const formValues = Array.prototype.filter
