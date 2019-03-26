@@ -5,25 +5,12 @@ const UserTable = require("../user/UserTable");
 // const SessionAPI = require("../user/session/SessionAPI");
 
 
-class domainAPI {
+class DomainAPI {
     constructor() {
-        this.router = null;
     }
 
 
     getMiddleware() {
-        if(!this.router)
-            this.configure();
-
-        return (req, res, next) => {
-            if(!req.url.startsWith('/:domain'))
-                return next();
-            return this.router(req, res, next);
-        }
-    }
-
-    async configure() {
-        // Configure Routes
         const router = express.Router();
         router.use(express.urlencoded({ extended: true }));
         router.use(express.json());
@@ -32,7 +19,15 @@ class domainAPI {
         // Handle Domain requests
         router.get('/[:]domain/[:]json',                    async (req, res) => await this.renderDomainJSON(req, res));
         router.all('/[:]domain(/[:]edit)?',                 async (req, res) => await this.renderDomainEditor(req, res));
-        this.router = router;
+
+        return (req, res, next) => {
+            if(!req.url.startsWith('/:domain'))
+                return next();
+            return router(req, res, next);
+        }
+    }
+
+    async configure(interactive=false) {
     }
 
 
@@ -128,5 +123,5 @@ class domainAPI {
 }
 
 
-module.exports = {domainAPI: new domainAPI()};
+module.exports = {domainAPI: new DomainAPI()};
 

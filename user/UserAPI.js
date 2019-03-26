@@ -22,6 +22,9 @@ class UserAPI {
         };
     }
 
+    async configure(interactive=false) {
+    }
+
 
     getMiddleware() {
         const express = require('express');
@@ -31,7 +34,7 @@ class UserAPI {
         const sessionConfig = {}; //await localConfig.getOrCreate('session');
         // if(!sessionConfig.secret) {
         //     sessionConfig.secret = require('uuid/v4')();
-        //     await localConfig.saveAll();
+        //     localConfig.saveAll();
         // }
         sessionConfig.cookieName = 'session';
 

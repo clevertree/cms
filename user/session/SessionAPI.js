@@ -21,29 +21,8 @@ class SessionAPI {
         this.sessionConfig = config.session;
     }
 
-    async configure(config=null) {
-        // if(config && typeof config.session === 'object') {
-        //     Object.assign(this.sessionConfig, config.session);
-        // } else {
-        //     const localConfig = new LocalConfig();
-        //     const sessionConfig = await localConfig.getOrCreate('session');
-        //     Object.assign(this.sessionConfig, sessionConfig);
-        //     Object.assign(sessionConfig, this.sessionConfig);
-        //     await localConfig.saveAll()
-        // }
-        //
-        // if(config && typeof config.cookie === 'object') {
-        //     Object.assign(this.cookieConfig, config.cookie);
-        // } else {
-        //     const localConfig = new LocalConfig();
-        //     const cookieConfig = await localConfig.getOrCreate('cookie');
-        //     Object.assign(this.cookieConfig, cookieConfig);
-        //     Object.assign(cookieConfig, this.cookieConfig);
-        //     await localConfig.saveAll()
-        // }
-
+    async configure(interactive=false) {
     }
-
 
 
     getSessionMiddleware() {

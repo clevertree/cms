@@ -99,6 +99,23 @@ body.theme-minimal-afoh > footer {
     text-shadow: #6669 1px 1px 1px;
 }
 
+/** Page Sections **/
+.theme-minimal-afoh > article > section {
+    background: #3785c5;
+}
+
+
+
+/** Themed Containers **/
+.theme-minimal-afoh div.themed,
+.theme-minimal-afoh > article > section.themed {
+    /* text-shadow: #000 1px 1px 1px; */
+    background-color: #ab6428ed;
+    /* box-shadow: 2px 2px 4px #0008; */
+    border-radius: 2px;
+}
+
+
 
 /** Paragraphs **/
 
@@ -118,23 +135,6 @@ body.theme-minimal-afoh > footer {
     margin: 5px 0.5em;
     padding: 0.5em;
 }
-
-/** Page Sections **/
-.theme-minimal-afoh > article > section {
-    background: #3785c5;
-}
-
-
-
-/** Themed Containers **/
-.theme-minimal-afoh div.themed,
-.theme-minimal-afoh > article > section.themed {
-    /* text-shadow: #000 1px 1px 1px; */
-    background-color: #ab6428ed;
-    /* box-shadow: 2px 2px 4px #0008; */
-    border-radius: 2px;
-}
-
 
 /** Images **/
 .theme-minimal-afoh img.themed {

@@ -2,6 +2,7 @@ const uuidv4 = require('uuid/v4');
 
 const UserAPI = require("../../user/UserAPI");
 const UserTable = require("../../user/UserTable");
+const DomainTable = require("../../server/DomainTable");
 const ConfigureDatabaseMail = require('../mail/ConfigureDatabaseMail');
 
 const configureRequests = {};
@@ -23,8 +24,9 @@ class databaseConfigureTask {
 
         let hostname = req.server.dbClient.getHostnameFromRequest(req);
 
-        const DomainTable = req.server.dbClient.getPrimaryDomainTable();
-        const domain = await DomainTable.fetchDomainByHostname(hostname);
+        const domainTable = new DomainTable(req.server.dbClient.primaryDatabase, req.server.dbClient);
+
+        const domain = await domainTable.fetchDomainByHostname(hostname);
         if(!domain) {
             console.warn("TODO: Domain entry missing. Shouldn't happen");
             return false;

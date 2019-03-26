@@ -1,9 +1,5 @@
-const {
-    DomainRow
-} = require('../');
+const DomainRow = require('./DomainRow');
 
-
-// const ConfigManager = require('../config/config.manager');
 
 class DomainTable  {
     constructor(dbName, dbClient) {
@@ -15,14 +11,14 @@ class DomainTable  {
 
 
     /** Initiate Table **/
-    async init(dbClient) {
+    async init() {
         // Check for tables
-        if (dbClient.isMultipleDomainMode() && dbClient.primaryDatabase === this.dbName)
+        if (this.dbClient.isMultipleDomainMode() && this.dbClient.primaryDatabase === this.dbName)
             await this.dbClient.queryAsync(this.getTableSQL());
     }
 
     /** Interactive Configuration **/
-    async configure(hostname=null) {
+    async configure(hostname, interactive=false) {
 
     }
 

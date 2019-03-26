@@ -36,6 +36,7 @@ class HTTPServer {
         this.serverConfig = config.server;
         if(localConfig)
             localConfig.saveAll();
+        this.configured = false;
     }
 
     async selectDatabaseByRequest(req, orThrowError=true) {
@@ -43,11 +44,19 @@ class HTTPServer {
     }
 
 
-    async configure() {
+    async configure(interactive=false) {
+        this.configured = null;
+        await this.dbClient.configure(interactive);
+        await this.mailClient.configure(interactive);
+        for(let apiKey in this.api) {
+            if(this.api.hasOwnProperty(apiKey)) {
+                await this.api[apiKey].configure(interactive);
+            }
+        }
 
         // const defaultHostname     = (require('os').hostname()).toLowerCase();
         let serverConfig = Object.assign({}, this.serverConfig);
-        const interactiveConfig = new InteractiveConfig(serverConfig);
+        const interactiveConfig = new InteractiveConfig(serverConfig, interactive);
 
         let attempts = 3;
         while (attempts-- > 0) {
@@ -103,17 +112,18 @@ class HTTPServer {
         }
 
         const localConfig = new LocalConfig();
-        const allConfig = await localConfig.getAll();
+        const allConfig = localConfig.getAll();
         allConfig.server = serverConfig;
-        await localConfig.saveAll();
-
-        return serverConfig;
+        localConfig.saveAll();
+        this.configured = true;
     }
 
 
 
     getMiddleware() {
         const router = express.Router();
+        if(this.configured === false)
+            this.configure(false);
 
         // Routes
         for(let apiKey in this.api) {
@@ -172,9 +182,11 @@ class HTTPServer {
 
     async listen() {
         try {
-
+            // Calling .listen configures all components
             if(process && process.argv && process.argv.indexOf('--configure') !== -1) {
-                await this.configure();
+                await this.configure(true);
+            } else {
+                await this.configure(false);
             }
             // const ConfigManager = require('../config/ConfigManager');
             // await ConfigManager.configure(); // TODO: pass config?

@@ -90,7 +90,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         `).join('')}
                         <tr>
                             <td><label>Password:</label></td>
-                            <td colspan="2"><a href="${this.state.src}/:password">Edit</a></td>
+                            <td></td>
+                            <td>${this.state.editable ? `<a href="${this.state.src}/:password" class="icon-edit" title="Edit Flags">[&#x270D;]</a>` : ''}</td>
                         </tr>
                         <tr><td colspan="3"><hr/></td></tr>
                         <tr>
