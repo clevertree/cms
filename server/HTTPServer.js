@@ -36,6 +36,7 @@ class HTTPServer {
         this.serverConfig = config.server;
         if(localConfig)
             localConfig.saveAll();
+        this.configured = false;
     }
 
     async selectDatabaseByRequest(req, orThrowError=true) {
@@ -44,6 +45,7 @@ class HTTPServer {
 
 
     async configure(interactive=false) {
+        this.configured = null;
         await this.dbClient.configure(interactive);
         await this.mailClient.configure(interactive);
         for(let apiKey in this.api) {
@@ -110,15 +112,18 @@ class HTTPServer {
         }
 
         const localConfig = new LocalConfig();
-        const allConfig = await localConfig.getAll();
+        const allConfig = localConfig.getAll();
         allConfig.server = serverConfig;
-        await localConfig.saveAll();
+        localConfig.saveAll();
+        this.configured = true;
     }
 
 
 
     getMiddleware() {
         const router = express.Router();
+        if(this.configured === false)
+            this.configure(false);
 
         // Routes
         for(let apiKey in this.api) {

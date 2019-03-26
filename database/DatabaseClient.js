@@ -83,7 +83,7 @@ class DatabaseManager {
             try {
                 await this.createConnection(dbConfig);
                 this.dbConfig = dbConfig;
-                await localConfig.saveAll();
+                localConfig.saveAll();
             } catch (e) {
                 console.error(e.message);
                 if(attempts <= 0)

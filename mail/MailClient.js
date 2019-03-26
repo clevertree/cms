@@ -53,9 +53,9 @@ class MailClient {
         this.mailConfig = mailConfig;
 
         const localConfig = new LocalConfig();
-        const allConfig = await localConfig.getAll();
+        const allConfig = localConfig.getAll();
         allConfig.mail = mailConfig;
-        await localConfig.saveAll();
+        localConfig.saveAll();
         // return mailConfig;
     }
 

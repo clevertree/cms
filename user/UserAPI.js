@@ -34,7 +34,7 @@ class UserAPI {
         const sessionConfig = {}; //await localConfig.getOrCreate('session');
         // if(!sessionConfig.secret) {
         //     sessionConfig.secret = require('uuid/v4')();
-        //     await localConfig.saveAll();
+        //     localConfig.saveAll();
         // }
         sessionConfig.cookieName = 'session';
 
