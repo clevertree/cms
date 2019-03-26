@@ -3,7 +3,7 @@
     color: #FFF;
     margin: 0 0;
     font-family: "Courier New",Courier,"Lucida Sans Typewriter","Lucida Typewriter",monospace;
-    background: #010101 no-repeat fixed center;
+    /*background: #010101 no-repeat fixed center;*/
 }
 
 /** Hyperlinks **/
@@ -19,14 +19,13 @@
 
 /** Header **/
 body.theme-minimal-future > header {
-    background: linear-gradient(to top, #011 0%,#010101 100%);
+    /*background: linear-gradient(to top, #011 0%,#010101 100%);*/
+    min-height: 180px;
 }
 body.theme-minimal-future > header .title {
-    font-size: 2.5em;
-    max-width: 238px;
-    font-weight: bold;
-    margin: 5px;
+    display: none;
 }
+
 
 /** Header Tags **/
 .theme-minimal-future h1, .theme-minimal-future h2,  .theme-minimal-future h3, .theme-minimal-future h4, .theme-minimal-future h5, .theme-minimal-future h6 {
@@ -36,7 +35,7 @@ body.theme-minimal-future > header .title {
 
 /** Footer **/
 body.theme-minimal-future > footer {
-    background: linear-gradient(to bottom, #011 0%,#010101 100%);
+    /*background: linear-gradient(to bottom, #011 0%,#010101 100%);*/
     /* background: url(texture/footer.background.png); */
 }
 
@@ -44,7 +43,12 @@ body.theme-minimal-future > footer {
 
 /** Navigation **/
 .theme-minimal-future content-nav {
+    position: fixed;
+    left: 0;
+    width: 100%;
+    text-align: center;
     font-size: larger;
+    background: #011D;
 }
 
 /** Navigation Menu Colors **/
@@ -63,6 +67,8 @@ body.theme-minimal-future > footer {
 /** Page Articles & Sections **/
 body.theme-minimal-future > article {
     /*background-color: #f5d06f;*/
+    background-color: #011E;
+
 }
 
 body.theme-minimal-future > section,
@@ -70,7 +76,7 @@ body.theme-minimal-future > article > section,
 body.theme-minimal-future > footer {
     margin: 0px auto;
     max-width: 800px;
-    padding: 12px 16px;
+    padding: 2em;
     /* border: 1px solid #CCC; */
     text-shadow: #6669 1px 1px 1px;
 }
@@ -85,9 +91,9 @@ body.theme-minimal-future > footer {
 .theme-minimal-future div.themed,
 .theme-minimal-future > article > section.themed {
     /* text-shadow: #000 1px 1px 1px; */
-    background-color: #011;
+    /*background-color: #011E;*/
     /* box-shadow: 2px 2px 4px #0008; */
-    border-radius: 2px;
+    border-radius: 2em;
 }
 
 /** Paragraphs **/
