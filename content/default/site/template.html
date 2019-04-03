@@ -1,63 +1,41 @@
-<article class="themed">
-    <section class="themed">
-        <h2 id="project">Project Introduction</h2>
-        <p>
-            Welcome to the Forgotten Future Project Page.
-            You'll find information on the upcoming
-            <a href="https://github.com/clevertree/forgotten-future" target="_blank">open source</a>
-            <a href="https://en.wikipedia.org/wiki/Parallax_scrolling" target="_blank">parallax scrolling</a>
-            action/adventure game <em>Forgotten Future</em>.
-            Feel free to listen to the
-            <a href="pages/media.html?autoplay=true">Forgotten Future Title Theme</a> and check out some of the
-            <a href="pages/media.html#art">concept art</a>. Don't forget to read up on the coming <a href="pages/story.html#timeline">cataclysm</a>...
-        </p>
+<html>
+<head>
+    <link href="/site/template.css" rel="stylesheet" />
+    <script src="/site/template.js"></script>
 
-        <h2 id="what-is">What's the Story?</h2>
-        <p>
-            In <em>Forgotten Future</em>, a city-rail driver named Lem is conscripted into an assault mission
-            to the Earth's Moon in an attempt to recapture it from an unknown alien invasion force.
-            When the mission suffers unexpected setbacks, Lem finds himself in the center of a
-            cataclysmic event that would threaten to change the course of human history forever.
-        </p>
-        <p>
-            Read More: <a href="story">The Story So far...</a>
-        </p>
+    <link href=":content/:client/theme/minimal/minimal.theme.css" rel="stylesheet" />
+    <link href=":content/:client/theme/minimal/yoga/yoga.theme.css" rel="stylesheet" />
 
-        <h2 id="status">Development Status</h2>
-        <p>
-            Each section describes the current completeness of the targeted feature.
-            Click each section to view the source code behind each feature.
-            If it's something you think you can help with
-            <a href="https://github.com/clevertree/forgotten-future/blob/master/README.md" target="_blank">please
-                do!</a>
-            Subscribe below to receive updates on the <em>Forgotten Future</em> development process.
-        </p>
-        <table class="themed">
-            <caption>Development Status</caption>
-            <tr>
-                <th>Target</th>
-                <th>Complete</th>
-            </tr>
-            <tr>
-                <td><a href="https://github.com/clevertree/forgotten-future-site" target="_blank">Informational
-                    Website</a></td>
-                <td><span style="color: green;">85</span></td>
-            </tr>
-            <tr>
-                <td><a href="https://github.com/clevertree/forgotten-future/tree/master/render/shader" target="_blank">WebGL
-                    Shaders</a></td>
-                <td><span style="color: yellow">20</span></td>
-            </tr>
-            <tr>
-                <td><a href="https://github.com/clevertree/forgotten-future/tree/master/sprite" target="_blank">Sprite
-                    Sheets</a></td>
-                <td><span style="color: red">5</span></td>
-            </tr>
-            <tr>
-                <td><a href="https://github.com/clevertree/forgotten-future/tree/master/terrain" target="_blank">Physics
-                    & Terrain</a></td>
-                <td><span style="color: red">10</span></td>
-            </tr>
-        </table>
-    </section>
-</article>
+    <meta charset="UTF-8">
+    <meta content="Welcome to kittenton." name="description">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body class='theme-minimal theme-minimal-yoga'>
+<header>
+    <a href="/"><img src="/site/logo.png" alt="kittenton" class="logo"/></a>
+    <h1 class="title"><a href="<%-path%>"><%-title%></a></h1>
+    <content-nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+    </content-nav>
+</header>
+
+<%-data%>
+
+<footer>
+    <div>
+        <h2>Created With</h2>
+        <div><a class="created-by" target='_blank' href='https://github.com/clevertree/cms'>CleverTree CMS</a></div>
+        <div><a href='/:content'>[Site Index]</a> <a href='/:user'>[User Index]</a></div>
+    </div>
+    <div>
+    </div>
+    <div>
+        <h2>Contact Us</h2>
+        <div>Email: <a href="mailto:admin@kittenton">admin@kittenton</a></div>
+        <div>Address: <a href="http://maps.google.com/?q=123 clevertree ln">123 clevertree ln</a></div>
+    </div>
+</footer>
+</body>
+</html>

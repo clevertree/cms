@@ -27,7 +27,7 @@ class ContentAPI {
         // const bodyParser = require('body-parser');
 
         const router = express.Router();
-        const PM = [express.urlencoded({ extended: true }), express.json()];
+        const PM = [express.urlencoded({ extended: true, limit: '16mb' }), express.json()];
         // const SM = new SessionAPI().getMiddleware();
         // const FM = multiparty.multipartyExpress();
         // Handle Content requests
