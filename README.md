@@ -131,8 +131,8 @@ const app = express();
 app.use(express.static(__dirname));
 
 
-// Add CMS middleware
-app.use(clevertree.getMiddleware({
+// CMS Config
+const config = {
     database: {
         host: 'localhost',
         user: 'cms_user',
@@ -157,15 +157,16 @@ app.use(clevertree.getMiddleware({
     session: {
         secret: "my-random-string-6d4b-48c8-9b3d-9c6bfd506057"
     }
-}));
+};
 
-
+// Add CMS middleware
+app.use(clevertreeCMS.getMiddleware(config));
 
 // Launch your server
-const httpPort = 8080;
-app.listen(httpPort, function() {
-    console.log('Example app listening on port: ' + httpPort);
+app.listen(config.server.httpPort, function() {
+    console.log('Example app listening on port: ' + config.server.httpPort);
 });
+
 ```
 
 ### Run Server

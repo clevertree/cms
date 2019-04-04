@@ -89,6 +89,10 @@ body.theme-minimal-yoga .title a {
     text-decoration: none;
 }
 
+.theme-minimal-yoga ul li {
+    max-width: 700px;
+    margin: auto;
+}
 
 /** Paragraphs **/
 .theme-minimal-yoga p {

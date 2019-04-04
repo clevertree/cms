@@ -7,12 +7,12 @@
     <link href=":content/:client/theme/minimal/yoga/yoga.theme.css" rel="stylesheet" />
 
     <meta charset="UTF-8">
-    <meta content="Welcome to kittenton." name="description">
+    <meta content="Welcome to <%-hostname%>." name="description">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body class='theme-minimal theme-minimal-yoga'>
 <header>
-    <a href="/"><img src="/site/logo.png" alt="kittenton" class="logo"/></a>
+    <a href="/"><img src="/site/logo.png" alt="<%-hostname%>" class="logo"/></a>
     <h1 class="title"><a href="<%-path%>"><%-title%></a></h1>
     <content-nav>
         <a href="/">Home</a>
@@ -33,7 +33,7 @@
     </div>
     <div>
         <h2>Contact Us</h2>
-        <div>Email: <a href="mailto:admin@kittenton">admin@kittenton</a></div>
+        <div>Email: <a href="mailto:admin@<%-hostname%>">admin@<%-hostname%></a></div>
         <div>Address: <a href="http://maps.google.com/?q=123 clevertree ln">123 clevertree ln</a></div>
     </div>
 </footer>
