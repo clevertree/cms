@@ -214,7 +214,7 @@ class DatabaseManager {
         if(!dbConfig)
             throw new Error("Invalid Database Config");
         if(this.db) {
-            console.warn("Closing existing DB Connection");
+            // console.warn("Closing existing DB Connection");
             this.db.end();
         }
 
