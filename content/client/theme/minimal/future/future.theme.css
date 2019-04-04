@@ -27,6 +27,49 @@ body.theme-minimal-future > header .title {
 }
 
 
+
+/** Header **/
+body.theme-minimal-future > header {
+    /* background: linear-gradient(to top, #EEE 0%, #CCC 100%); */
+    text-align: center;
+    /* border-bottom: solid 1px #CCC; */
+}
+
+/** Title Text **/
+body.theme-minimal-future > header h1 {
+    display: inline-block;
+    max-width: 300px;
+}
+
+/** Title Logo **/
+body.theme-minimal-future > header img.logo {
+    vertical-align: top;
+    max-width: 300px;
+    max-height: 100px;
+    margin: 4px;
+    object-fit: contain;
+}
+
+/** Footer **/
+body.theme-minimal-future > footer {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    /* background: linear-gradient(to bottom, #EEE 0%, #CCC 100%); */
+}
+
+
+/** Page Articles & Sections **/
+body.theme-minimal-future > section,
+body.theme-minimal-future > article > section,
+body.theme-minimal-future > footer {
+    /*margin: 6px auto;*/
+    /* max-width: 800px; */
+    /*padding: 1px 16px;*/
+    /* border: 1px solid #CCC; */
+}
+
+
 /** Header Tags **/
 .theme-minimal-future h1, .theme-minimal-future h2,  .theme-minimal-future h3, .theme-minimal-future h4, .theme-minimal-future h5, .theme-minimal-future h6 {
     color: #fff6d4;

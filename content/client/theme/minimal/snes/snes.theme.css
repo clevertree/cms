@@ -27,7 +27,8 @@
 
 /** Background **/
 body.theme-minimal-snes {
-    background: #111 url(texture/default.background.png) no-repeat fixed center;
+    background: #111;
+    /*background: #111 url(texture/default.background.png) no-repeat fixed center;*/
     max-width: 80em;
     margin: 0 auto;
     /*background: #b5b6e4 url(texture/default.background.png) no-repeat fixed center;*/
@@ -35,6 +36,69 @@ body.theme-minimal-snes {
     font-size: 16px;
 }
 
+
+
+/** Hyperlinks **/
+.theme-minimal-snes > header a,
+.theme-minimal-snes > footer a,
+.theme-minimal-snes > article > section a {
+    /*color: #FFF;*/
+    /*text-decoration: none;*/
+    /* text-decoration-color: #CCCC; */
+}
+
+body.theme-minimal-snes > header a:not(:hover) {
+    text-decoration: none;
+}
+
+
+
+
+/** Header **/
+body.theme-minimal-snes > header {
+    /* background: linear-gradient(to top, #EEE 0%, #CCC 100%); */
+    text-align: center;
+    /* border-bottom: solid 1px #CCC; */
+}
+
+/** Title Text **/
+body.theme-minimal-snes > header h1 {
+    display: inline-block;
+    max-width: 300px;
+}
+
+/** Title Logo **/
+body.theme-minimal-snes > header img.logo {
+    vertical-align: top;
+    max-width: 400px;
+    max-height: 100px;
+    margin: 4px;
+    object-fit: contain;
+}
+
+/** Footer **/
+body.theme-minimal-snes > footer {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    /* background: linear-gradient(to bottom, #EEE 0%, #CCC 100%); */
+}
+
+
+/** Page Articles & Sections **/
+body.theme-minimal-snes > section,
+body.theme-minimal-snes > article > section,
+body.theme-minimal-snes > footer {
+    /*margin: 6px auto;*/
+    /* max-width: 800px; */
+    /*padding: 1px 16px;*/
+    /* border: 1px solid #CCC; */
+}
+
+.theme-minimal-snes header,
+.theme-minimal-snes footer {
+    color: #DDD;
+}
 
 /** Page Articles **/
 .theme-minimal-snes > article {
@@ -54,5 +118,14 @@ body.theme-minimal-snes {
 
 .theme-minimal-snes > article > section:nth-child(odd) {
     background: #bbb;
+}
+
+/** Navigation Menu Colors **/
+.theme-minimal-snes content-nav ul.menu > li:hover > a,
+.theme-minimal-snes content-nav ul.submenu {
+    background-color: #DDDE;
+}
+.theme-minimal-snes content-nav ul.submenu > li:hover > a {
+    background-color: #EEEE;
 }
 

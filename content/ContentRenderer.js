@@ -1,3 +1,4 @@
+const path = require('path');
 // const { JSDOM } = require('jsdom');
 const cheerio = require('cheerio');
 const beautify_html = require('js-beautify').html;
@@ -85,8 +86,20 @@ class ContentRenderer {
             head.append(`<meta name="content:id" content="${content.id}">`);
 
         for(let i=0; i<customElms.length; i++) {
-            const customElementSourceFile = this.getCustomElementSourceFile(customElms[i]);
-            head.append(`<script src="${customElementSourceFile}" ></script>`);
+            const customElementSourceFiles = this.getCustomElementSourceFiles(customElms[i]);
+            for(let j=0; j<customElementSourceFiles.length; j++) {
+                const sourceFile = customElementSourceFiles[j];
+                switch(path.extname(sourceFile).toLowerCase()) {
+                    case '.js':
+                        head.append(`<script src="${sourceFile}" ></script>`);
+                        break;
+                    case '.css':
+                        head.append(`<link href="${sourceFile}" rel="stylesheet" />`);
+                        break;
+                    default:
+                        throw new Error("Invalid source file: " + sourceFile);
+                }
+            }
         }
 
         html = DOM.html(); // .window.document.documentElement.outerHTML;
@@ -99,11 +112,17 @@ class ContentRenderer {
         // prependHTML += await TaskAPI.getSessionHTML(req);
     }
 
-    getCustomElementSourceFile(customName) {
-        if(typeof CUSTOM_ELEMENT_SOURCE[customName] !== "undefined")
-            return CUSTOM_ELEMENT_SOURCE[customName];
-        const split = customName.split('-');
-        return `/:${split[0]}/:client/${split[1]}/${customName}.element.js`;
+    getCustomElementSourceFiles(customName) {
+        let sourceFiles = [];
+        if(typeof GLOBAL_ELEMENT_SOURCE[customName] !== "undefined") {
+            sourceFiles = GLOBAL_ELEMENT_SOURCE[customName];
+            if(!Array.isArray(sourceFiles))
+                sourceFiles = [sourceFiles];
+        } else {
+            const split = customName.split('-');
+            sourceFiles.push(`/:${split[0]}/:client/${split[1]}/${customName}.element.js`);
+        }
+        return sourceFiles;
     }
 
     async send(req, res, content) {
@@ -114,13 +133,26 @@ class ContentRenderer {
     }
 
 }
+
 ContentRenderer.send = function(req, res, content) {
     const renderer = new ContentRenderer();
     renderer.send(req, res, content);
 }
+
+ContentRenderer.addGlobalElementSource = function(customElementName, sourceURL) {
+    GLOBAL_ELEMENT_SOURCE[customElementName] = sourceURL;
+}
+ContentRenderer.addGlobalElementSources = function(keyPairs) {
+    for(let key in keyPairs) {
+        if(keyPairs.hasOwnProperty(key)) {
+            ContentRenderer.addGlobalElementSource(key, keyPairs[key]);
+        }
+    }
+}
+
 module.exports = ContentRenderer;
 
-const CUSTOM_ELEMENT_SOURCE = {
+const GLOBAL_ELEMENT_SOURCE = {
     // 'config-editor':        '/:config/:client/config-editor.element.js',
     //
     // 'content-form-add':          '/:content/:client/content-form-add.element.js',

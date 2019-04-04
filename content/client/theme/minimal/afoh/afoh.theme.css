@@ -41,8 +41,16 @@ body.theme-minimal-afoh {
     /* text-decoration-color: #CCCC; */
 }
 
+body.theme-minimal-afoh > header a:not(:hover) {
+    text-decoration: none;
+}
+
+
+
 /** Header **/
 body.theme-minimal-afoh > header {
+    /* background: linear-gradient(to top, #EEE 0%, #CCC 100%); */
+    text-align: center;
     background: linear-gradient(to bottom, #487bb3 0%, #88a9cc 1%,#487bb3 2%,#1b589b 98%,#022035 100%);
 }
 body.theme-minimal-afoh > header .title {
@@ -51,6 +59,44 @@ body.theme-minimal-afoh > header .title {
     font-weight: bold;
     margin: 5px;
 }
+
+/** Title Text **/
+body.theme-minimal-afoh > header h1 {
+    display: inline-block;
+    max-width: 300px;
+}
+
+/** Title Logo **/
+body.theme-minimal-afoh > header img.logo {
+    vertical-align: top;
+    max-width: 300px;
+    max-height: 100px;
+    margin: 4px;
+    object-fit: contain;
+}
+
+/** Footer **/
+body.theme-minimal-afoh > footer {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    /* background: linear-gradient(to bottom, #EEE 0%, #CCC 100%); */
+}
+
+
+/** Page Articles & Sections **/
+body.theme-minimal-afoh > section,
+body.theme-minimal-afoh > article > section,
+body.theme-minimal-afoh > footer {
+    /*margin: 6px auto;*/
+    /* max-width: 800px; */
+    /*padding: 1px 16px;*/
+    /* border: 1px solid #CCC; */
+}
+
+
+
+/** Header **/
 
 /** Header Tags **/
 .theme-minimal-afoh h1, .theme-minimal-afoh h2,  .theme-minimal-afoh h3, .theme-minimal-afoh h4, .theme-minimal-afoh h5, .theme-minimal-afoh h6 {
