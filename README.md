@@ -50,7 +50,7 @@ with a primary goal for **all** of its content is transferable with other UCMS b
 * Quick-Start server configuration
 * Topical MVC - Database / API / client files must exist within the same topic directory
 * Maximum server performance with minimal overhead
-* Minimal HTML output! Example: [Login Page](https://www.afoh.info/:user/:login)  (46 lines of HTML total)
+* Minimal HTML output! Example: [Login Page](https://www.snesology.net/:user/:login)  (46 lines of HTML total)
   * Use as few tags as possible and keep documents small so they render quickly
 * Content only! No CMS-specific tags, prefixes, or support libraries on ANY rendered output
 * No server admins required - DNS SOA email authorizes administrator
@@ -61,8 +61,8 @@ with a primary goal for **all** of its content is transferable with other UCMS b
 #### Client-side Sharable customElements 
 * Sharable customElements between websites
 * Server determines the client-side dependencies for each customElement based on it's name _automatically_. Examples:
-  * [\<user-message>\</user-message>](https://www.afoh.info/:user/:client/message/user-message.element.js) is found at `https://www.afoh.info/:user/:client/message/user-message.element.js`
-  * [\<content-nav>\</content-nav>](https://www.afoh.info/:content/:client/nav/content-nav.element.js) is found at `https://www.afoh.info/:content/:client/nav/content-nav.element.js`
+  * [\<user-message>\</user-message>](https://www.snesology.net/:user/:client/message/user-message.element.js) is found at `https://www.snesology.net/:user/:client/message/user-message.element.js`
+  * [\<content-nav>\</content-nav>](https://www.snesology.net/:content/:client/nav/content-nav.element.js) is found at `https://www.snesology.net/:content/:client/nav/content-nav.element.js`
 * End-user HTML content only needs to contain the customElement tag and the dependencies will be found 
 * Encapsulated in a single client-side customElement containing:
   * Model - Requests a copy of the model from the API as it relates to the module
@@ -79,9 +79,8 @@ with a primary goal for **all** of its content is transferable with other UCMS b
 
 
 ### Sites Powered by CleverTree CMS
-* https://afoh.info - Arizona Friends of Homeless 
-* https://tybee.yoga/ - Tybee Yoga and Healing Arts
-* https://ffga.me/ - Forgotten Future Game
+* https://snesology.net/ - Free Digital Audio Workstation based on Super Nintendo Samples
+* https://ffga.me/ - Forgotten Future Video Game
 
 
 # Installation (Stand alone)
